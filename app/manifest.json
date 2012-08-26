@@ -14,5 +14,11 @@
     "default_icon": "assets/images/icon_19_grey.png",
     "popup": "popup.html"
   },
+  "content_scripts": [{
+      "matches" : ["http://oauth.vk.com/*"],
+      "js" : ["modules/background/auth/vk.js"],
+      "run_at" : "document_end",
+      "all_frames" : true
+  }],
   "minimum_chrome_version" : "10"
 }
