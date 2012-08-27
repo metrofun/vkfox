@@ -1,6 +1,6 @@
 "use strict";
 require.config({
-    baseUrl: '/modules/background',
+    baseUrl: '/modules/popup',
     paths: {
         jquery: '/assets/js/jquery-1.7.2.min',
         underscore: '/assets/js/underscore-min',
@@ -17,5 +17,6 @@ require.config({
         }
     }
 });
-require(['auth/auth', 'newsfeed/newsfeed', 'updates/updates'], function(){
+require(['mediator/mediator'], function (Mediator) {
+    Mediator.pub('popup:zzz', {a: 1111});
 });

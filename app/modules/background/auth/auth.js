@@ -13,17 +13,18 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
             initialize: function() {
                 var loginUrl;
 
-                chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
-                    var url = request.location;
-                    if (request.from == 'auth/vk.js') {
-                        try {
-                            this.set('accessToken',  url.match(/access_token=([^&]+)/i)[1]);
-                            this.set('userId',  url.match(/user_id=([^&]+)/i)[1]);
-                        } catch(e) {
-                            // FIXME empty catch?
-                        }
+                Mediator.sub('auth:iframe', function(url) {
+                    try {
+                        this.set('accessToken',  url.match(/access_token=([^&]+)/i)[1]);
+                        this.set('userId',  url.match(/user_id=([^&]+)/i)[1]);
+                    } catch(e) {
+                        // FIXME empty catch?
                     }
                 }.bind(this));
+
+                // FIXME http://code.google.com/p/chromium/issues/detail?id=63122
+                chrome.extension.onRequest.addListener(function(){});
+
                 this.on('change:accessToken', function() {
                     Mediator.pub('auth:success', {
                         accessToken: this.get('accessToken'),

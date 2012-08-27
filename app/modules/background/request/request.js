@@ -72,7 +72,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                 dataType: type
             });
         },
-        queryApi: function(params, callback) {
+        api: function(params, callback) {
             var queryDeferred = new jQuery.Deferred();
             apiQueriesQueue.push({
                 params: params,
@@ -97,7 +97,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                     }
 
                     if (method === 'execute') {
-                        executeCodeTokens.push( params.code );
+                        executeCodeTokens.push( params.code.replace(/^return\s*|;$/g, '') );
                     } else {
                         // TODO not implemented
                         throw 'not implemented';
@@ -113,7 +113,6 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                         access_token: accessToken
                     },
                     function(data) {
-                        console.log(data);
                         var response = data.response, i;
                         for (i=0; i < response.length; i++) {
                             queriesToProcess[i].deferred.resolve(response[i]);

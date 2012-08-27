@@ -1,24 +1,27 @@
 {
-  "name": "VKfox - клиент для \"В контакте\"",
-  "version": "5",
-  "description": "__MSG_ext_description__",
-  "icons": {
-      "32": "assets/images/icon_32.png",
-      "48": "assets/images/icon_48.png",
-      "128": "assets/images/icon_128.png"
-  },
-  "background_page": "background.html",
-  "permissions": ["tabs", "http://*.vkontakte.ru/*","http://*.vk.com/*", "https://*.vkontakte.ru/*","https://*.vk.com/*", "bookmarks", "notifications"],
-  "browser_action": {
-    "default_title": "VKfox",
-    "default_icon": "assets/images/icon_19_grey.png",
-    "popup": "popup.html"
-  },
-  "content_scripts": [{
-      "matches" : ["http://oauth.vk.com/*"],
-      "js" : ["modules/background/auth/vk.js"],
-      "run_at" : "document_end",
-      "all_frames" : true
-  }],
-  "minimum_chrome_version" : "10"
+        "name": "VKfox - клиент для \"В контакте\"",
+        "version": "5",
+        "manifest_version": 2,
+        "description": "__MSG_ext_description__",
+        "icons": {
+            "32": "assets/images/icon_32.png",
+            "48": "assets/images/icon_48.png",
+            "128": "assets/images/icon_128.png"
+        },
+        "background": {
+            "page": "background.html"
+        },
+        "permissions": ["tabs", "http://*.vkontakte.ru/*","http://*.vk.com/*", "https://*.vkontakte.ru/*","https://*.vk.com/*", "bookmarks", "notifications"],
+        "browser_action": {
+            "default_title": "VKfox",
+            "default_icon": "assets/images/icon_19_grey.png",
+            "default_popup": "popup.html"
+        },
+        "content_scripts": [{
+            "matches" : ["http://oauth.vk.com/*"],
+            "js" : ["modules/background/auth/vk.js"],
+            "run_at" : "document_end",
+            "all_frames" : true
+        }],
+        "minimum_chrome_version" : "10"
 }
