@@ -2,10 +2,10 @@
 require.config({
     baseUrl: '/modules/background',
     paths: {
-        jquery: '/assets/js/jquery-1.7.2.min',
-        underscore: '/assets/js/underscore-min',
-        jtoh: '/assets/js/jtoh',
-        backbone: '/assets/js/backbone-min'
+        jquery: '/assets/libs/jquery-1.7.2.min',
+        underscore: '/assets/libs/underscore-min',
+        jtoh: '/assets/libs/jtoh',
+        backbone: '/assets/libs/backbone-min'
     },
     shim: {
         'underscore': {
@@ -17,5 +17,5 @@ require.config({
         }
     }
 });
-require(['auth/auth', 'newsfeed/newsfeed', 'updates/updates'], function(){
+require(['auth/auth', 'newsfeed/newsfeed', 'updates/updates'], function () {
 });
