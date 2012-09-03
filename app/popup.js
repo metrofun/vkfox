@@ -17,6 +17,5 @@ require.config({
         }
     }
 });
-require(['mediator/mediator'], function (Mediator) {
-    Mediator.pub('popup:zzz', {a: 1111});
+require(['newsfeed/newsfeed'], function () {
 });

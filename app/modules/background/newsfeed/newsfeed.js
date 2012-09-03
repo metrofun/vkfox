@@ -4,8 +4,8 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
         MAX_ITEMS_COUNT = 50,
 
         NewsfeedModel = Backbone.Model.extend({
+            startTime: 'API.getServerTime() - 1 * 24 * 60 * 60',
             defaults: {
-                startTime: 'API.getServerTime() - 1 * 24 * 60 * 60',
                 groups: new Backbone.Collection(),
                 profiles: new Backbone.Collection(),
                 items : new Backbone.Collection()
@@ -14,15 +14,19 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                 Mediator.sub('auth:success', function () {
                     request.api({
                         code: ['return { "news" : API.newsfeed.get({start_time: ',
-                            this.get('startTime'), ', "count" : "', MAX_ITEMS_COUNT,
+                            this.startTime, ', "count" : "', MAX_ITEMS_COUNT,
                             '"}), "time" : API.getServerTime()};'].join('')
                     }).done(function (response) {
-                        this.set('startTime',  response.time);
-                        console.log(new Backbone.Collection.extend({model: Backbone.Model.extend({})}));
+                        this.startTime = response.time;
+
                         this.get('groups').add(response.news.groups);
                         this.get('profiles').add(response.news.groups);
                         this.get('items').add(response.news.items);
                     }.bind(this));
+                }.bind(this));
+
+                Mediator.sub('newsfeed:view', function () {
+                    Mediator.pub('newsfeed:data', this.toJSON());
                 }.bind(this));
             }
         }),

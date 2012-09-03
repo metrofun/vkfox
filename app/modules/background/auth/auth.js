@@ -1,5 +1,5 @@
 define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
-    function(Mediator, jtoh, template, jQuery, Backbone) {
+    function (Mediator, jtoh, template, jQuery, Backbone) {
         var
         APP_ID = 1920884,
         AUTH_DOMAIN = 'http://oauth.vk.com/',
@@ -10,22 +10,22 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
                 accessToken: undefined,
                 userId: undefined
             },
-            initialize: function() {
+            initialize: function () {
                 var loginUrl;
 
-                Mediator.sub('auth:iframe', function(url) {
+                Mediator.sub('auth:iframe', function (url) {
                     try {
-                        this.set('accessToken',  url.match(/access_token=([^&]+)/i)[1]);
-                        this.set('userId',  url.match(/user_id=([^&]+)/i)[1]);
-                    } catch(e) {
+                        this.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
+                        this.set('userId',  url.match(/user_id=(\w+)(?:&|$)/i)[1]);
+                    } catch (e) {
                         // FIXME empty catch?
                     }
                 }.bind(this));
 
                 // FIXME http://code.google.com/p/chromium/issues/detail?id=63122
-                chrome.extension.onRequest.addListener(function(){});
+                chrome.extension.onRequest.addListener(function () {});
 
-                this.on('change:accessToken', function() {
+                this.on('change:accessToken', function () {
                     Mediator.pub('auth:success', {
                         accessToken: this.get('accessToken'),
                         userId: this.get('userId')
@@ -45,9 +45,9 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
                 ].join('');
                 this.$iframe = jQuery(jtoh.compile(template)(loginUrl)).appendTo(this.el);
             }
-        });
+        }),
 
-        new AuthModel();
+        authModel = new AuthModel();
     }
 );
 

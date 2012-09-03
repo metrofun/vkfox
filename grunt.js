@@ -1,13 +1,12 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     grunt.initConfig({
         recess: {
-            all: {
+            design: {
                 src: [
-                    'bootstrap/less/bootstrap.less',
-                    'style.less'
+                    'design/*.less'
                 ],
-                dest: 'style.css',
+                dest: 'design/style.css',
                 options: {
                     compile: true
                 }
@@ -23,7 +22,7 @@ module.exports = function(grunt) {
         },
         watch: {
             less: {
-                files: ['<config:recess.all.src>', 'bootstrap/less/variables.less'],
+                files: ['<config:recess.design.src>'],
                 tasks: 'recess'
             }
         }

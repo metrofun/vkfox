@@ -1,4 +1,4 @@
-(function(root){
+(function (root) {
     "use strict";
 
     var emptyTagNames = ['area', 'base', 'br', 'col', 'hr', 'img', 'input', 'link', 'meta', 'param'];
@@ -16,20 +16,20 @@
         return htmlTokens;
     }
 
-    function precompile(json){
+    function precompile(template) {
         var tagNameRaw, attributes, innerHtmlTokens,
             htmlTokens, attrName, attrValRaw, attrsTokens = [];
 
-        if (Array.isArray(json)) {
-            htmlTokens = json.map(function(json){
-                return precompile(json);
+        if (Array.isArray(template)) {
+            htmlTokens = template.map(function (template) {
+                return precompile(template);
             });
-        } else if (typeof json === 'object') {
-            attributes = json.attributes;
+        } else if (typeof template === 'object') {
+            attributes = template.attributes;
 
-            if (json.className) {
+            if (template.className) {
                 attributes = attributes || {};
-                attributes['class'] = json.className;
+                attributes['class'] = template.className;
             }
 
             for (attrName in attributes) {
@@ -46,18 +46,18 @@
                 }
             }
 
-            tagNameRaw = json.tagName;
+            tagNameRaw = template.tagName;
             if (typeof tagNameRaw === 'function') {
-                innerHtmlTokens = precompile(json.innerHTML);
+                innerHtmlTokens = precompile(template.innerHTML);
                 htmlTokens = [function(){
                     var tagName = tagNameRaw.apply(this, arguments);
                     return (typeof tagName !== 'undefined') ? tokenizeElement(tagName, attrsTokens, innerHtmlTokens) : [];
                 }];
             } else {
-                htmlTokens = tokenizeElement(tagNameRaw, attrsTokens, precompile(json.innerHTML));
+                htmlTokens = tokenizeElement(tagNameRaw, attrsTokens, precompile(template.innerHTML));
             }
-        } else if (typeof json === 'string') {
-            htmlTokens = [json];
+        } else if (typeof template !== 'undefined') {
+            htmlTokens = [template];
         } else {
             htmlTokens = [];
         }
@@ -65,14 +65,19 @@
         return htmlTokens;
     };
 
-    function compile(json) {
-        var precompiled = precompile(json);
+    function compile(template) {
+        var precompiled = precompile(template);
 
-        return function process(precompiled){
-            var args = [].slice.call(arguments, 1),
-                compiled = precompiled.map(function(strOrFunc){
+        return function process(precompiledOrTemplate){
+            var args = [].slice.call(arguments, 1), compiled;
+            // If precompiled, then array of strings or functions
+            if (!Array.isArray(precompiledOrTemplate)) {
+                precompiledOrTemplate = precompile(precompiledOrTemplate);
+            }
+            compiled = precompiledOrTemplate.map(function(strOrFunc){
                 return (typeof strOrFunc === 'function')?process.apply(this, [strOrFunc.apply(this, args)].concat(args)):strOrFunc;
             });
+
             return compiled.join('');
         }.bind(this, precompiled);
     }
