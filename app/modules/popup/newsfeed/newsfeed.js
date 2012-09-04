@@ -6,12 +6,12 @@ define(['backbone', 'mediator/mediator', 'newsfeed/item-view'],
             initialize: function () {
                 Mediator.pub('newsfeed:view');
                 Mediator.sub('newsfeed:data', function (data) {
-                    data.items.forEach(function (item) {
-                        var itemView = new ItemView({
-                            el: this.el,
-                            model: new Backbone.Model(item)
-                        });
-                    }, this);
+                    // data.items.forEach(function (item) {
+                        // var itemView = new ItemView({
+                            // el: this.el,
+                            // model: new Backbone.Model(item)
+                        // });
+                    // }, this);
                 }.bind(this));
             }
         }),

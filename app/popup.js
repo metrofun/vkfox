@@ -17,5 +17,5 @@ require.config({
         }
     }
 });
-require(['newsfeed/newsfeed'], function () {
+require(['app/app', 'newsfeed/newsfeed'], function () {
 });

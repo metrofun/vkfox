@@ -20,39 +20,43 @@
         var tagNameRaw, attributes, innerHtmlTokens,
             htmlTokens, attrName, attrValRaw, attrsTokens = [];
 
+        function attrsTokensFactory(attrName, attrValRaw) {
+            var attrVal = attrValRaw.apply(this, [].slice.call(arguments, 2));
+            attrVal = ('' + attrVal).replace(/"/g, '&quot;');
+            return (typeof attrVal !== 'undefined') ? [' ', attrName, '="', attrVal, '"']:[];
+        }
+
         if (Array.isArray(template)) {
-            htmlTokens = template.map(function (template) {
-                return precompile(template);
+            htmlTokens = [];
+            template.forEach(function (template) {
+                htmlTokens = htmlTokens.concat(precompile(template));
             });
         } else if (typeof template === 'object') {
-            attributes = template.attributes;
+            attributes = template.attributes || {};
 
             if (template.className) {
-                attributes = attributes || {};
                 attributes['class'] = template.className;
             }
 
-            for (attrName in attributes) {
+            Object.keys(attributes).forEach(function (attrName) {
                 attrValRaw = attributes[attrName];
                 if (typeof attrValRaw === 'function') {
-                    attrsTokens = attrsTokens.concat(function(attrValRaw) {
-                        var attrVal = attrValRaw.apply(this, [].slice.call(arguments, 1));
-                        attrVal = ('' + attrVal).replace(/"/g, '&quot;');
-                        return (typeof attrVal !== 'undefined') ? [' ', attrName, '="', attrVal, '"']:[];
-                    }.bind(this, attrValRaw));
+                    attrsTokens = attrsTokens.concat(attrsTokensFactory.bind(this, attrName, attrValRaw));
                 } else {
                     attrValRaw = ('' + attrValRaw).replace(/"/g, '&quot;');
                     attrsTokens = attrsTokens.concat([' ', attrName, '="', attrValRaw, '"']);
                 }
-            }
+            });
 
             tagNameRaw = template.tagName;
             if (typeof tagNameRaw === 'function') {
                 innerHtmlTokens = precompile(template.innerHTML);
-                htmlTokens = [function(){
+                htmlTokens = [function () {
                     var tagName = tagNameRaw.apply(this, arguments);
                     return (typeof tagName !== 'undefined') ? tokenizeElement(tagName, attrsTokens, innerHtmlTokens) : [];
                 }];
+            } else if (typeof tagNameRaw === 'undefined') {
+                htmlTokens = tokenizeElement('div', attrsTokens, precompile(template.innerHTML));
             } else {
                 htmlTokens = tokenizeElement(tagNameRaw, attrsTokens, precompile(template.innerHTML));
             }
@@ -63,19 +67,19 @@
         }
 
         return htmlTokens;
-    };
+    }
 
     function compile(template) {
         var precompiled = precompile(template);
 
-        return function process(precompiledOrTemplate){
+        return function process(precompiledOrTemplate) {
             var args = [].slice.call(arguments, 1), compiled;
             // If precompiled, then array of strings or functions
-            if (!Array.isArray(precompiledOrTemplate)) {
-                precompiledOrTemplate = precompile(precompiledOrTemplate);
-            }
-            compiled = precompiledOrTemplate.map(function(strOrFunc){
-                return (typeof strOrFunc === 'function')?process.apply(this, [strOrFunc.apply(this, args)].concat(args)):strOrFunc;
+            // if (!Array.isArray(precompiledOrTemplate)) {
+            precompiledOrTemplate = precompile(precompiledOrTemplate);
+            // }
+            compiled = precompiledOrTemplate.map(function (strOrFunc) {
+                return (typeof strOrFunc === 'function') ? process.apply(this, [strOrFunc.apply(this, args)].concat(args)):strOrFunc;
             });
 
             return compiled.join('');
@@ -85,7 +89,7 @@
     function factory() {
         return {
             compile: compile
-        }
+        };
     }
 
     if (typeof define === 'function' && define.amd) {
@@ -93,7 +97,7 @@
     } else {
         root.jtoh = factory();
     }
-})(typeof window === 'undefined'?global:window);
+})(typeof window === 'undefined' ? global:window);
 
 // console.log(jtoh.compile({
     // tagName: function(){return 'tr'},

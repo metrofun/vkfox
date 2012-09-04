@@ -10,20 +10,32 @@ module.exports = function (grunt) {
                 options: {
                     compile: true
                 }
+            },
+            less: {
+                src: 'app/_style.less',
+                dest: 'app/style.css',
+                options: {
+                    compile: true
+                }
             }
         },
-        lint: {
-            all: ['grunt.js', 'lib/**/*.js', 'test/**/*.js']
-        },
-        jshint: {
-            options: {
-                browser: true
+        concat: {
+            less: {
+                src: [
+                    'app/style.less',
+                    'app/modules/popup/*/*.less'
+                ],
+                dest: 'app/_style.less'
             }
         },
         watch: {
-            less: {
+            design: {
                 files: ['<config:recess.design.src>'],
-                tasks: 'recess'
+                tasks: 'recess:design'
+            },
+            less: {
+                files: ['<config:concat.less.src>'],
+                tasks: 'concat:less recess:less'
             }
         }
     });
