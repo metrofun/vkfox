@@ -43,7 +43,7 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
                         'display=popup'
                     ].join('&')
                 ].join('');
-                this.$iframe = jQuery(jtoh.compile(template)(loginUrl)).appendTo(this.el);
+                this.$iframe = jQuery(jtoh(template).build(loginUrl)).appendTo(this.el);
             }
         }),
 

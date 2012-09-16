@@ -4,7 +4,6 @@ define(['backbone', 'app/app.tpl'], function (Backbone, template) {
         el: document.body,
         template: template,
         initialize: function () {
-            console.log(template);
             this.$el.append(template());
         }
     }),

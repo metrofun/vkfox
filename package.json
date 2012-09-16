@@ -2,6 +2,7 @@
     "name": "vkfox",
     "version": "5.0.0",
     "dependencies": {
-        "grunt-recess": ">= 0.1.1"
+        "grunt-recess": ">= 0.1.1",
+        "grunt-clean": ">= 0.1.0"
     }
 }

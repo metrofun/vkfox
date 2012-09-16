@@ -20,7 +20,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                         this.startTime = response.time;
 
                         this.get('groups').add(response.news.groups);
-                        this.get('profiles').add(response.news.groups);
+                        this.get('profiles').add(response.news.profiles);
                         this.get('items').add(response.news.items);
                     }.bind(this));
                 }.bind(this));

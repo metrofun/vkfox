@@ -5,7 +5,7 @@ require.config({
         jquery: '/assets/libs/jquery-1.7.2.min',
         underscore: '/assets/libs/underscore-min',
         jtoh: '/assets/libs/jtoh',
-        backbone: '/assets/libs/backbone-min'
+        backbone: '/assets/libs/backbone'
     },
     shim: {
         'underscore': {
@@ -14,8 +14,12 @@ require.config({
         'backbone': {
             deps: ['underscore', 'jquery'],
             exports: 'Backbone'
+        },
+        'jsonpath': {
+            exports: 'jsonPath'
         }
     }
 });
+window.console = chrome.extension.getBackgroundPage().console;
 require(['app/app', 'newsfeed/newsfeed'], function () {
 });

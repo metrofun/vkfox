@@ -19,6 +19,9 @@ module.exports = function (grunt) {
                 }
             }
         },
+        clean: {
+            less: 'app/_style.less'
+        },
         concat: {
             less: {
                 src: [
@@ -35,14 +38,15 @@ module.exports = function (grunt) {
             },
             less: {
                 files: ['<config:concat.less.src>'],
-                tasks: 'concat:less recess:less'
+                tasks: 'concat:less recess:less clean:less'
             }
         }
     });
 
 
     grunt.loadNpmTasks('grunt-recess');
+    grunt.loadNpmTasks('grunt-clean');
 
-    grunt.registerTask('default', 'recess');
+    grunt.registerTask('default', 'watch:less');
 
 };

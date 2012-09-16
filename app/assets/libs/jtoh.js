@@ -73,12 +73,10 @@
         var precompiled = precompile(template);
 
         return function process(precompiledOrTemplate) {
-            var args = [].slice.call(arguments, 1), compiled;
-            // If precompiled, then array of strings or functions
-            // if (!Array.isArray(precompiledOrTemplate)) {
-            precompiledOrTemplate = precompile(precompiledOrTemplate);
-            // }
-            compiled = precompiledOrTemplate.map(function (strOrFunc) {
+            var args = [].slice.call(arguments, 1), compiled,
+                precompiled = precompile(precompiledOrTemplate);
+
+            compiled = precompiled.map(function (strOrFunc) {
                 return (typeof strOrFunc === 'function') ? process.apply(this, [strOrFunc.apply(this, args)].concat(args)):strOrFunc;
             });
 
@@ -86,9 +84,36 @@
         }.bind(this, precompiled);
     }
 
+    function getElementsByClassName(json, needle) {
+        var elementClassName, result = [], isMatched;
+        if (Array.isArray(json)) {
+            json.forEach(function (json) {
+                result = result.concat(getElementsByClassName(json, needle));
+            });
+        } else if (typeof json === 'object') {
+            elementClassName = ' ' + (json.className || json.attributes.class) + ' ';
+            isMatched = needle.split(' ').every(function (className) {
+                return elementClassName.indexOf(' ' + className + ' ') !== -1;
+            });
+            if (isMatched) {
+                result.push(json);
+            }
+            if (json.innerHTML) {
+                result = result.concat(getElementsByClassName(json.innerHTML, needle));
+            }
+        }
+        return result;
+    }
+
     function factory() {
-        return {
-            compile: compile
+        return function (json) {
+            return {
+                compile: compile.bind(this, json),
+                build: function () {
+                    return compile(json).apply(this, arguments);
+                },
+                getElementsByClassName: getElementsByClassName.bind(this, json)
+            };
         };
     }
 
