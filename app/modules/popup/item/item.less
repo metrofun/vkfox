@@ -1,0 +1,42 @@
+.item {
+    @itemPadding: 10px;
+    @iconSize: 32px;
+
+    background: @white;
+    padding: 6px @itemPadding @itemPadding;
+    position: relative;
+
+    & + .item  {
+        border-top: 1px solid @grayLighter;
+    }
+    &-inner {
+        padding-left: @iconSize + @itemPadding;
+    }
+    &-header {
+        overflow: hidden;
+    }
+    .avatar {
+        width: @iconSize;
+        height: @iconSize;
+        position: absolute;
+        top: @itemPadding;
+        left: @itemPadding;
+        cursor: pointer;
+        .border-radius(4px);
+    }
+    .name {
+        .text-overflow();
+        max-width: 200px;
+        display: block;
+        float: left;
+    }
+    .time {
+        float: right;
+    }
+    .actions {
+        font-size: 12px;
+    }
+    .icon-white {
+        background-color: @linkColor;
+    }
+}
