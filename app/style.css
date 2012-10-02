@@ -5644,6 +5644,10 @@ body {
           box-shadow: 0 1px 4px #999999;
 }
 
+.items > .item + .item {
+  border-top: 1px solid #eeeeee;
+}
+
 a > [class^="icon-"] {
   background-color: #0088cc;
   background-image: url("modules/popup/common/glyphicons-halflings-white-invert.png");
@@ -5659,8 +5663,8 @@ a:hover > [class^="icon-"] {
   background: #ffffff;
 }
 
-.item + .item {
-  border-top: 1px solid #eeeeee;
+.item .item {
+  margin: 0 -10px -10px;
 }
 
 .item-inner {
@@ -5671,16 +5675,24 @@ a:hover > [class^="icon-"] {
   overflow: hidden;
 }
 
+.item-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .item .avatar {
-  position: absolute;
-  top: 10px;
-  left: 10px;
   width: 32px;
   height: 32px;
   cursor: pointer;
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
+}
+
+.item-header .avatar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
 }
 
 .item .name {
@@ -5690,6 +5702,11 @@ a:hover > [class^="icon-"] {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.item .name:hover {
+  color: #000000;
+  cursor: pointer;
 }
 
 .item .time {

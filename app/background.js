@@ -17,5 +17,5 @@ require.config({
         }
     }
 });
-require(['auth/auth', 'newsfeed/newsfeed', 'updates/updates'], function () {
+require(['auth/auth', 'newsfeed/newsfeed', 'feedback/feedback'], function () {
 });

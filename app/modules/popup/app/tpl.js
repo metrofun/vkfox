@@ -5,24 +5,31 @@ define(['jtoh'], function (jtoh) {
             innerHTML: {className: 'container', innerHTML: [
                 {className: 'brand', tagName: 'a', attributes: {href: '#'}, innerHTML: 'VKfox'},
                 {className: 'nav', tagName: 'ul', innerHTML: [
-                    {className: 'active', tagName: 'li', attributes: {href: '#'}, innerHTML: {
+                    {tagName: 'li', innerHTML: {
                         tagName: 'a',
-                        attributes: {href: '#'},
-                        innerHTML: 'Updates'
+                        attributes: {href: '#feedback'},
+                        innerHTML: 'Feedback'
                     }},
-                    {tagName: 'li', attributes: {href: '#'}, innerHTML: {
+                    {className: 'active', tagName: 'li', innerHTML: {
                         tagName: 'a',
-                        attributes: {href: '#'},
+                        attributes: {href: '#news'},
                         innerHTML: 'News'
                     }},
-                    {tagName: 'li', attributes: {href: '#'}, innerHTML: {
+                    {tagName: 'li', innerHTML: {
                         tagName: 'a',
-                        attributes: {href: '#'},
+                        attributes: {href: '#chat'},
                         innerHTML: 'Chat'
                     }}
                 ]},
             ]}
         }},
-        {className: 'content', innerHTML: {className: 'items'}}
+        {
+            className: 'tab-content content',
+            innerHTML: [
+                {className: 'tab-pane items', id: 'feedback'},
+                {className: 'tab-pane items active', id: 'news'},
+                {className: 'tab-pane items', id: 'chat'}
+            ]
+        }
     ]).compile();
 });

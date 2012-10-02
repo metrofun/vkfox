@@ -6,8 +6,8 @@
     padding: 6px @itemPadding @itemPadding;
     position: relative;
 
-    & + .item  {
-        border-top: 1px solid @grayLighter;
+    & .item  {
+        margin: 0 -@itemPadding -@itemPadding;
     }
     &-inner {
         padding-left: @iconSize + @itemPadding;
@@ -15,20 +15,31 @@
     &-header {
         overflow: hidden;
     }
+    &-content {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .avatar {
         width: @iconSize;
         height: @iconSize;
+        cursor: pointer;
+        .border-radius(4px);
+    }
+    &-header .avatar {
         position: absolute;
         top: @itemPadding;
         left: @itemPadding;
-        cursor: pointer;
-        .border-radius(4px);
     }
     .name {
         .text-overflow();
         max-width: 200px;
         display: block;
         float: left;
+
+        &:hover {
+            color: @black;
+            cursor: pointer;
+        }
     }
     .time {
         float: right;

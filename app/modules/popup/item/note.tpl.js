@@ -1,5 +1,6 @@
-define(['jtoh', 'item/tpl'], function (jtoh, itemTemplate) {
-    jtoh(itemTemplate).getElementsByClassName('item-content')[0].innerHTML = [
+define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
+    var tpl = jQuery.extend(true, {}, itemTemplate);
+    jtoh(tpl).getElementsByClassName('item-content')[0].innerHTML = [
         function (data) {
             return data.item.notes.slice(1).map(function (note) {
                 var mid = note.owner_id + '_' + note.nid,
@@ -15,5 +16,5 @@ define(['jtoh', 'item/tpl'], function (jtoh, itemTemplate) {
             });
         }
     ];
-    return itemTemplate;
+    return tpl;
 });

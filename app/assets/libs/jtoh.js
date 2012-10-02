@@ -34,8 +34,12 @@
         } else if (typeof template === 'object') {
             attributes = template.attributes || {};
 
+            // TODO mutates template
             if (template.className) {
-                attributes['class'] = template.className;
+                attributes.class = template.className;
+            }
+            if (template.id) {
+                attributes.id = template.id;
             }
 
             Object.keys(attributes).forEach(function (attrName) {
