@@ -22,7 +22,9 @@
 
         function attrsTokensFactory(attrName, attrValRaw) {
             var attrVal = attrValRaw.apply(this, [].slice.call(arguments, 2));
-            attrVal = ('' + attrVal).replace(/"/g, '&quot;');
+            if (typeof attrVal === 'string') {
+                attrVal = attrVal.replace(/"/g, '&quot;');
+            }
             return (typeof attrVal !== 'undefined') ? [' ', attrName, '="', attrVal, '"']:[];
         }
 

@@ -19,7 +19,9 @@ define(['jtoh', 'config/config', 'common/common'], function (jtoh, config, commo
                     case 'video':
                         return [
                             {tagName: 'img', className: 'img-polaroid', attributes: {
-                                src: common.addVkBase(attachmentData.image_big)
+                                src: common.addVkBase(
+                                    attachmentData.image_big || attachmentData.image_medium || attachmentData.image
+                                )
                             }},
                             {tagName: 'p', innerHTML: [
                                 {tagName: 'i', className: 'icon-film'},

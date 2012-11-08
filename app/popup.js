@@ -5,9 +5,11 @@ require.config({
         jquery: '/assets/libs/jquery-1.7.2.min',
         'jquery.tooltip': '/assets/frameworks/twitter-bootstrap/js/bootstrap-tooltip',
         'jquery.tab': '/assets/frameworks/twitter-bootstrap/js/bootstrap-tab',
+        'jquery.typeahead': '/assets/frameworks/twitter-bootstrap/js/bootstrap-typeahead',
         underscore: '/assets/libs/underscore-min',
         jtoh: '/assets/libs/jtoh',
-        backbone: '/assets/libs/backbone'
+        backbone: '/assets/libs/backbone',
+        'backbone.localStorage': '/assets/libs/backbone.localStorage-min'
     },
     shim: {
         'jquery.tooltip': {

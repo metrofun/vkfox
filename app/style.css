@@ -5663,8 +5663,24 @@ a:hover > [class^="icon-"] {
   background: #ffffff;
 }
 
+.item:first-child {
+  -webkit-border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+          border-radius: 4px 4px 0 0;
+}
+
+.item:last-child {
+  -webkit-border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+          border-radius: 4px 4px 0 0;
+}
+
 .item .item {
   margin: 0 -10px -10px;
+}
+
+.item .item .avatar {
+  display: none;
 }
 
 .item-inner {
@@ -5719,4 +5735,8 @@ a:hover > [class^="icon-"] {
 
 .item .icon-white {
   background-color: #0088cc;
+}
+
+.item .img-polaroid {
+  box-sizing: border-box;
 }

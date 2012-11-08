@@ -6,7 +6,7 @@ define([
     'item/post.view',
     'item/note.tpl',
     'item/friend.tpl',
-    'item/photo.tpl',
+    'item/new-photo.tpl',
     'item/photo-tag.tpl'
 ], function (
     Backbone,
@@ -16,13 +16,13 @@ define([
     ItemPostView,
     noteTemplate,
     friendTemplate,
-    photoTemplate,
+    newPhotoTemplate,
     photoTagTemplate
 ) {
     var compiledTemplates = {
         note: jtoh(noteTemplate).compile(),
         friend: jtoh(friendTemplate).compile(),
-        photo: jtoh(photoTemplate).compile(),
+        photo: jtoh(newPhotoTemplate).compile(),
         photo_tag: jtoh(photoTagTemplate).compile()
     };
 
@@ -53,48 +53,53 @@ define([
         render: function () {
             this.model.get('items').forEach(function (item) {
                 var source_id = item.get('source_id'),
-                    itemView, type = item.get('type'), View;
+                    itemView, type = item.get('type'), View,
+                    profile, group;
                 // TODO for source_id < 0
                 if (source_id > 0) {
-                    switch (type) {
-                    case 'post':
-                        itemView = new ItemPostView({
-                            el: this.el,
-                            model: new Backbone.Model({
-                                profile: this.model.get('profiles').get(source_id).toJSON(),
-                                item: item.toJSON()
-                            })
-                        });
-                        break;
-                    case 'friend':
-                        View = ItemView.extend({
-                            template: compiledTemplates[type]
-                        });
-                        itemView = new View({
-                            el: this.el,
-                            model: new Backbone.Model({
-                                profile: this.model.get('profiles').get(source_id).toJSON(),
-                                count: item.get('friends')[0],
-                                profiles: item.get('friends').slice(1).map(function (friend) {
-                                    return this.model.get('profiles').get(friend.uid);
-                                }, this)
-                            })
-                        });
-                        break;
-                    // TODO photo_tags template
-                    default:
-                        View = ItemView.extend({
-                            template: compiledTemplates[type]
-                        });
-                        itemView = new View({
-                            el: this.el,
-                            model: new Backbone.Model({
-                                profile: this.model.get('profiles').get(source_id).toJSON(),
-                                item: item.toJSON()
-                            })
-                        });
-                        break;
-                    }
+                    profile = this.model.get('profiles').get(source_id).toJSON();
+                } else {
+                    group = this.model.get('groups').get(-source_id).toJSON();
+                }
+                switch (type) {
+                case 'post':
+                    itemView = new ItemPostView({
+                        el: this.el,
+                        model: new Backbone.Model({
+                            profile: profile,
+                            group: group,
+                            item: item.toJSON()
+                        })
+                    });
+                    break;
+                case 'friend':
+                    View = ItemView.extend({
+                        template: compiledTemplates[type]
+                    });
+                    itemView = new View({
+                        el: this.el,
+                        model: new Backbone.Model({
+                            profile: profile,
+                            count: item.get('friends')[0],
+                            profiles: item.get('friends').slice(1).map(function (friend) {
+                                return this.model.get('profiles').get(friend.uid);
+                            }, this)
+                        })
+                    });
+                    break;
+                default:
+                    View = ItemView.extend({
+                        template: compiledTemplates[type]
+                    });
+                    itemView = new View({
+                        el: this.el,
+                        model: new Backbone.Model({
+                            group: group,
+                            profile: profile,
+                            item: item.toJSON()
+                        })
+                    });
+                    break;
                 }
             }, this);
         }

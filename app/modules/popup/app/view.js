@@ -1,32 +1,42 @@
 define([
+    'jtoh',
     'backbone',
     'app/tpl',
+    'chat/view',
+    'friends/view',
     'newsfeed/view',
     'feedback/view',
     'common/common',
     'jquery',
+    'mediator/mediator',
     'jquery.tooltip',
+    'jquery.typeahead',
     'jquery.tab'
 ], function (
+    jtoh,
     Backbone,
     template,
+    ChatView,
+    FriendsView,
     NewsfeedView,
     FeedbackView,
     common,
-    jQuery
+    jQuery,
+    Mediator
 ) {
     return Backbone.View.extend({
         el: document.body,
-        template: template,
+        template: jtoh(template).build(),
         // events: {
             // 'click [href]': function (e) {
                 // common.openTab(jQuery(e.currentTarget).attr('href'));
             // }
         // },
         initialize: function () {
-            var newsfeedView, feedbackView;
+            var newsfeedView, feedbackView,
+                chatView, friendsView;
 
-            this.$el.append(template());
+            this.$el.append(this.template);
 
             this.$el.find('.nav a').click(function (e) {
                 e.preventDefault();
@@ -37,14 +47,24 @@ define([
                 selector: '[rel=tooltip]',
                 html: false
             });
+            Mediator.pub('app:view');
+            Mediator.sub('app:data', function (data) {
+                chatView = new ChatView({
+                    el: this.$el.find('#chat')
+                });
 
-            newsfeedView = new NewsfeedView({
-                el: this.$el.find('#news')
-            });
+                friendsView = new FriendsView({
+                    el: this.$el.find('#friends')
+                });
 
-            feedbackView = new FeedbackView({
-                el: this.$el.find('#feedback')
-            });
+                newsfeedView = new NewsfeedView({
+                    el: this.$el.find('#news')
+                });
+
+                feedbackView = new FeedbackView({
+                    el: this.$el.find('#feedback')
+                });
+            }.bind(this));
         }
     });
 });

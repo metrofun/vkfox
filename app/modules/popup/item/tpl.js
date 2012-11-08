@@ -2,8 +2,8 @@ define(['jtoh'], function (jtoh) {
     return {
         className: 'item',
         attributes: {
-            'data-uid': function (data) {
-                return data.profile.uid;
+            'data-owner-id': function (data) {
+                return (data.profile && data.profile.uid) || -data.group.gid;
             }
         },
         innerHTML: {
@@ -11,11 +11,17 @@ define(['jtoh'], function (jtoh) {
             innerHTML: [
                 {className: 'item-header', innerHTML: [
                     {className: 'avatar', tagName: 'img', attributes: {
-                        src: function (data) {return data.profile.photo; },
+                        src: function (data) {
+                            return data.profile ? data.profile.photo:data.group.photo;
+                        },
                         alt: ''
                     }},
                     {className: 'name', tagName: 'strong', innerHTML: function (data) {
-                        return [data.profile.first_name, data.profile.last_name].join(' ');
+                        if (data.profile) {
+                            return [data.profile.first_name, data.profile.last_name].join(' ');
+                        } else {
+                            return data.group.name;
+                        }
                     }},
                     {className: 'time muted', innerHTML: function () {return 'yyy'; }}
                 ]},

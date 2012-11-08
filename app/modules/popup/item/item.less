@@ -6,8 +6,19 @@
     padding: 6px @itemPadding @itemPadding;
     position: relative;
 
+    &:first-child  {
+        .border-radius(4px 4px 0 0);
+    }
+    &:last-child  {
+        .border-radius(4px 4px 0 0);
+}
+
     & .item  {
         margin: 0 -@itemPadding -@itemPadding;
+
+        .avatar {
+            display: none;
+        }
     }
     &-inner {
         padding-left: @iconSize + @itemPadding;
@@ -49,5 +60,8 @@
     }
     .icon-white {
         background-color: @linkColor;
+    }
+    .img-polaroid {
+        box-sizing: border-box;
     }
 }

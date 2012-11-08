@@ -2,9 +2,9 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
     function (Mediator, jtoh, template, jQuery, Backbone) {
         var
         APP_ID = 1920884,
-        AUTH_DOMAIN = 'http://oauth.vk.com/',
+        AUTH_DOMAIN = 'http://oauth.vk.com/';
 
-        AuthModel = Backbone.Model.extend({
+        return Backbone.Model.extend({
             el: document.body,
             defaults: {
                 accessToken: undefined,
@@ -15,8 +15,8 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
 
                 Mediator.sub('auth:iframe', function (url) {
                     try {
-                        this.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
                         this.set('userId',  url.match(/user_id=(\w+)(?:&|$)/i)[1]);
+                        this.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
                     } catch (e) {
                         // FIXME empty catch?
                     }
@@ -45,9 +45,7 @@ define(['mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbone'],
                 ].join('');
                 this.$iframe = jQuery(jtoh(template).build(loginUrl)).appendTo(this.el);
             }
-        }),
-
-        authModel = new AuthModel();
+        });
     }
 );
 

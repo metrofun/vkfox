@@ -5,7 +5,8 @@ require.config({
         jquery: '/assets/libs/jquery-1.7.2.min',
         underscore: '/assets/libs/underscore-min',
         jtoh: '/assets/libs/jtoh',
-        backbone: '/assets/libs/backbone'
+        backbone: '/assets/libs/backbone',
+        'backbone.localStorage': '/assets/libs/backbone.localStorage-min'
     },
     shim: {
         'underscore': {
@@ -14,8 +15,13 @@ require.config({
         'backbone': {
             deps: ['underscore', 'jquery'],
             exports: 'Backbone'
+        },
+        'backbone.localStorage': {
+            deps: ['backbone'],
+            exports: 'Backbone'
         }
     }
 });
-require(['auth/auth', 'newsfeed/newsfeed', 'feedback/feedback'], function () {
+require(['app/model'], function (AppModel) {
+    var appModel = new AppModel();
 });
