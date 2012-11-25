@@ -2,7 +2,7 @@
 require.config({
     baseUrl: '/modules/background',
     paths: {
-        jquery: '/assets/libs/jquery-1.7.2.min',
+        jquery: '/assets/libs/jquery-1.8.2',
         underscore: '/assets/libs/underscore-min',
         jtoh: '/assets/libs/jtoh',
         backbone: '/assets/libs/backbone',

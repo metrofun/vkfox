@@ -53,7 +53,7 @@ define([
                 this.model.get('items').reset(data.items);
             }.bind(this));
         },
-        // TODO user documentfragment
+        // TODO use documentfragment split into three functions
         render: function () {
             this.model.get('items').slice(1).reverse().forEach(function (item) {
                 var itemView, type = item.get('type'), View,

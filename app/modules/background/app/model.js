@@ -5,9 +5,10 @@ define([
     'newsfeed/model',
     'feedback/model',
     'users/model',
+    'friends/model',
     'request/request',
     'mediator/mediator'
-], function (Backbone, AuthModel, ChatModel, NewsfeedModel, FeedbackModel, UsersModel, request, Mediator) {
+], function (Backbone, AuthModel, ChatModel, NewsfeedModel, FeedbackModel, UsersModel, FriendsModel, request, Mediator) {
     return Backbone.Model.extend({
         //FIXME unimplemented
         attributes: {
@@ -16,7 +17,9 @@ define([
         initialize: function () {
             var
             authModel = new AuthModel(),
-            newsfeedModel, feedbackModel, chatModel, usersModel;
+            newsfeedModel, feedbackModel,
+            chatModel, usersModel,
+            friendsModel;
 
             Mediator.sub('app:view', function () {
                 Mediator.pub('app:data', this.toJSON());
@@ -27,6 +30,7 @@ define([
                 chatModel = new ChatModel();
                 usersModel = new UsersModel();
                 feedbackModel = new FeedbackModel();
+                friendsModel = new FriendsModel();
             });
         }
     });

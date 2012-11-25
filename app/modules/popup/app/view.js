@@ -3,7 +3,6 @@ define([
     'backbone',
     'app/tpl',
     'chat/view',
-    'friends/view',
     'newsfeed/view',
     'feedback/view',
     'common/common',
@@ -17,7 +16,6 @@ define([
     Backbone,
     template,
     ChatView,
-    FriendsView,
     NewsfeedView,
     FeedbackView,
     common,
@@ -34,7 +32,7 @@ define([
         // },
         initialize: function () {
             var newsfeedView, feedbackView,
-                chatView, friendsView;
+                chatView;
 
             this.$el.append(this.template);
 
@@ -51,10 +49,6 @@ define([
             Mediator.sub('app:data', function (data) {
                 chatView = new ChatView({
                     el: this.$el.find('#chat')
-                });
-
-                friendsView = new FriendsView({
-                    el: this.$el.find('#friends')
                 });
 
                 newsfeedView = new NewsfeedView({

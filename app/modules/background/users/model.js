@@ -4,6 +4,8 @@ define([
     'request/request',
     'mediator/mediator'
 ], function (Backbone, _, request, Mediator) {
+    var DROP_PROFILES_INTERVAL = 30000;
+
     return Backbone.Model.extend({
         defaults: {
             users: new (Backbone.Collection.extend({
@@ -13,14 +15,20 @@ define([
             }))()
         },
         initialize: function () {
+            this.dropProfiles();
             Mediator.sub('users:get', this.onGet.bind(this));
         },
+        dropProfiles: _.debounce(function () {
+            this.get('users').reset();
+            this.dropProfiles();
+        }, DROP_PROFILES_INTERVAL),
         onGet: function (uids) {
             var newUids = _.without(uids, this.get('users').pluck('uid'));
 
             if (newUids.length) {
                 request.api({
-                    code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "photo,sex,nickname,lists"})'
+                    // TODO limit for uids.length
+                    code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "online, photo,sex,nickname,lists"})'
                 }).done(function (response) {
                     if (response && response.length) {
                         this.get('users').add(response);

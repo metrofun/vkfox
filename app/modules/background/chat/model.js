@@ -6,8 +6,9 @@ define([
 ], function (_, Backbone, request, Mediator) {
     return Backbone.Model.extend({
         defaults: {
-            items : new Backbone.Collection(),
-            profiles : new Backbone.Collection(),
+            dialogsItems : new Backbone.Collection(),
+            friends: new Backbone.Collection(),
+            nonFriendsProfiles : new Backbone.Collection(),
             ready: false
         },
         initialize: function () {
@@ -23,30 +24,33 @@ define([
                 }
             }.bind(this));
 
-            request.api({
-                code: 'return API.messages.getDialogs();'
-            }).done(function (response) {
+            jQuery.when(
+                request.api({code: 'return API.messages.getDialogs({preview_length: 0});'}),
+                request.api({code: 'return API.friends.get({fields : "photo,sex,nickname,lists", order: "hints"});'})
+            ).done(function (dialogResponse, friendsResponse) {
                 var uids;
-                if (response && response.length > 1) {
-                    this.get('items').reset(response);
 
-                    // get all uids from messages
-                    uids = _.uniq([].concat.apply([], this.get('items').slice(1).map(function (item) {
-                        var chatActive = item.get('chat_active');
-                        return chatActive ? chatActive.split(','):item.get('uid') + '';
-                    }))).map(function (uid) {return parseInt(uid, 10); });
+                this.get('dialogsItems').reset(dialogResponse);
+                this.get('friends').add(friendsResponse);
 
-                    if (uids.length) {
-                        Mediator.pub('users:get', uids);
-                        Mediator.sub('users:' + uids.join(), function handler(data) {
-                            Mediator.unsub('users:' + uids.join(), handler);
+                // get all uids from messages
+                uids = _.uniq(_.flatten(this.get('dialogsItems').slice(1).map(function (item) {
+                    var chatActive = item.get('chat_active');
+                    return chatActive ? chatActive.split(','):item.get('uid') + '';
+                }), true)).map(function (uid) {return parseInt(uid, 10); });
+                // remove friends' uids
+                uids = _.without.apply(_, [uids].concat(this.get('friends').pluck('uid')));
 
-                            this.get('profiles').reset(data);
-                            this.set('ready', true);
-                        }.bind(this));
-                    } else {
+                if (uids.length) {
+                    Mediator.pub('users:get', uids);
+                    Mediator.sub('users:' + uids.join(), function handler(data) {
+                        Mediator.unsub('users:' + uids.join(), handler);
+
+                        this.get('nonFriendsProfiles').reset(data);
                         this.set('ready', true);
-                    }
+                    }.bind(this));
+                } else {
+                    this.set('ready', true);
                 }
             }.bind(this));
         }

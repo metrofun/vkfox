@@ -1,9 +1,15 @@
 define(['jtoh'], function (jtoh) {
     return {
-        className: 'item',
+        className: [
+            'item ',
+            function (data) {
+                return data.profile && data.profile.online ? 'online':undefined;
+            }
+        ],
+
         attributes: {
             'data-owner-id': function (data) {
-                return (data.profile && data.profile.uid) || -data.group.gid;
+                return (data.profile && data.profile.uid) || (data.group && -data.group.gid);
             }
         },
         innerHTML: {
@@ -22,10 +28,10 @@ define(['jtoh'], function (jtoh) {
                         } else {
                             return data.group.name;
                         }
-                    }},
-                    {className: 'time muted', innerHTML: function () {return 'yyy'; }}
+                    }}
+                    // {className: 'time muted', innerHTML: function () {return 'yyy'; }},
                 ]},
-                {className: 'item-content', innerHTML: function () {return 'zzzz'; }},
+                {className: 'item-content'},
                 {className: 'item-foot', innerHTML: {
                     className: 'actions'
                 }}

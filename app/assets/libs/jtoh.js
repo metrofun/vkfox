@@ -48,8 +48,10 @@
                 attrValRaw = attributes[attrName];
                 if (typeof attrValRaw === 'function') {
                     attrsTokens = attrsTokens.concat(attrsTokensFactory.bind(this, attrName, attrValRaw));
+                // } else if (Array.isArray(attrValRaw)) {
+                    // attrsTokens = attrsTokens.concat([' ', attrName, '="', attrValRaw, '"']);
                 } else {
-                    attrValRaw = ('' + attrValRaw).replace(/"/g, '&quot;');
+                    // attrValRaw = ('' + attrValRaw).replace(/"/g, '&quot;');
                     attrsTokens = attrsTokens.concat([' ', attrName, '="', attrValRaw, '"']);
                 }
             });
@@ -96,7 +98,7 @@
             json.forEach(function (json) {
                 result = result.concat(getElementsByClassName(json, needle));
             });
-        } else if (typeof json === 'object') {
+        } else if (typeof json === 'object' && (json.className || (json.attributes && json.attributes.class))) {
             elementClassName = ' ' + (json.className || json.attributes.class) + ' ';
             isMatched = needle.split(' ').every(function (className) {
                 return elementClassName.indexOf(' ' + className + ' ') !== -1;

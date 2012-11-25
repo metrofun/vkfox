@@ -5631,10 +5631,12 @@ body {
 }
 
 .content {
-  padding: 10px;
+  /* padding: 10px; */
+
 }
 
 .items {
+  margin: 10px;
   overflow: hidden;
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
@@ -5648,6 +5650,51 @@ body {
   border-top: 1px solid #eeeeee;
 }
 
+.item-friend .actions [class*="icon-"] {
+  margin-top: 0;
+  margin-right: 2px;
+}
+
+.item-recent.out .item-content:before {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  margin-right: 6px;
+  *margin-right: .3em;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url("assets/frameworks/twitter-bootstrap/img/glyphicons-halflings.png");
+  background-position: 14px 14px;
+  background-position: -120px -72px;
+  background-repeat: no-repeat;
+  content: '';
+}
+
+.item-recent.favourite .action-favourite {
+  color: #ffc40d;
+}
+
+.item-recent.favourite .action-favourite [class^="icon-"] {
+  background-color: #ffc40d;
+}
+
+.item-recent.favourite .action-favourite span {
+  opacity: 0;
+}
+
+.item-recent.favourite .action-favourite:hover {
+  color: #f3b700;
+}
+
+.item-recent.favourite .action-favourite:hover [class^="icon-"] {
+  background-color: #f3b700;
+}
+
+.item-recent.favourite .action-favourite:hover span {
+  opacity: 1;
+}
+
 a > [class^="icon-"] {
   background-color: #0088cc;
   background-image: url("modules/popup/common/glyphicons-halflings-white-invert.png");
@@ -5659,7 +5706,7 @@ a:hover > [class^="icon-"] {
 
 .item {
   position: relative;
-  padding: 6px 10px 10px;
+  padding: 6px 10px 0;
   background: #ffffff;
 }
 
@@ -5676,7 +5723,7 @@ a:hover > [class^="icon-"] {
 }
 
 .item .item {
-  margin: 0 -10px -10px;
+  margin: 0 -10px 0;
 }
 
 .item .item .avatar {
@@ -5711,6 +5758,67 @@ a:hover > [class^="icon-"] {
   left: 10px;
 }
 
+.item.online .item-header:after {
+  position: relative;
+  top: 2px;
+  float: left;
+  padding: 1px 4px 2px;
+  margin-left: 6px;
+  font-size: 11.844px;
+  font-weight: bold;
+  line-height: 14px;
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: #999999;
+  background-color: #468847;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+  content: 'online';
+}
+
+.item.online .item-header:after-important {
+  background-color: #b94a48;
+}
+
+.item.online .item-header:after-important[href] {
+  background-color: #953b39;
+}
+
+.item.online .item-header:after-warning {
+  background-color: #f89406;
+}
+
+.item.online .item-header:after-warning[href] {
+  background-color: #c67605;
+}
+
+.item.online .item-header:after-success {
+  background-color: #468847;
+}
+
+.item.online .item-header:after-success[href] {
+  background-color: #356635;
+}
+
+.item.online .item-header:after-info {
+  background-color: #3a87ad;
+}
+
+.item.online .item-header:after-info[href] {
+  background-color: #2d6987;
+}
+
+.item.online .item-header:after-inverse {
+  background-color: #333333;
+}
+
+.item.online .item-header:after-inverse[href] {
+  background-color: #1a1a1a;
+}
+
 .item .name {
   display: block;
   float: left;
@@ -5731,6 +5839,10 @@ a:hover > [class^="icon-"] {
 
 .item .actions {
   font-size: 12px;
+}
+
+.item .actions a {
+  text-decoration: none !important;
 }
 
 .item .icon-white {

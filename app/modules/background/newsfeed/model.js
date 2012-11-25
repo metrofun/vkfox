@@ -1,7 +1,8 @@
 define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
     function (Backbone, _, request, Mediator) {
         var
-        MAX_ITEMS_COUNT = 50;
+        MAX_ITEMS_COUNT = 50,
+        UPDATE_ONLINE_INTERVAL = 1000;
 
         return Backbone.Model.extend({
             startTime: 'API.getServerTime() - 1 * 24 * 60 * 60',
@@ -10,6 +11,19 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                 profiles: new Backbone.Collection(),
                 items : new Backbone.Collection()
             },
+            updateOnlineStatus: _.debounce(function () {
+                var uids = _.filter(this.get('items').pluck('source_id'), function (sourceId) {
+                    return sourceId > 0;
+                }), self = this;
+
+                Mediator.pub('users:get', uids);
+                Mediator.sub('users:' + uids.join(), function handler(data) {
+                    Mediator.unsub('users:' + uids.join(), handler);
+
+                    this.get('profiles').add(data);
+                    self.updateOnlineStatus();
+                });
+            }, UPDATE_ONLINE_INTERVAL),
             initialize: function () {
                 request.api({
                     code: ['return { "news" : API.newsfeed.get({start_time: ',
@@ -26,6 +40,8 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                 Mediator.sub('newsfeed:view', function () {
                     Mediator.pub('newsfeed:data', this.toJSON());
                 }.bind(this));
+
+                this.updateOnlineStatus();
             }
         });
     }
