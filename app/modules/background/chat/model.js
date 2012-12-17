@@ -4,55 +4,137 @@ define([
     'request/request',
     'mediator/mediator'
 ], function (_, Backbone, request, Mediator) {
+    var LONG_POLL_WAIT = 25;
+
     return Backbone.Model.extend({
         defaults: {
-            dialogsItems : new Backbone.Collection(),
-            friends: new Backbone.Collection(),
-            nonFriendsProfiles : new Backbone.Collection(),
-            ready: false
+            dialogs: new Backbone.Collection({
+                messages: new Backbone.Collection()
+            })
         },
-        initialize: function () {
-            Mediator.sub('chat:view', function () {
-                if (this.get('ready')) {
-                    Mediator.pub('chat:data', this.toJSON());
-                } else {
-                    this.on('change:ready', function handler() {
-                        this.off('change:ready', handler);
+        getDialogs: function () {
+            var self = this;
 
-                        Mediator.pub('chat:data', this.toJSON());
+            return request.api({
+                code: 'return API.messages.getDialogs({preview_length: 0});'
+            }).done(function (response) {
+                self.get('dialogs').reset(response.slice(1).map(function (item) {
+                    return new Backbone.Model({
+                        chat_id: item.chat_id,
+                        uid: item.uid,
+                        id: item.chat_id + ' ' +  item.uid,
+                        messages: [item]
                     });
-                }
-            }.bind(this));
+                }));
+            });
+        },
+        /*
+        * If last message in dialog is unread,
+        * fetch dialog history and get last unread messages in a row
+        */
+        getUnreadMessages: function () {
+            var unreadHistoryRequests = this.get('dialogs').models.filter(function (dialog) {
+                return !dialog.get('chat_id') && !dialog.get('read_state');
+            }).map(function (dialog) {
+                return request.api({
+                    code: 'return API.messages.getHistory({uid: ' + dialog.get('uid') + '});'
+                });
+            }), self = this;
+            return jQuery.when.apply(jQuery, unreadHistoryRequests).done(function () {
+                [].forEach.call(arguments, function (messages, index) {
+                    var i, dialog, message = messages[1];
 
-            jQuery.when(
-                request.api({code: 'return API.messages.getDialogs({preview_length: 0});'}),
-                request.api({code: 'return API.friends.get({fields : "photo,sex,nickname,lists", order: "hints"});'})
-            ).done(function (dialogResponse, friendsResponse) {
-                var uids;
+                    if (message.read_state === 0) {
+                        dialog = self.get('dialogs').at(index);
 
-                this.get('dialogsItems').reset(dialogResponse);
-                this.get('friends').add(friendsResponse);
-
-                // get all uids from messages
-                uids = _.uniq(_.flatten(this.get('dialogsItems').slice(1).map(function (item) {
-                    var chatActive = item.get('chat_active');
-                    return chatActive ? chatActive.split(','):item.get('uid') + '';
-                }), true)).map(function (uid) {return parseInt(uid, 10); });
-                // remove friends' uids
-                uids = _.without.apply(_, [uids].concat(this.get('friends').pluck('uid')));
+                        for (i = 2; i < messages.length; i++) {
+                            message = messages[i];
+                            if (message.read_state === 0) {
+                                dialog.get('messages').push(message);
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                });
+            });
+        },
+        getProfiles: function () {
+            return jQuery.when.apply(jQuery, this.get('dialogs').models.map(function (dialog) {
+                var
+                uids = _.uniq(_.flatten(dialog.get('messages').map(function (message) {
+                    var chatActive = message.chat_active;
+                    if (chatActive) {
+                        return chatActive.split(',').map(function (uid) {return parseInt(uid, 10); });
+                    } else {
+                        return message.uid;
+                    }
+                }))),
+                deffer = jQuery.Deferred();
 
                 if (uids.length) {
                     Mediator.pub('users:get', uids);
                     Mediator.sub('users:' + uids.join(), function handler(data) {
                         Mediator.unsub('users:' + uids.join(), handler);
 
-                        this.get('nonFriendsProfiles').reset(data);
-                        this.set('ready', true);
-                    }.bind(this));
+                        dialog.set('profiles', data);
+                        deffer.resolve();
+                    });
                 } else {
-                    this.set('ready', true);
+                    deffer.resolve();
                 }
-            }.bind(this));
+                return deffer;
+            }));
+        },
+        initialize: function () {
+            var self = this;
+
+            this.getDialogs().done(function () {
+                jQuery.when([
+                    self.getUnreadMessages(),
+                    self.getProfiles()
+                ]).done(function () {
+                    Mediator.sub('chat:view', function () {
+                        Mediator.pub('chat:data', self.toJSON());
+                    });
+                });
+            });
+            this.enableLongPollUpdates();
+        },
+        enableLongPollUpdates: function () {
+            var self = this;
+            request.api({
+                code: 'return API.messages.getLongPollServer();'
+            }).done(function (response) {
+                self.longPollParams = response;
+                self.fetchUpdates();
+            });
+        },
+        fetchUpdates: function () {
+            var self = this;
+
+            request.get('http://' + this.longPollParams.server, {
+                act: 'a_check',
+                key:  this.longPollParams.key,
+                ts: this.longPollParams.ts,
+                wait: LONG_POLL_WAIT,
+                mode: 2
+            }, function (response) {
+                var
+                data = JSON.parse(jQuery.trim(response)),
+                updates = data.updates.filter(function (update) {
+                    return update[0] >= 0 && update[0] <= 4;
+                });
+
+                if (updates.length) {
+                    self.getDialogs();
+                }
+
+                self.longPollParams.ts = data.ts;
+                self.fetchUpdates();
+            }, 'text').fail(function () {
+                self.enableLongPollUpdates();
+            });
         }
     });
 });

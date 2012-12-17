@@ -3,6 +3,7 @@ define([
     'backbone',
     'jtoh',
     'mediator/mediator',
+    'request/request',
     'chat/tpl',
     'chat/friend-item.tpl',
     'item/view',
@@ -13,6 +14,7 @@ define([
     Backbone,
     jtoh,
     Mediator,
+    request,
     template,
     friendTemplate,
     ItemView,
@@ -44,6 +46,20 @@ define([
                 if (typeof uid !== 'undefined') {
                     RecentView.toggleFavourite(item);
                 }
+            },
+            'click .action-message, .item-content': function (e) {
+                var item = jQuery(e.target).parents('.item'),
+                uid = item.data('owner-id');
+
+                if (typeof uid !== 'undefined') {
+                    RecentView.toggleReply(item, function (value) {
+                        this.value = '';
+
+                        request.api({
+                            code: 'return API.messages.send({uid: ' +  uid + ', message: "' + jQuery.trim(value) + '"});'
+                        });
+                    }, 'Private message');
+                }
             }
         },
         initialize: function () {
@@ -53,17 +69,14 @@ define([
 
             Mediator.pub('chat:view');
             Mediator.sub('chat:data', function (data) {
+                console.log(data);
                 this.model.get('nonFriendsProfiles').reset(data.nonFriendsProfiles);
                 this.model.get('friends').reset(data.friends);
                 this.model.get('dialogsItems').reset(data.dialogsItems);
-
-                this.render();
             }.bind(this));
-        },
-        render: function () {
-            this.renderControls();
-            this.renderRecentItems();
-            // this.renderFriendsItems();
+
+            this.model.get('friends').on('reset', this.renderControls.bind(this));
+            this.model.get('dialogsItems').on('reset', this.renderRecentItems.bind(this));
         },
         renderRecentItems: function () {
             var fragment = document.createDocumentFragment();
@@ -88,7 +101,7 @@ define([
                 });
             }, this);
 
-            this.$el.find('.items').prepend(fragment);
+            this.$el.find('.items').empty().prepend(fragment);
         },
         renderControls: function () {
             this.$el.find('.dropdown-toggle').dropdown();
@@ -98,29 +111,6 @@ define([
                     return [friend.get('first_name'), friend.get('last_name')].join(' ');
                 })
             });
-        },
-        renderRecent: function () {
-            var fragment = document.createDocumentFragment();
-
-            this.model.get('dialogsItems').slice(1).forEach(function (item) {
-                var
-                chatActive = item.get('chat_active'),
-                profiles = (chatActive ? chatActive.split(','):[item.get('uid')]).map(function (uid) {
-                    return this.model.get('profiles').get(parseInt(uid, 10)).toJSON();
-                }, this),
-
-                itemView = new this.DialogView({
-                    el: fragment,
-                    model: new Backbone.Model({
-                        profile: profiles[0],
-                        profiles: profiles,
-                        item: item.toJSON()
-                    })
-                });
-
-            }.bind(this));
-
-            this.$el.find('.dialogsItems').prepend(fragment);
         },
         renderFriendsItems: function () {
             var ITEMS_PER_TICK = 10, $itemsHolder = this.$el.find('.items');

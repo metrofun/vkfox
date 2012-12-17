@@ -1,18 +1,13 @@
-define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator, _) {
+define(['jquery', 'mediator/mediator', 'underscore'], function (jQuery, Mediator, _) {
     var
     API_QUERIES_PER_REQUEST = 15,
     API_DOMAIN = 'https://api.vk.com/',
     API_REQUESTS_DEBOUNCE = 400,
 
-    accessToken, apiQueriesQueue= [];
-
-    Mediator.sub('auth:success', function(data){
-        accessToken = data.accessToken;
-    });
-
-    return {
-        ajax: function(url, options) {
-            var success, error, _accessToken = accessToken,
+    accessToken, apiQueriesQueue = [],
+    request = {
+        ajax: function (url, options) {
+            var success, error, usedAccessToken = accessToken,
                  ajaxDeferred = new jQuery.Deferred();
 
             if (typeof url === "object") {
@@ -29,14 +24,14 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                 delete options.error;
             }
             jQuery.ajax(options).then(
-                function() {
-                    if (accessToken === _accessToken) {
+                function () {
+                    if (accessToken === usedAccessToken) {
                         ajaxDeferred.resolve.apply(ajaxDeferred, arguments);
                     } else {
                         ajaxDeferred.reject.apply(ajaxDeferred, arguments);
                     }
                 },
-                function() {
+                function () {
                     ajaxDeferred.reject.apply(ajaxDeferred, arguments);
                 }
             );
@@ -72,7 +67,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                 dataType: type
             });
         },
-        api: function(params, callback) {
+        api: function (params, callback) {
             var queryDeferred = new jQuery.Deferred();
             apiQueriesQueue.push({
                 params: params,
@@ -81,7 +76,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
             this.processApiQueries();
             return queryDeferred.done(callback);
         },
-        processApiQueries: _.debounce(function() {
+        processApiQueries: _.debounce(function () {
             if (apiQueriesQueue.length) {
                 var queriesToProcess = apiQueriesQueue.slice(0, API_QUERIES_PER_REQUEST),
                     executeCodeTokens = [], executeCode,  i, method, params;
@@ -97,7 +92,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                     }
 
                     if (method === 'execute') {
-                        executeCodeTokens.push( params.code.replace(/^return\s*|;$/g, '') );
+                        executeCodeTokens.push(params.code.replace(/^return\s*|;$/g, ''));
                     } else {
                         // TODO not implemented
                         throw 'not implemented';
@@ -112,9 +107,9 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                         code: executeCode,
                         access_token: accessToken
                     },
-                    function(data) {
+                    function (data) {
                         var response = data.response, i;
-                        for (i=0; i < response.length; i++) {
+                        for (i = 0; i < response.length; i++) {
                             queriesToProcess[i].deferred.resolve(response[i]);
                         }
                         this.processApiQueries();
@@ -122,6 +117,19 @@ define(['jquery', 'mediator/mediator', 'underscore'], function(jQuery, Mediator,
                 );
             }
         }, API_REQUESTS_DEBOUNCE)
-    }
-});
+    };
 
+    Mediator.sub('auth:success', function (data) {
+        accessToken = data.accessToken;
+    });
+    Mediator.sub('request', function (params) {
+        request[params.method].apply(request, params.arguments).done(function () {
+            Mediator.pub('request:' + params.id, {method: 'resolve', arguments: arguments});
+        }).fail(function () {
+            Mediator.pub('request:' + params.id, {method: 'reject', arguments: arguments});
+        });
+    });
+
+
+    return request;
+});

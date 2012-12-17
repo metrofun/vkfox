@@ -1,0 +1,97 @@
+define([
+    'underscore',
+    'backbone',
+    'request/request',
+    'mediator/mediator'
+], function (_, Backbone, request, Mediator) {
+    var LONG_POLL_WAIT = 5;
+
+    return Backbone.Model.extend({
+        defaults: {
+            dialogsItems : new Backbone.Collection(),
+            friends: new Backbone.Collection(),
+            nonFriendsProfiles : new Backbone.Collection()
+        },
+        retrieveDialogs: function () {
+            var self = this;
+
+            request.api({
+                code: 'return API.messages.getDialogs({preview_length: 0});'
+            }).done(function (response) {
+                var uids;
+
+                if (true) {
+                    // get all uids from messages
+                    uids = _.uniq(_.flatten(response.slice(1).map(function (item) {
+                        var chatActive = item.chat_active;
+                        return chatActive ? chatActive.split(','):item.uid + '';
+                    }), true)).map(function (uid) {return parseInt(uid, 10); });
+                    // remove friends' uids
+                    // uids = _.without.apply(_, [uids].concat(self.get('friends').pluck('uid')));
+
+                    if (uids.length) {
+                        Mediator.pub('users:get', uids);
+                        Mediator.sub('users:' + uids.join(), function handler(data) {
+                            Mediator.unsub('users:' + uids.join(), handler);
+
+                            self.get('nonFriendsProfiles').reset(data);
+                            self.get('dialogsItems').reset(response);
+                        });
+                    } else {
+                        self.get('dialogsItems').reset(response);
+                    }
+                }
+                // self.retrieveDialogs();
+            });
+        },
+        initialize: function () {
+            var self = this;
+
+            Mediator.sub('chat:view', function () {
+                Mediator.pub('chat:data', self.toJSON());
+            });
+
+            this.get('dialogsItems').on('reset', function () {
+                Mediator.pub('chat:data', self.toJSON());
+            });
+
+            this.retrieveDialogs();
+            this.enableLongPollUpdates();
+        },
+        enableLongPollUpdates: function () {
+            var self = this;
+            request.api({
+                code: 'return API.messages.getLongPollServer();'
+            }).done(function (response) {
+                self.longPollParams = response;
+                self.fetchUpdates();
+            });
+        },
+        fetchUpdates: function () {
+            var self = this;
+
+            request.get('http://' + this.longPollParams.server, {
+                act: 'a_check',
+                key:  this.longPollParams.key,
+                ts: this.longPollParams.ts,
+                wait: LONG_POLL_WAIT,
+                mode: 2
+            }, function (response) {
+                var
+                data = JSON.parse(jQuery.trim(response)),
+                updates = data.updates.filter(function (update) {
+                    return update[0] >= 0 && update[0] <= 4;
+                });
+
+                if (updates.length) {
+                    self.retrieveDialogs();
+                }
+
+                self.longPollParams.ts = data.ts;
+                self.fetchUpdates();
+            }, 'text').fail(function () {
+                self.enableLongPollUpdates();
+            });
+        }
+    });
+});

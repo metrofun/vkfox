@@ -2,13 +2,17 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
     function (Backbone, _, request, Mediator) {
         var
         MAX_ITEMS_COUNT = 50,
-        UPDATE_ONLINE_INTERVAL = 1000;
+        UPDATE_ONLINE_INTERVAL = 30000;
 
         return Backbone.Model.extend({
             startTime: 'API.getServerTime() - 1 * 24 * 60 * 60',
             defaults: {
                 groups: new Backbone.Collection(),
-                profiles: new Backbone.Collection(),
+                profiles: new (Backbone.Collection.extend({
+                    model: Backbone.Model.extend({
+                        idAttribute: 'uid'
+                    })
+                }))(),
                 items : new Backbone.Collection()
             },
             updateOnlineStatus: _.debounce(function () {
@@ -20,7 +24,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                 Mediator.sub('users:' + uids.join(), function handler(data) {
                     Mediator.unsub('users:' + uids.join(), handler);
 
-                    this.get('profiles').add(data);
+                    self.get('profiles').add(data);
                     self.updateOnlineStatus();
                 });
             }, UPDATE_ONLINE_INTERVAL),

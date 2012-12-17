@@ -18,12 +18,13 @@ define([
             this.dropProfiles();
             Mediator.sub('users:get', this.onGet.bind(this));
         },
+        // TODO problem when dropped between onGet and response
         dropProfiles: _.debounce(function () {
             this.get('users').reset();
             this.dropProfiles();
         }, DROP_PROFILES_INTERVAL),
         onGet: function (uids) {
-            var newUids = _.without(uids, this.get('users').pluck('uid'));
+            var newUids = _.difference(uids, this.get('users').pluck('uid'));
 
             if (newUids.length) {
                 request.api({

@@ -1,0 +1,39 @@
+.item-recent {
+    .item-content {
+        cursor: pointer;
+    }
+}
+.item-recent.out {
+    .item-content:before {
+        content: '';
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        line-height: 14px;
+        vertical-align: text-top;
+        background-image: url("@{iconSpritePath}");
+        background-repeat: no-repeat;
+        margin-top: 1px;
+        .icon-user();
+        margin-right: 6px;
+    }
+}
+.item-recent.favourite {
+    .action-favourite {
+        color: @yellow;
+        display: inline !important;
+
+        [class^="icon-"] {
+            background-color: @yellow;
+        }
+
+        @hoverColor: darken(@yellow, 5%);
+        &:hover {
+            color: @hoverColor;
+
+            [class^="icon-"] {
+                background-color: @hoverColor;
+            }
+        }
+    }
+}

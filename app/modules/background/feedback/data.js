@@ -1,7 +1,174 @@
 define(function () {
     return {
         "news": {
-            "items": [12, {
+            "items": [18, {
+                "type": "comment_photo",
+                "date": 1354022536,
+                "parent": {
+                    "pid": 291830567,
+                    "aid": -7,
+                    "owner_id": 8935126,
+                    "src": "http://cs302214.userapi.com/v302214126/6523/7rQfs57PTQU.jpg",
+                    "src_big": "http://cs302214.userapi.com/v302214126/6524/Q-i8cEvezjc.jpg",
+                    "src_small": "http://cs302214.userapi.com/v302214126/6522/6e-k0sugLm0.jpg",
+                    "src_xbig": "http://cs302214.userapi.com/v302214126/6525/tmiKZjlJ1qg.jpg",
+                    "src_xxbig": "http://cs302214.userapi.com/v302214126/6526/2zYBGn8a5OI.jpg",
+                    "width": 1280,
+                    "height": 849,
+                    "text": "",
+                    "created": 1353963672
+                },
+                "feedback": {
+                    "owner_id": "19709326",
+                    "id": "110445608",
+                    "text": "Зато тут гарно)",
+                    "date": 1354022536,
+                    "likes": {
+                        "count": 0,
+                        "user_likes": 0
+                    }
+                }
+            }, {
+                "type": "comment_photo",
+                "date": 1354022487,
+                "parent": {
+                    "pid": 291830576,
+                    "aid": -7,
+                    "owner_id": 8935126,
+                    "src": "http://cs302214.userapi.com/v302214126/6550/-rC4UUOMyxs.jpg",
+                    "src_big": "http://cs302214.userapi.com/v302214126/6551/CGRpXqI7YUQ.jpg",
+                    "src_small": "http://cs302214.userapi.com/v302214126/654f/uiucXBqXHHc.jpg",
+                    "src_xbig": "http://cs302214.userapi.com/v302214126/6552/9hrvWkEx_YA.jpg",
+                    "src_xxbig": "http://cs302214.userapi.com/v302214126/6553/DSHKzb9fvTo.jpg",
+                    "width": 1280,
+                    "height": 848,
+                    "text": "",
+                    "created": 1353963679
+                },
+                "feedback": {
+                    "owner_id": "19709326",
+                    "id": "110445592",
+                    "text": "І тут так собі...",
+                    "date": 1354022487,
+                    "likes": {
+                        "count": 0,
+                        "user_likes": 0
+                    }
+                }
+            }, {
+                "type": "comment_photo",
+                "date": 1354022471,
+                "parent": {
+                    "pid": 291830579,
+                    "aid": -7,
+                    "owner_id": 8935126,
+                    "src": "http://cs302214.userapi.com/v302214126/6562/XoE87-KO5ok.jpg",
+                    "src_big": "http://cs302214.userapi.com/v302214126/6563/E6QMJJERlcM.jpg",
+                    "src_small": "http://cs302214.userapi.com/v302214126/6561/hv2bHXncbks.jpg",
+                    "src_xbig": "http://cs302214.userapi.com/v302214126/6564/drHnAKnNing.jpg",
+                    "src_xxbig": "http://cs302214.userapi.com/v302214126/6565/8ZUhizvO1f0.jpg",
+                    "width": 1280,
+                    "height": 855,
+                    "text": "",
+                    "created": 1353963681
+                },
+                "feedback": {
+                    "owner_id": "19709326",
+                    "id": "110445586",
+"text": "А тут не дуже)",
+"date": 1354022471,
+"likes": {
+    "count": 0,
+    "user_likes": 0
+}
+                }
+            }, {
+                "type": "comment_photo",
+                "date": 1354022456,
+                "parent": {
+                    "pid": 291830569,
+                    "aid": -7,
+                    "owner_id": 8935126,
+                    "src": "http://cs302214.userapi.com/v302214126/652c/XgSMomSBCko.jpg",
+                    "src_big": "http://cs302214.userapi.com/v302214126/652d/SHX77vuk-Ws.jpg",
+                    "src_small": "http://cs302214.userapi.com/v302214126/652b/cLEMhMzBuZM.jpg",
+                    "src_xbig": "http://cs302214.userapi.com/v302214126/652e/4FeBUwC-yns.jpg",
+                    "src_xxbig": "http://cs302214.userapi.com/v302214126/652f/wdfeWXfFyXM.jpg",
+                    "width": 1280,
+                    "height": 848,
+                    "text": "",
+                    "created": 1353963673
+                },
+                "feedback": {
+                    "owner_id": "19709326",
+                    "id": "110445583",
+"text": "Дуже романтично)",
+"date": 1354022456,
+"likes": {
+    "count": 0,
+    "user_likes": 0
+}
+                }
+            }, {
+                "type": "comment_photo",
+                "date": 1353975105,
+                "parent": {
+                    "pid": 291830567,
+                    "aid": -7,
+                    "owner_id": 8935126,
+                    "src": "http://cs302214.userapi.com/v302214126/6523/7rQfs57PTQU.jpg",
+                    "src_big": "http://cs302214.userapi.com/v302214126/6524/Q-i8cEvezjc.jpg",
+                    "src_small": "http://cs302214.userapi.com/v302214126/6522/6e-k0sugLm0.jpg",
+                    "src_xbig": "http://cs302214.userapi.com/v302214126/6525/tmiKZjlJ1qg.jpg",
+                    "src_xxbig": "http://cs302214.userapi.com/v302214126/6526/2zYBGn8a5OI.jpg",
+                    "width": 1280,
+                    "height": 849,
+                    "text": "",
+                    "created": 1353963672
+                },
+                "feedback": {
+                    "owner_id": "5782194",
+                    "id": "110440692",
+                    "text": "оо, вы и в Вене были? круто!",
+                    "date": 1353975104,
+                    "likes": {
+                        "count": 0,
+                        "user_likes": 0
+                    }
+                }
+            }, {
+                "type": "comment_photo",
+                "date": 1353971771,
+                "parent": {
+                    "pid": 291813457,
+                    "aid": 153673656,
+                    "owner_id": 8935126,
+                    "src": "http://cs306209.userapi.com/v306209205/1397/QsZTIj1oANk.jpg",
+                    "src_big": "http://cs306209.userapi.com/v306209205/1398/c4TbCXWJrNU.jpg",
+                    "src_small": "http://cs306209.userapi.com/v306209205/1396/XnAE3g7G1Lg.jpg",
+                    "src_xbig": "http://cs306209.userapi.com/v306209205/1399/0MzGNLwOPRk.jpg",
+                    "width": 800,
+                    "height": 800,
+                    "text": "",
+                    "created": 1353947812
+                },
+                "feedback": {
+                    "owner_id": "7131005",
+                    "id": "110440616",
+"text": "Приезжайте еще!!))",
+"date": 1353971771,
+"likes": {
+    "count": 0,
+    "user_likes": 0
+}
+                },
+                "reply": {
+                    "id": "110440617",
+                    "date": "1353971783",
+                    "text": "[id7131005|Valery], насовсем ахаха )))"
+                }
+            },
+            {
                 "type": "reply_topic",
                 "date": 1351019307,
                 "parent": {
@@ -404,6 +571,43 @@ define(function () {
                 }]
             }],
             "profiles": [{
+                "uid": 5782194,
+                "first_name": "Sandra",
+                "last_name": "Udivitelnaya",
+                "photo": "http://cs304403.userapi.com/v304403194/54ad/C3DnDkjNmag.jpg",
+                "photo_medium_rec": "http://cs304403.userapi.com/v304403194/54ac/F2Xah0TscmQ.jpg",
+                "sex": 1,
+                "online": 0,
+                "screen_name": "id5782194"
+            }, {
+                "uid": 7131005,
+                "first_name": "Valery",
+                "last_name": "Napolitano",
+                "photo": "http://cs405631.userapi.com/v405631005/5403/34sO0bP9FQw.jpg",
+                "photo_medium_rec": "http://cs405631.userapi.com/v405631005/5402/SPki4vRGUlM.jpg",
+                "sex": 2,
+                "online": 0,
+                "screen_name": "groovywizard"
+            }, {
+                "uid": 8935126,
+                "first_name": "Mitya",
+                "last_name": "Ourside",
+                "photo": "http://cs307912.userapi.com/v307912126/29ec/EtmqhJ169PY.jpg",
+                "photo_medium_rec": "http://cs307912.userapi.com/v307912126/29eb/AjhS1Sua56A.jpg",
+                "sex": 2,
+                "online": 1,
+                "screen_name": "metrofun"
+            }, {
+                "uid": 19709326,
+                "first_name": "Mikola",
+                "last_name": "Rudik",
+                "photo": "http://cs323919.userapi.com/u19709326/e_7538c9fd.jpg",
+                "photo_medium_rec": "http://cs323919.userapi.com/u19709326/d_415c6692.jpg",
+                "sex": 2,
+                "online": 1,
+                "screen_name": "id19709326"
+            },
+            {
                 "uid": 8935126,
                 "first_name": "Митя",
                 "last_name": "Ourside",

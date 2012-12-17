@@ -8,7 +8,17 @@ define([
     'friends/model',
     'request/request',
     'mediator/mediator'
-], function (Backbone, AuthModel, ChatModel, NewsfeedModel, FeedbackModel, UsersModel, FriendsModel, request, Mediator) {
+], function (
+    Backbone,
+    AuthModel,
+    ChatModel,
+    NewsfeedModel,
+    FeedbackModel,
+    UsersModel,
+    FriendsModel,
+    request,
+    Mediator
+) {
     return Backbone.Model.extend({
         //FIXME unimplemented
         attributes: {
@@ -26,11 +36,11 @@ define([
             }.bind(this));
 
             Mediator.sub('auth:success', function (authData) {
+                usersModel = new UsersModel();
                 newsfeedModel = new NewsfeedModel();
                 chatModel = new ChatModel();
-                usersModel = new UsersModel();
                 feedbackModel = new FeedbackModel();
-                friendsModel = new FriendsModel();
+                // friendsModel = new FriendsModel();
             });
         }
     });
