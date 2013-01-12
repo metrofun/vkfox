@@ -4,7 +4,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
         MAX_ITEMS_COUNT = 50;
 
         return Backbone.Model.extend({
-            startTime: 'API.getServerTime() - 1 * 24 * 60 * 60',
+            startTime: '0',
             defaults: {
                 groups: new Backbone.Collection(),
                 profiles: new Backbone.Collection(),
@@ -15,7 +15,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                 // FIXME remove after dev
                 this.get('groups').add(data.news.groups);
                 this.get('profiles').add(data.news.profiles);
-                this.get('items').add(data.news.items);
+                this.get('items').add(data.news.items.slice(1));
 
                 request.api({
                     code: ['return { "news" : API.notifications.get({start_time: ',
@@ -27,7 +27,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                     // TODO uniquiness
                     this.get('groups').add(response.news.groups);
                     this.get('profiles').add(response.news.profiles);
-                    this.get('items').add(response.news.items);
+                    this.get('items').add(response.news.items.slice(1));
 
                 }.bind(this));
 

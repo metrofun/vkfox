@@ -33,7 +33,7 @@ define(['jtoh'], function (jtoh) {
                         {className: 'actions'}
                         // {className: 'time muted', innerHTML: function () {return 'yyy'; }},
                     ]},
-                    {className: 'item-content'}
+                    {className: ['item-content']}
                 ]
             }
         ]

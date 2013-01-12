@@ -5,7 +5,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
         UPDATE_ONLINE_INTERVAL = 30000;
 
         return Backbone.Model.extend({
-            startTime: 'API.getServerTime() - 1 * 24 * 60 * 60',
+            startTime: '0',
             defaults: {
                 groups: new Backbone.Collection(),
                 profiles: new (Backbone.Collection.extend({

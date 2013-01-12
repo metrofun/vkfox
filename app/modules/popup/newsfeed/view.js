@@ -23,6 +23,7 @@ define([
         note: jtoh(noteTemplate).compile(),
         friend: jtoh(friendTemplate).compile(),
         photo: jtoh(newPhotoTemplate).compile(),
+        wall_photo: jtoh(newPhotoTemplate).compile(),
         photo_tag: jtoh(photoTagTemplate).compile()
     };
 
@@ -88,6 +89,7 @@ define([
                     });
                     break;
                 default:
+                    // TODO handle unknown type
                     View = ItemView.extend({
                         template: compiledTemplates[type]
                     });

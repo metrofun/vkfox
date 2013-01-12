@@ -5658,19 +5658,39 @@ body {
   cursor: pointer;
 }
 
-.item-recent.out .item-content:before {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  margin-top: 1px;
-  margin-right: 6px;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url("assets/frameworks/twitter-bootstrap/img/glyphicons-halflings.png");
-  background-position: -168px 0;
-  background-repeat: no-repeat;
-  content: '';
+.item-recent .align-right {
+  text-align: right;
 }
+
+/* .item-recent.out { */
+
+/* .item-content:before { */
+
+/* content: ''; */
+
+/* display: inline-block; */
+
+/* width: 14px; */
+
+/* height: 14px; */
+
+/* line-height: 14px; */
+
+/* vertical-align: text-top; */
+
+/* background-image: url("@{iconSpritePath}"); */
+
+/* background-repeat: no-repeat; */
+
+/* margin-top: 1px; */
+
+/* .icon-user(); */
+
+/* margin-right: 6px; */
+
+/* } */
+
+/* } */
 
 .item-recent.favourite .action-favourite {
   display: inline !important;
