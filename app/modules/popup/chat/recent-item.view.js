@@ -13,7 +13,6 @@ define([
             initialize: function () {
                 var self = this;
                 this.model.on('change:messages', function () {
-                    console.log(template);
                     self.$el.find('.item-content').replaceWith(jtoh(
                         jtoh(template).getElementsByClassName('item-content')[0]
                     ).build(self.model.toJSON()));

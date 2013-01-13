@@ -107,29 +107,29 @@ define([
                 })
             });
         },
-        renderFriendsItems: function () {
-            var ITEMS_PER_TICK = 10, $itemsHolder = this.$el.find('.items');
+        // renderFriendsItems: function () {
+            // var ITEMS_PER_TICK = 10, $itemsHolder = this.$el.find('.items');
 
-            // split all friends into chunks
-            _(this.model.get('friends').groupBy(function (friend, i) {
-                return i % ITEMS_PER_TICK;
-            })).forEach(function (collection) {
-                // defer rendering of chunks
-                _.defer(function () {
-                    var fragment = document.createDocumentFragment();
+            // // split all friends into chunks
+            // _(this.model.get('friends').groupBy(function (friend, i) {
+                // return i % ITEMS_PER_TICK;
+            // })).forEach(function (collection) {
+                // // defer rendering of chunks
+                // _.defer(function () {
+                    // var fragment = document.createDocumentFragment();
 
-                    collection.forEach(function (friend) {
-                        var FriendView = new this.FriendView({
-                            el: fragment,
-                            model: new Backbone.Model({
-                                profile: friend.toJSON()
-                            })
-                        });
-                    }, this);
+                    // collection.forEach(function (friend) {
+                        // var FriendView = new this.FriendView({
+                            // el: fragment,
+                            // model: new Backbone.Model({
+                                // profile: friend.toJSON()
+                            // })
+                        // });
+                    // }, this);
 
-                    $itemsHolder.append(fragment);
-                }.bind(this));
-            }.bind(this));
-        }
+                    // $itemsHolder.append(fragment);
+                // }.bind(this));
+            // }.bind(this));
+        // }
     });
 });

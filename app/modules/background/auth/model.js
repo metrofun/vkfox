@@ -29,7 +29,7 @@ define(['underscore', 'mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbo
                 Mediator.sub('auth:login', this.login.bind(this));
                 Mediator.sub('auth:iframe', function (url) {
                     try {
-                        this.set('userId',  url.match(/user_id=(\w+)(?:&|$)/i)[1]);
+                        this.set('userId',  parseInt(url.match(/user_id=(\w+)(?:&|$)/i)[1], 10));
                         // save memory
                         this.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
                         this.$iframe.remove();

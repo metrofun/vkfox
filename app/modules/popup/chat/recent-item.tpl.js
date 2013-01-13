@@ -9,15 +9,22 @@ define([
         content = jtoh(tpl).getElementsByClassName('item-content')[0];
 
     avatar.attributes.src = function (data) {
-        if (data.profiles.length === 1) {
-            return data.profiles[0].photo;
+        var companionProfile;
+        if (!data.chat_id) {
+            data.profiles.some(function (profile) {
+                if (profile.uid === data.uid) {
+                    companionProfile = profile;
+                    return true;
+                }
+            });
+            return companionProfile.photo;
         }
     };
     avatar.tagName = function (data) {
-        return data.profiles.length === 1 ? 'img':'div';
+        return !data.chat_id ? 'img':'div';
     };
     avatar.innerHTML = function (data) {
-        if (data.profiles.length > 1) {
+        if (data.chat_id) {
             return [
                 {tagName: 'i', className: 'icon-user'},
                 data.profiles.length
@@ -47,24 +54,58 @@ define([
         return data.uid;
     };
     jtoh(tpl).getElementsByClassName('name')[0].innerHTML = function (data) {
-        return data.profiles.map(function (profile) {
+        var profiles = data.profiles;
+
+        if (!data.chat_id) {
+            profiles.some(function (profile) {
+                if (profile.uid === data.uid) {
+                    profiles = [profile];
+                    return true;
+                }
+            });
+        }
+        return profiles.map(function (profile) {
             return [profile.first_name, profile.last_name].join(' ');
         }).join(', ');
     };
-    content.innerHTML = function (data) {
-        return data.messages.map(function (message, i) {
-            var content = [message.body, jtoh(attachmentsTemplate).build({
-                item: message
-            })];
-            if (i < data.messages.length - 1) {
-                content.push('</br>');
+    content.tagName = 'blockquote';
+    content.innerHTML = [
+        {
+            tagName: 'p',
+            innerHTML: function (data) {
+                return data.messages.map(function (message, i) {
+                    var content = [message.body, jtoh(attachmentsTemplate).build({
+                        item: message
+                    })];
+                    if (i < data.messages.length - 1) {
+                        content.push('</br>');
+                    }
+                    return content;
+                });
             }
-            return content;
-        });
-    };
+        },
+        function (data) {
+            var senderUid = data.messages[0].uid,
+                senderProfile;
+
+            data.profiles.some(function (profile) {
+                console.log(profile.uid, senderUid);
+                if (profile.uid === senderUid) {
+                    senderProfile = profile;
+                    return true;
+                }
+            });
+
+            if ((data.chat_id || data.uid !== senderUid) && senderProfile) {
+                return {tagName: 'small', innerHTML: [
+                    senderProfile.first_name, senderProfile.last_name
+                ].join(' ')};
+            }
+        }
+    ];
     content.className.push(function (data) {
-        if (data.messages[0].out || data.chat_id) {
-            return ' align-right';
+        if (data.messages[0].uid !== data.uid) {
+            return ' pull-right';
         }
     });
     jtoh(tpl).getElementsByClassName('actions')[0].innerHTML = [

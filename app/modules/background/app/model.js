@@ -38,7 +38,9 @@ define([
             Mediator.sub('auth:success', function (authData) {
                 usersModel = new UsersModel();
                 newsfeedModel = new NewsfeedModel();
-                chatModel = new ChatModel();
+                chatModel = new ChatModel({
+                    userId: authData.userId
+                });
                 feedbackModel = new FeedbackModel();
                 // friendsModel = new FriendsModel();
             });
