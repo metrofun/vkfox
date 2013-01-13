@@ -4,7 +4,7 @@ define([
     'jtoh',
     'mediator/mediator',
     'item/view',
-    'chat/recent-item.tpl',
+    'chat/item/tpl',
     'jquery.dropdown'
 ], function (_, Backbone, jtoh, Mediator, ItemView, template) {
     return ItemView.extend(
@@ -12,12 +12,16 @@ define([
             template: jtoh(template).compile(),
             initialize: function () {
                 var self = this;
+                // this.model.on('all', function () {
+                    // console.log(arguments);
+                // });
                 this.model.on('change:messages', function () {
                     self.$el.find('.item-content').replaceWith(jtoh(
                         jtoh(template).getElementsByClassName('item-content')[0]
                     ).build(self.model.toJSON()));
                 });
                 ItemView.prototype.initialize.apply(this, arguments);
+                // this.setElement(jQuery(this.template(this.model)).appendTo(this.el), true);
             }
         }, {
             toggleFavourite: function ($el) {

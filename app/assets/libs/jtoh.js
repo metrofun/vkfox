@@ -93,21 +93,30 @@
     }
 
     function getElementsByClassName(json, needle) {
-        var elementClassName, result = [], isMatched;
+        var className, classNameStatic, result = [], isMatched;
+
         if (Array.isArray(json)) {
             json.forEach(function (json) {
                 result = result.concat(getElementsByClassName(json, needle));
             });
-        } else if (typeof json === 'object' && (json.className || (json.attributes && json.attributes.class))) {
-            elementClassName = ' ' + (json.className || json.attributes.class) + ' ';
-            isMatched = needle.split(' ').every(function (className) {
-                return elementClassName.indexOf(' ' + className + ' ') !== -1;
-            });
-            if (isMatched) {
-                result.push(json);
-            }
-            if (json.innerHTML) {
-                result = result.concat(getElementsByClassName(json.innerHTML, needle));
+        } else if (typeof json === 'object') {
+            className = (json.attributes && json.attributes.class) || json.className;
+
+            if (className) {
+                // search only through already known classes
+                classNameStatic = ' ' + [].concat(className).filter(function (token) {
+                    return typeof token === 'string';
+                }).join('') + ' ';
+
+                isMatched = needle.split(' ').every(function (className) {
+                    return classNameStatic.indexOf(' ' + className + ' ') !== -1;
+                });
+                if (isMatched) {
+                    result.push(json);
+                }
+                if (json.innerHTML) {
+                    result = result.concat(getElementsByClassName(json.innerHTML, needle));
+                }
             }
         }
         return result;

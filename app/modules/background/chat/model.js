@@ -3,8 +3,9 @@ define([
     'underscore',
     'backbone',
     'request/request',
-    'mediator/mediator'
-], function (_, Backbone, request, Mediator) {
+    'mediator/mediator',
+    'auth/model'
+], function (_, Backbone, request, Mediator, AuthModel) {
     var LONG_POLL_WAIT = 25,
         MAX_HISTORY_COUNT = 10;
 
@@ -24,11 +25,12 @@ define([
                 code: 'return API.messages.getDialogs({preview_length: 0});'
             }).done(function (response) {
                 self.get('dialogs').reset(response.slice(1).map(function (item) {
+                    // convert dialog data into message data
                     return {
                         id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,
                         chat_id: item.chat_id,
                         uid: item.uid,
-                        messages: [item]
+                        messages: [self.convertDialogIntoMessageData(item)]
                     };
                 }));
             });
@@ -75,7 +77,16 @@ define([
             });
             dialog.set('messages', updatedMessages);
         },
+        convertDialogIntoMessageData: function (dialog) {
+            var message = dialog;
+            if (message.out) {
+                message.uid = this.userId;
+                delete message.out;
+            }
+            return message;
+        },
         getProfiles: function () {
+            var self = this;
             return jQuery.when.apply(jQuery, this.get('dialogs').map(function (dialog) {
                 var
                 uids = _.uniq(_.flatten(dialog.get('messages').map(function (message) {
@@ -83,7 +94,7 @@ define([
                     if (chatActive) {
                         return chatActive.split(',').map(function (uid) {return parseInt(uid, 10); });
                     } else {
-                        return message.uid;
+                        return [message.uid, dialog.get('uid')];
                     }
                 }))),
                 deffer = jQuery.Deferred();
@@ -103,9 +114,10 @@ define([
                 return deffer;
             }));
         },
-        initialize: function () {
+        initialize: function (params) {
             var self = this;
 
+            this.userId = params.userId;
             this.getDialogs().done(function () {
                 jQuery.when(
                     self.getUnreadMessages(),
@@ -187,18 +199,19 @@ define([
                 flags = update[2],
                 attachment = update[7],
                 message, dialog, messageDeferred,
-                self = this;
+                self = this, out;
 
             if (_(attachment).isEmpty()) {
+                out = +!!(flags & 2);
                 // zero index contains quantity
                 messageDeferred = jQuery.Deferred().resolve([1, {
                     body: update[6],
                     title: update[5],
                     date: update[4],
-                    uid: update[3],
+                    uid: out ? update[3]:self.userId,
                     read_state: +!(flags & 1),
                     mid: messageId,
-                    out: +!!(flags & 2)
+                    // out: +!!(flags & 2)
                 }]);
                 console.log('isEmpty');
             } else {

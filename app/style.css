@@ -5662,6 +5662,16 @@ body {
   text-align: right;
 }
 
+.item-recent .item-inner {
+  overflow: hidden;
+}
+
+.item-recent .item-content {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
 /* .item-recent.out { */
 
 /* .item-content:before { */
