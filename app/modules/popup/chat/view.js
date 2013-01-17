@@ -5,9 +5,8 @@ define([
     'mediator/mediator',
     'request/request',
     'chat/tpl',
-    'chat/friend-item.tpl',
-    'item/view',
-    'chat/recent-item.view',
+    'chat/item/view',
+    'chat/item/model',
     'jquery.dropdown'
 ], function (
     _,
@@ -16,15 +15,11 @@ define([
     Mediator,
     request,
     template,
-    friendTemplate,
     ItemView,
-    RecentView
+    ItemModel
 ) {
     return Backbone.View.extend({
         template: jtoh(template).build(),
-        FriendView: ItemView.extend({
-            template: jtoh(friendTemplate).compile()
-        }),
         model: new Backbone.Model({
             itemsViews : new (Backbone.Collection.extend({
                 comparator: function (itemView) {
@@ -39,7 +34,7 @@ define([
                     uid = item.data('owner-id');
 
                 if (typeof uid !== 'undefined') {
-                    RecentView.toggleFavourite(item);
+                    ItemView.toggleFavourite(item);
                 }
             },
             'click .action-message, .item-content': function (e) {
@@ -48,7 +43,7 @@ define([
                     chat_id = item.data('chat-id');
 
                 if (typeof uid !== 'undefined') {
-                    RecentView.toggleReply(item, function (value) {
+                    ItemView.toggleReply(item, function (value) {
                         var params = {
                             message: jQuery.trim(value)
                         };
@@ -84,14 +79,14 @@ define([
                 var view = self.model.get('itemsViews').get(dialog.id);
 
                 if (view) {
-                    view.get('view').model.set(dialog);
+                    view.get('view').model.set(new ItemModel(dialog).toJSON());
                     view.get('view').$el.appendTo(fragment);
                 } else {
                     self.model.get('itemsViews').add({
                         id: dialog.id,
-                        view: new RecentView({
+                        view: new ItemView({
                             el: fragment,
-                            model: new Backbone.Model(dialog)
+                            model: new ItemModel(dialog)
                         })
                     });
                 }

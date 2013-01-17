@@ -1,17 +1,7 @@
 define(['jtoh'], function (jtoh) {
     return {
-        className: [
-            'item ',
-            function (data) {
-                return data.profile && data.profile.online ? 'online':undefined;
-            }
-        ],
-
-        attributes: {
-            'data-owner-id': function (data) {
-                return (data.profile && data.profile.uid) || (data.group && -data.group.gid);
-            }
-        },
+        className: ['item '],
+        attributes: {},
         innerHTML: [
             {
                 className: 'item-inner',

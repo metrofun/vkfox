@@ -90,7 +90,6 @@ define([
     ];
     content.className.push(function (data) {
         if (data.messages[0].uid !== data.uid) {
-            console.log(data);
             return ' pull-right';
         }
     });

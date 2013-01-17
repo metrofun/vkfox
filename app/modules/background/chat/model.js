@@ -66,10 +66,10 @@ define([
          */
         removeReadMessages: function (dialog) {
             var messages = dialog.get('messages'),
-                updatedMessages = [], dialogOut = messages[messages.length - 1].out;
+                updatedMessages = [], dialogCompanionUid = messages[messages.length - 1].uid;
 
             messages.reverse().some(function (message) {
-                if (message.out !== dialogOut && message.read_state) {
+                if (message.uid !== dialogCompanionUid && message.read_state) {
                     return true;
                 } else {
                     updatedMessages.unshift(message);
@@ -92,7 +92,9 @@ define([
                 uids = _.uniq(_.flatten(dialog.get('messages').map(function (message) {
                     var chatActive = message.chat_active;
                     if (chatActive) {
-                        return chatActive.split(',').map(function (uid) {return parseInt(uid, 10); });
+                        return chatActive.split(',').map(function (uid) {
+                            return parseInt(uid, 10);
+                        }).concat(self.userId);
                     } else {
                         return [message.uid, dialog.get('uid')];
                     }
@@ -100,6 +102,7 @@ define([
                 deffer = jQuery.Deferred();
 
                 if (uids.length) {
+                    console.log(uids);
                     Mediator.pub('users:get', uids);
                     Mediator.sub('users:' + uids.join(), function handler(data) {
                         Mediator.unsub('users:' + uids.join(), handler);
@@ -129,67 +132,36 @@ define([
                     Mediator.pub('chat:data', self.toJSON());
                 });
             });
-            this.enableLongPollUpdates();
+            Mediator.sub('longpoll:updates', this.onUpdates.bind(this));
         },
-        enableLongPollUpdates: function () {
-            var self = this;
-            request.api({
-                code: 'return API.messages.getLongPollServer();'
-            }).done(function (response) {
-                self.longPollParams = response;
-                self.fetchUpdates();
-            });
-        },
-        fetchUpdates: function () {
-            var self = this;
+        onUpdates: function (updates) {
+            updates.forEach(function (update) {
+                var messageId, mask;
 
-            request.get('http://' + this.longPollParams.server, {
-                act: 'a_check',
-                key:  this.longPollParams.key,
-                ts: this.longPollParams.ts,
-                wait: LONG_POLL_WAIT,
-                mode: 2
-            }, function (response) {
-                var data = JSON.parse(jQuery.trim(response));
-
-                if (!data.updates) {
-                    self.enableLongPollUpdates();
-                    return;
-                }
-
-                data.updates.forEach(function (update) {
-                    var messageId, mask;
-
-                    // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
-                    switch (update[0]) {
+                // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
+                switch (update[0]) {
                     // reset message flags (FLAGS&=~$mask)
-                    case 3:
-                        messageId = update[1],
-                        mask = update[2];
-                        if (messageId && mask) {
-                            self.get('dialogs').some(function (dialog) {
-                                return dialog.get('messages').some(function (message) {
-                                    if (message.mid === messageId) {
-                                        message.read_state = mask & 1;
-                                        self.removeReadMessages(dialog);
-                                        Mediator.pub('chat:data', self.toJSON());
-                                        return true;
-                                    }
-                                });
-                            });
-                        }
-                        break;
-                    case 4:
-                        self.addNewMessage(update);
-                        break;
+                case 3:
+                    messageId = update[1],
+                    mask = update[2];
+                    if (messageId && mask) {
+                        this.get('dialogs').some(function (dialog) {
+                            return dialog.get('messages').some(function (message) {
+                                if (message.mid === messageId) {
+                                    message.read_state = mask & 1;
+                                    this.removeReadMessages(dialog);
+                                    Mediator.pub('chat:data', this.toJSON());
+                                    return true;
+                                }
+                            }, this);
+                        });
                     }
-                });
-
-                self.longPollParams.ts = data.ts;
-                self.fetchUpdates();
-            }, 'text').fail(function () {
-                self.enableLongPollUpdates();
-            });
+                    break;
+                case 4:
+                    this.addNewMessage(update);
+                    break;
+                }
+            }, this);
         },
         /*
          * @param {Object} update Update object from long poll
@@ -199,8 +171,10 @@ define([
                 flags = update[2],
                 attachment = update[7],
                 message, dialog, messageDeferred,
+                dialogCompanionUid = update[3],
                 self = this, out;
 
+            // For messages from chat attachment contains "from" property
             if (_(attachment).isEmpty()) {
                 out = +!!(flags & 2);
                 // zero index contains quantity
@@ -208,23 +182,21 @@ define([
                     body: update[6],
                     title: update[5],
                     date: update[4],
-                    uid: out ? update[3]:self.userId,
+                    uid: out ? self.userId:dialogCompanionUid,
                     read_state: +!(flags & 1),
                     mid: messageId,
                     // out: +!!(flags & 2)
                 }]);
-                console.log('isEmpty');
             } else {
                 messageDeferred = request.api({
                     code: 'return API.messages.getById({mid: ' + messageId + '});'
                 });
-                console.log('getById');
             }
 
             messageDeferred.done(function (response) {
                 // zero index contains quantity
                 var message = response[1],
-                    dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + message.uid;
+                    dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
                 dialog = self.get('dialogs').get(dialogId);
                 if (dialog) {
@@ -235,7 +207,7 @@ define([
                 } else {
                     self.get('dialogs').add({
                         id: dialogId,
-                        uid: message.uid,
+                        uid: dialogCompanionUid,
                         chat_id: message.chat_id,
                         messages: [message]
                     });

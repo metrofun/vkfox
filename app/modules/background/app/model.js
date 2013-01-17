@@ -5,9 +5,8 @@ define([
     'newsfeed/model',
     'feedback/model',
     'users/model',
-    'friends/model',
-    'request/request',
-    'mediator/mediator'
+    'longpoll/model',
+    'mediator/mediator',
 ], function (
     Backbone,
     AuthModel,
@@ -15,8 +14,7 @@ define([
     NewsfeedModel,
     FeedbackModel,
     UsersModel,
-    FriendsModel,
-    request,
+    LongpollModel,
     Mediator
 ) {
     return Backbone.Model.extend({
@@ -29,7 +27,7 @@ define([
             authModel = new AuthModel(),
             newsfeedModel, feedbackModel,
             chatModel, usersModel,
-            friendsModel;
+            longpollModel;
 
             Mediator.sub('app:view', function () {
                 Mediator.pub('app:data', this.toJSON());
@@ -37,12 +35,12 @@ define([
 
             Mediator.sub('auth:success', function (authData) {
                 usersModel = new UsersModel();
-                newsfeedModel = new NewsfeedModel();
+                // newsfeedModel = new NewsfeedModel();
+                longpollModel = new LongpollModel();
                 chatModel = new ChatModel({
                     userId: authData.userId
                 });
-                feedbackModel = new FeedbackModel();
-                // friendsModel = new FriendsModel();
+                // feedbackModel = new FeedbackModel();
             });
         }
     });

@@ -7,10 +7,9 @@ require.config({
         'jquery.tab': '/assets/frameworks/twitter-bootstrap/js/bootstrap-tab',
         'jquery.typeahead': '/assets/frameworks/twitter-bootstrap/js/bootstrap-typeahead',
         'jquery.dropdown': '/assets/frameworks/twitter-bootstrap/js/bootstrap-dropdown',
-        underscore: '/assets/libs/underscore-min',
+        underscore: '/assets/libs/underscore',
         jtoh: '/assets/libs/jtoh',
-        backbone: '/assets/libs/backbone',
-        'backbone.localStorage': '/assets/libs/backbone.localStorage-min'
+        backbone: '/assets/libs/backbone'
     },
     shim: {
         'jquery.tooltip': {
