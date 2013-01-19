@@ -13,6 +13,9 @@ define(['backbone', 'underscore'], function (Backbone, _) {
         sub: function () {
             dispatcher.on.apply(dispatcher, arguments);
         },
+        once: function () {
+            dispatcher.once.apply(dispatcher, arguments);
+        },
         unsub: function () {
             dispatcher.off.apply(dispatcher, arguments);
         }

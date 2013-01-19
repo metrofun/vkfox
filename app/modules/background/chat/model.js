@@ -102,11 +102,8 @@ define([
                 deffer = jQuery.Deferred();
 
                 if (uids.length) {
-                    console.log(uids);
-                    Mediator.pub('users:get', uids);
-                    Mediator.sub('users:' + uids.join(), function handler(data) {
-                        Mediator.unsub('users:' + uids.join(), handler);
-
+                    Mediator.pub('users:getById', uids);
+                    Mediator.once('users:' + uids.join(), function handler(data) {
                         dialog.set('profiles', data);
                         deffer.resolve();
                     });

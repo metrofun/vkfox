@@ -17,13 +17,19 @@ define([
             }))()
         },
         initialize: function () {
+            var requestDeferred = this.requestFriends(),
+                self = this;
             this.dropOldNonFriendsProfiles();
-            this.getFriends();
-            Mediator.sub('users:get', this.onGet.bind(this));
-            Mediator.sub('users:getFriends', this.onGetFriends.bind(this));
+
+            Mediator.sub('users:getById', this.onGet.bind(this));
+            Mediator.sub('users:getFriends', function () {
+                requestDeferred.done(function () {
+                    self.onGetFriends();
+                });
+            });
         },
-        getFriends: function () {
-            request.api({
+        requestFriends: function () {
+            return request.api({
                 code: 'return API.friends.get({ fields : "photo,sex,nickname,lists" })'
             }).done(function (response) {
                 if (response && response.length) {
@@ -44,7 +50,7 @@ define([
         onGetFriends: function () {
             Mediator.pub('users:friends', this.get('users').filter(function (model) {
                 return model.get('isFriend');
-            }).toJSON());
+            }));
         },
         // TODO bulk several requests to users.get
         onGet: function (uids) {

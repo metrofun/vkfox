@@ -9,9 +9,7 @@ define(['mediator/mediator', 'underscore'], function (Mediator, _) {
                 id: id,
                 arguments: [].slice.apply(arguments)
             });
-            Mediator.sub('request:' + id, function handler(data) {
-                Mediator.unsub('request:' + id, handler);
-
+            Mediator.once('request:' + id, function (data) {
                 ajaxDeferred[data.method].apply(ajaxDeferred, data.arguments);
             });
 

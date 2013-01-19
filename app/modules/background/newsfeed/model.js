@@ -20,10 +20,8 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                     return sourceId > 0;
                 }), self = this;
 
-                Mediator.pub('users:get', uids);
-                Mediator.sub('users:' + uids.join(), function handler(data) {
-                    Mediator.unsub('users:' + uids.join(), handler);
-
+                Mediator.pub('users:getById', uids);
+                Mediator.once('users:' + uids.join(), function handler(data) {
                     self.get('profiles').add(data);
                     self.updateOnlineStatus();
                 });
