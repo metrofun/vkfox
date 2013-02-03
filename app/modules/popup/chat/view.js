@@ -29,16 +29,16 @@ define([
             }))()
         }),
         events: {
-            'click .action-favourite': function (e) {
-                var item = jQuery(e.target).parents('.item'),
-                    uid = item.data('owner-id');
+            // 'click .action-favourite': function (e) {
+                // var item = jQuery(e.target).parents('.item'),
+                    // uid = item.data('owner-id');
 
-                if (typeof uid !== 'undefined') {
-                    ItemView.toggleFavourite(item);
-                }
-            },
-            'click .action-message, .item-content': function (e) {
-                var item = jQuery(e.target).parents('.item'),
+                // if (typeof uid !== 'undefined') {
+                    // ItemView.toggleFavourite(item);
+                // }
+            // },
+            'click .t-item__action--message, .t-item__content': function (e) {
+                var item = jQuery(e.target).parents('.t-item'),
                     uid = item.data('owner-id'),
                     chat_id = item.data('chat-id');
 

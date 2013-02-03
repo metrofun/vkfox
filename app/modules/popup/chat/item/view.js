@@ -16,8 +16,8 @@ define([
                     // console.log(arguments);
                 // });
                 this.model.on('change:messages', function () {
-                    self.$el.find('.item-content').replaceWith(jtoh(
-                        jtoh(template).getElementsByClassName('item-content')[0]
+                    self.$el.find('.t-item__content').replaceWith(jtoh(
+                        jtoh(template).getElementsByClassName('.t-item__content')[0]
                     ).build(self.model.toJSON()));
                 });
                 ItemView.prototype.initialize.apply(this, arguments);

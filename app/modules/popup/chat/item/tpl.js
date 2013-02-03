@@ -5,8 +5,8 @@ define([
     'item/attachments'
 ], function (jtoh, jQuery, itemTemplate, attachmentsTemplate) {
     var tpl = jQuery.extend(true, {}, itemTemplate),
-        avatar = jtoh(tpl).getElementsByClassName('avatar')[0],
-        content = jtoh(tpl).getElementsByClassName('item-content')[0];
+        avatar = jtoh(tpl).getElementsByClassName('t-item__img')[0],
+        content = jtoh(tpl).getElementsByClassName('t-item__content')[0];
 
     avatar.attributes.src = function (data) {
         var companionProfile;
@@ -26,12 +26,11 @@ define([
         }
     };
 
-    tpl.className[1] = function (data) {
+    tpl.className = ['t-item t-item--chat ', function (data) {
         if (!data.chat_id) {
-            return data.profiles.at(0).get('online') ? 'online':undefined;
+            return data.profiles.at(0).get('online') ? 'is-online':undefined;
         }
-    };
-    tpl.className.push(' item-recent');
+    }];
     // TODO
     // tpl.className.push(function (data) {
         // if (data.item.read_state === 0) {
@@ -47,7 +46,7 @@ define([
     tpl.attributes['data-owner-id'] = function (data) {
         return data.uid;
     };
-    jtoh(tpl).getElementsByClassName('name')[0].innerHTML = function (data) {
+    jtoh(tpl).getElementsByClassName('t-item__author')[0].innerHTML = function (data) {
         var profiles = data.profiles;
 
         if (!data.chat_id) {
@@ -93,8 +92,8 @@ define([
             return ' pull-right';
         }
     });
-    jtoh(tpl).getElementsByClassName('actions')[0].innerHTML = [
-        {tagName: 'a', className: 'action action-message', attributes: {href: '#'}, innerHTML: [
+    jtoh(tpl).getElementsByClassName('t-item__actions')[0].innerHTML = [
+        {tagName: 'a', className: 't-item__action t-item__action--message', attributes: {href: '#'}, innerHTML: [
             {tagName: 'i', className: 'icon-envelope'}
         ]},
         // function (data) {

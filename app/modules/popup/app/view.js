@@ -2,7 +2,7 @@ define([
     'jtoh',
     'backbone',
     'app/tpl',
-    // 'chat/view',
+    'chat/view',
     // 'newsfeed/view',
     // 'feedback/view',
     'buddies/view',
@@ -16,7 +16,7 @@ define([
     jtoh,
     Backbone,
     template,
-    // ChatView,
+    ChatView,
     // NewsfeedView,
     // FeedbackView,
     BuddiesView,
@@ -49,9 +49,9 @@ define([
             });
             Mediator.pub('app:view');
             Mediator.sub('app:data', function (data) {
-                // chatView = new ChatView({
-                    // el: this.$el.find('#chat')
-                // });
+                chatView = new ChatView({
+                    el: this.$el.find('#chat')
+                });
 
                 // newsfeedView = new NewsfeedView({
                     // el: this.$el.find('#news')

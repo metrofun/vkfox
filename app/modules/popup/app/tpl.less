@@ -1,3 +1,16 @@
+@import-once "components/bootstrap/less/bootstrap.less";
+
+@iconSpritePath:          "components/bootstrap/img/glyphicons-halflings.png";
+@iconWhiteSpritePath:     "components/bootstrap/img/glyphicons-halflings-white.png";
+@iconWhiteInvertSpritePath: "modules/popup/common/glyphicons-halflings-white-invert.png";
+
+a > [class^="icon-"] {
+    background-image: url("@{iconWhiteInvertSpritePath}");
+    background-color: @linkColor;
+}
+a:hover > [class^="icon-"] {
+    background-color: @linkColorHover;
+}
 body {
     /* overflow: hidden; */
     background: @grayLighter;
