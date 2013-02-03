@@ -5,6 +5,7 @@
     background: @white;
     padding: 6px @itemPadding @itemPadding;
     position: relative;
+    overflow: hidden;
 
     &:first-child  {
         .border-radius(4px 4px 0 0);
@@ -14,14 +15,15 @@
     }
 
     & .item  {
-        margin: 0 -@itemPadding -@itemPadding;
+        margin: -@itemPadding -@itemPadding;
 
         .avatar {
             display: none;
         }
     }
     &-inner {
-        padding-left: @iconSize + @itemPadding;
+        /* padding-left: @iconSize + @itemPadding; */
+        box-sizing: border-box;
     }
     &-header {
         overflow: hidden;
@@ -30,15 +32,19 @@
     &-content {
         overflow: hidden;
         text-overflow: ellipsis;
+        width: 100%;
     }
     .avatar {
         width: @iconSize;
         height: @iconSize;
         cursor: pointer;
-        position: absolute;
-        top: @itemPadding;
-        left: @itemPadding;
+        margin-right: @itemPadding;
+        margin-top: @itemPadding;
+        /* position: absolute; */
+        /* top: @itemPadding; */
+        /* left: @itemPadding; */
         .border-radius(4px);
+        float: left;
         z-index: 1;
     }
     &.online .name:after {

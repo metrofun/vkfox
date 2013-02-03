@@ -1,8 +1,9 @@
 {
-    "name": "vkfox",
-    "version": "5.0.0",
-    "dependencies": {
-        "grunt-recess": ">= 0.1.1",
-        "grunt-clean": ">= 0.1.0"
-    }
+  "name": "vkfox",
+  "version": "5.0.0",
+  "dependencies": {
+    "grunt-recess": "~0.3.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-watch": "~0.1.4"
+  }
 }

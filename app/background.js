@@ -2,10 +2,10 @@
 require.config({
     baseUrl: '/modules/background',
     paths: {
-        jquery: '/assets/libs/jquery-1.8.2',
-        underscore: '/assets/libs/underscore',
-        jtoh: '/assets/libs/jtoh',
-        backbone: '/assets/libs/backbone'
+        jquery: '/components/jquery/jquery',
+        underscore: '/components/underscore/underscore',
+        jtoh: '/components/jtoh/jtoh',
+        backbone: '/components/backbone/backbone'
     },
     shim: {
         'underscore': {

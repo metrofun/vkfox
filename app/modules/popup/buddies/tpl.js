@@ -13,9 +13,6 @@ define(['jtoh'], function (jtoh) {
                     className: 'btn-group pull-right',
                     attributes: {'data-toggle': 'buttons-checkbox'},
                     innerHTML: [
-                        // {tagName: 'button', attributes: {type: 'button'}, className: 'btn', innerHTML: '&#9794;'},
-                        // {tagName: 'button', attributes: {type: 'button'}, className: 'btn', innerHTML: '&#9792;'},
-                        // {tagName: 'button', attributes: {type: 'button'}, className: 'btn', innerHTML: '1'},
                         {
                             tagName: 'button',
                             className: 'btn dropdown-toggle',

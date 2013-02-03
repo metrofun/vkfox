@@ -2,9 +2,10 @@ define([
     'jtoh',
     'backbone',
     'app/tpl',
-    'chat/view',
-    'newsfeed/view',
-    'feedback/view',
+    // 'chat/view',
+    // 'newsfeed/view',
+    // 'feedback/view',
+    'buddies/view',
     'common/common',
     'jquery',
     'mediator/mediator',
@@ -15,9 +16,10 @@ define([
     jtoh,
     Backbone,
     template,
-    ChatView,
-    NewsfeedView,
-    FeedbackView,
+    // ChatView,
+    // NewsfeedView,
+    // FeedbackView,
+    BuddiesView,
     common,
     jQuery,
     Mediator
@@ -32,7 +34,7 @@ define([
         // },
         initialize: function () {
             var newsfeedView, feedbackView,
-                chatView;
+                chatView, buddiesView;
 
             this.$el.append(this.template);
 
@@ -47,16 +49,20 @@ define([
             });
             Mediator.pub('app:view');
             Mediator.sub('app:data', function (data) {
-                chatView = new ChatView({
-                    el: this.$el.find('#chat')
-                });
+                // chatView = new ChatView({
+                    // el: this.$el.find('#chat')
+                // });
 
-                newsfeedView = new NewsfeedView({
-                    el: this.$el.find('#news')
-                });
+                // newsfeedView = new NewsfeedView({
+                    // el: this.$el.find('#news')
+                // });
 
-                feedbackView = new FeedbackView({
-                    el: this.$el.find('#feedback')
+                // feedbackView = new FeedbackView({
+                    // el: this.$el.find('#feedback')
+                // });
+
+                buddiesView = new BuddiesView({
+                    el: this.$el.find('#buddies')
                 });
             }.bind(this));
         }

@@ -58,6 +58,7 @@ define(['underscore', 'mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbo
             }, RETRY_INTERVAL),
             login: function () {
                 if (!this.$iframe) {
+                    console.log(jQuery, jtoh);
                     this.$iframe = jQuery(jtoh(template).build(this.authURL));
                 } else {
                     this.$iframe.attr('src', this.authURL);
