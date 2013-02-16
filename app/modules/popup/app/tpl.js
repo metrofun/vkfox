@@ -22,7 +22,7 @@ define(['jtoh'], function (jtoh) {
                     }},
                     {className: 'active', tagName: 'li', innerHTML: {
                         tagName: 'a',
-                        attributes: {href: '#news'},
+                        attributes: {href: '#buddies'},
                         innerHTML: 'Buddies'
                     }}
                 ]}

@@ -52,12 +52,23 @@
        font-size: 12px;
 
        &__action {
-           display: none;
+           opacity: 0;
            text-decoration: none !important;
        }
    }
+   &__action {
+       opacity: 0;
+       text-decoration: none !important;
+   }
+   &:hover .t-item__action {
+       opacity: 1;
+   }
    &__content {
        .text-overflow();
+   }
+
+   & + .t-item {
+       border-top: 1px solid @grayLighter;
    }
 }
 /* .item { */

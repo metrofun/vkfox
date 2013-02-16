@@ -92,7 +92,7 @@ define([
                 uids = _.uniq(_.flatten(dialog.get('messages').map(function (message) {
                     var chatActive = message.chat_active;
                     if (chatActive) {
-                        return chatActive.split(',').map(function (uid) {
+                        return chatActive.map(function (uid) {
                             return parseInt(uid, 10);
                         }).concat(self.userId);
                     } else {
@@ -102,7 +102,7 @@ define([
                 deffer = jQuery.Deferred();
 
                 if (uids.length) {
-                    Mediator.pub('users:getById', uids);
+                    Mediator.pub('users:get', uids);
                     Mediator.once('users:' + uids.join(), function handler(data) {
                         dialog.set('profiles', data);
                         deffer.resolve();

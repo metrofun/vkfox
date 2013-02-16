@@ -3,6 +3,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function (jQuery, Mediator
     API_QUERIES_PER_REQUEST = 15,
     API_DOMAIN = 'https://api.vk.com/',
     API_REQUESTS_DEBOUNCE = 400,
+    API_VERSION = 5,
 
     accessToken, apiQueriesQueue = [],
     request = {
@@ -105,7 +106,8 @@ define(['jquery', 'mediator/mediator', 'underscore'], function (jQuery, Mediator
                     {
                         method: 'execute',
                         code: executeCode,
-                        access_token: accessToken
+                        access_token: accessToken,
+                        v: API_VERSION
                     },
                     function (data) {
                         var response = data.response, i;
@@ -124,9 +126,15 @@ define(['jquery', 'mediator/mediator', 'underscore'], function (jQuery, Mediator
     });
     Mediator.sub('request', function (params) {
         request[params.method].apply(request, params.arguments).done(function () {
-            Mediator.pub('request:' + params.id, {method: 'resolve', arguments: arguments});
+            Mediator.pub('request:' + params.id, {
+                method: 'resolve',
+                arguments: [].slice.call(arguments)
+            });
         }).fail(function () {
-            Mediator.pub('request:' + params.id, {method: 'reject', arguments: arguments});
+            Mediator.pub('request:' + params.id, {
+                method: 'reject',
+                arguments: [].slice.call(arguments)
+            });
         });
     });
 

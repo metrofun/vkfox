@@ -19,7 +19,7 @@ define(['underscore', 'mediator/mediator', 'jtoh', 'auth/tpl', 'jquery', 'backbo
                     'scope=539774',
                     'redirect_uri=http://oauth.vk.com/blank.html',
                     'response_type=token',
-                    'display=popup'
+                    'display=wap'
                 ].join('&')
             ].join(''),
             initialize: function () {

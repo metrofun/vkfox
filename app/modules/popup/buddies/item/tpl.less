@@ -1,4 +1,13 @@
-.item-friend .actions [class*="icon-"] {
-    margin-top: 0;
-    margin-right: 2px;
+.t-buddies__item.is-favourite {
+    .t-buddies__toggle-favourite {
+        opacity: 1;
+
+        [class^="icon-"] {
+            background-color: @btnWarningBackground;
+        }
+
+        &:hover [class^="icon-"] {
+            background-color: @btnWarningBackgroundHighlight;
+        }
+    }
 }

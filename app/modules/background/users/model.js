@@ -21,8 +21,8 @@ define([
                 self = this;
             this.dropOldNonFriendsProfiles();
 
-            Mediator.sub('users:getById', this.onGet.bind(this));
-            Mediator.sub('users:getFriends', function () {
+            Mediator.sub('users:get', this.onGet.bind(this));
+            Mediator.sub('users:friends:get', function () {
                 requestDeferred.done(function () {
                     self.onGetFriends();
                 });
@@ -30,7 +30,7 @@ define([
         },
         requestFriends: function () {
             return request.api({
-                code: 'return API.friends.get({ fields : "photo,sex,nickname,lists" })'
+                code: 'return API.friends.get({ fields : "photo,sex,nickname,lists", order: "hints" })'
             }).done(function (response) {
                 if (response && response.length) {
                     response.forEach(function (friendData) {
@@ -54,7 +54,7 @@ define([
         },
         // TODO bulk several requests to users.get
         onGet: function (uids) {
-            this.usersGetQueue.push(uids);
+            this.usersGetQueue.push([].concat(uids));
             this.processGetUsersQueue();
         },
         processGetUsersQueue: _.debounce(function () {
@@ -77,14 +77,14 @@ define([
         publishUids: function () {
             var data, uids;
             function getUid(uid) {
-                return this.get('users').get(uid);
+                return _.clone(this.get('users').get(uid));
             }
 
             while (this.usersGetQueue.length) {
                 uids = this.usersGetQueue.pop();
                 data = uids.map(getUid, this);
 
-                Mediator.pub('users:' + uids.join(), data);
+                Mediator.pub('users:' + uids.join(), data.length === 1 ? data[0]:data);
             }
         }
     });
