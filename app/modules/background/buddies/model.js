@@ -34,13 +34,18 @@ define([
                 Mediator.pub('buddies:data', friends);
             });
 
-            Mediator.sub('buddies:getData', function () {
+            Mediator.sub('buddies:data:get', function () {
                 self.getFriendsDeferred.done(function () {
                     Mediator.pub('buddies:data', self.get('buddies').toJSON());
                 });
             });
             Mediator.sub('buddies:favourite:toggle', self.toggleFavourite.bind(self));
         },
+        /**
+         * Toggles favourite and resorts models
+         *
+         * @param {Number} uid Friend or non friend id
+         */
         toggleFavourite: function (uid) {
             var buddies = this.get('buddies'),
                 profile = buddies.get(uid);
@@ -54,7 +59,8 @@ define([
                         buddies.remove(profile);
                     }
                 } else {
-                    // Index only on set, on unset it will be already indexed
+                    // Need to index friends, when any is favourited
+                    // So it would be correctly places, when defavourited
                     this.indexFriendModels();
                     profile.set('favourite', true);
                     buddies.sort();
@@ -82,6 +88,7 @@ define([
                 length = buddies.length;
 
             if (length && !buddies.at(length - 1).get('originalIndex')) {
+                console.log('fire');
                 buddies.forEach(function (buddie, i) {
                     buddie.set('originalIndex', i);
                 });
