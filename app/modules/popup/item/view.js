@@ -1,5 +1,11 @@
-define(['backbone', 'jtoh', 'jquery', 'item/tpl', 'common/common'], function (Backbone, jtoh, jQuery, template, common) {
-    return Backbone.View.extend({
+define([
+    'backbone.bemview',
+    'jtoh',
+    'jquery',
+    'item/tpl',
+    'common/common'
+], function (Backbone, jtoh, jQuery, template, common) {
+    return Backbone.BEMView.extend({
         initialize: function () {
             this.setElement(jQuery(this.template(this.model.toJSON())).appendTo(this.el), true);
         }

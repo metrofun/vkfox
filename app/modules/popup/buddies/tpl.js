@@ -17,10 +17,10 @@ define(['jtoh'], function (jtoh) {
                         {tagName: 'input', attributes: {
                             type: 'text',
                             placeholder: 'http://vk.com/durov',
-                            class: 'span2 t-buddies__add-fav-button'
+                            class: 'span2 t-buddies__add-fav-input'
                         }},
                         {tagName: 'button', attributes: {
-                            class: 'btn',
+                            class: 'btn t-buddies__add-fav-button',
                             type: 'button'
                             // TODO I18N
                         }, innerHTML: 'Watch'},

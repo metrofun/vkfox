@@ -29,6 +29,10 @@ define([
             }, {name: 'buddies.filters'})
         }),
         events: {
+            // prevent form from submiting
+            'submit .t-buddies__controls': function (e) {
+                return false;
+            },
             'click .t-buddies__dropdown-checkbox': function (e) {
                 var target = e.target;
 
@@ -38,31 +42,10 @@ define([
                 this.$el.find('.t-buddies__item-list').empty();
                 Mediator.pub('buddies:data:get');
             },
-            'click .t-buddies__toggle-favourite': function (e) {
-                var item = jQuery(e.target).parents('.t-buddies__item');
-
-                item.toggleClass('is-favourite');
-                Mediator.pub('buddies:favourite:toggle', item.data('uid'));
-            },
-            'keypress .t-buddies__add-fav-button': function (e) {
-                var value, screenName;
+            'click .t-buddies__add-fav-button': 'addFavouriteBuddie',
+            'keypress .t-buddies__add-fav-input': function (e) {
                 if (e.keyCode === 13) {
-                    value = e.currentTarget.value;
-                    e.currentTarget.value = '';
-                    try {
-                        screenName = value.match(/vk\.com\/([\w_]+)/)[1];
-                    } catch (e) {}
-                    request.api({
-                        code: 'return API.resolveScreenName({screen_name: "' + screenName + '"});'
-                    }).done(function (response) {
-                        var uid;
-                        if (response.type === 'user') {
-                            uid = response.object_id;
-                            Mediator.pub('buddies:favourite:toggle', uid);
-                        // } else {
-                            // FIXME
-                        }
-                    });
+                    this.addFavouriteBuddie();
                 }
             }
         },
@@ -74,19 +57,41 @@ define([
                 this.renderBuddies(buddies);
             }.bind(this));
         },
+        addFavouriteBuddie: function () {
+            var screenName,
+                input = this.$el.find('.t-buddies__add-fav-input'),
+                value = input.val();
+
+            input.val('');
+            try {
+                screenName = value.match(/vk\.com\/([\w_]+)/)[1];
+            } catch (e) {}
+
+            request.api({
+                code: 'return API.resolveScreenName({screen_name: "' + screenName + '"});'
+            }).done(function (response) {
+                var uid;
+                if (response.type === 'user') {
+                    uid = response.object_id;
+                    Mediator.pub('buddies:favourite:toggle', uid);
+                    // } else {
+                        // FIXME
+                }
+            });
+        },
         renderBuddies: function (buddies) {
             var self = this,
                 fragment = document.createDocumentFragment();
 
             buddies.filter(this.filterBuddy, this).forEach(function (buddie) {
-                var view = self.model.get('itemsViews').get(buddie.id);
+                var view = self.model.get('itemsViews').get(buddie.uid);
 
                 if (view) {
                     view.get('view').model.set(buddie);
                     view.get('view').$el.appendTo(fragment);
                 } else {
                     self.model.get('itemsViews').add({
-                        id: buddie.id,
+                        id: buddie.uid,
                         view: new ItemView({
                             el: fragment,
                             model: new Backbone.Model(buddie)

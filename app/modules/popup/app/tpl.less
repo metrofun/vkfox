@@ -4,13 +4,14 @@
 @iconWhiteSpritePath:     "components/bootstrap/img/glyphicons-halflings-white.png";
 @iconWhiteInvertSpritePath: "modules/popup/app/glyphicons-halflings-white-invert.png";
 
-a > [class^="icon-"] {
-    background-image: url("@{iconWhiteInvertSpritePath}");
-    background-color: @linkColor;
+.t-app__color-with-hover (@color) {
+    background-color: @color;
+
+    &:hover {
+        background-color: darken(@color, 15%);
+    }
 }
-a:hover > [class^="icon-"] {
-    background-color: @linkColorHover;
-}
+
 /* FIXME remove */
 body {
     /* overflow: hidden; */

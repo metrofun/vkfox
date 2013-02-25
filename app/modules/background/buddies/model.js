@@ -39,30 +39,34 @@ define([
                     Mediator.pub('buddies:data', self.get('buddies').toJSON());
                 });
             });
-            Mediator.sub('buddies:favourite:toggle', self.toggleFavourite.bind(self));
+            Mediator.sub('buddies:favourite:toggle', self.toggleBuddieField.bind(self, 'favourite'));
+            Mediator.sub('buddies:watched:toggle', self.toggleBuddieField.bind(self, 'watched'));
         },
         /**
-         * Toggles favourite and resorts models
+         * Toggles boolean field of buddie.
+         * If buddie is unknown, then fetch it and add to list.
+         * Also resorts models.
          *
+         * @param {String} field Name of field
          * @param {Number} uid Friend or non friend id
          */
-        toggleFavourite: function (uid) {
+        toggleBuddieField: function (field, uid) {
             var buddies = this.get('buddies'),
                 profile = buddies.get(uid);
 
             if (profile) {
-                if (profile.get('favourite')) {
+                if (profile.get(field)) {
                     if (profile.get('isFriend')) {
-                        profile.unset('favourite');
+                        profile.unset(field);
                         buddies.sort();
                     } else {
                         buddies.remove(profile);
                     }
                 } else {
-                    // Need to index friends, when any is favourited
-                    // So it would be correctly places, when defavourited
+                    // Need to index friends, when fields are changed
+                    // So it would be correctly placed, when field unchanged
                     this.indexFriendModels();
-                    profile.set('favourite', true);
+                    profile.set(field, true);
                     buddies.sort();
                 }
 
@@ -71,15 +75,15 @@ define([
                 // Need to fetch non-friend profile
                 Mediator.pub('users:get', uid);
                 Mediator.once('users:' + uid, function (profile) {
-                    profile.favourite = true;
+                    profile[field] = true;
                     buddies.unshift(profile);
                     Mediator.pub('buddies:data', buddies.toJSON());
                 });
             }
         },
         /**
-         * After favouriting and defavouriting friend
-         * must return to his previous position.
+         * After changing and unchanging any field of buddie,
+         * we need to place it to original place in list,
          * So we add index property.
          * Runs once.
          */
@@ -88,7 +92,6 @@ define([
                 length = buddies.length;
 
             if (length && !buddies.at(length - 1).get('originalIndex')) {
-                console.log('fire');
                 buddies.forEach(function (buddie, i) {
                     buddie.set('originalIndex', i);
                 });

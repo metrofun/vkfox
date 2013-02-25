@@ -2,14 +2,15 @@
 require.config({
     baseUrl: '/modules/popup',
     paths: {
-        jquery: '/components/jquery/jquery',
+        'jquery': '/components/jquery/jquery',
         'jquery.tooltip': '/components/bootstrap/js/bootstrap-tooltip',
         'jquery.tab': '/components/bootstrap/js/bootstrap-tab',
         'jquery.typeahead': '/components/bootstrap/js/bootstrap-typeahead',
         'jquery.dropdown': '/components/bootstrap/js/bootstrap-dropdown',
-        underscore: '/components/underscore/underscore',
-        jtoh: '/components/jtoh/jtoh',
-        backbone: '/components/backbone/backbone'
+        'underscore': '/components/underscore/underscore',
+        'jtoh': '/components/jtoh/jtoh',
+        'backbone': '/components/backbone/backbone',
+        'backbone.bemview': '/components/backbone-bemview/backbone-bemview'
     },
     shim: {
         'jquery.tooltip': {
