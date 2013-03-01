@@ -5,7 +5,7 @@ define(['jtoh'], function (jtoh) {
             innerHTML: {className: 'container', innerHTML: [
                 // {className: 'brand', tagName: 'a', attributes: {href: '#'}, innerHTML: 'VKfox'},
                 {className: 'nav', tagName: 'ul', innerHTML: [
-                    {tagName: 'li', innerHTML: {
+                    {className: 'active', tagName: 'li', innerHTML: {
                         tagName: 'a',
                         attributes: {href: '#chat'},
                         innerHTML: 'Chat'
@@ -20,7 +20,7 @@ define(['jtoh'], function (jtoh) {
                         attributes: {href: '#news'},
                         innerHTML: 'News'
                     }},
-                    {className: 'active', tagName: 'li', innerHTML: {
+                    {tagName: 'li', innerHTML: {
                         tagName: 'a',
                         attributes: {href: '#buddies'},
                         innerHTML: 'Buddies'
@@ -31,10 +31,10 @@ define(['jtoh'], function (jtoh) {
         {
             className: 'tab-content content',
             innerHTML: [
-                {className: 'tab-pane', id: 'chat'},
-                {className: 'tab-pane items', id: 'feedback'},
-                {className: 'tab-pane items', id: 'news'},
-                {className: 'tab-pane active', id: 'buddies'}
+                {className: 'tab-pane t-item-list active', id: 'chat'},
+                {className: 'tab-pane t-item-list', id: 'feedback'},
+                {className: 'tab-pane t-item-list', id: 'news'},
+                {className: 'tab-pane', id: 'buddies'}
             ]
         }
     ];

@@ -1,25 +1,10 @@
-.t-item--chat {
+.t-chat__item {
     .t-item__content {
         cursor: pointer;
         border: 0;
         margin: 0;
         padding: 0;
    }
-}
-.item-recent {
-    .align-right {
-        text-align: right;
-    }
-    .item-inner {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .item-content {
-        cursor: pointer;
-        border: 0;
-        margin: 0;
-        padding: 0;
-    }
 }
 /* .item-recent.out { */
     /* .item-content:before { */
@@ -36,22 +21,3 @@
         /* margin-right: 6px; */
     /* } */
 /* } */
-.item-recent.favourite {
-    .action-favourite {
-        color: @yellow;
-        display: inline !important;
-
-        [class^="icon-"] {
-            background-color: @yellow;
-        }
-
-        @hoverColor: darken(@yellow, 5%);
-        &:hover {
-            color: @hoverColor;
-
-            [class^="icon-"] {
-                background-color: @hoverColor;
-            }
-        }
-    }
-}

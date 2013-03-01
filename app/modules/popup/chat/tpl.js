@@ -40,6 +40,6 @@ define(['jtoh'], function (jtoh) {
                 }
             ]
         }}},
-        {className: 'items'}
+        {className: 't-item-list '}
     ];
 });

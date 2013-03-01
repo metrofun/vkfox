@@ -1,4 +1,4 @@
-define(['jtoh'], function (jtoh) {
+define(['jtoh', 'buddies/i18n'], function (jtoh, i18n) {
     return [
         {className: 'navbar navbar-static-top', innerHTML: {
             className: 'navbar-inner form-inline navbar-form t-buddies__controls',
@@ -7,13 +7,6 @@ define(['jtoh'], function (jtoh) {
                 {
                     className: 'input-append',
                     innerHTML: [
-                        // {className: 'add-on', innerHTML: [
-                            // 'Watch'
-                            // // {
-                                // // tagName: 'i',
-                                // // className: 'icon-star'
-                                // // }
-                        // ]},
                         {tagName: 'input', attributes: {
                             type: 'text',
                             placeholder: 'http://vk.com/durov',
@@ -23,22 +16,9 @@ define(['jtoh'], function (jtoh) {
                             class: 'btn t-buddies__add-fav-button',
                             type: 'button'
                             // TODO I18N
-                        }, innerHTML: 'Watch'},
+                        }, innerHTML: i18n('watch')},
                     ]
                 },
-                // {
-                    // tagName: 'label',
-                    // className: 'checkbox',
-                    // innerHTML: [
-                        // {
-                            // tagName: 'input',
-                            // attributes: {
-                                // type: 'checkbox',
-                            // }
-                        // },
-                        // 'Offline'
-                    // ]
-                // },
                 {
                     className: 'btn-group pull-right',
                     attributes: {'data-toggle': 'buttons-checkbox'},
@@ -48,8 +28,8 @@ define(['jtoh'], function (jtoh) {
                             className: 'btn dropdown-toggle',
                             attributes: {'data-toggle': 'dropdown', type: 'button'},
                             innerHTML: [
-                                'Filter ',
-                                // {tagName: 'i', className: 'icon-align-justify'}, ' ',
+                                // i18n('filter'), ' ',
+                                {tagName: 'i', className: 'icon-align-justify'}, ' ',
                                 {className: 'caret'}
                             ]
                         },
@@ -71,8 +51,7 @@ define(['jtoh'], function (jtoh) {
                                                     type: 'checkbox',
                                                 }
                                             },
-                                            //TODO I18N
-                                            checkboxName
+                                            i18n(checkboxName)
                                         ]
                                     }}};
                                 });
@@ -82,6 +61,6 @@ define(['jtoh'], function (jtoh) {
                 }
             ]
         }},
-        {className: 't-buddies__item-list'}
+        {className: 't-item-list'}
     ];
 });

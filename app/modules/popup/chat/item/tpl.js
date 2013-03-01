@@ -9,7 +9,6 @@ define([
         content = jtoh(tpl).getElementsByClassName('t-item__content')[0];
 
     avatar.attributes.src = function (data) {
-        var companionProfile;
         if (!data.chat_id) {
             return data.profiles.get(data.uid).get('photo');
         }
@@ -26,20 +25,11 @@ define([
         }
     };
 
-    tpl.className = ['t-item t-item--chat ', function (data) {
+    tpl.className.push([' t-chat__item ', function (data) {
         if (!data.chat_id) {
             return data.profiles.at(0).get('online') ? 'is-online':undefined;
         }
-    }];
-    // TODO
-    // tpl.className.push(function (data) {
-        // if (data.item.read_state === 0) {
-            // return ' unread';
-        // }
-    // });
-    // tpl.attributes['data-mid'] = function (data) {
-        // return data.item.mid;
-    // };
+    }]);
     tpl.attributes['data-chat-id'] = function (data) {
         return data.chat_id;
     };
@@ -47,10 +37,10 @@ define([
         return data.uid;
     };
     jtoh(tpl).getElementsByClassName('t-item__author')[0].innerHTML = function (data) {
-        var profiles = data.profiles;
+        var profiles;
 
         if (!data.chat_id) {
-            profiles = [profiles.get(data.uid).toJSON()];
+            profiles = [data.profiles.get(data.uid).toJSON()];
         } else {
             profiles = data.profiles.toJSON();
         }
@@ -92,17 +82,21 @@ define([
             return ' pull-right';
         }
     });
-    jtoh(tpl).getElementsByClassName('t-item__actions')[0].innerHTML = [
-        {tagName: 'a', className: 't-item__action t-item__action--message', attributes: {href: '#'}, innerHTML: [
-            {tagName: 'i', className: 'icon-envelope'}
-        ]},
-        // function (data) {
-            // if (data.profiles.length === 1 && data.profiles[0].hasOwnProperty('online')) {
-                // return [' ', {tagName: 'a', className: 'action action-favourite', attributes: {href: '#'}, innerHTML: [
-                    // {tagName: 'i', className: 'icon-star'}
-                // ]}];
-            // }
-        // }
-    ];
+    jtoh(tpl).getElementsByClassName('t-item__actions')[0].innerHTML = (function () {
+        var elements = [
+            /*TODO i18n */
+            {name: 'toggle-message', icon: 'icon-envelope', title: 'Write message'}
+        ];
+
+        return elements.map(function (element) {
+            return {
+                tagName: 'i',
+                attributes: {
+                    title: element.title,
+                    class: 't-item__action t-chat__' + element.name + ' ' + element.icon
+                }
+            };
+        });
+    }());
     return tpl;
 });

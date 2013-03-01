@@ -4,7 +4,6 @@ define([
     'jtoh',
     'mediator/mediator',
     'request/request',
-    'chat/tpl',
     'chat/item/view',
     'chat/item/model',
     'jquery.dropdown'
@@ -14,12 +13,10 @@ define([
     jtoh,
     Mediator,
     request,
-    template,
     ItemView,
     ItemModel
 ) {
     return Backbone.View.extend({
-        template: jtoh(template).build(),
         model: new Backbone.Model({
             itemsViews : new (Backbone.Collection.extend({
                 comparator: function (itemView) {
@@ -29,14 +26,6 @@ define([
             }))()
         }),
         events: {
-            // 'click .action-favourite': function (e) {
-                // var item = jQuery(e.target).parents('.item'),
-                    // uid = item.data('owner-id');
-
-                // if (typeof uid !== 'undefined') {
-                    // ItemView.toggleFavourite(item);
-                // }
-            // },
             'click .t-item__action--message, .t-item__content': function (e) {
                 var item = jQuery(e.target).parents('.t-item'),
                     uid = item.data('owner-id'),
@@ -64,8 +53,6 @@ define([
             }
         },
         initialize: function () {
-            this.$el.append(this.template);
-
             Mediator.pub('chat:view');
             Mediator.sub('chat:data', function (data) {
                 this.renderDialogs(data.dialogs);
@@ -91,40 +78,7 @@ define([
                     });
                 }
             });
-            this.$el.find('.items').prepend(fragment);
-        },
-        renderControls: function () {
-            this.$el.find('.dropdown-toggle').dropdown();
-
-            this.$el.find('.typeahead').typeahead({
-                source: this.model.get('friends').map(function (friend) {
-                    return [friend.get('first_name'), friend.get('last_name')].join(' ');
-                })
-            });
-        },
-        // renderFriendsItems: function () {
-            // var ITEMS_PER_TICK = 10, $itemsHolder = this.$el.find('.items');
-
-            // // split all friends into chunks
-            // _(this.model.get('friends').groupBy(function (friend, i) {
-                // return i % ITEMS_PER_TICK;
-            // })).forEach(function (collection) {
-                // // defer rendering of chunks
-                // _.defer(function () {
-                    // var fragment = document.createDocumentFragment();
-
-                    // collection.forEach(function (friend) {
-                        // var FriendView = new this.FriendView({
-                            // el: fragment,
-                            // model: new Backbone.Model({
-                                // profile: friend.toJSON()
-                            // })
-                        // });
-                    // }, this);
-
-                    // $itemsHolder.append(fragment);
-                // }.bind(this));
-            // }.bind(this));
-        // }
+            this.$el.prepend(fragment);
+        }
     });
 });

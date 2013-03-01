@@ -72,7 +72,8 @@
    }
    &__content {
        clear: both;
-       .text-overflow();
+       overflow: hidden;
+       text-overflow: ellipsis;
    }
    & + .t-item {
        border-top: 1px solid @grayLighter;
