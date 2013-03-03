@@ -7,11 +7,6 @@ define([
 ], function (jtoh, Mediator, ItemView, template) {
     return ItemView.extend({
         events: {
-            'mouseover .t-buddies__item': function (e) {
-                jQuery('t-item__action', e.target).tooltip({
-                    delay: { show: 0, hide: 0 }
-                });
-            },
             'click .t-buddies__toggle-watch': function (e) {
                 this.$el.toggleClass('is-watched');
                 Mediator.pub('buddies:watched:toggle', this.$el.data('uid'));

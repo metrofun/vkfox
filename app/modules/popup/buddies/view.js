@@ -99,7 +99,7 @@ define([
                     });
                 }
             });
-            this.$el.find('.t-buddies__item-list').prepend(fragment);
+            this.$el.find('.t-item-list').prepend(fragment);
         },
         /**
          * Filters buddie according to selected filters

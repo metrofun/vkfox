@@ -5,7 +5,12 @@ define(function () {
         var store = {};
 
         function i18n(key, data) {
-            var translation = store[key][lang];
+            var translation;
+            try {
+                translation = store[key][lang];
+            } catch (e) {
+                throw new Error('Undefined keyset: ' + lang + ' ' + key);
+            }
 
             if (typeof translation === 'function') {
                 return translation(data);

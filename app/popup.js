@@ -7,6 +7,7 @@ require.config({
         'jquery.tab': '/components/bootstrap/js/bootstrap-tab',
         'jquery.typeahead': '/components/bootstrap/js/bootstrap-typeahead',
         'jquery.dropdown': '/components/bootstrap/js/bootstrap-dropdown',
+        'jquery.button': '/components/bootstrap/js/bootstrap-button',
         'underscore': '/components/underscore/underscore',
         'jtoh': '/components/jtoh/jtoh',
         'backbone': '/components/backbone/backbone',

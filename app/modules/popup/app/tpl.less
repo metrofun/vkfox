@@ -7,6 +7,13 @@
 /* @baseFontSize:          14px; */
 @baseLineHeight:        16px;
 
+/* FIXME remove */
+body {
+    /* overflow: hidden; */
+    width: 320px;
+    height: 480px;
+}
+
 .t-app__color-with-hover (@color) {
     background-color: @color;
 
@@ -15,10 +22,6 @@
     }
 }
 
-/* FIXME remove */
-body {
-    /* overflow: hidden; */
+.t-app__content {
     background: @grayLighter;
-    width: 320px;
-    height: 480px;
 }

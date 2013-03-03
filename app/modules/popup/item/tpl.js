@@ -5,7 +5,6 @@ define(['jtoh'], function (jtoh) {
         innerHTML: [
             {
                 className: 'pull-left',
-                tagName: 'a',
                 innerHTML: {className: 't-item__img media-object', tagName: 'img', attributes: {
                     src: function (data) {
                         return data.profile ? data.profile.photo:data.group.photo;

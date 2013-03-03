@@ -1,19 +1,16 @@
 define([
-    'backbone.bemview',
+    'backbone',
     'jtoh',
     'jquery',
     'item/tpl',
     'common/common'
 ], function (Backbone, jtoh, jQuery, template, common) {
-    return Backbone.BEMView.extend({
-        initialize: function () {
-            this.setElement(jQuery(this.template(this.model.toJSON())).appendTo(this.el), true);
-        }
-    }, {
-        toggleReply: function toggleReply($el, callback, placeholder) {
-            if ($el.find('.item-reply').length === 0) {
+    return Backbone.View.extend({
+        toggleReply: function ($el, callback, placeholder) {
+            var reply = $el.find('.t-item__reply');
+            if (reply.length === 0) {
                 $el.append(jtoh({
-                    className: 'item-reply',
+                    className: 't-item__reply',
                     innerHTML: {tagName: 'textarea', attributes: {
                         placeholder: placeholder || undefined
                     }}
@@ -24,8 +21,11 @@ define([
                     }
                 });
             } else {
-                $el.find('.item-reply').remove();
+                reply.remove();
             }
+        },
+        initialize: function () {
+            this.setElement(jQuery(this.template(this.model.toJSON())).appendTo(this.el), true);
         }
     });
 });

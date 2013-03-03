@@ -2,8 +2,9 @@ define([
     'jtoh',
     'jquery',
     'item/tpl',
-    'item/attachments'
-], function (jtoh, jQuery, itemTemplate, attachmentsTemplate) {
+    'item/attachments',
+    'chat/i18n'
+], function (jtoh, jQuery, itemTemplate, attachmentsTemplate, i18n) {
     var tpl = jQuery.extend(true, {}, itemTemplate),
         avatar = jtoh(tpl).getElementsByClassName('t-item__img')[0],
         content = jtoh(tpl).getElementsByClassName('t-item__content')[0];
@@ -33,7 +34,7 @@ define([
     tpl.attributes['data-chat-id'] = function (data) {
         return data.chat_id;
     };
-    tpl.attributes['data-owner-id'] = function (data) {
+    tpl.attributes['data-uid'] = function (data) {
         return data.uid;
     };
     jtoh(tpl).getElementsByClassName('t-item__author')[0].innerHTML = function (data) {
@@ -84,8 +85,7 @@ define([
     });
     jtoh(tpl).getElementsByClassName('t-item__actions')[0].innerHTML = (function () {
         var elements = [
-            /*TODO i18n */
-            {name: 'toggle-message', icon: 'icon-envelope', title: 'Write message'}
+            {name: 'toggle-message', icon: 'icon-envelope', title: i18n('private-message')}
         ];
 
         return elements.map(function (element) {
