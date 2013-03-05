@@ -43,7 +43,7 @@ define([
                 });
                 buddiesModel = new BuddiesModel();
                 // newsfeedModel = new NewsfeedModel();
-                // feedbackModel = new FeedbackModel();
+                feedbackModel = new FeedbackModel();
             });
         }
     });
