@@ -29,9 +29,9 @@ define([
                 self.model.set('activeTab', tabName);
             });
 
-            // feedbackView = new FeedbackView({
-                // el: this.$el.find('#t-updates__feedback')
-            // });
+            feedbackView = new FeedbackView({
+                el: this.$el.find('#t-updates__feedback')
+            });
         }
     });
 });

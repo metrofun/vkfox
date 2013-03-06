@@ -39,8 +39,6 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                     });
 
                     response.news.items.slice(1).map(self.processNewsItem.bind(self));
-
-                    console.log(self.toJSON());
                 });
 
                 Mediator.sub('feedback:view', function () {
@@ -86,8 +84,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                 if (parentType) {
                     itemID  = this.generateItemID(parentType, parent);
                     if (!(itemModel = this.get('items').get(itemID))) {
-                        itemModel = this.createFeedbackItem(parentType, parent);
-                        console.log(typeof itemModel.id);
+                        itemModel = this.createFeedbackItem(parentType, parent, true);
                         this.get('items').add(itemModel);
                     }
                     itemModel.get('feedbacks').add({
@@ -98,7 +95,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                         this.owners.get(this.getOwnerID(parent))
                     );
                 } else {
-                    this.get('items').add(this.createFeedbackItem(feedbackType, feedback));
+                    this.get('items').add(this.createFeedbackItem(feedbackType, feedback, false));
                 }
             },
             /**
@@ -140,17 +137,20 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
              *
              * @return {Object}
              */
-            createFeedbackItem: function (type, parent) {
-                return new Backbone.Model({
+            createFeedbackItem: function (type, parent, canHaveFeedbacks) {
+                var itemModel = new Backbone.Model({
                     id: this.generateItemID(type, parent),
                     parent: parent,
                     type: type,
                     owners: new Backbone.Collection([
                         this.owners.get(this.getOwnerID(parent))
-                    ]),
-                    // TODO implement sorting
-                    feedbacks: new Backbone.Collection()
+                    ])
                 });
+                if (canHaveFeedbacks) {
+                    // TODO implement sorting
+                    itemModel.set('feedbacks', new Backbone.Collection());
+                }
+                return itemModel;
             }
         });
     }
