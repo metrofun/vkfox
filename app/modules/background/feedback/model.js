@@ -140,7 +140,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
             createFeedbackItem: function (type, parent, canHaveFeedbacks) {
                 var itemModel = new Backbone.Model({
                     id: this.generateItemID(type, parent),
-                    parent: parent,
+                    item: parent,
                     type: type,
                     owners: new Backbone.Collection([
                         this.owners.get(this.getOwnerID(parent))

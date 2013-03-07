@@ -2,7 +2,7 @@ define([
     'jtoh',
     'jquery',
     'item/tpl',
-    'item/attachments',
+    'item/__attachments.tpl',
     'chat/i18n'
 ], function (jtoh, jQuery, itemTemplate, attachmentsTemplate, i18n) {
     var tpl = jQuery.extend(true, {}, itemTemplate),
