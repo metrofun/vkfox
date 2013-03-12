@@ -2,9 +2,9 @@ define([
     'jtoh',
     'jquery',
     'item/tpl',
-    'item/__attachments.tpl',
+    'item/__attachment.tpl',
     'chat/i18n'
-], function (jtoh, jQuery, itemTemplate, attachmentsTemplate, i18n) {
+], function (jtoh, jQuery, itemTemplate, attachmentTemplate, i18n) {
     var tpl = jQuery.extend(true, {}, itemTemplate),
         avatar = jtoh(tpl).getElementsByClassName('t-item__img')[0],
         content = jtoh(tpl).getElementsByClassName('t-item__content')[0];
@@ -55,9 +55,8 @@ define([
             tagName: 'p',
             innerHTML: function (data) {
                 return data.messages.map(function (message, i) {
-                    var content = [message.body, jtoh(attachmentsTemplate).build({
-                        item: message
-                    })];
+                    // TODO attachments
+                    var content = [message.body];
                     if (i < data.messages.length - 1) {
                         content.push('</br>');
                     }

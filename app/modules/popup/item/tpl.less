@@ -74,6 +74,14 @@
        clear: both;
        overflow: hidden;
        text-overflow: ellipsis;
+       padding-bottom: 1px;
+   }
+   &__attachment {
+       max-width: 100%;
+   }
+   &__picture {
+       box-sizing: border-box;
+       .img-polaroid();
    }
    & + .t-item {
        border-top: 1px solid @grayLighter;

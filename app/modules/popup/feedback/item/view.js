@@ -9,8 +9,7 @@ define([
     return ItemView.extend({
         template: jtoh(template).compile(),
         initialize: function () {
-            var self = this,
-                type = this.model.get('type');
+            var self = this;
 
             if (this.model.get('feedbacks')) {
                 this.model.on('change:feedbacks', function () {});

@@ -134,13 +134,14 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
              *
              * @param {String} type Type of parent: post, wall, topic, photo etc
              * @param {Object} parent
+             * @param {Boolean} canHaveFeedbacks
              *
              * @return {Object}
              */
             createFeedbackItem: function (type, parent, canHaveFeedbacks) {
                 var itemModel = new Backbone.Model({
                     id: this.generateItemID(type, parent),
-                    item: parent,
+                    parent: parent,
                     type: type,
                     owners: new Backbone.Collection([
                         this.owners.get(this.getOwnerID(parent))
