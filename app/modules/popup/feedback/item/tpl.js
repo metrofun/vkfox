@@ -4,7 +4,7 @@ define([
     'item/tpl',
     'item/__attachment.tpl'
 ], function (jtoh, jQuery, itemTemplate, attachmentTemplate) {
-    var tpl = jQuery.extend(true, {}, itemTemplate), i = 0;
+    var tpl = jQuery.extend(true, {}, itemTemplate);
 
     jtoh(tpl).getElementsByClassName('t-item__img')[0].attributes.src = function (data) {
         return data.owners[0].photo;
@@ -21,6 +21,14 @@ define([
             attachment.type = data.type;
             attachment[data.type] = data.parent;
             return attachmentTemplate(attachment);
+        case 'topic':
+            return data.parent.title;
+        case 'post':
+        case 'comment':
+            return [
+                data.parent.text,
+                (data.parent.attachments || []).map(attachmentTemplate)
+            ];
         }
     };
 
