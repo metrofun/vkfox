@@ -6,6 +6,7 @@
     "jtoh": "https://github.com/metrofun/jtoh.git",
     "bootstrap": "~2.2.2",
     "requirejs": "~2.1.4",
-    "backbone-bemview": "https://github.com/metrofun/backbone-bemview.git"
+    "backbone-bemview": "https://github.com/metrofun/backbone-bemview.git",
+    "angular-unstable": "~1.1.5"
   }
 }

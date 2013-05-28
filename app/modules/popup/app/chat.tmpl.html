@@ -1,0 +1,22 @@
+<ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
+<div ng-controller="chatCtrl" class="t-item-list">
+    <item ng-repeat="dialog in data">
+        <div image ng-switch on="!!dialog.chat_id">
+            <img ng-switch-when="false" ng-src="{{dialog.photo}}" class="t-item__img media-object">
+            <div ng-switch-when="true" class="t-item__img media-object">
+                <i class="icon-user"></i>{{dialog.profiles.length}}
+            </div>
+        </div>
+        <content>
+            <blockquote
+                ng-class="messageAuthor && 'pull-right'"
+                ng-click="showReply = !showReply"
+                class="t-item__content">
+                <p ng-repeat="message in dialog.messages">
+                {{message.body}}<br/>
+                </p>
+                <small ng-if="messageAuthor">{{messageAuthor}}</small>
+            </blockquote>
+        </content>
+    </item>
+</div>

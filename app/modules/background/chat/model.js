@@ -104,7 +104,7 @@ define([
                 if (uids.length) {
                     Mediator.pub('users:get', uids);
                     Mediator.once('users:' + uids.join(), function handler(data) {
-                        dialog.set('profiles', data);
+                        dialog.set('profiles', [].concat(data));
                         deffer.resolve();
                     });
                 } else {
@@ -123,7 +123,7 @@ define([
                     self.getUnreadMessages(),
                     self.getProfiles()
                 ).done(function () {
-                    Mediator.sub('chat:view', function () {
+                    Mediator.sub('chat:data:get', function () {
                         Mediator.pub('chat:data', self.toJSON());
                     });
                     Mediator.pub('chat:data', self.toJSON());

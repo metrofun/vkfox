@@ -1,63 +1,6 @@
-angular.module('app', ['router', 'item'])
-    .controller('navigationCtrl', function ($scope, $location) {
-        $scope.locationPath = $location.path();
-        $scope.location = $location;
-        $scope.$watch('location.path()', function (path) {
-            $scope.locationPath = path;
-        });
-        $scope.tabs = [
-            {
-                href: '/chat',
-                name: 'Chat'
-            },
-            {
-                href: '/buddies',
-                name: 'Buddies'
-            },
-            {
-                href: '/updates',
-                name: 'Updates'
-            }
-        ];
-    })
-    .controller('buddiesCtrl', function ($scope, mediator) {
-        mediator.pub('buddies:data:get');
-        mediator.sub('buddies:data', function (data) {
-            $scope.$apply(function () {
-                $scope.data = data;
-            });
-        }.bind(this));
-    })
+console.log('123');
+angular.module('app', [])
     .controller('chatCtrl', function ($scope, mediator) {
-        mediator.pub('chat:data:get');
-        mediator.sub('chat:data', function (data) {
-            $scope.$apply(function () {
-                $scope.data = data.dialogs;
-            });
-        }.bind(this));
-    })
-    .controller('feedCtrl', function ($scope) {
-        var dialog = $scope.dialog,
-            profile,
-            messageAuthorId = dialog.messages[0].uid;
-
-        if (dialog.chat_id) {
-        } else {
-            profile = _(dialog.profiles).findWhere({
-                uid: dialog.uid
-            });
-
-            $scope.photo = profile.photo;
-            $scope.title = profile.first_name + ' ' + profile.last_name;
-        }
-
-        if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
-            profile = _(dialog.profiles).findWhere({
-                uid: messageAuthorId
-            });
-
-            $scope.messageAuthor = profile.first_name + ' ' + profile.last_name;
-        }
     });
 
 define(['i18n/i18n'], function (I18N) {
@@ -1253,40 +1196,6 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     return tpl;
 });
 
-angular.module('item', [])
-    .controller('ItemController', function ($scope) {
-    })
-    .directive('item', function factory() {
-        return {
-            controller: 'ItemController',
-            templateUrl: '/modules/popup/item/item.tmpl.html',
-            replace: true,
-            transclude: true,
-            restrict: 'E',
-            scope: {
-                onSend: '&send'
-            }
-        };
-    })
-    .directive('image', function factory() {
-        return {
-            require: '^item',
-            templateUrl: '/modules/popup/item/image.tmpl.html',
-            replace: true,
-            transclude: true,
-            restrict: 'AE',
-        };
-    })
-    .directive('content', function factory() {
-        return {
-            require: '^item',
-            templateUrl: '/modules/popup/item/content.tmpl.html',
-            replace: true,
-            transclude: true,
-            restrict: 'E',
-        };
-    });
-
 define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     var tpl = jQuery.extend(true, {}, itemTemplate);
     jtoh(tpl).getElementsByClassName('item-content')[0].innerHTML = function (data) {
@@ -1621,25 +1530,6 @@ define(['mediator/mediator', 'underscore'], function (Mediator, _) {
         }
     };
 });
-
-
-angular.module('router', [])
-    .config(function ($routeProvider, $locationProvider, $compileProvider) {
-        $locationProvider.html5Mode(true);
-
-        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension):/);
-
-        $routeProvider
-            .when('/chat', {
-                templateUrl: '/modules/popup/app/chat.tmpl.html'
-            })
-            .when('/buddies', {
-                templateUrl: '/modules/popup/app/buddies.tmpl.html'
-            })
-            .otherwise({
-                templateUrl: '/modules/popup/app/chat.tmpl.html'
-            });
-    });
 
 
 define(['backbone'], function (Backbone) {

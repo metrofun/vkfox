@@ -6187,8 +6187,6 @@ body {
 
 .t-item__picture {
   box-sizing: border-box;
-  /* .img-polaroid(); */
-
 }
 
 .t-item + .t-item {
