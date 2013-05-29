@@ -1,4 +1,4 @@
-angular.module('app', ['router', 'item'])
+angular.module('app', ['router', 'item', 'filters'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.location = $location;
@@ -32,33 +32,30 @@ angular.module('app', ['router', 'item'])
         mediator.pub('chat:data:get');
         mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
-                $scope.data = data.dialogs;
+                $scope.data = data.dialogs.map(function (dialog) {
+                    var messageAuthorId = dialog.messages[0].uid, result = {};
+
+                    if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
+                        result.author = _(dialog.profiles).findWhere({
+                            uid: messageAuthorId
+                        });
+                    }
+                    if (dialog.chat_id) {
+                        result.owners = dialog.profiles;
+                    } else {
+                        result.owners = [_(dialog.profiles).findWhere({
+                            uid: dialog.uid
+                        })];
+                    }
+
+                    result.messages = dialog.messages;
+
+                    return result;
+                });
             });
         }.bind(this));
-    })
-    .controller('feedCtrl', function ($scope) {
-        var dialog = $scope.dialog,
-            profile,
-            messageAuthorId = dialog.messages[0].uid;
-
-        if (dialog.chat_id) {
-        } else {
-            profile = _(dialog.profiles).findWhere({
-                uid: dialog.uid
-            });
-
-            $scope.photo = profile.photo;
-            $scope.title = profile.first_name + ' ' + profile.last_name;
-        }
-
-        if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
-            profile = _(dialog.profiles).findWhere({
-                uid: messageAuthorId
-            });
-
-            $scope.messageAuthor = profile.first_name + ' ' + profile.last_name;
-        }
     });
+
 
 define(['i18n/i18n'], function (I18N) {
     var i18n = new I18N();
@@ -1146,6 +1143,13 @@ define([
     });
 });
 
+angular.module('filters', [])
+    .filter('name', function () {
+        return function (input) {
+            return input.first_name + ' ' + input.last_name;
+        };
+    });
+
 define(function () {
     var lang = window.navigator.language.match(/(ru)|(en)/)[1] || 'ru';
 
@@ -1253,9 +1257,7 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     return tpl;
 });
 
-angular.module('item', [])
-    .controller('ItemController', function ($scope) {
-    })
+angular.module('item', ['filters'])
     .directive('item', function factory() {
         return {
             controller: 'ItemController',
@@ -1264,28 +1266,12 @@ angular.module('item', [])
             transclude: true,
             restrict: 'E',
             scope: {
+                owners: '=owners',
                 onSend: '&send'
             }
         };
     })
-    .directive('image', function factory() {
-        return {
-            require: '^item',
-            templateUrl: '/modules/popup/item/image.tmpl.html',
-            replace: true,
-            transclude: true,
-            restrict: 'AE',
-        };
-    })
-    .directive('content', function factory() {
-        return {
-            require: '^item',
-            templateUrl: '/modules/popup/item/content.tmpl.html',
-            replace: true,
-            transclude: true,
-            restrict: 'E',
-        };
-    });
+
 
 define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     var tpl = jQuery.extend(true, {}, itemTemplate);
