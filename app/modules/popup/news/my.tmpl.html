@@ -1,0 +1,21 @@
+<div ng-controller="FeedbackController" class="t-item-list">
+    <item
+        ng-repeat="feedback in data"
+        owners="feedback.owners">
+        <div ng-if="feedback.type == 'photo' || feedback.type == 'video'">
+            <attachment data="feedback.parent" type="{{feedback.type}}">
+            </attachment>
+        </div>
+        <div ng-if="feedback.type == 'topic'">
+            {{feedback.parent.title}}
+        </div>
+        <div ng-if="['post', 'comment', 'wall'].indexOf(feedback.type) !== -1">
+            {{feedback.parent.text}}
+            <attachment
+                ng-repeat="attachment in feedback.parent.attachments"
+                data="attachment[attachment.type]"
+                type="{{attachment.type}}">
+            </attachment>
+        </div>
+    </item>
+</div>

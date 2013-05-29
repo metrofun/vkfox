@@ -1,12 +1,12 @@
-<div class="t-item media">
-    <div ng-switch on="owners.length > 1" class="pull-left">
-        <img ng-switch-when="false" ng-src="{{owners[0].photo}}" class="t-item__img media-object">
-        <div ng-switch-when="true" class="t-item__img media-object">
+<div class="t-item media" ng-class="{'is-online': owner.online}">
+    <div ng-switch on="!!owner" class="pull-left">
+        <img ng-switch-when="true" ng-src="{{owner.photo}}" class="t-item__img media-object">
+        <div ng-switch-when="false" class="t-item__img media-object">
             <i class="icon-user"></i>{{owners.length}}
         </div>
     </div>
     <div class="media-body" ng-transclude>
-        <strong class="t-item__author media-heading">{{owners[0] | name}}</strong>
+        <strong class="t-item__author media-heading">{{owner | name}}</strong>
     </div>
     <div ng-if="showReply" class="t-item__reply">
         <textarea></textarea>

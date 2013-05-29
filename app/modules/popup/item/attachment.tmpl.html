@@ -1,0 +1,25 @@
+<ng-switch on="type">
+    <img ng-switch-when="graffiti" ng-src="{{data.src}}" class="img-polaroid" />
+    <img ng-switch-when="photo" ng-src="{{data.src}}" class="img-polaroid" />
+    <img ng-switch-when="posted_photo" ng-src="{{data.src}}" class="img-polaroid" />
+    <img ng-switch-when="app" ng-src="{{data.src}}"/>
+    <div ng-switch-when="video">
+        <img ng-src="{{data.image}}" class="img-polaroid" />
+        <p><i class="icon-film"></i>{{data.title}}</p>
+    </div>
+    <p ng-switch-when="audio">
+        <i class="icon-music"></i> {{data.performer}} - {{data.title}}
+    </p>
+    <a ng-switch-when="link" href="{{data.url}}">
+        <i class="icon-share-alt"></i> {{data.url}}
+    </a>
+    <a ng-switch-when="note" href="/note{{data.owner_id}}_{{data.nid}}">
+        <i class="icon-file"></i> {{data.title}}
+    </a>
+    <a ng-switch-when="doc" href="#">
+        <i class="icon-file"></i> {{data.title}}
+    </a>
+    <a ng-switch-when="poll" href="{{data.url}}">
+        <i class="icon-list-alt"></i> {{data.question}}
+    </a>
+</ng-switch>

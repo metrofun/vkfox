@@ -1,4 +1,4 @@
-angular.module('app', ['router', 'item', 'filters'])
+angular.module('app', ['router', 'item', 'filters', 'news'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.location = $location;
@@ -15,16 +15,18 @@ angular.module('app', ['router', 'item', 'filters'])
                 name: 'Buddies'
             },
             {
-                href: '/updates',
-                name: 'Updates'
+                href: '/news',
+                name: 'News'
             }
         ];
     })
     .controller('buddiesCtrl', function ($scope, mediator) {
+        var PRELOAD_ITEMS = 15;
+
         mediator.pub('buddies:data:get');
         mediator.sub('buddies:data', function (data) {
             $scope.$apply(function () {
-                $scope.data = data;
+                $scope.data = data.slice(0, PRELOAD_ITEMS);
             });
         }.bind(this));
     })
@@ -43,9 +45,9 @@ angular.module('app', ['router', 'item', 'filters'])
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
                     } else {
-                        result.owners = [_(dialog.profiles).findWhere({
+                        result.owners = _(dialog.profiles).findWhere({
                             uid: dialog.uid
-                        })];
+                        });
                     }
 
                     result.messages = dialog.messages;

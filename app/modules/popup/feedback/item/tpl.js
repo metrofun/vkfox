@@ -15,6 +15,7 @@ define([
     };
     jtoh(tpl).getElementsByClassName('t-item__content')[0].innerHTML = function (data) {
         var attachment = {};
+
         switch (data.type) {
         case 'photo':
         case 'video':

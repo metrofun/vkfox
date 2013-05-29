@@ -1,4 +1,13 @@
 angular.module('item', ['filters'])
+    .controller('ItemController', function ($scope) {
+        $scope.$watch('owners', function () {
+            var owners = [].concat($scope.owners);
+
+            if (owners.length === 1) {
+                $scope.owner = owners[0];
+            }
+        });
+    })
     .directive('item', function factory() {
         return {
             controller: 'ItemController',
@@ -8,8 +17,21 @@ angular.module('item', ['filters'])
             restrict: 'E',
             scope: {
                 owners: '=owners',
-                onSend: '&send'
+                class: '@class'
             }
         };
     })
+    .directive('attachment', function factory() {
+        return {
+            templateUrl: '/modules/popup/item/attachment.tmpl.html',
+            replace: true,
+            transclude: true,
+            restrict: 'E',
+            scope: {
+                type: '@type',
+                data: '=data'
+            }
+        };
+    });
+
 

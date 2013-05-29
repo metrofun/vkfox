@@ -1,4 +1,4 @@
-angular.module('app', ['router', 'item', 'filters'])
+angular.module('app', ['router', 'item', 'filters', 'news'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.location = $location;
@@ -15,16 +15,18 @@ angular.module('app', ['router', 'item', 'filters'])
                 name: 'Buddies'
             },
             {
-                href: '/updates',
-                name: 'Updates'
+                href: '/news',
+                name: 'News'
             }
         ];
     })
     .controller('buddiesCtrl', function ($scope, mediator) {
+        var PRELOAD_ITEMS = 15;
+
         mediator.pub('buddies:data:get');
         mediator.sub('buddies:data', function (data) {
             $scope.$apply(function () {
-                $scope.data = data;
+                $scope.data = data.slice(0, PRELOAD_ITEMS);
             });
         }.bind(this));
     })
@@ -43,9 +45,9 @@ angular.module('app', ['router', 'item', 'filters'])
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
                     } else {
-                        result.owners = [_(dialog.profiles).findWhere({
+                        result.owners = _(dialog.profiles).findWhere({
                             uid: dialog.uid
-                        })];
+                        });
                     }
 
                     result.messages = dialog.messages;
@@ -798,13 +800,8 @@ define(['config/config'], function (config) {
     };
 });
 
-define(function () {
-    return {
-        vk: {
-            domain: 'vk.com'
-        }
-    };
-});
+angular.module('config', [])
+    .constant('VK_BASE', 'vk.com');
 
 define([
     'jtoh',
@@ -823,6 +820,7 @@ define([
     };
     jtoh(tpl).getElementsByClassName('t-item__content')[0].innerHTML = function (data) {
         var attachment = {};
+
         switch (data.type) {
         case 'photo':
         case 'video':
@@ -1143,10 +1141,30 @@ define([
     });
 });
 
-angular.module('filters', [])
+angular.module('filters', ['config'])
     .filter('name', function () {
         return function (input) {
-            return input.first_name + ' ' + input.last_name;
+            if (input) {
+                if (input.name) {
+                    return input.name;
+                } else {
+                    return input.first_name + ' ' + input.last_name;
+                }
+            }
+        };
+    })
+    // TODO legacy
+    .filter('absoluteVkUrl', function (VK_BASE) {
+        return function (url) {
+            if ((url) && (url.substr(0, 4) !== 'http') && (url.substr(0, 4) !== 'www.')) {
+                if (url.charAt(0) === '/') {
+                    url = 'http://' + VK_BASE + url;
+                } else {
+                    url = 'http://' + VK_BASE + '/' + url;
+                }
+            }
+
+            return url;
         };
     });
 
@@ -1182,6 +1200,7 @@ define(['item/__attachments.tpl'], function (attachmentsTemplate) {
     return [
         function (data) {
             var item = data.item;
+
             return item.text;
         },
         attachmentsTemplate
@@ -1258,6 +1277,15 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
 });
 
 angular.module('item', ['filters'])
+    .controller('ItemController', function ($scope) {
+        $scope.$watch('owners', function () {
+            var owners = [].concat($scope.owners);
+
+            if (owners.length === 1) {
+                $scope.owner = owners[0];
+            }
+        });
+    })
     .directive('item', function factory() {
         return {
             controller: 'ItemController',
@@ -1267,10 +1295,23 @@ angular.module('item', ['filters'])
             restrict: 'E',
             scope: {
                 owners: '=owners',
-                onSend: '&send'
+                class: '@class'
             }
         };
     })
+    .directive('attachment', function factory() {
+        return {
+            templateUrl: '/modules/popup/item/attachment.tmpl.html',
+            replace: true,
+            transclude: true,
+            restrict: 'E',
+            scope: {
+                type: '@type',
+                data: '=data'
+            }
+        };
+    });
+
 
 
 define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
@@ -1477,6 +1518,30 @@ angular.module('app').factory('mediator', function () {
     };
 });
 
+angular.module('news', [])
+    .controller('NewsController', function ($scope, $routeParams) {
+        $scope.tabs = [
+            {
+                href: '/news/my',
+                text: 'My'
+            },
+            {
+                href: '/news/feed',
+                text: 'Feed'
+            }
+        ];
+
+        $scope.activeTab = $routeParams.tab;
+    })
+    .controller('FeedbackController', function ($scope, mediator) {
+        mediator.pub('feedback:data:get');
+        mediator.sub('feedback:data', function (data) {
+            $scope.$apply(function () {
+                $scope.data = data.items;
+            });
+        });
+    });
+
 define([
     'backbone',
     'jtoh',
@@ -1622,8 +1687,15 @@ angular.module('router', [])
             .when('/buddies', {
                 templateUrl: '/modules/popup/app/buddies.tmpl.html'
             })
+            .when('/news', {
+                redirectTo: '/news/my'
+            })
+            .when('/news/:tab', {
+                controller: 'NewsController',
+                templateUrl: '/modules/popup/news/news.tmpl.html'
+            })
             .otherwise({
-                templateUrl: '/modules/popup/app/chat.tmpl.html'
+                redirectTo: '/news'
             });
     });
 

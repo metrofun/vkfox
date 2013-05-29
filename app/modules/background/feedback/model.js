@@ -41,7 +41,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                     response.news.items.slice(1).map(self.processNewsItem.bind(self));
                 });
 
-                Mediator.sub('feedback:view', function () {
+                Mediator.sub('feedback:data:get', function () {
                     Mediator.pub('feedback:data', this.toJSON());
                 }.bind(this));
             },

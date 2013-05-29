@@ -11,8 +11,15 @@ angular.module('router', [])
             .when('/buddies', {
                 templateUrl: '/modules/popup/app/buddies.tmpl.html'
             })
+            .when('/news', {
+                redirectTo: '/news/my'
+            })
+            .when('/news/:tab', {
+                controller: 'NewsController',
+                templateUrl: '/modules/popup/news/news.tmpl.html'
+            })
             .otherwise({
-                templateUrl: '/modules/popup/app/chat.tmpl.html'
+                redirectTo: '/news'
             });
     });
 
