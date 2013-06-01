@@ -1,4 +1,14 @@
 angular.module('filters', ['config'])
+    .filter('where', function () {
+        return function (input, property, value) {
+            var obj;
+            if (input) {
+                obj  = {};
+                obj[property] = value
+                return _(input).findWhere(obj);
+            }
+        };
+    })
     .filter('name', function () {
         return function (input) {
             if (input) {

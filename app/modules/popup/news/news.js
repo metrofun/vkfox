@@ -17,7 +17,8 @@ angular.module('news', [])
         mediator.pub('feedback:data:get');
         mediator.sub('feedback:data', function (data) {
             $scope.$apply(function () {
-                $scope.data = data.items;
+                $scope.data = data;
+                console.log(data);
             });
         });
     });

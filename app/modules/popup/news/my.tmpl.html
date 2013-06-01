@@ -1,21 +1,30 @@
 <div ng-controller="FeedbackController" class="t-item-list">
     <item
-        ng-repeat="feedback in data"
-        owners="feedback.owners">
-        <div ng-if="feedback.type == 'photo' || feedback.type == 'video'">
-            <attachment data="feedback.parent" type="{{feedback.type}}">
+        ng-repeat="item in data.items"
+        owners="data.profiles | where:'id':item.parent.owner_id">
+        <div ng-if="item.type == 'photo' || item.type == 'video'">
+            <attachment data="item.parent" type="{{item.type}}">
             </attachment>
         </div>
-        <div ng-if="feedback.type == 'topic'">
-            {{feedback.parent.title}}
+        <div ng-if="item.type == 'topic'">
+            {{item.parent.title}}
         </div>
-        <div ng-if="['post', 'comment', 'wall'].indexOf(feedback.type) !== -1">
-            {{feedback.parent.text}}
+        <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
+            {{item.parent.text}}
             <attachment
-                ng-repeat="attachment in feedback.parent.attachments"
+                ng-repeat="attachment in item.parent.attachments"
                 data="attachment[attachment.type]"
                 type="{{attachment.type}}">
             </attachment>
         </div>
+        <item
+            ng-repeat="feedback in item.feedbacks"
+            owners="data.profiles | where:'id':feedback.feedback.owner_id">
+            <div ng-if="['comment', 'reply'].indexOf(feedback.type) !== -1">
+                {{feedback.feedback.text}}
+            </div>
+            <i ng-if="feedback.type == 'like'" class="icon-heart"></i>
+            <i ng-if="feedback.type == 'copy'" class="icon-share-alt"></i>
+        </item>
     </item>
 </div>

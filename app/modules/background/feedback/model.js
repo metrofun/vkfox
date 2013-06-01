@@ -5,40 +5,32 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
 
         return Backbone.Model.extend({
             startTime: '0',
-            owners : new Backbone.Collection(),
             defaults: {
-                items : new Backbone.Collection()
+                items: new Backbone.Collection(),
+                profiles: new Backbone.Collection()
             },
             initialize: function () {
                 var self = this;
-                // FIXME remove after dev
-                data.news.profiles.map(function (profile) {
-                    profile.id = profile.uid;
-                    self.owners.add(profile);
-                });
-                data.news.groups.map(function (group) {
-                    group.id = - group.gid;
-                    self.owners.add(group);
-                });
-                data.news.items.slice(1).map(this.processNewsItem.bind(this));
+
+                this.normaliseResponse(data);
+
+                this.get('profiles').add(data.news.profiles);
+                this.get('profiles').add(data.news.groups);
+                data.news.items.slice(1).forEach(this.processNewsItem, this);
 
                 request.api({
                     code: ['return { "news" : API.notifications.get({start_time: ',
                         this.startTime, ', "count" : "', MAX_ITEMS_COUNT,
                         '"}), "time" : API.getServerTime()};'].join('')
                 }).done(function (response) {
+                    self.normaliseResponse(response);
+
                     self.startTime = response.time;
 
-                    response.news.profiles.map(function (profile) {
-                        profile.id = profile.uid;
-                        self.owners.add(profile);
-                    });
-                    response.news.groups.map(function (group) {
-                        group.id = - group.gid;
-                        self.owners.add(group);
-                    });
+                    self.get('profiles').add(response.news.profiles);
+                    self.get('profiles').add(response.news.groups);
 
-                    response.news.items.slice(1).map(self.processNewsItem.bind(self));
+                    response.news.items.slice(1).forEach(self.processNewsItem, self);
                 });
 
                 Mediator.sub('feedback:data:get', function () {
@@ -54,60 +46,56 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
              */
             processNewsItem: function (item) {
                 var parentType, parent = item.parent,
-                    feedbackType = item.type, feedback = item.feedback,
-                    itemID, itemModel;
+                    feedbackType, feedback = item.feedback,
+                    itemID, itemModel, typeTokens;
 
-                switch (feedbackType) {
-                case 'comment_post':
-                case 'like_post':
-                case 'copy_post':
-                    parentType = 'post';
-                    break;
-                case 'reply_comment':
-                case 'like_comment':
-                    parentType = 'comment';
-                    break;
-                case 'comment_video':
-                case 'like_video':
-                case 'copy_video':
-                    parentType = 'video';
-                    break;
-                case 'comment_photo':
-                case 'like_photo':
-                case 'copy_photo':
-                    parentType = 'photo';
-                    break;
-                case 'reply_topic':
-                    parentType = 'topic';
-                    break;
+                if (item.type.indexOf('_') !== -1) {
+                    typeTokens = item.type.split('_');
+                    feedbackType = typeTokens[0];
+                    parentType = typeTokens[1];
+                } else {
+                    parentType = item.type;
                 }
-                if (parentType) {
+
+                console.log(parentType, feedbackType);
+                if (feedbackType) {
                     itemID  = this.generateItemID(parentType, parent);
                     if (!(itemModel = this.get('items').get(itemID))) {
                         itemModel = this.createFeedbackItem(parentType, parent, true);
                         this.get('items').add(itemModel);
                     }
-                    itemModel.get('feedbacks').add({
-                        type: feedbackType,
-                        feedback: feedback
-                    });
-                    itemModel.get('owners').add(
-                        this.owners.get(this.getOwnerID(parent))
-                    );
+                    itemModel.get('feedbacks').add([].concat(feedback).map(function (feedback) {
+                        return {
+                            type: feedbackType,
+                            feedback: feedback
+                        };
+                    }));
                 } else {
-                    this.get('items').add(this.createFeedbackItem(feedbackType, feedback, false));
+                    this.get('items').add(this.createFeedbackItem(parentType, feedback, false));
                 }
             },
-            /**
-             * Returns id of owner
-             * @param {Object} feedback
-             *
-             * @return {Number}
-             */
-            getOwnerID: function (feedback) {
-                // Only parent post object has "from_id",
-                // so don't change sequence
-                return feedback.owner_id || feedback.from_id;
+            normaliseResponse: function (data) {
+                var news = data.news;
+
+                news.groups.forEach(function (group) {
+                    group.id = -group.gid;
+                });
+                news.profiles.forEach(function (profile) {
+                    profile.id = profile.uid;
+                });
+
+                news.items.slice(1).forEach(function (item) {
+                    var feedback = item.feedback,
+                        parent = item.parent;
+
+                    [].concat(feedback).forEach(function (feedback) {
+                        feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
+                    });
+
+                    if (parent) {
+                        parent.owner_id = Number(parent.owner_id || parent.from_id);
+                    }
+                });
             },
             /**
              * Generates uniq id for feedback item
@@ -118,12 +106,10 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
              * @return {String}
              */
             generateItemID: function (type, parent) {
-                var ownerID = this.getOwnerID(parent);
-
-                if (ownerID) {
+                if (parent.owner_id) {
                     return [
                         type, parent.id || parent.pid,
-                        'user', ownerID
+                        'user', parent.owner_id
                     ].join(':');
                 } else {
                     return _.uniqueId(type);
@@ -142,10 +128,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                 var itemModel = new Backbone.Model({
                     id: this.generateItemID(type, parent),
                     parent: parent,
-                    type: type,
-                    owners: new Backbone.Collection([
-                        this.owners.get(this.getOwnerID(parent))
-                    ])
+                    type: type
                 });
                 if (canHaveFeedbacks) {
                     // TODO implement sorting

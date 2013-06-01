@@ -1142,6 +1142,16 @@ define([
 });
 
 angular.module('filters', ['config'])
+    .filter('where', function () {
+        return function (input, property, value) {
+            var obj;
+            if (input) {
+                obj  = {};
+                obj[property] = value
+                return _(input).findWhere(obj);
+            }
+        };
+    })
     .filter('name', function () {
         return function (input) {
             if (input) {
@@ -1537,7 +1547,8 @@ angular.module('news', [])
         mediator.pub('feedback:data:get');
         mediator.sub('feedback:data', function (data) {
             $scope.$apply(function () {
-                $scope.data = data.items;
+                $scope.data = data;
+                console.log(data);
             });
         });
     });
