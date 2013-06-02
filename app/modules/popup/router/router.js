@@ -12,7 +12,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/app/buddies.tmpl.html'
             })
             .when('/news', {
-                redirectTo: '/news/my'
+                redirectTo: '/news/friends'
             })
             .when('/news/:tab', {
                 controller: 'NewsController',

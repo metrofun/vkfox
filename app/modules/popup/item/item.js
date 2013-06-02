@@ -32,6 +32,11 @@ angular.module('item', ['filters'])
                 data: '=data'
             }
         };
+    })
+    .filter('isObject', function () {
+        return function (input) {
+            return angular.isObject(input);
+        };
     });
 
 

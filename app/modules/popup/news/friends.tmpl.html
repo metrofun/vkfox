@@ -1,0 +1,23 @@
+<div ng-controller="FriendNewsController" class="t-item-list">
+    <item
+        ng-repeat="item in data.items"
+        owners="data.profiles | where:'id':item.source_id">
+        <ng-switch on="item.type">
+            <div ng-switch-when="posts">
+                {{item.text}}
+                <attachment
+                    ng-repeat="attachment in item.attachments"
+                    data="attachment[attachment.type]"
+                    type="{{attachment.type}}">
+                </attachment>
+            </div>
+            <div ng-switch-when="photo">
+                <attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+                </attachment>
+            </div>
+            <div ng-switch-when="wall_photo">
+                {{item.photos | json}}
+            </div>
+        </ng-switch>
+    </item>
+</div>

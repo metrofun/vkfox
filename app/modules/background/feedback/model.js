@@ -12,7 +12,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
             initialize: function () {
                 var self = this;
 
-                this.normaliseResponse(data);
+                this.normalizeResponse(data);
 
                 this.get('profiles').add(data.news.profiles);
                 this.get('profiles').add(data.news.groups);
@@ -23,7 +23,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                         this.startTime, ', "count" : "', MAX_ITEMS_COUNT,
                         '"}), "time" : API.getServerTime()};'].join('')
                 }).done(function (response) {
-                    self.normaliseResponse(response);
+                    self.normalizeResponse(response);
 
                     self.startTime = response.time;
 
@@ -57,7 +57,6 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                     parentType = item.type;
                 }
 
-                console.log(parentType, feedbackType);
                 if (feedbackType) {
                     itemID  = this.generateItemID(parentType, parent);
                     if (!(itemModel = this.get('items').get(itemID))) {
@@ -74,7 +73,12 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator', 'feedb
                     this.get('items').add(this.createFeedbackItem(parentType, feedback, false));
                 }
             },
-            normaliseResponse: function (data) {
+            /**
+             * Normalizes response from vk.
+             *
+             * @params {Object} data
+             */
+            normalizeResponse: function (data) {
                 var news = data.news;
 
                 news.groups.forEach(function (group) {

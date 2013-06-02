@@ -1,4 +1,4 @@
-<ng-switch on="type">
+<ng-switch on="type" ng-if="data | isObject">
     <img ng-switch-when="graffiti" ng-src="{{data.src}}" class="img-polaroid" />
     <img ng-switch-when="photo" ng-src="{{data.src}}" class="img-polaroid" />
     <img ng-switch-when="posted_photo" ng-src="{{data.src}}" class="img-polaroid" />

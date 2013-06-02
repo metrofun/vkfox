@@ -42,7 +42,7 @@ define([
                     userId: authData.userId
                 });
                 buddiesModel = new BuddiesModel();
-                // newsfeedModel = new NewsfeedModel();
+                newsfeedModel = new NewsfeedModel();
                 feedbackModel = new FeedbackModel();
             });
         }
