@@ -6,7 +6,7 @@ angular.module('router', [])
 
         $routeProvider
             .when('/chat', {
-                templateUrl: '/modules/popup/app/chat.tmpl.html'
+                templateUrl: '/modules/popup/chat/chat.tmpl.html'
             })
             .when('/buddies', {
                 templateUrl: '/modules/popup/app/buddies.tmpl.html'

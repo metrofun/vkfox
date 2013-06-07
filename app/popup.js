@@ -1,4 +1,4 @@
-angular.module('app', ['router', 'item', 'filters', 'news'])
+angular.module('app', ['router', 'item', 'filters', 'news', 'chat'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.location = $location;
@@ -30,33 +30,6 @@ angular.module('app', ['router', 'item', 'filters', 'news'])
             });
         }.bind(this));
     })
-    .controller('chatCtrl', function ($scope, mediator) {
-        mediator.pub('chat:data:get');
-        mediator.sub('chat:data', function (data) {
-            $scope.$apply(function () {
-                $scope.data = data.dialogs.map(function (dialog) {
-                    var messageAuthorId = dialog.messages[0].uid, result = {};
-
-                    if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
-                        result.author = _(dialog.profiles).findWhere({
-                            uid: messageAuthorId
-                        });
-                    }
-                    if (dialog.chat_id) {
-                        result.owners = dialog.profiles;
-                    } else {
-                        result.owners = _(dialog.profiles).findWhere({
-                            uid: dialog.uid
-                        });
-                    }
-
-                    result.messages = dialog.messages;
-
-                    return result;
-                });
-            });
-        }.bind(this));
-    });
 
 
 define(['i18n/i18n'], function (I18N) {
@@ -471,6 +444,35 @@ define([
         }
     });
 });
+
+angular.module('chat', [])
+    .controller('chatCtrl', function ($scope, mediator) {
+        mediator.pub('chat:data:get');
+        mediator.sub('chat:data', function (data) {
+            $scope.$apply(function () {
+                $scope.data = data.dialogs.map(function (dialog) {
+                    var messageAuthorId = dialog.messages[0].uid, result = {};
+
+                    if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
+                        result.author = _(dialog.profiles).findWhere({
+                            uid: messageAuthorId
+                        });
+                    }
+                    if (dialog.chat_id) {
+                        result.owners = dialog.profiles;
+                    } else {
+                        result.owners = _(dialog.profiles).findWhere({
+                            uid: dialog.uid
+                        });
+                    }
+
+                    result.messages = dialog.messages;
+
+                    return result;
+                });
+            });
+        }.bind(this));
+    });
 
 define(['i18n/i18n'], function (I18N) {
     var i18n = new I18N();
@@ -1534,7 +1536,7 @@ angular.module('app').factory('mediator', function () {
 });
 
 angular.module('news', [])
-    .controller('NewsController', function ($scope, $routeParams) {
+    .controller('NewsController', function ($scope, $routeParams, $controller) {
         $scope.tabs = [
             {
                 href: '/news/my',
@@ -1551,6 +1553,7 @@ angular.module('news', [])
         ];
 
         $scope.activeTab = $routeParams.tab;
+        console.log($scope.MyNewsController);
     })
     .controller('MyNewsController', function ($scope, mediator) {
         mediator.pub('feedback:data:get');
@@ -1564,6 +1567,14 @@ angular.module('news', [])
     .controller('FriendNewsController', function ($scope, mediator) {
         mediator.pub('newsfeed:friends:get');
         mediator.sub('newsfeed:friends', function (data) {
+            $scope.$apply(function () {
+                $scope.data = data;
+            });
+        });
+    })
+    .controller('GroupNewsController', function ($scope, mediator) {
+        mediator.pub('newsfeed:groups:get');
+        mediator.sub('newsfeed:groups', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
             });
@@ -1710,7 +1721,7 @@ angular.module('router', [])
 
         $routeProvider
             .when('/chat', {
-                templateUrl: '/modules/popup/app/chat.tmpl.html'
+                templateUrl: '/modules/popup/chat/chat.tmpl.html'
             })
             .when('/buddies', {
                 templateUrl: '/modules/popup/app/buddies.tmpl.html'

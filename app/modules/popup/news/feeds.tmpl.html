@@ -1,0 +1,35 @@
+<item
+    ng-repeat="item in data.items"
+    owners="data.profiles | where:'id':item.source_id">
+    <ng-switch on="item.type">
+        <div ng-switch-when="post">
+            {{item.text}}
+            <attachment
+            ng-repeat="attachment in item.attachments"
+            data="attachment[attachment.type]"
+            type="{{attachment.type}}">
+            </attachment>
+        </div>
+        <div ng-switch-when="photo">
+            <attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+            </attachment>
+        </div>
+        <div ng-switch-when="wall_photo">
+            <attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+            </attachment>
+        </div>
+        <div ng-switch-when="photo_tag">
+            <attachment ng-repeat="photo in item.photo_tags" data="photo" type="photo">
+            </attachment>
+        </div>
+        <div ng-switch-when="note">
+            {{item | json}}
+        </div>
+        <div ng-switch-when="friend">
+            <!-- TODO I18N -->
+            Added new friend:
+            <span ng-repeat="friend in item.friends">{{data.profiles | where:'id':friend.uid | name }} </span>
+        </div>
+    </ng-switch>
+</item>
+

@@ -134,6 +134,7 @@ define([
         onUpdates: function (updates) {
             updates.forEach(function (update) {
                 var messageId, mask;
+                console.log(update);
 
                 // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
                 switch (update[0]) {

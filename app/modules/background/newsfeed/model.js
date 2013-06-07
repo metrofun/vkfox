@@ -12,7 +12,7 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
                 friendItems: new Backbone.Collection()
             },
             updateOnlineStatus: _.debounce(function () {
-                var uids = _.filter(this.get('items').pluck('source_id'), function (sourceId) {
+                var uids = _.filter(this.get('friendItems').pluck('source_id'), function (sourceId) {
                     return sourceId > 0;
                 });
 
