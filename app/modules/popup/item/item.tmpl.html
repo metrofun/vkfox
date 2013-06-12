@@ -1,15 +1,18 @@
-<div class="t-item media" ng-class="{'is-online': owner.online}">
+<div class="item media" ng-class="{'is-online': owner.online}">
     <div ng-switch on="!!owner" class="pull-left">
-        <img ng-switch-when="true" ng-src="{{owner.photo}}" class="t-item__img media-object">
-        <div ng-switch-when="false" class="t-item__img media-object">
+        <img ng-switch-when="true" ng-src="{{owner.photo}}" class="item__img media-object"/>
+        <div ng-switch-when="false" class="item__img media-object">
             <i class="icon-user"></i>{{owners.length}}
         </div>
     </div>
     <div class="media-body" ng-transclude>
-        <strong class="t-item__author media-heading">{{owner | name}}</strong>
+        <strong class="item__author media-heading">{{owner | name}}</strong>
     </div>
-    <div ng-if="showReply" class="t-item__reply">
-        <textarea></textarea>
+    <div ng-if="showReply" class="item__reply">
+        <textarea
+            ui-keypress="{'enter': 'onReply({message: message})'}"
+            autofocus="autofocus"
+            ng-model="message">
+        </textarea>
     </div>
 </div>
-

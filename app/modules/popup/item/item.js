@@ -1,10 +1,13 @@
-angular.module('item', ['filters'])
+angular.module('item', ['filters', 'ui.keypress'])
     .controller('ItemController', function ($scope) {
         $scope.$watch('owners', function () {
             var owners = [].concat($scope.owners);
 
             if (owners.length === 1) {
                 $scope.owner = owners[0];
+            }
+            $scope.callback = function () {
+                console.log(arguments);
             }
         });
     })
@@ -16,8 +19,10 @@ angular.module('item', ['filters'])
             transclude: true,
             restrict: 'E',
             scope: {
-                owners: '=owners',
-                class: '@class'
+                owners: '=',
+                showReply: '=',
+                onReply: '&',
+                class: '@'
             }
         };
     })
@@ -28,9 +33,25 @@ angular.module('item', ['filters'])
             transclude: true,
             restrict: 'E',
             scope: {
-                type: '@type',
-                data: '=data'
+                type: '@',
+                data: '='
             }
+        };
+    })
+    .directive('actions', function factory() {
+        return {
+            template: '<div class="item__actions" ng-transclude></div>',
+            replace: true,
+            transclude: true,
+            restrict: 'E'
+        };
+    })
+    .directive('action', function factory() {
+        return {
+            template: '<i class="item__action" ng-transclude></i>',
+            replace: true,
+            transclude: true,
+            restrict: 'E'
         };
     })
     .filter('isObject', function () {

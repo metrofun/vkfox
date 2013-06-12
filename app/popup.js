@@ -445,8 +445,8 @@ define([
     });
 });
 
-angular.module('chat', [])
-    .controller('chatCtrl', function ($scope, mediator) {
+angular.module('chat', ['request'])
+    .controller('ChatCtrl', function ($scope, mediator) {
         mediator.pub('chat:data:get');
         mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
@@ -467,11 +467,44 @@ angular.module('chat', [])
                     }
 
                     result.messages = dialog.messages;
+                    result.chat_id = dialog.chat_id;
+                    result.uid = dialog.uid;
 
                     return result;
                 });
             });
         }.bind(this));
+    })
+    .controller('ChatItemCtrl', function ($scope, request) {
+        $scope.onReply = function (message) {
+            alert(message);
+        };
+
+        $scope.itemData = {actions: [
+            {
+                class: 'icon-envelope',
+                onClick: function () {
+                    $scope.itemData.showReply = !$scope.itemData.showReply;
+
+                    $scope.onReply = function (message) {
+                        var params = {
+                                message: jQuery.trim(message)
+                            }, dialog = $scope.dialog;
+
+                        if (dialog.chat_id) {
+                            params.chat_id = dialog.chat_id;
+                        } else {
+                            params.uid = dialog.uid;
+                        }
+
+                        request.api({
+                            code: 'return API.messages.send(' + JSON.stringify(params) + ');'
+                        });
+                        console.log(params);
+                    }
+                }
+            }
+        ]};
     });
 
 define(['i18n/i18n'], function (I18N) {
@@ -1288,13 +1321,16 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     return tpl;
 });
 
-angular.module('item', ['filters'])
+angular.module('item', ['filters', 'ui.keypress'])
     .controller('ItemController', function ($scope) {
         $scope.$watch('owners', function () {
             var owners = [].concat($scope.owners);
 
             if (owners.length === 1) {
                 $scope.owner = owners[0];
+            }
+            $scope.callback = function () {
+                console.log(arguments);
             }
         });
     })
@@ -1306,8 +1342,10 @@ angular.module('item', ['filters'])
             transclude: true,
             restrict: 'E',
             scope: {
-                owners: '=owners',
-                class: '@class'
+                owners: '=',
+                showReply: '=',
+                onReply: '&',
+                class: '@'
             }
         };
     })
@@ -1318,9 +1356,25 @@ angular.module('item', ['filters'])
             transclude: true,
             restrict: 'E',
             scope: {
-                type: '@type',
-                data: '=data'
+                type: '@',
+                data: '='
             }
+        };
+    })
+    .directive('actions', function factory() {
+        return {
+            template: '<div class="item__actions" ng-transclude></div>',
+            replace: true,
+            transclude: true,
+            restrict: 'E'
+        };
+    })
+    .directive('action', function factory() {
+        return {
+            template: '<i class="item__action" ng-transclude></i>',
+            replace: true,
+            transclude: true,
+            restrict: 'E'
         };
     })
     .filter('isObject', function () {
@@ -1511,29 +1565,30 @@ define([
     });
 });
 
-angular.module('app').factory('mediator', function () {
-    var dispatcher = _.clone(Backbone.Events);
+angular.module('mediator', [])
+    .factory('mediator', function () {
+        var dispatcher = _.clone(Backbone.Events);
 
-    chrome.extension.onMessage.addListener(function (messageData) {
-        dispatcher.trigger.apply(dispatcher, messageData);
+        chrome.extension.onMessage.addListener(function (messageData) {
+            dispatcher.trigger.apply(dispatcher, messageData);
+        });
+
+        return {
+            pub: function () {
+                // dispatcher.trigger.apply(dispatcher, arguments);
+                chrome.extension.sendMessage([].slice.call(arguments));
+            },
+            sub: function () {
+                dispatcher.on.apply(dispatcher, arguments);
+            },
+            once: function () {
+                dispatcher.once.apply(dispatcher, arguments);
+            },
+            unsub: function () {
+                dispatcher.off.apply(dispatcher, arguments);
+            }
+        };
     });
-
-    return {
-        pub: function () {
-            // dispatcher.trigger.apply(dispatcher, arguments);
-            chrome.extension.sendMessage([].slice.call(arguments));
-        },
-        sub: function () {
-            dispatcher.on.apply(dispatcher, arguments);
-        },
-        once: function () {
-            dispatcher.once.apply(dispatcher, arguments);
-        },
-        unsub: function () {
-            dispatcher.off.apply(dispatcher, arguments);
-        }
-    };
-});
 
 angular.module('news', [])
     .controller('NewsController', function ($scope, $routeParams, $controller) {
@@ -1691,27 +1746,28 @@ define([
     });
 });
 
-define(['mediator/mediator', 'underscore'], function (Mediator, _) {
-    return {
-        api: function () {
-            var ajaxDeferred = new jQuery.Deferred(),
+angular.module('request', ['mediator'])
+    .factory('request', function (mediator) {
+        return {
+            api: function () {
+                var ajaxDeferred = new jQuery.Deferred(),
                 id = _.uniqueId();
 
-            Mediator.pub('request', {
-                method: 'api',
-                id: id,
-                arguments: [].slice.apply(arguments)
-            });
-            Mediator.once('request:' + id, function (data) {
-                ajaxDeferred[data.method].apply(ajaxDeferred, data.arguments);
-                console.log(data.arguments);
-            });
+                mediator.pub('request', {
+                    method: 'api',
+                    id: id,
+                    arguments: [].slice.apply(arguments)
+                });
+                mediator.once('request:' + id, function (data) {
+                    ajaxDeferred[data.method].apply(ajaxDeferred, data.arguments);
+                    console.log(data.arguments);
+                });
 
-            return ajaxDeferred;
-        }
-    };
-});
+                return ajaxDeferred;
 
+            }
+        };
+    });
 
 angular.module('router', [])
     .config(function ($routeProvider, $locationProvider, $compileProvider) {
@@ -1734,7 +1790,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/news'
+                redirectTo: '/chat'
             });
     });
 

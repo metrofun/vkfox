@@ -1,12 +1,31 @@
 <ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
-<div ng-controller="chatCtrl" class="t-item-list">
-    <item ng-repeat="dialog in data" owners="dialog.owners">
-    <blockquote
-        ng-class="author && 'pull-right'"
-        ng-click="showReply = !showReply"
-        class="t-item__content">
-        <p ng-repeat="message in dialog.messages">{{message.body}}<br/></p>
-        <small ng-if="author">{{dialog.author | name}}</small>
-    </blockquote>
-    </item>
+<div ng-controller="ChatCtrl" class="item-list">
+    <div ng-repeat="dialog in data" ng-controller="ChatItemCtrl">
+        <item
+            show-reply="itemData.showReply"
+            on-reply="onReply(message)"
+            owners="dialog.owners">
+            <blockquote
+                ng-click="itemData.showReply = !itemData.showReply"
+                ng-class="author && 'pull-right'"
+                class="chat__item-content">
+                <p ng-repeat="message in dialog.messages">
+                    {{message.body}}
+                    <attachment
+                        ng-repeat="attachment in message.attachments"
+                        data="attachment[attachment.type]"
+                        type="{{attachment.type}}">
+                    </attachment>
+                </p>
+                <small ng-if="author">{{dialog.author | name}}</small>
+            </blockquote>
+            <actions>
+                <action
+                    ng-repeat="action in itemData.actions"
+                    ng-class="action.class"
+                    ng-click="action.onClick()">
+                </action>
+            </actions>
+        </item>
+    </div>
 </div>

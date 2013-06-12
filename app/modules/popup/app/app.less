@@ -7,21 +7,16 @@
 /* @baseFontSize:          14px; */
 @baseLineHeight:        16px;
 
-/* FIXME remove */
-body {
-    /* overflow: hidden; */
-    width: 320px;
-    height: 480px;
-}
-
 .t-app__color-with-hover (@color) {
     background-color: @color;
 
     &:hover {
         background-color: darken(@color, 15%);
-    }
+}
 }
 
-.t-app__content {
+.app {
     background: @grayLighter;
+    width: 320px;
+    height: 480px;
 }

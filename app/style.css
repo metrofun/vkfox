@@ -6040,16 +6040,9 @@ a.badge:hover {
 
 /* @baseFontSize:          14px; */
 
-/* FIXME remove */
-
-body {
-  /* overflow: hidden; */
-
+.app {
   width: 320px;
   height: 480px;
-}
-
-.t-app__content {
   background: #eeeeee;
 }
 
@@ -6071,11 +6064,10 @@ body {
   min-height: 100px;
 }
 
-.t-item-list {
+.item-list {
   min-height: 100px;
   margin: 10px;
   overflow: hidden;
-  background-color: white;
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
@@ -6084,7 +6076,7 @@ body {
           box-shadow: 0 1px 4px #999999;
 }
 
-.t-item {
+.item {
   position: relative;
   padding: 10px;
   margin: 0;
@@ -6092,19 +6084,19 @@ body {
   background: #ffffff;
 }
 
-.t-item:first-child {
+.item:first-child {
   -webkit-border-radius: 4px 4px 0 0;
      -moz-border-radius: 4px 4px 0 0;
           border-radius: 4px 4px 0 0;
 }
 
-.t-item:last-child {
+.item:last-child {
   -webkit-border-radius: 4px 4px 0 0;
      -moz-border-radius: 4px 4px 0 0;
           border-radius: 4px 4px 0 0;
 }
 
-.t-item__img {
+.item__img {
   width: 32px;
   height: 32px;
   cursor: pointer;
@@ -6113,7 +6105,7 @@ body {
           border-radius: 4px;
 }
 
-.t-item__author {
+.item__author {
   display: block;
   max-width: 200px;
   overflow: hidden;
@@ -6121,12 +6113,18 @@ body {
   white-space: nowrap;
 }
 
-.t-item__author:hover {
+.item__author:hover {
   color: #000000;
   cursor: pointer;
 }
 
-.t-item.is-online .t-item__author:after {
+.item__author > * {
+  padding-bottom: 1px;
+  overflow: hidden;
+  clear: both;
+}
+
+.item.is-online .item__author:after {
   position: relative;
   top: 1px;
   display: inline-block;
@@ -6141,18 +6139,18 @@ body {
   content: '';
 }
 
-.t-item__actions {
+.item__actions {
   position: absolute;
   top: 10px;
   right: 10px;
   font-size: 12px;
 }
 
-.t-item:hover .t-item__action {
+.item:hover .item__action {
   opacity: 1;
 }
 
-.t-item__action {
+.item__action {
   display: inline-block;
   text-decoration: none !important;
   cursor: pointer;
@@ -6165,34 +6163,27 @@ body {
           transition: opacity 0.1s ease 0.1s;
 }
 
-.t-item__action:hover {
+.item__action:hover {
   background-color: #036690;
 }
 
-.t-item__action + .t-item__action {
+.item__action + .item__action {
   margin-left: 0.5em;
 }
 
-.t-item__content {
-  padding-bottom: 1px;
-  overflow: hidden;
-  clear: both;
-  text-overflow: ellipsis;
-}
-
-.t-item__attachment {
+.item__attachment {
   max-width: 100%;
 }
 
-.t-item__picture {
+.item__picture {
   box-sizing: border-box;
 }
 
-.t-item + .t-item {
+.item + .item {
   border-top: 1px solid #eeeeee;
 }
 
-.t-item__reply {
+.item__reply {
   position: relative;
   padding: 10px;
   margin: 10px -10px -10px;
@@ -6203,7 +6194,7 @@ body {
           box-shadow: inset 0 1px 0 #ffffff;
 }
 
-.t-item__reply:before {
+.item__reply:before {
   position: absolute;
   top: -6px;
   left: 22px;
@@ -6223,7 +6214,7 @@ body {
           box-shadow: inset 1px 1px 0 #ffffff;
 }
 
-.t-item__reply:after {
+.item__reply:after {
   position: absolute;
   right: 0;
   bottom: -1px;
@@ -6234,13 +6225,13 @@ body {
   content: '';
 }
 
-.t-item__reply textarea {
+.item__reply textarea {
   width: 100%;
   margin: 0;
   box-sizing: border-box;
 }
 
-.t-item__action-active {
+.item__action-active {
   opacity: 1;
 }
 
