@@ -445,7 +445,7 @@ define([
     });
 });
 
-angular.module('chat', ['request'])
+angular.module('chat', ['request', 'item'])
     .controller('ChatCtrl', function ($scope, mediator) {
         mediator.pub('chat:data:get');
         mediator.sub('chat:data', function (data) {
@@ -476,35 +476,45 @@ angular.module('chat', ['request'])
         }.bind(this));
     })
     .controller('ChatItemCtrl', function ($scope, request) {
-        $scope.onReply = function (message) {
-            alert(message);
-        };
+        $scope.reply = {};
 
-        $scope.itemData = {actions: [
-            {
-                class: 'icon-envelope',
-                onClick: function () {
-                    $scope.itemData.showReply = !$scope.itemData.showReply;
+        $scope.replyDialog = function () {
+            $scope.reply = {
+                visible: !$scope.reply.visible,
+                onSend: function (message) {
+                    var params = {
+                        message: jQuery.trim(message)
+                    }, dialog = $scope.dialog;
 
-                    $scope.onReply = function (message) {
-                        var params = {
-                                message: jQuery.trim(message)
-                            }, dialog = $scope.dialog;
-
-                        if (dialog.chat_id) {
-                            params.chat_id = dialog.chat_id;
-                        } else {
-                            params.uid = dialog.uid;
-                        }
-
-                        request.api({
-                            code: 'return API.messages.send(' + JSON.stringify(params) + ');'
-                        });
-                        console.log(params);
+                    if (dialog.chat_id) {
+                        params.chat_id = dialog.chat_id;
+                    } else {
+                        params.uid = dialog.uid;
                     }
-                }
+
+                    request.api({
+                        code: 'return API.messages.send(' + JSON.stringify(params) + ');'
+                    });
+                },
+                placeHolder: ''
+            };
+        }
+
+        $scope.chatItem = {actions: [
+            {
+                class: 'icon-share-alt',
+                onClick: $scope.replyDialog
             }
         ]};
+        if (!$scope.dialog.chat_id) {
+            $scope.chatItem.actions.push({
+                class: 'icon-comment',
+                onClick: function () {
+                    $scope.chatItem.showReply = !$scope.chatItem.showReply;
+                    console.log(arguments);
+                }
+            });
+        }
     });
 
 define(['i18n/i18n'], function (I18N) {
@@ -1190,11 +1200,13 @@ angular.module('filters', ['config'])
     .filter('name', function () {
         return function (input) {
             if (input) {
-                if (input.name) {
-                    return input.name;
-                } else {
-                    return input.first_name + ' ' + input.last_name;
-                }
+                return [].concat(input).map(function (owner) {
+                    if (owner.name) {
+                        return owner.name;
+                    } else {
+                        return owner.first_name + ' ' + owner.last_name;
+                    }
+                }).join(', ');
             }
         };
     })
@@ -1212,34 +1224,6 @@ angular.module('filters', ['config'])
             return url;
         };
     });
-
-define(function () {
-    var lang = window.navigator.language.match(/(ru)|(en)/)[1] || 'ru';
-
-    function factory() {
-        var store = {};
-
-        function i18n(key, data) {
-            var translation;
-            try {
-                translation = store[key][lang];
-            } catch (e) {
-                throw new Error('Undefined keyset: ' + lang + ' ' + key);
-            }
-
-            if (typeof translation === 'function') {
-                return translation(data);
-            } else {
-                return translation;
-            }
-        }
-        i18n.decl = function (key, translations) {
-            store[key] = translations;
-        };
-        return i18n;
-    }
-    return factory;
-});
 
 define(['item/__attachments.tpl'], function (attachmentsTemplate) {
     return [
@@ -1343,8 +1327,7 @@ angular.module('item', ['filters', 'ui.keypress'])
             restrict: 'E',
             scope: {
                 owners: '=',
-                showReply: '=',
-                onReply: '&',
+                reply: '=',
                 class: '@'
             }
         };

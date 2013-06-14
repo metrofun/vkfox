@@ -110,6 +110,7 @@ define(['jquery', 'mediator/mediator', 'underscore'], function (jQuery, Mediator
                         v: API_VERSION
                     },
                     function (data) {
+                        console.log(arguments);
                         var response = data.response, i;
                         for (i = 0; i < response.length; i++) {
                             queriesToProcess[i].deferred.resolve(response[i]);

@@ -1,4 +1,4 @@
-angular.module('chat', ['request'])
+angular.module('chat', ['request', 'item'])
     .controller('ChatCtrl', function ($scope, mediator) {
         mediator.pub('chat:data:get');
         mediator.sub('chat:data', function (data) {
@@ -29,33 +29,43 @@ angular.module('chat', ['request'])
         }.bind(this));
     })
     .controller('ChatItemCtrl', function ($scope, request) {
-        $scope.onReply = function (message) {
-            alert(message);
-        };
+        $scope.reply = {};
 
-        $scope.itemData = {actions: [
-            {
-                class: 'icon-envelope',
-                onClick: function () {
-                    $scope.itemData.showReply = !$scope.itemData.showReply;
+        $scope.replyDialog = function () {
+            $scope.reply = {
+                visible: !$scope.reply.visible,
+                onSend: function (message) {
+                    var params = {
+                        message: jQuery.trim(message)
+                    }, dialog = $scope.dialog;
 
-                    $scope.onReply = function (message) {
-                        var params = {
-                                message: jQuery.trim(message)
-                            }, dialog = $scope.dialog;
-
-                        if (dialog.chat_id) {
-                            params.chat_id = dialog.chat_id;
-                        } else {
-                            params.uid = dialog.uid;
-                        }
-
-                        request.api({
-                            code: 'return API.messages.send(' + JSON.stringify(params) + ');'
-                        });
-                        console.log(params);
+                    if (dialog.chat_id) {
+                        params.chat_id = dialog.chat_id;
+                    } else {
+                        params.uid = dialog.uid;
                     }
-                }
+
+                    request.api({
+                        code: 'return API.messages.send(' + JSON.stringify(params) + ');'
+                    });
+                },
+                placeHolder: ''
+            };
+        }
+
+        $scope.chatItem = {actions: [
+            {
+                class: 'icon-share-alt',
+                onClick: $scope.replyDialog
             }
         ]};
+        if (!$scope.dialog.chat_id) {
+            $scope.chatItem.actions.push({
+                class: 'icon-comment',
+                onClick: function () {
+                    $scope.chatItem.showReply = !$scope.chatItem.showReply;
+                    console.log(arguments);
+                }
+            });
+        }
     });

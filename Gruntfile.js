@@ -14,6 +14,17 @@ module.exports = function (grunt) {
             js: {
                 files: 'app/modules/popup/**/*.js',
                 tasks: ['concat:js']
+            },
+            messages: {
+                files: 'app/modules/popup/i18n/**/*.json',
+                tasks: ['messageformat']
+            }
+        },
+        messageformat: {
+            ru: {
+                locale: 'ru',
+                inputDir: 'app/modules/popup/i18n/ru',
+                output: 'app/modules/popup/i18n/ru.js'
             }
         },
         concat: {
@@ -46,13 +57,14 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-messageformat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-recess');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.registerTask(
         'default',
-        ['concat', 'recess:less', 'clean:less', 'watch']
+        ['concat', 'messageformat', 'recess:less', 'clean:less', 'watch']
     );
 
 };

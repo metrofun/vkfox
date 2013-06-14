@@ -8,12 +8,6 @@
    position: relative;
    overflow: hidden;
 
-   &:first-child  {
-       .border-radius(4px 4px 0 0);
-   }
-   &:last-child  {
-       .border-radius(4px 4px 0 0);
-   }
    &__img {
         width: @iconSize;
         height: @iconSize;
@@ -80,9 +74,6 @@
    }
    &__picture {
        box-sizing: border-box;
-   }
-   & + .item {
-       border-top: 1px solid @grayLighter;
    }
    &__reply {
        background-color: #f5f5f5;

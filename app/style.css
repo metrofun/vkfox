@@ -6064,6 +6064,29 @@ a.badge:hover {
   min-height: 100px;
 }
 
+.chat__item-content {
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  border: 0;
+}
+
+.chat__item + .chat__item {
+  border-top: 1px solid #eeeeee;
+}
+
+.chat__item:first-child {
+  -webkit-border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+          border-radius: 4px 4px 0 0;
+}
+
+.chat__item:last-child {
+  -webkit-border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+          border-radius: 4px 4px 0 0;
+}
+
 .item-list {
   min-height: 100px;
   margin: 10px;
@@ -6082,18 +6105,6 @@ a.badge:hover {
   margin: 0;
   overflow: hidden;
   background: #ffffff;
-}
-
-.item:first-child {
-  -webkit-border-radius: 4px 4px 0 0;
-     -moz-border-radius: 4px 4px 0 0;
-          border-radius: 4px 4px 0 0;
-}
-
-.item:last-child {
-  -webkit-border-radius: 4px 4px 0 0;
-     -moz-border-radius: 4px 4px 0 0;
-          border-radius: 4px 4px 0 0;
 }
 
 .item__img {
@@ -6177,10 +6188,6 @@ a.badge:hover {
 
 .item__picture {
   box-sizing: border-box;
-}
-
-.item + .item {
-  border-top: 1px solid #eeeeee;
 }
 
 .item__reply {

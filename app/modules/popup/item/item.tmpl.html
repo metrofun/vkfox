@@ -6,11 +6,11 @@
         </div>
     </div>
     <div class="media-body" ng-transclude>
-        <strong class="item__author media-heading">{{owner | name}}</strong>
+        <strong class="item__author media-heading">{{owners | name}}</strong>
     </div>
-    <div ng-if="showReply" class="item__reply">
+    <div ng-if="reply.visible" class="item__reply">
         <textarea
-            ui-keypress="{'enter': 'onReply({message: message})'}"
+            ui-keypress="{'enter': 'reply.onSend(message)'}"
             autofocus="autofocus"
             ng-model="message">
         </textarea>

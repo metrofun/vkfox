@@ -20,8 +20,7 @@ angular.module('item', ['filters', 'ui.keypress'])
             restrict: 'E',
             scope: {
                 owners: '=',
-                showReply: '=',
-                onReply: '&',
+                reply: '=',
                 class: '@'
             }
         };

@@ -1,12 +1,14 @@
 <ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
 <div ng-controller="ChatCtrl" class="item-list">
-    <div ng-repeat="dialog in data" ng-controller="ChatItemCtrl">
+    <div
+        ng-repeat="dialog in data"
+        ng-controller="ChatItemCtrl"
+        class="chat__item">
         <item
-            show-reply="itemData.showReply"
-            on-reply="onReply(message)"
+            reply="reply"
             owners="dialog.owners">
             <blockquote
-                ng-click="itemData.showReply = !itemData.showReply"
+                ng-click="replyDialog()"
                 ng-class="author && 'pull-right'"
                 class="chat__item-content">
                 <p ng-repeat="message in dialog.messages">
@@ -21,7 +23,7 @@
             </blockquote>
             <actions>
                 <action
-                    ng-repeat="action in itemData.actions"
+                    ng-repeat="action in chatItem.actions"
                     ng-class="action.class"
                     ng-click="action.onClick()">
                 </action>

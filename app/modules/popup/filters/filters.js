@@ -12,11 +12,13 @@ angular.module('filters', ['config'])
     .filter('name', function () {
         return function (input) {
             if (input) {
-                if (input.name) {
-                    return input.name;
-                } else {
-                    return input.first_name + ' ' + input.last_name;
-                }
+                return [].concat(input).map(function (owner) {
+                    if (owner.name) {
+                        return owner.name;
+                    } else {
+                        return owner.first_name + ' ' + owner.last_name;
+                    }
+                }).join(', ');
             }
         };
     })
