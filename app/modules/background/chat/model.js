@@ -24,15 +24,17 @@ define([
             return request.api({
                 code: 'return API.messages.getDialogs({preview_length: 0});'
             }).done(function (response) {
-                self.get('dialogs').reset(response.slice(1).map(function (item) {
-                    // convert dialog data into message data
-                    return {
-                        id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,
-                        chat_id: item.chat_id,
-                        uid: item.uid,
-                        messages: [self.convertDialogIntoMessageData(item)]
-                    };
-                }));
+                if (response && response.count) {
+                    self.get('dialogs').reset(response.items.map(function (item) {
+                        // convert dialog data into message data
+                        return {
+                            id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,
+                            chat_id: item.chat_id,
+                            uid: item.uid,
+                            messages: [self.convertDialogIntoMessageData(item)]
+                        };
+                    }));
+                }
             });
         },
         /*
@@ -51,10 +53,11 @@ define([
             }), self = this;
 
             return jQuery.when.apply(jQuery, unreadHistoryRequests).done(function () {
-                _(arguments).each(function (messages, index) {
-                    // zero index contains quantity
-                    unreadDialogs[index].set('messages', messages.slice(1).reverse());
-                    self.removeReadMessages(unreadDialogs[index]);
+                _(arguments).each(function (unreadMessages, index) {
+                    if (unreadMessages && unreadMessages.count) {
+                        unreadDialogs[index].set('messages', unreadMessages.items.reverse());
+                        self.removeReadMessages(unreadDialogs[index]);
+                    }
                 });
             });
         },
@@ -172,19 +175,22 @@ define([
                 dialogCompanionUid = update[3],
                 self = this, out;
 
+            console.log('update', update);
             // For messages from chat attachment contains "from" property
             if (_(attachment).isEmpty()) {
                 out = +!!(flags & 2);
-                // zero index contains quantity
-                messageDeferred = jQuery.Deferred().resolve([1, {
-                    body: update[6],
-                    title: update[5],
-                    date: update[4],
-                    uid: out ? self.userId:dialogCompanionUid,
-                    read_state: +!(flags & 1),
-                    mid: messageId,
-                    // out: +!!(flags & 2)
-                }]);
+                messageDeferred = jQuery.Deferred().resolve({
+                    count: 1,
+                    items: {
+                        body: update[6],
+                        title: update[5],
+                        date: update[4],
+                        uid: out ? self.userId:dialogCompanionUid,
+                        read_state: +!(flags & 1),
+                        mid: messageId,
+                        // out: +!!(flags & 2)
+                    }
+                });
             } else {
                 messageDeferred = request.api({
                     code: 'return API.messages.getById({mid: ' + messageId + '});'
@@ -192,8 +198,7 @@ define([
             }
 
             messageDeferred.done(function (response) {
-                // zero index contains quantity
-                var message = response[1],
+                var message = response.items[0],
                     dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
                 dialog = self.get('dialogs').get(dialogId);

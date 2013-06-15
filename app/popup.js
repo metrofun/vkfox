@@ -454,15 +454,16 @@ angular.module('chat', ['request', 'item'])
                     var messageAuthorId = dialog.messages[0].uid, result = {};
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
+                        console.log(dialog);
                         result.author = _(dialog.profiles).findWhere({
-                            uid: messageAuthorId
+                            id: messageAuthorId
                         });
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
                     } else {
                         result.owners = _(dialog.profiles).findWhere({
-                            uid: dialog.uid
+                            id: dialog.uid
                         });
                     }
 
@@ -1225,6 +1226,52 @@ angular.module('filters', ['config'])
         };
     });
 
+angular.module('i18n', [])
+    .config(function ($filterProvider) {
+        var DEFAULT_LANGUAGE = 'ru',
+            language = navigator.language.split('_')[0],
+            messages;
+
+        messages = i18n[language];
+
+        if (!messages) {
+            messages = i18n[DEFAULT_LANGUAGE];
+        }
+
+        $filterProvider.register('i18n', function (input) {
+            if (input) {
+                return messages[input].apply(
+                    messages,
+                    [].slice.call(arguments, 1)
+                )
+            }
+        });
+    });
+
+(function(){ window.i18n || (window.i18n = {}) 
+var MessageFormat = { locale: {} };
+MessageFormat.locale.ru = function (n) {
+  if ((n % 10) == 1 && (n % 100) != 11) {
+    return 'one';
+  }
+  if ((n % 10) >= 2 && (n % 10) <= 4 &&
+      ((n % 100) < 12 || (n % 100) > 14) && n == Math.floor(n)) {
+    return 'few';
+  }
+  if ((n % 10) === 0 || ((n % 10) >= 5 && (n % 10) <= 9) ||
+      ((n % 100) >= 11 && (n % 100) <= 14) && n == Math.floor(n)) {
+    return 'many';
+  }
+  return 'other';
+};
+
+window.i18n["ru"] = {}
+window.i18n["ru"]["Private message"] = function(d){
+var r = "";
+r += "Личное сообщение";
+return r;
+}
+})();
 define(['item/__attachments.tpl'], function (attachmentsTemplate) {
     return [
         function (data) {

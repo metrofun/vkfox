@@ -12,7 +12,7 @@ define([
         defaults: {
             users: new (Backbone.Collection.extend({
                 model: Backbone.Model.extend({
-                    idAttribute: 'uid'
+                    idAttribute: 'id'
                 })
             }))()
         },
@@ -76,8 +76,10 @@ define([
         }, USERS_GET_DEBOUNCE),
         publishUids: function () {
             var data, uids;
+            console.log(this.get('users'));
             function getUid(uid) {
-                return _.clone(this.get('users').get(uid));
+                console.log(uid, typeof uid);
+                return _.clone(this.get('users').get(Number(uid)));
             }
 
             while (this.usersGetQueue.length) {

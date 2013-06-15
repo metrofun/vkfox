@@ -23,7 +23,7 @@ module.exports = function (grunt) {
         messageformat: {
             ru: {
                 locale: 'ru',
-                inputDir: 'app/modules/popup/i18n/ru',
+                inputdir: 'app/modules/popup/i18n/ru',
                 output: 'app/modules/popup/i18n/ru.js'
             }
         },

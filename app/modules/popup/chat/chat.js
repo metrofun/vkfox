@@ -7,15 +7,16 @@ angular.module('chat', ['request', 'item'])
                     var messageAuthorId = dialog.messages[0].uid, result = {};
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
+                        console.log(dialog);
                         result.author = _(dialog.profiles).findWhere({
-                            uid: messageAuthorId
+                            id: messageAuthorId
                         });
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
                     } else {
                         result.owners = _(dialog.profiles).findWhere({
-                            uid: dialog.uid
+                            id: dialog.uid
                         });
                     }
 
