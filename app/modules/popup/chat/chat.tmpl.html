@@ -22,11 +22,12 @@
                 <small ng-if="author">{{dialog.author | name}}</small>
             </blockquote>
             <actions>
-            <action
-                send-message
-                chat-id="dialog.chat_id"
-                uid="dialog.uid"
-                ng-class="'icon-share-alt'">
+                <action
+                    send-message
+                    chat-id="dialog.chat_id"
+                    uid="dialog.uid"
+                    ng-class="'icon-share-alt'">
+                <action>
             </actions>
         </item>
     </div>
