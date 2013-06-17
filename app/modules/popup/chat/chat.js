@@ -1,4 +1,4 @@
-angular.module('chat', ['request', 'item'])
+angular.module('chat', ['item'])
     .controller('ChatCtrl', function ($scope, mediator) {
         mediator.pub('chat:data:get');
         mediator.sub('chat:data', function (data) {
@@ -7,7 +7,6 @@ angular.module('chat', ['request', 'item'])
                     var messageAuthorId = dialog.messages[0].uid, result = {};
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
-                        console.log(dialog);
                         result.author = _(dialog.profiles).findWhere({
                             id: messageAuthorId
                         });
@@ -28,45 +27,4 @@ angular.module('chat', ['request', 'item'])
                 });
             });
         }.bind(this));
-    })
-    .controller('ChatItemCtrl', function ($scope, request) {
-        $scope.reply = {};
-
-        $scope.replyDialog = function () {
-            $scope.reply = {
-                visible: !$scope.reply.visible,
-                onSend: function (message) {
-                    var params = {
-                        message: jQuery.trim(message)
-                    }, dialog = $scope.dialog;
-
-                    if (dialog.chat_id) {
-                        params.chat_id = dialog.chat_id;
-                    } else {
-                        params.uid = dialog.uid;
-                    }
-
-                    request.api({
-                        code: 'return API.messages.send(' + JSON.stringify(params) + ');'
-                    });
-                },
-                placeHolder: ''
-            };
-        }
-
-        $scope.chatItem = {actions: [
-            {
-                class: 'icon-share-alt',
-                onClick: $scope.replyDialog
-            }
-        ]};
-        if (!$scope.dialog.chat_id) {
-            $scope.chatItem.actions.push({
-                class: 'icon-comment',
-                onClick: function () {
-                    $scope.chatItem.showReply = !$scope.chatItem.showReply;
-                    console.log(arguments);
-                }
-            });
-        }
     });

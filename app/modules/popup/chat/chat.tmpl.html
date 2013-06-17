@@ -1,15 +1,15 @@
 <ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
 <div ng-controller="ChatCtrl" class="item-list">
-    <div
-        ng-repeat="dialog in data"
-        ng-controller="ChatItemCtrl"
-        class="chat__item">
+    <div ng-repeat="dialog in data" class="chat__item">
         <item
             reply="reply"
             owners="dialog.owners">
             <blockquote
-                ng-click="replyDialog()"
+                send-message
                 ng-class="author && 'pull-right'"
+                chat-id="dialog.chat_id"
+                uid="dialog.uid"
+                ng-transclude
                 class="chat__item-content">
                 <p ng-repeat="message in dialog.messages">
                     {{message.body}}
@@ -22,11 +22,11 @@
                 <small ng-if="author">{{dialog.author | name}}</small>
             </blockquote>
             <actions>
-                <action
-                    ng-repeat="action in chatItem.actions"
-                    ng-class="action.class"
-                    ng-click="action.onClick()">
-                </action>
+            <action
+                send-message
+                chat-id="dialog.chat_id"
+                uid="dialog.uid"
+                ng-class="'icon-share-alt'">
             </actions>
         </item>
     </div>

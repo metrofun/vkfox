@@ -9,15 +9,28 @@ module.exports = function (grunt) {
                     'app/modules/popup/*/*.less',
                     'app/modules/popup/*/*/*.less'
                 ],
-                tasks: ['concat:less', 'recess:less', 'clean:less']
+                tasks: [
+                    'concat:less',
+                    'recess:less',
+                    'clean:less'
+                ],
+                options: {
+                    interrupt: true
+                }
             },
             js: {
                 files: 'app/modules/popup/**/*.js',
-                tasks: ['concat:js']
+                tasks: ['concat:js'],
+                options: {
+                    interrupt: true
+                }
             },
             messages: {
                 files: 'app/modules/popup/i18n/**/*.json',
-                tasks: ['messageformat']
+                tasks: ['messageformat'],
+                options: {
+                    interrupt: true
+                }
             }
         },
         messageformat: {
