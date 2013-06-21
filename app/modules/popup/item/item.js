@@ -1,24 +1,17 @@
-angular.module('item', ['filters', 'ui.keypress', 'request'])
-    .directive('item', function factory() {
+angular.module('item', ['common', 'ui.keypress', 'request'])
+    .directive('item', function () {
         return {
             controller: function ($scope) {
-                var self = this;
-
-                $scope.$watch('owners', function () {
-                    var owners = [].concat($scope.owners);
-
-                    if (owners.length === 1) {
-                        $scope.owner = owners[0];
-                    }
-                    $scope.callback = function () {
-                        console.log(arguments);
-                    }
-                });
-
                 $scope.reply = {
                     visible: false
                 };
 
+                /**
+                 * Show block with text message input
+                 *
+                 * @param {Function} onSend
+                 * @param {String} placeholder
+                 */
                 this.showReply = function (onSend, placeholder) {
                     $scope.reply.onSend = onSend;
                     $scope.reply.placeholder = placeholder;
@@ -41,7 +34,7 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             }
         };
     })
-    .directive('attachment', function factory() {
+    .directive('itemAttachment', function () {
         return {
             templateUrl: '/modules/popup/item/attachment.tmpl.html',
             replace: true,
@@ -53,7 +46,7 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             }
         };
     })
-    .directive('actions', function factory() {
+    .directive('itemActions', function () {
         return {
             template: '<div class="item__actions" ng-transclude></div>',
             replace: true,
@@ -61,14 +54,14 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             restrict: 'E'
         };
     })
-    .directive('action', function factory() {
+    .directive('itemAction', function () {
         return {
             template: '<i class="item__action"></i>',
             replace: true,
             restrict: 'E'
         };
     })
-    .directive('sendMessage', function (request) {
+    .directive('itemSendMessage', function (request) {
         return {
             transclude: true,
             require: '^item',
@@ -76,6 +69,11 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             scope: {
                 uid: '=',
                 chatId: '='
+            },
+            controller: function($transclude, $element) {
+                $transclude(function(clone) {
+                    $element.append(clone);
+                });
             },
             link: function(scope, element, attrs, itemCtrl) {
                 element.bind('click', function () {
@@ -98,11 +96,6 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
                     });
                 });
             }
-        };
-    })
-    .filter('isObject', function () {
-        return function (input) {
-            return angular.isObject(input);
         };
     });
 

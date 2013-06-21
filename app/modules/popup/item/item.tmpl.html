@@ -1,7 +1,11 @@
-<div class="item media" ng-class="{'is-online': owner.online}">
-    <div ng-switch on="!!owner" class="pull-left">
-        <img ng-switch-when="true" ng-src="{{owner.photo}}" class="item__img media-object"/>
-        <div ng-switch-when="false" class="item__img media-object">
+<div class="item media" ng-class="{'is-online': owners.online}">
+    <div ng-switch on="owners | isArray" class="pull-left">
+        <img
+            ng-switch-when="false"
+            ng-src="{{owners.photo}}"
+            anchor="{{'/id' + owners.id | addVKBase}}"
+            class="item__img media-object"/>
+        <div ng-switch-when="true" class="item__img media-object">
             <i class="icon-user"></i>{{owners.length}}
         </div>
     </div>

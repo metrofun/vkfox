@@ -1,2 +1,2 @@
 angular.module('config', [])
-    .constant('VK_BASE', 'vk.com');
+    .constant('VK_BASE', 'http://vk.com/');

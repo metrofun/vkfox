@@ -1,4 +1,4 @@
-angular.module('app', ['router', 'item', 'filters', 'news', 'chat'])
+angular.module('app', ['router', 'item', 'common', 'news', 'chat'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.location = $location;
@@ -784,28 +784,85 @@ define([
     });
 });
 
-define(['config/config'], function (config) {
-    return {
-        addVkBase: function (url) {
-            if ((url) && (url.substr(0, 4) !== 'http') && (url.substr(0, 4) !== 'www.')) {
-                if (url.charAt(0) === '/') {
-                    url = 'http://' + config.vk.domain + url;
-                } else {
-                    url = 'http://' + config.vk.domain + '/' + url;
-                }
+angular.module('common', ['config'])
+    .directive('anchor', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                element.bind('click', function () {
+                    chrome.tabs.create({url: attr['anchor']});
+                });
             }
-            return url;
-        },
-        openTab: function (url) {
-            chrome.tabs.create({
-                "url": url
-            });
-        }
-    };
-});
+        };
+    })
+    .filter('where', function () {
+        /**
+         * Returns object from collection,
+         * by it's key/value pair
+         *
+         * @param {Array} input
+         * @param {String} property
+         * @param {Mixed} value
+         *
+         * @returns {Object}
+         */
+        return function (input, property, value) {
+            var obj;
+            if (input) {
+                obj  = {};
+                obj[property] = value
+                return _(input).findWhere(obj);
+            }
+        };
+    })
+    .filter('name', function () {
+        /**
+         * Returns names from profile's data
+         *
+         * @param {Object|Array} input
+         *
+         * @returns {String} String
+         */
+        return function (input) {
+            if (input) {
+                return [].concat(input).map(function (owner) {
+                    //group profile
+                    if (owner.name) {
+                        return owner.name;
+                    //user profile
+                    } else {
+                        return owner.first_name + ' ' + owner.last_name;
+                    }
+                }).join(', ');
+            }
+        };
+    })
+    .filter('addVKBase', function (VK_BASE) {
+        return function (path) {
+            if (path.indexOf(VK_BASE) === -1) {
+                if (path.charAt(0) === '/') {
+                    path = path.substr(1);
+                }
+                path = VK_BASE + path;
+            }
+            return path;
+        };
+    })
+    .filter('isObject', function () {
+        return function (input) {
+            return angular.isObject(input);
+        };
+    })
+    .filter('isArray', function () {
+        return function (input) {
+            return angular.isArray(input);
+        };
+    });
+
+
 
 angular.module('config', [])
-    .constant('VK_BASE', 'vk.com');
+    .constant('VK_BASE', 'http://vk.com/');
 
 define([
     'jtoh',
@@ -1145,45 +1202,6 @@ define([
     });
 });
 
-angular.module('filters', ['config'])
-    .filter('where', function () {
-        return function (input, property, value) {
-            var obj;
-            if (input) {
-                obj  = {};
-                obj[property] = value
-                return _(input).findWhere(obj);
-            }
-        };
-    })
-    .filter('name', function () {
-        return function (input) {
-            if (input) {
-                return [].concat(input).map(function (owner) {
-                    if (owner.name) {
-                        return owner.name;
-                    } else {
-                        return owner.first_name + ' ' + owner.last_name;
-                    }
-                }).join(', ');
-            }
-        };
-    })
-    // TODO legacy
-    .filter('absoluteVkUrl', function (VK_BASE) {
-        return function (url) {
-            if ((url) && (url.substr(0, 4) !== 'http') && (url.substr(0, 4) !== 'www.')) {
-                if (url.charAt(0) === '/') {
-                    url = 'http://' + VK_BASE + url;
-                } else {
-                    url = 'http://' + VK_BASE + '/' + url;
-                }
-            }
-
-            return url;
-        };
-    });
-
 angular.module('i18n', [])
     .config(function ($filterProvider) {
         var DEFAULT_LANGUAGE = 'ru',
@@ -1310,27 +1328,20 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     return tpl;
 });
 
-angular.module('item', ['filters', 'ui.keypress', 'request'])
-    .directive('item', function factory() {
+angular.module('item', ['common', 'ui.keypress', 'request'])
+    .directive('item', function () {
         return {
             controller: function ($scope) {
-                var self = this;
-
-                $scope.$watch('owners', function () {
-                    var owners = [].concat($scope.owners);
-
-                    if (owners.length === 1) {
-                        $scope.owner = owners[0];
-                    }
-                    $scope.callback = function () {
-                        console.log(arguments);
-                    }
-                });
-
                 $scope.reply = {
                     visible: false
                 };
 
+                /**
+                 * Show block with text message input
+                 *
+                 * @param {Function} onSend
+                 * @param {String} placeholder
+                 */
                 this.showReply = function (onSend, placeholder) {
                     $scope.reply.onSend = onSend;
                     $scope.reply.placeholder = placeholder;
@@ -1353,7 +1364,7 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             }
         };
     })
-    .directive('attachment', function factory() {
+    .directive('itemAttachment', function () {
         return {
             templateUrl: '/modules/popup/item/attachment.tmpl.html',
             replace: true,
@@ -1365,7 +1376,7 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             }
         };
     })
-    .directive('actions', function factory() {
+    .directive('itemActions', function () {
         return {
             template: '<div class="item__actions" ng-transclude></div>',
             replace: true,
@@ -1373,14 +1384,14 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             restrict: 'E'
         };
     })
-    .directive('action', function factory() {
+    .directive('itemAction', function () {
         return {
             template: '<i class="item__action"></i>',
             replace: true,
             restrict: 'E'
         };
     })
-    .directive('sendMessage', function (request) {
+    .directive('itemSendMessage', function (request) {
         return {
             transclude: true,
             require: '^item',
@@ -1388,6 +1399,11 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
             scope: {
                 uid: '=',
                 chatId: '='
+            },
+            controller: function($transclude, $element) {
+                $transclude(function(clone) {
+                    $element.append(clone);
+                });
             },
             link: function(scope, element, attrs, itemCtrl) {
                 element.bind('click', function () {
@@ -1410,11 +1426,6 @@ angular.module('item', ['filters', 'ui.keypress', 'request'])
                     });
                 });
             }
-        };
-    })
-    .filter('isObject', function () {
-        return function (input) {
-            return angular.isObject(input);
         };
     });
 

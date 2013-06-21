@@ -1,4 +1,4 @@
-angular.module('app', ['router', 'item', 'filters', 'news', 'chat'])
+angular.module('app', ['router', 'item', 'common', 'news', 'chat'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.location = $location;
