@@ -1,3 +1,8 @@
 {
-    "Private message": "Личное сообщение"
+    "Private message": "Личное сообщение",
+    "Filters": "Фильтры",
+    "Search": "Имя или Фамилия",
+    "Male": "Мужчины",
+    "Female": "Женщины",
+    "Offline": "Не в сети"
 }

@@ -1,37 +1,36 @@
 <ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
 <div ng-controller="ChatCtrl" class="item-list">
-    <div ng-repeat="dialog in data" class="chat__item">
-        <item
-            reply="reply"
-            owners="dialog.owners">
-            <blockquote
+    <item
+        ng-repeat="dialog in data" class="chat__item"
+        reply="reply"
+        owners="dialog.owners">
+        <blockquote
+            item-send-message
+            ng-class="{'pull-right': author}"
+            chat-id="dialog.chat_id"
+            uid="dialog.uid"
+            class="chat__item-content">
+            <p ng-repeat="message in dialog.messages">
+                {{message.body}}
+                <item-attachment
+                    ng-repeat="attachment in message.attachments"
+                    data="attachment[attachment.type]"
+                    type="{{attachment.type}}">
+                </item-attachment>
+            </p>
+            <small ng-if="author">{{dialog.author | name}}</small>
+        </blockquote>
+        <item-actions>
+            <item-action
                 item-send-message
-                ng-class="{'pull-right': author}"
                 chat-id="dialog.chat_id"
                 uid="dialog.uid"
-                class="chat__item-content">
-                <p ng-repeat="message in dialog.messages">
-                    {{message.body}}
-                    <item-attachment
-                        ng-repeat="attachment in message.attachments"
-                        data="attachment[attachment.type]"
-                        type="{{attachment.type}}">
-                    </item-attachment>
-                </p>
-                <small ng-if="author">{{dialog.author | name}}</small>
-            </blockquote>
-            <item-actions>
-                <item-action
-                    item-send-message
-                    chat-id="dialog.chat_id"
-                    uid="dialog.uid"
-                    ng-class="'icon-share-alt'">
-                </item-action>
-                <item-action
-                    anchor="{{'/albums' + dialog.uid | addVKBase}}"
-                    ng-class="'icon-camera'">
-                </item-action>
-            </item-actions>
-        </item>
-    </div>
+                ng-class="'icon-share-alt'">
+            </item-action>
+            <item-action
+                anchor="{{'/albums' + dialog.uid | addVKBase}}"
+                ng-class="'icon-camera'">
+            </item-action>
+        </item-actions>
+    </item>
 </div>

@@ -11,7 +11,7 @@ module.exports = function (grunt) {
                 ],
                 tasks: [
                     'concat:less',
-                    'recess:less',
+                    'less:all',
                     'clean:less'
                 ],
                 options: {
@@ -55,8 +55,8 @@ module.exports = function (grunt) {
                 dest: 'app/popup.js'
             }
         },
-        recess: {
-            less: {
+        less: {
+            all: {
                 src: '<%= concat.less.dest %>',
                 dest: 'app/style.css',
                 options: {
@@ -73,11 +73,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-messageformat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-recess');
+    grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.registerTask(
         'default',
-        ['concat', 'messageformat', 'recess:less', 'clean:less', 'watch']
+        ['concat', 'messageformat', 'less:all', 'clean:less', 'watch']
     );
 
 };

@@ -29,7 +29,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'E',
             scope: {
                 owners: '=',
-                reply: '=',
+                reply: '=?',
                 class: '@'
             }
         };
@@ -68,7 +68,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'A',
             scope: {
                 uid: '=',
-                chatId: '='
+                chatId: '=?'
             },
             controller: function($transclude, $element) {
                 $transclude(function(clone) {

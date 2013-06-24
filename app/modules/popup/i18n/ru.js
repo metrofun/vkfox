@@ -21,4 +21,29 @@ var r = "";
 r += "Личное сообщение";
 return r;
 }
+window.i18n["ru"]["Filters"] = function(d){
+var r = "";
+r += "Фильтры";
+return r;
+}
+window.i18n["ru"]["Search"] = function(d){
+var r = "";
+r += "Имя или Фамилия";
+return r;
+}
+window.i18n["ru"]["Male"] = function(d){
+var r = "";
+r += "Мужчины";
+return r;
+}
+window.i18n["ru"]["Female"] = function(d){
+var r = "";
+r += "Женщины";
+return r;
+}
+window.i18n["ru"]["Offline"] = function(d){
+var r = "";
+r += "Не в сети";
+return r;
+}
 })();

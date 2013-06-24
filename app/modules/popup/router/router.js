@@ -9,7 +9,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/chat/chat.tmpl.html'
             })
             .when('/buddies', {
-                templateUrl: '/modules/popup/app/buddies.tmpl.html'
+                templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
             })
             .when('/news', {
                 redirectTo: '/news/friends'
@@ -19,7 +19,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/chat'
+                redirectTo: '/buddies'
             });
     });
 

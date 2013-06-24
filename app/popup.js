@@ -1,7 +1,6 @@
-angular.module('app', ['router', 'item', 'common', 'news', 'chat'])
+angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
-        $scope.location = $location;
         $scope.$watch('location.path()', function (path) {
             $scope.locationPath = path;
         });
@@ -19,16 +18,6 @@ angular.module('app', ['router', 'item', 'common', 'news', 'chat'])
                 name: 'News'
             }
         ];
-    })
-    .controller('buddiesCtrl', function ($scope, mediator) {
-        var PRELOAD_ITEMS = 15;
-
-        mediator.pub('buddies:data:get');
-        mediator.sub('buddies:data', function (data) {
-            $scope.$apply(function () {
-                $scope.data = data.slice(0, PRELOAD_ITEMS);
-            });
-        }.bind(this));
     })
 
 
@@ -149,6 +138,19 @@ define([
         }
     });
 });
+
+angular.module('buddies', ['i18n'])
+    .controller('buddiesCtrl', function ($scope, mediator) {
+        var PRELOAD_ITEMS = 15;
+
+        mediator.pub('buddies:data:get');
+        mediator.sub('buddies:data', function (data) {
+            $scope.$apply(function () {
+                $scope.data = data;
+            });
+        }.bind(this));
+    })
+
 
 define(['i18n/i18n'], function (I18N) {
     var i18n = new I18N();
@@ -1204,22 +1206,24 @@ define([
 
 angular.module('i18n', [])
     .config(function ($filterProvider) {
-        var DEFAULT_LANGUAGE = 'ru',
-            language = navigator.language.split('_')[0],
-            messages;
+        $filterProvider.register('i18n', function () {
+            var DEFAULT_LANGUAGE = 'ru',
+                language = navigator.language.split('_')[0],
+                messages;
 
-        messages = i18n[language];
+            messages = i18n[language];
 
-        if (!messages) {
-            messages = i18n[DEFAULT_LANGUAGE];
-        }
+            if (!messages) {
+                messages = i18n[DEFAULT_LANGUAGE];
+            }
 
-        $filterProvider.register('i18n', function (input) {
-            if (input) {
-                return messages[input].apply(
-                    messages,
-                    [].slice.call(arguments, 1)
-                )
+            return function (input) {
+                if (input) {
+                    return messages[input].apply(
+                        messages,
+                        [].slice.call(arguments, 1)
+                    )
+                }
             }
         });
     });
@@ -1245,6 +1249,31 @@ window.i18n["ru"] = {}
 window.i18n["ru"]["Private message"] = function(d){
 var r = "";
 r += "Личное сообщение";
+return r;
+}
+window.i18n["ru"]["Filters"] = function(d){
+var r = "";
+r += "Фильтры";
+return r;
+}
+window.i18n["ru"]["Search"] = function(d){
+var r = "";
+r += "Имя или Фамилия";
+return r;
+}
+window.i18n["ru"]["Male"] = function(d){
+var r = "";
+r += "Мужчины";
+return r;
+}
+window.i18n["ru"]["Female"] = function(d){
+var r = "";
+r += "Женщины";
+return r;
+}
+window.i18n["ru"]["Offline"] = function(d){
+var r = "";
+r += "Не в сети";
 return r;
 }
 })();
@@ -1359,7 +1388,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'E',
             scope: {
                 owners: '=',
-                reply: '=',
+                reply: '=?',
                 class: '@'
             }
         };
@@ -1398,7 +1427,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'A',
             scope: {
                 uid: '=',
-                chatId: '='
+                chatId: '=?'
             },
             controller: function($transclude, $element) {
                 $transclude(function(clone) {
@@ -1826,7 +1855,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/chat/chat.tmpl.html'
             })
             .when('/buddies', {
-                templateUrl: '/modules/popup/app/buddies.tmpl.html'
+                templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
             })
             .when('/news', {
                 redirectTo: '/news/friends'
@@ -1836,7 +1865,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/chat'
+                redirectTo: '/buddies'
             });
     });
 

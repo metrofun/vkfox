@@ -1,7 +1,6 @@
-angular.module('app', ['router', 'item', 'common', 'news', 'chat'])
+angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
-        $scope.location = $location;
         $scope.$watch('location.path()', function (path) {
             $scope.locationPath = path;
         });
@@ -19,15 +18,5 @@ angular.module('app', ['router', 'item', 'common', 'news', 'chat'])
                 name: 'News'
             }
         ];
-    })
-    .controller('buddiesCtrl', function ($scope, mediator) {
-        var PRELOAD_ITEMS = 15;
-
-        mediator.pub('buddies:data:get');
-        mediator.sub('buddies:data', function (data) {
-            $scope.$apply(function () {
-                $scope.data = data.slice(0, PRELOAD_ITEMS);
-            });
-        }.bind(this));
     })
 
