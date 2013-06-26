@@ -5274,6 +5274,13 @@ a.badge:focus {
   width: 320px;
   height: 480px;
 }
+.buddies .dropdown-menu label {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
 .t-buddies__controls {
   padding: 0 10px 5px !important;
   min-height: auto;
@@ -5308,6 +5315,11 @@ a.badge:focus {
   border-radius: 4px 4px 0 0;
 }
 .item-list {
+  overflow: scroll;
+  min-height: 100px;
+  max-height: 400px;
+}
+.item-list__content {
   margin: 10px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -5316,7 +5328,6 @@ a.badge:focus {
   -moz-box-shadow: 0 1px 4px #999999;
   box-shadow: 0 1px 4px #999999;
   overflow: hidden;
-  min-height: 100px;
 }
 .item {
   background: #ffffff;

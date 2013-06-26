@@ -1,0 +1,55 @@
+<ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
+<div ng-controller="buddiesCtrl" class="buddies">
+    <div class="navbar navbar-static-top">
+        <form class="navbar-inner form-inline navbar-form t-buddies__controls">
+            <div class="input-prepend">
+                <span class="add-on"><i class="icon-search"></i></span>
+                <input
+                    class="span2"
+                    id="prependedInput"
+                    type="text"
+                    ng-model="searchClue"
+                    placeholder="{{'Search' | i18n}}">
+            </div>
+            <div
+                ng-class="{open: filtersOpened}"
+                class="dropdown btn-group pull-right">
+                <button
+                    ng-click="filtersOpened = !filtersOpened"
+                    class="btn dropdown-toggle" type="button">
+                    {{'Filters' | i18n}} <div class="caret"></div>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><label class="checkbox">
+                        <input ng-model="filters.male" type="checkbox">{{'Male' | i18n}}
+                    </label></li>
+                    <li><label class="checkbox">
+                        <input ng-model="filters.female" type="checkbox">{{'Female' | i18n}}
+                    </label></li>
+                    <li class="divider"></li>
+                    <li><label class="checkbox">
+                        <input ng-model="filters.offline" type="checkbox">{{'Offline' | i18n}}
+                    </label></li>
+            </div>
+        </form>
+    </div>
+    <div class="item-list">
+        <div class="item-list__content">
+            <item
+                ng-repeat="friend in data | buddiesFilter:filters:25:searchClue"
+                owners="friend">
+                <item-actions>
+                    <item-action
+                        item-send-message
+                        uid="dialog.uid"
+                        ng-class="'icon-share-alt'">
+                        </item-action>
+                    <item-action
+                        anchor="{{'/albums' + dialog.uid | addVKBase}}"
+                        ng-class="'icon-camera'">
+                    </item-action>
+                </item-actions>
+            </item>
+        </div>
+    </div>
+</div>
