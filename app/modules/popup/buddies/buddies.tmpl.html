@@ -33,23 +33,21 @@
             </div>
         </form>
     </div>
-    <div class="item-list">
-        <div class="item-list__content">
-            <item
-                ng-repeat="friend in data | buddiesFilter:filters:25:searchClue"
-                owners="friend">
-                <item-actions>
-                    <item-action
-                        item-send-message
-                        uid="dialog.uid"
-                        ng-class="'icon-share-alt'">
-                        </item-action>
-                    <item-action
-                        anchor="{{'/albums' + dialog.uid | addVKBase}}"
-                        ng-class="'icon-camera'">
+    <item-list>
+        <item
+            item-list-repeat="friend in data | buddiesFilter:filters:25:searchClue"
+            owners="friend">
+            <item-actions>
+                <item-action
+                    item-send-message
+                    uid="dialog.uid"
+                    ng-class="'icon-share-alt'">
                     </item-action>
-                </item-actions>
-            </item>
-        </div>
-    </div>
+                <item-action
+                    anchor="{{'/albums' + dialog.uid | addVKBase}}"
+                    ng-class="'icon-camera'">
+                </item-action>
+            </item-actions>
+        </item>
+    </item-list>
 </div>

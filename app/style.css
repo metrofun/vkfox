@@ -5316,8 +5316,7 @@ a.badge:focus {
 }
 .item-list {
   overflow: scroll;
-  min-height: 100px;
-  max-height: 400px;
+  height: 400px;
 }
 .item-list__content {
   margin: 10px;

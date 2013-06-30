@@ -1,4 +1,4 @@
-angular.module('buddies', ['i18n'])
+angular.module('buddies', ['i18n', 'item-list'])
     .controller('buddiesCtrl', function ($scope, $element, mediator) {
         $scope.filters = {
             male: true,
@@ -48,6 +48,6 @@ angular.module('buddies', ['i18n'])
                     ) && (!searchClue || matchProfile(profile, searchClue));
                 });
             }
-        }
-    })
+        };
+    });
 

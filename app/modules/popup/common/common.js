@@ -4,7 +4,7 @@ angular.module('common', ['config'])
             restrict: 'A',
             link: function (scope, element, attr) {
                 element.bind('click', function () {
-                    chrome.tabs.create({url: attr['anchor']});
+                    chrome.tabs.create({url: attr.anchor});
                 });
             }
         };
@@ -24,7 +24,7 @@ angular.module('common', ['config'])
             var obj;
             if (input) {
                 obj  = {};
-                obj[property] = value
+                obj[property] = value;
                 return _(input).findWhere(obj);
             }
         };
