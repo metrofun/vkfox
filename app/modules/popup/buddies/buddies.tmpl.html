@@ -40,9 +40,14 @@
             <item-actions>
                 <item-action
                     item-send-message
-                    uid="dialog.uid"
+                    uid="friend.id"
                     ng-class="'icon-share-alt'">
-                    </item-action>
+                </item-action>
+                <item-action
+                    item-post-wall
+                    uid="friend.id"
+                    ng-class="'icon-comment'">
+                </item-action>
                 <item-action
                     anchor="{{'/albums' + dialog.uid | addVKBase}}"
                     ng-class="'icon-camera'">

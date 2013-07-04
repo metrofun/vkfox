@@ -139,16 +139,16 @@ define([
     });
 });
 
-angular.module('buddies', ['i18n', 'item-list'])
-    .controller('buddiesCtrl', function ($scope, $element, mediator) {
+angular.module('buddies', ['i18n', 'item-list', 'mediator'])
+    .controller('buddiesCtrl', function ($scope, $element, Mediator) {
         $scope.filters = {
             male: true,
             female: true,
             offline: false
         };
 
-        mediator.pub('buddies:data:get');
-        mediator.sub('buddies:data', function (data) {
+        Mediator.pub('buddies:data:get');
+        Mediator.sub('buddies:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
             });
@@ -183,10 +183,14 @@ angular.module('buddies', ['i18n', 'item-list'])
         return function (input, filters, count, searchClue) {
             if (Array.isArray(input)) {
                 return input.filter(function (profile) {
-                    return (filters.offline || profile.online) && (
-                        (filters.male || profile.sex !== 2)
-                        && (filters.female || profile.sex !== 1)
-                    ) && (!searchClue || matchProfile(profile, searchClue));
+                    if (!searchClue) {
+                        return (filters.offline || profile.online) && (
+                            (filters.male || profile.sex !== 2)
+                            && (filters.female || profile.sex !== 1)
+                        );
+                    } else {
+                        return matchProfile(profile, searchClue);
+                    }
                 });
             }
         };
@@ -488,10 +492,10 @@ define([
     });
 });
 
-angular.module('chat', ['item'])
-    .controller('ChatCtrl', function ($scope, mediator) {
-        mediator.pub('chat:data:get');
-        mediator.sub('chat:data', function (data) {
+angular.module('chat', ['item', 'mediator'])
+    .controller('ChatCtrl', function ($scope, Mediator) {
+        Mediator.pub('chat:data:get');
+        Mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data.dialogs.map(function (dialog) {
                     var messageAuthorId = dialog.messages[0].uid, result = {};
@@ -1292,6 +1296,11 @@ var r = "";
 r += "Личное сообщение";
 return r;
 }
+window.i18n["ru"]["Wall post"] = function(d){
+var r = "";
+r += "Сообщение на стене";
+return r;
+}
 window.i18n["ru"]["Filters"] = function(d){
 var r = "";
 r += "Фильтры";
@@ -1408,7 +1417,6 @@ angular.module('item-list', [])
                             }
 
                             block = nextBlockOrder[index];
-                            console.log(block);
 
                             if (block.element) {
                                 // if we have already seen this object, then we need to reuse the
@@ -1485,7 +1493,6 @@ angular.module('item-list', [])
                         }
 
                         // remove existing items that are were not moved to nextBlockMap
-                        console.log(lastBlockMap, nextBlockOrder);
                         for (key in lastBlockMap) {
                             if (lastBlockMap.hasOwnProperty(key) && lastBlockMap[key].element) {
                                 block = lastBlockMap[key];
@@ -1616,7 +1623,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             scope: {
                 owners: '=',
                 reply: '=?',
-                class: '@'
+                'class': '@'
             }
         };
     })
@@ -1656,17 +1663,17 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 uid: '=',
                 chatId: '=?'
             },
-            controller: function($transclude, $element) {
-                $transclude(function(clone) {
+            controller: function ($transclude, $element) {
+                $transclude(function (clone) {
                     $element.append(clone);
                 });
             },
-            link: function(scope, element, attrs, itemCtrl) {
+            link: function (scope, element, attrs, itemCtrl) {
                 element.bind('click', function () {
                     scope.$apply(function () {
                         itemCtrl.showReply(function (message) {
                             var params = {
-                                message: message
+                                message: message.trim()
                             };
 
                             if (scope.chatId) {
@@ -1683,9 +1690,38 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 });
             }
         };
+    })
+    .directive('itemPostWall', function (request) {
+        return {
+            transclude: true,
+            require: '^item',
+            restrict: 'A',
+            scope: {
+                uid: '='
+            },
+            controller: function ($transclude, $element) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            link: function (scope, element, attrs, itemCtrl) {
+                element.bind('click', function () {
+                    scope.$apply(function () {
+                        itemCtrl.showReply(function (message) {
+                            var params = {
+                                message: message.trim(),
+                                owner_id: scope.uid
+                            };
+
+                            request.api({
+                                code: 'return API.wall.post(' + JSON.stringify(params) + ');'
+                            });
+                        }, 'Wall post');
+                    });
+                });
+            }
+        };
     });
-
-
 
 define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     var tpl = jQuery.extend(true, {}, itemTemplate);
@@ -1868,7 +1904,7 @@ define([
 });
 
 angular.module('mediator', [])
-    .factory('mediator', function () {
+    .factory('Mediator', function () {
         var dispatcher = _.clone(Backbone.Events);
 
         chrome.extension.onMessage.addListener(function (messageData) {
@@ -1892,8 +1928,8 @@ angular.module('mediator', [])
         };
     });
 
-angular.module('news', [])
-    .controller('NewsController', function ($scope, $routeParams, $controller) {
+angular.module('news', ['mediator'])
+    .controller('NewsController', function ($scope, $routeParams) {
         $scope.tabs = [
             {
                 href: '/news/my',
@@ -1912,26 +1948,26 @@ angular.module('news', [])
         $scope.activeTab = $routeParams.tab;
         console.log($scope.MyNewsController);
     })
-    .controller('MyNewsController', function ($scope, mediator) {
-        mediator.pub('feedback:data:get');
-        mediator.sub('feedback:data', function (data) {
+    .controller('MyNewsController', function ($scope, Mediator) {
+        Mediator.pub('feedback:data:get');
+        Mediator.sub('feedback:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
                 console.log(data);
             });
         });
     })
-    .controller('FriendNewsController', function ($scope, mediator) {
-        mediator.pub('newsfeed:friends:get');
-        mediator.sub('newsfeed:friends', function (data) {
+    .controller('FriendNewsController', function ($scope, Mediator) {
+        Mediator.pub('newsfeed:friends:get');
+        Mediator.sub('newsfeed:friends', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
             });
         });
     })
-    .controller('GroupNewsController', function ($scope, mediator) {
-        mediator.pub('newsfeed:groups:get');
-        mediator.sub('newsfeed:groups', function (data) {
+    .controller('GroupNewsController', function ($scope, Mediator) {
+        Mediator.pub('newsfeed:groups:get');
+        Mediator.sub('newsfeed:groups', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
             });
@@ -2049,20 +2085,20 @@ define([
 });
 
 angular.module('request', ['mediator'])
-    .factory('request', function (mediator) {
+    .factory('request', function (Mediator) {
         return {
             api: function () {
                 var ajaxDeferred = new jQuery.Deferred(),
                 id = _.uniqueId();
 
-                mediator.pub('request', {
+                Mediator.pub('request', {
                     method: 'api',
                     id: id,
-                    arguments: [].slice.apply(arguments)
+                    'arguments': [].slice.apply(arguments)
                 });
-                mediator.once('request:' + id, function (data) {
-                    ajaxDeferred[data.method].apply(ajaxDeferred, data.arguments);
-                    console.log(data.arguments);
+                Mediator.once('request:' + id, function (data) {
+                    ajaxDeferred[data.method].apply(ajaxDeferred, data['arguments']);
+                    console.log(data['arguments']);
                 });
 
                 return ajaxDeferred;

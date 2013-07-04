@@ -1,16 +1,18 @@
-<div class="item media" ng-class="{'is-online': owners.online}">
-    <div ng-switch on="owners | isArray" class="pull-left">
-        <img
+<div class="item" ng-class="{'is-online': owners.online}">
+    <div class="media">
+        <div ng-switch on="owners | isArray" class="pull-left">
+            <img
             ng-switch-when="false"
             ng-src="{{owners.photo}}"
             anchor="{{'/id' + owners.id | addVKBase}}"
             class="item__img media-object"/>
-        <div ng-switch-when="true" class="item__img media-object">
-            <i class="icon-user"></i>{{owners.length}}
+            <div ng-switch-when="true" class="item__img media-object">
+                <i class="icon-user"></i>{{owners.length}}
+            </div>
         </div>
-    </div>
-    <div class="media-body clearfix" ng-transclude>
-        <strong class="item__author media-heading">{{owners | name}}</strong>
+        <div class="media-body clearfix" ng-transclude>
+            <strong class="item__author media-heading">{{owners | name}}</strong>
+        </div>
     </div>
     <div ng-if="reply.visible" class="item__reply">
         <textarea

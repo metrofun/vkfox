@@ -1,18 +1,18 @@
 angular.module('request', ['mediator'])
-    .factory('request', function (mediator) {
+    .factory('request', function (Mediator) {
         return {
             api: function () {
                 var ajaxDeferred = new jQuery.Deferred(),
                 id = _.uniqueId();
 
-                mediator.pub('request', {
+                Mediator.pub('request', {
                     method: 'api',
                     id: id,
-                    arguments: [].slice.apply(arguments)
+                    'arguments': [].slice.apply(arguments)
                 });
-                mediator.once('request:' + id, function (data) {
-                    ajaxDeferred[data.method].apply(ajaxDeferred, data.arguments);
-                    console.log(data.arguments);
+                Mediator.once('request:' + id, function (data) {
+                    ajaxDeferred[data.method].apply(ajaxDeferred, data['arguments']);
+                    console.log(data['arguments']);
                 });
 
                 return ajaxDeferred;

@@ -3,11 +3,9 @@ define([
     'underscore',
     'request/request',
     'mediator/mediator',
+    'users/model',
     'jquery'
-], function (Backbone, _, request, Mediator, jQuery) {
-    var DROP_PROFILES_INTERVAL = 30000,
-        USERS_GET_DEBOUNCE = 400;
-
+], function (Backbone, _, request, Mediator, UsersModel, jQuery) {
     return Backbone.Model.extend({
         defaults: {
             buddies: new (Backbone.Collection.extend({
@@ -27,6 +25,7 @@ define([
         initialize: function () {
             var self = this;
 
+            self.getFavouriteUsers();
             Mediator.pub('users:friends:get');
             Mediator.once('users:friends', function (friends) {
                 self.get('buddies').add(friends);
@@ -41,6 +40,16 @@ define([
             });
             Mediator.sub('buddies:favourite:toggle', self.toggleBuddieField.bind(self, 'favourite'));
             Mediator.sub('buddies:watched:toggle', self.toggleBuddieField.bind(self, 'watched'));
+        },
+        getFavouriteUsers: function () {
+            request.api({
+                code: 'return API.fave.getUsers()'
+            }).then(function (response) {
+                console.log(response);
+                UsersModel.getProfilesById(_.pluck(response.slice(1), 'id')).then(function () {
+                    console.log(arguments);
+                });
+            });
         },
         /**
          * Toggles boolean field of buddie.

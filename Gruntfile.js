@@ -18,9 +18,16 @@ module.exports = function (grunt) {
                     interrupt: true
                 }
             },
-            js: {
+            popupJs: {
                 files: 'app/modules/popup/**/*.js',
-                tasks: ['concat:js'],
+                tasks: ['concat:popupJs'],
+                options: {
+                    interrupt: true
+                }
+            },
+            backgroundJs: {
+                files: 'app/modules/background/**/*.js',
+                tasks: ['concat:backgroundJs'],
                 options: {
                     interrupt: true
                 }
@@ -48,11 +55,17 @@ module.exports = function (grunt) {
                 ],
                 dest: 'app/style.less'
             },
-            js: {
+            popupJs: {
                 src: [
                     'app/modules/popup/**/*.js'
                 ],
                 dest: 'app/popup.js'
+            },
+            backgroundJs: {
+                src: [
+                    'app/modules/background/**/*.js'
+                ],
+                dest: 'app/background.js'
             }
         },
         less: {

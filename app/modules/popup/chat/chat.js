@@ -1,7 +1,7 @@
-angular.module('chat', ['item'])
-    .controller('ChatCtrl', function ($scope, mediator) {
-        mediator.pub('chat:data:get');
-        mediator.sub('chat:data', function (data) {
+angular.module('chat', ['item', 'mediator'])
+    .controller('ChatCtrl', function ($scope, Mediator) {
+        Mediator.pub('chat:data:get');
+        Mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data.dialogs.map(function (dialog) {
                     var messageAuthorId = dialog.messages[0].uid, result = {};

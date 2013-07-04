@@ -1,13 +1,13 @@
-angular.module('buddies', ['i18n', 'item-list'])
-    .controller('buddiesCtrl', function ($scope, $element, mediator) {
+angular.module('buddies', ['i18n', 'item-list', 'mediator'])
+    .controller('buddiesCtrl', function ($scope, $element, Mediator) {
         $scope.filters = {
             male: true,
             female: true,
             offline: false
         };
 
-        mediator.pub('buddies:data:get');
-        mediator.sub('buddies:data', function (data) {
+        Mediator.pub('buddies:data:get');
+        Mediator.sub('buddies:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
             });
@@ -42,10 +42,14 @@ angular.module('buddies', ['i18n', 'item-list'])
         return function (input, filters, count, searchClue) {
             if (Array.isArray(input)) {
                 return input.filter(function (profile) {
-                    return (filters.offline || profile.online) && (
-                        (filters.male || profile.sex !== 2)
-                        && (filters.female || profile.sex !== 1)
-                    ) && (!searchClue || matchProfile(profile, searchClue));
+                    if (!searchClue) {
+                        return (filters.offline || profile.online) && (
+                            (filters.male || profile.sex !== 2)
+                            && (filters.female || profile.sex !== 1)
+                        );
+                    } else {
+                        return matchProfile(profile, searchClue);
+                    }
                 });
             }
         };

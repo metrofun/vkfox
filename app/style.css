@@ -5353,10 +5353,6 @@ a.badge:focus {
   max-width: 200px;
   display: block;
 }
-.item__author:hover {
-  color: #000000;
-  cursor: pointer;
-}
 .item__author > * {
   clear: both;
   overflow: hidden;

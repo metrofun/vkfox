@@ -30,7 +30,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             scope: {
                 owners: '=',
                 reply: '=?',
-                class: '@'
+                'class': '@'
             }
         };
     })
@@ -70,17 +70,17 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 uid: '=',
                 chatId: '=?'
             },
-            controller: function($transclude, $element) {
-                $transclude(function(clone) {
+            controller: function ($transclude, $element) {
+                $transclude(function (clone) {
                     $element.append(clone);
                 });
             },
-            link: function(scope, element, attrs, itemCtrl) {
+            link: function (scope, element, attrs, itemCtrl) {
                 element.bind('click', function () {
                     scope.$apply(function () {
                         itemCtrl.showReply(function (message) {
                             var params = {
-                                message: message
+                                message: message.trim()
                             };
 
                             if (scope.chatId) {
@@ -97,6 +97,35 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 });
             }
         };
+    })
+    .directive('itemPostWall', function (request) {
+        return {
+            transclude: true,
+            require: '^item',
+            restrict: 'A',
+            scope: {
+                uid: '='
+            },
+            controller: function ($transclude, $element) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            link: function (scope, element, attrs, itemCtrl) {
+                element.bind('click', function () {
+                    scope.$apply(function () {
+                        itemCtrl.showReply(function (message) {
+                            var params = {
+                                message: message.trim(),
+                                owner_id: scope.uid
+                            };
+
+                            request.api({
+                                code: 'return API.wall.post(' + JSON.stringify(params) + ');'
+                            });
+                        }, 'Wall post');
+                    });
+                });
+            }
+        };
     });
-
-

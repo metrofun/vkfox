@@ -21,6 +21,11 @@ var r = "";
 r += "Личное сообщение";
 return r;
 }
+window.i18n["ru"]["Wall post"] = function(d){
+var r = "";
+r += "Сообщение на стене";
+return r;
+}
 window.i18n["ru"]["Filters"] = function(d){
 var r = "";
 r += "Фильтры";

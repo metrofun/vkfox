@@ -1,5 +1,5 @@
 angular.module('mediator', [])
-    .factory('mediator', function () {
+    .factory('Mediator', function () {
         var dispatcher = _.clone(Backbone.Events);
 
         chrome.extension.onMessage.addListener(function (messageData) {

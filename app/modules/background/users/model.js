@@ -17,28 +17,31 @@ define([
             }))()
         },
         initialize: function () {
-            var requestDeferred = this.requestFriends(),
-                self = this;
-            this.dropOldNonFriendsProfiles();
+            var self = this;
 
-            Mediator.sub('users:get', this.onGet.bind(this));
+            this.dropOldNonFriendsProfiles();
             Mediator.sub('users:friends:get', function () {
-                requestDeferred.done(function () {
-                    self.onGetFriends();
+                self.getFriendsProfiles().done(function (friendsProfiles) {
+                    Mediator.pub('users:friends', friendsProfiles);
                 });
             });
         },
-        requestFriends: function () {
-            return request.api({
-                code: 'return API.friends.get({ fields : "photo,sex,nickname,lists", order: "hints" })'
-            }).done(function (response) {
-                if (response && response.length) {
-                    response.forEach(function (friendData) {
-                        friendData.isFriend = true;
-                    });
-                    this.get('users').add(response);
-                }
-            }.bind(this));
+        getFriendsProfiles: function () {
+            if (!this._friendsProfilesDeferr) {
+                this._friendsProfilesDeferr = request.api({
+                    code: 'return API.friends.get({ fields : "photo,sex,nickname,lists", order: "hints" })'
+                }).then(function (response) {
+                    if (response && response.length) {
+                        response.forEach(function (friendData) {
+                            friendData.isFriend = true;
+                        });
+                        this.get('users').add(response);
+                    }
+                    return response;
+                }.bind(this));
+            }
+
+            return this._friendsProfilesDeferr;
         },
         // TODO problem when dropped between onGet and response
         dropOldNonFriendsProfiles: _.debounce(function () {
@@ -47,18 +50,9 @@ define([
             }));
             this.dropOldNonFriendsProfiles();
         }, DROP_PROFILES_INTERVAL),
-        onGetFriends: function () {
-            Mediator.pub('users:friends', this.get('users').filter(function (model) {
-                return model.get('isFriend');
-            }));
-        },
-        // TODO bulk several requests to users.get
-        onGet: function (uids) {
-            this.usersGetQueue.push([].concat(uids));
-            this.processGetUsersQueue();
-        },
         processGetUsersQueue: _.debounce(function () {
-            var newUids = _.difference(_.unique(_.flatten(this.usersGetQueue)), this.get('users').pluck('uid'));
+            var newUids = _.chain(this.usersGetQueue).pluck('uids').flatten()
+                .unique().difference(this.get('users').pluck('uid'));
 
             if (newUids.length) {
                 request.api({
@@ -67,27 +61,47 @@ define([
                 }).done(function (response) {
                     if (response && response.length) {
                         this.get('users').add(response);
-                        this.publishUids();
+                        this._publishUids();
                     }
                 }.bind(this));
             } else {
-                this.publishUids();
+                this._publishUids();
             }
         }, USERS_GET_DEBOUNCE),
-        publishUids: function () {
-            var data, uids;
-            console.log(this.get('users'));
+        _publishUids: function () {
+            var data, queueItem;
+
             function getUid(uid) {
-                console.log(uid, typeof uid);
                 return _.clone(this.get('users').get(Number(uid)));
             }
 
             while (this.usersGetQueue.length) {
-                uids = this.usersGetQueue.pop();
-                data = uids.map(getUid, this);
+                queueItem = this.usersGetQueue.pop();
+                data = queueItem.uids.map(getUid, this);
 
-                Mediator.pub('users:' + uids.join(), data.length === 1 ? data[0]:data);
+                if (data.length === 1) {
+                    queueItem.resolve(data[0]);
+                } else {
+                    queueItem.resolve(data);
+                }
             }
+        },
+        /**
+         * Returns profiles by ids
+         * @param [Array<<Number>>|Number] uids Array of user's uds
+         *
+         * @returns {jQuery.Deferred} Returns promise that will be fulfilled with profiles
+         */
+        getProfilesById: function (uids) {
+            return this.getFriendsProfiles().then(function () {
+                var deferr = new jQuery.Deferred();
+
+                this.usersGetQueue.push({
+                    uids: uids,
+                    deferr: deferr
+                });
+                this.processGetUsersQueue();
+            });
         }
     });
 });

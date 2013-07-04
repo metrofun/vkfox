@@ -1,144 +1,118 @@
-define(['jquery', 'mediator/mediator', 'underscore'], function (jQuery, Mediator, _) {
-    var
-    API_QUERIES_PER_REQUEST = 15,
-    API_DOMAIN = 'https://api.vk.com/',
-    API_REQUESTS_DEBOUNCE = 400,
-    API_VERSION = 5,
+angular.module('request', ['mediator', 'auth']).factory(
+    'Request',
+    function (Auth, Mediator) {
+        var
+        API_QUERIES_PER_REQUEST = 15,
+        API_DOMAIN = 'https://api.vk.com/',
+        API_REQUESTS_DEBOUNCE = 400,
+        API_VERSION = 5,
 
-    accessToken, apiQueriesQueue = [],
-    request = {
-        ajax: function (url, options) {
-            var success, error, usedAccessToken = accessToken,
-                 ajaxDeferred = new jQuery.Deferred();
+        apiQueriesQueue = [],
+        Request = {
+            ajax: function (options) {
+                return Auth.getAccessToken().then(function (accessToken) {
+                    var usedAccessToken = accessToken,
+                        ajaxDeferred = jQuery.Deferred();
 
-            if (typeof url === "object") {
-                options = url;
-                url = undefined;
-            }
-            options = options || {};
-            if (options.success) {
-                success = options.success;
-                delete options.success;
-            }
-            if (options.success) {
-                error = options.error;
-                delete options.error;
-            }
-            jQuery.ajax(options).then(
-                function () {
-                    if (accessToken === usedAccessToken) {
-                        ajaxDeferred.resolve.apply(ajaxDeferred, arguments);
-                    } else {
-                        ajaxDeferred.reject.apply(ajaxDeferred, arguments);
-                    }
-                },
-                function () {
-                    ajaxDeferred.reject.apply(ajaxDeferred, arguments);
-                }
-            );
-            return ajaxDeferred.done(success).fail(error);
-        },
-        get: function (url, data, callback, type) {
-            // shift arguments if data argument was omitted
-            if (jQuery.isFunction(data)) {
-                type = type || callback;
-                callback = data;
-                data = undefined;
-            }
-
-            return this.ajax({
-                url: url,
-                data: data,
-                success: callback,
-                dataType: type
-            });
-        },
-        post: function (url, data, callback, type) {
-            // shift arguments if data argument was omitted
-            if (jQuery.isFunction(data)) {
-                type = type || callback;
-                callback = data;
-                data = undefined;
-            }
-
-            return this.ajax({
-                url: url,
-                data: data,
-                success: callback,
-                dataType: type
-            });
-        },
-        api: function (params, callback) {
-            var queryDeferred = new jQuery.Deferred();
-            apiQueriesQueue.push({
-                params: params,
-                deferred: queryDeferred
-            });
-            this.processApiQueries();
-            return queryDeferred.done(callback);
-        },
-        processApiQueries: _.debounce(function () {
-            if (apiQueriesQueue.length) {
-                var queriesToProcess = apiQueriesQueue.slice(0, API_QUERIES_PER_REQUEST),
-                    executeCodeTokens = [], executeCode,  i, method, params;
-
-                apiQueriesQueue = apiQueriesQueue.slice(API_QUERIES_PER_REQUEST);
-                for (i = 0; i < queriesToProcess.length; i++) {
-                    params = queriesToProcess[i].params;
-                    method = params.method || 'execute';
-
-                    if (params.method) {
-                        method = params.method;
-                        delete params.method;
-                    }
-
-                    if (method === 'execute') {
-                        executeCodeTokens.push(params.code.replace(/^return\s*|;$/g, ''));
-                    } else {
-                        // TODO not implemented
-                        throw 'not implemented';
-                    }
-                }
-                executeCode = 'return [' + executeCodeTokens + '];';
-
-                this.post(
-                    [API_DOMAIN, 'method/', method].join(''),
-                    {
-                        method: 'execute',
-                        code: executeCode,
-                        access_token: accessToken,
-                        v: API_VERSION
-                    },
-                    function (data) {
-                        console.log(arguments);
-                        var response = data.response, i;
-                        for (i = 0; i < response.length; i++) {
-                            queriesToProcess[i].deferred.resolve(response[i]);
+                    jQuery.ajax(options).then(
+                        function (response) {
+                            Auth.getAccessToken().then(function (accessToken) {
+                                if (accessToken === usedAccessToken) {
+                                    ajaxDeferred.resolve.call(ajaxDeferred, response);
+                                } else {
+                                    ajaxDeferred.reject.call(ajaxDeferred, response);
+                                }
+                            });
+                        },
+                        function (response) {
+                            ajaxDeferred.reject.call(ajaxDeferred, response);
                         }
-                        this.processApiQueries();
-                    }.bind(this)
-                );
-            }
-        }, API_REQUESTS_DEBOUNCE)
-    };
+                    );
+                    return ajaxDeferred;
+                });
+            },
+            get: function (url, data) {
+                return this.ajax({
+                    method: 'GET',
+                    url: url,
+                    data: data
+                });
+            },
+            post: function (url, data) {
+                return this.ajax({
+                    method: 'POST',
+                    url: url,
+                    data: data
+                });
+            },
+            api: function (params) {
+                var deferred = jQuery.Deferred();
+                apiQueriesQueue.push({
+                    params: params,
+                    deferred: deferred
+                });
+                this.processApiQueries();
+                return deferred;
+            },
+            processApiQueries: _.debounce(function () {
+                if (apiQueriesQueue.length) {
+                    var self = this, queriesToProcess = apiQueriesQueue.slice(0, API_QUERIES_PER_REQUEST),
+                        executeCodeTokens = [], executeCode,  i, method, params;
 
-    Mediator.sub('auth:success', function (data) {
-        accessToken = data.accessToken;
-    });
-    Mediator.sub('request', function (params) {
-        request[params.method].apply(request, params.arguments).done(function () {
-            Mediator.pub('request:' + params.id, {
-                method: 'resolve',
-                arguments: [].slice.call(arguments)
-            });
-        }).fail(function () {
-            Mediator.pub('request:' + params.id, {
-                method: 'reject',
-                arguments: [].slice.call(arguments)
+                    apiQueriesQueue = apiQueriesQueue.slice(API_QUERIES_PER_REQUEST);
+                    for (i = 0; i < queriesToProcess.length; i++) {
+                        params = queriesToProcess[i].params;
+                        method = params.method || 'execute';
+
+                        if (params.method) {
+                            method = params.method;
+                            delete params.method;
+                        }
+
+                        if (method === 'execute') {
+                            executeCodeTokens.push(params.code.replace(/^return\s*|;$/g, ''));
+                        } else {
+                            // TODO not implemented
+                            throw 'not implemented';
+                        }
+                    }
+                    executeCode = 'return [' + executeCodeTokens + '];';
+
+                    Auth.getAccessToken().then(function (accessToken) {
+                        console.log(accessToken);
+                        self.post([API_DOMAIN, 'method/', method].join(''), {
+                            method: 'execute',
+                            code: executeCode,
+                            access_token: accessToken,
+                            v: API_VERSION
+                        }).then(function (data) {
+                            var response = data.response, i;
+                            for (i = 0; i < response.length; i++) {
+                                queriesToProcess[i].deferred.resolve(response[i]);
+                            }
+                            self.processApiQueries();
+                        });
+                    });
+                }
+            }, API_REQUESTS_DEBOUNCE)
+        };
+
+        // Mediator.sub('auth:success', function (data) {
+            // accessToken = data.accessToken;
+        // });
+        Mediator.sub('request', function (params) {
+            Request[params.method].apply(Request, params['arguments']).then(function () {
+                Mediator.pub('request:' + params.id, {
+                    method: 'resolve',
+                    'arguments': [].slice.call(arguments)
+                });
+            }, function () {
+                Mediator.pub('request:' + params.id, {
+                    method: 'reject',
+                    'arguments': [].slice.call(arguments)
+                });
             });
         });
+
+        return Request;
     });
-
-
-    return request;
-});
