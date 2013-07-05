@@ -238,13 +238,31 @@ angular.module(
                 idAttribute: 'id'
             }),
             comparator: function (buddie) {
-                if (buddie.get('isFave')) {
+                if (buddie.get('isWatched')) {
+                    return -2;
+                } else if (buddie.get('isFave')) {
                     return -1;
                 } else {
                     return buddie.get('originalIndex') || 0;
                 }
             }
         }))();
+
+    /**
+     * After changing and unchanging any field of buddie,
+     * we need to place it to original place in list,
+     * So we add index property.
+     * Runs once.
+     */
+    function saveOriginalBuddiesOrder() {
+        var length = buddiesColl.length;
+
+        if (length && !buddiesColl.at(length - 1).get('originalIndex')) {
+            buddiesColl.forEach(function (buddie, i) {
+                buddie.set('originalIndex', i);
+            });
+        }
+    }
 
     /**
      * Returns profiles from bookmarks,
@@ -274,13 +292,19 @@ angular.module(
     ).then(function (favourites, friends) {
         buddiesColl.add(favourites);
         buddiesColl.add(friends);
+
+        saveOriginalBuddiesOrder();
+
         watchedBuddiesSet.toArray().forEach(function (uid) {
             var model = buddiesColl.get(uid);
-            console.log(model, uid);
             if (model) {
                 model.set('isWatched', true);
             }
         });
+        // resort if any profile was changed
+        if (watchedBuddiesSet.size()) {
+            buddiesColl.sort();
+        }
         readyDeferred.resolve();
     });
 
@@ -291,15 +315,15 @@ angular.module(
     });
 
     Mediator.sub('buddies:watch:toggle', function (uid) {
-        console.log(uid, watchedBuddiesSet.contains(uid));
         if (watchedBuddiesSet.contains(uid)) {
             watchedBuddiesSet.remove(uid);
             buddiesColl.get(uid).unset('isWatched');
         } else {
             watchedBuddiesSet.add(uid);
-            buddiesColl.get(uid).set('isWatched');
+            buddiesColl.get(uid).set('isWatched', true);
         }
         if (buddiesColl.get(uid).hasChanged()) {
+            buddiesColl.sort();
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         }
     });
@@ -1650,15 +1674,23 @@ angular.module('persistent-set', []).factory('PersistentSet', function () {
             return this._set;
         },
         add: function (value) {
-            this._set.push(value);
-            this._save();
+            if (!this.contains(value)) {
+                this._set.push(value);
+                this._save();
+            }
         },
         contains: function (value) {
             return this._set.indexOf(value) !== -1;
         },
         remove: function (value) {
-            this._set.splice(this._set.indexOf(value), 1);
-            this._save();
+            var position = this._set.indexOf(value);
+            if (position !== -1) {
+                this._set.splice(position, 1);
+                this._save();
+            }
+        },
+        size: function () {
+            return this._set.length;
         }
     };
 

@@ -20,15 +20,23 @@ angular.module('persistent-set', []).factory('PersistentSet', function () {
             return this._set;
         },
         add: function (value) {
-            this._set.push(value);
-            this._save();
+            if (!this.contains(value)) {
+                this._set.push(value);
+                this._save();
+            }
         },
         contains: function (value) {
             return this._set.indexOf(value) !== -1;
         },
         remove: function (value) {
-            this._set.splice(this._set.indexOf(value), 1);
-            this._save();
+            var position = this._set.indexOf(value);
+            if (position !== -1) {
+                this._set.splice(position, 1);
+                this._save();
+            }
+        },
+        size: function () {
+            return this._set.length;
         }
     };
 
