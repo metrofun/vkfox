@@ -7,6 +7,11 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
             faves: true
         };
 
+        $scope.toggleFriendWatching = function (profile) {
+            profile.isWatched = !profile.isWatched;
+            Mediator.pub('buddies:watch:toggle', profile.id);
+        };
+
         Mediator.pub('buddies:data:get');
         Mediator.sub('buddies:data', function (data) {
             $scope.$apply(function () {

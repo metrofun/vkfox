@@ -17,6 +17,7 @@ angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
                     horiz = 0.5 * width - left,
                     horizPlacement = horiz > 0 ? 'right' : 'left',
                     placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
+
                 return placement;
             }
         });

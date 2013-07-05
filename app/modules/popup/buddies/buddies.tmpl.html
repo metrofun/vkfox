@@ -40,7 +40,6 @@
     <item-list>
         <item
             item-list-repeat="friend in data | buddiesFilter:filters:25:searchClue"
-            class="{{friend.isFave && 'buddies__item_is-fave'}}"
             owners="friend">
             <span ng-if="friend.isFave">{{'Bookmarked' | i18n}}</span>
             <item-actions>
@@ -55,8 +54,9 @@
                     ng-class="'icon-comment'">
                 </item-action>
                 <item-action
-                    ng-click=""
-                    ng-class="'icon-eye-open'"
+                    ng-click="toggleFriendWatching(friend)"
+                    ng-class="{'buddies__item-action_active': friend.isWatched}"
+                    class="icon-eye-open"
                     title="{{'Monitor online status' | i18n}}">
                 </item-action>
             </item-actions>

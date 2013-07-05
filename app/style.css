@@ -5281,6 +5281,10 @@ a.badge:focus {
   -o-user-select: none;
   user-select: none;
 }
+.buddies__item-action_active.item__action {
+  opacity: 1 !important;
+  background-color: #5bc0de;
+}
 .t-buddies__controls {
   padding: 0 10px 5px !important;
   min-height: auto;
@@ -5455,20 +5459,6 @@ a.badge:focus {
 .t-updates__controls {
   padding: 0 10px 5px !important;
   min-height: auto;
-}
-.t-buddies__item.is-watched .t-buddies__toggle-watch {
-  background-color: #049cdb;
-  opacity: 1;
-}
-.t-buddies__item.is-watched .t-buddies__toggle-watch:hover {
-  background-color: #036690;
-}
-.t-buddies__item.is-favourite .t-buddies__toggle-favourite {
-  background-color: #fbb450;
-  opacity: 1;
-}
-.t-buddies__item.is-favourite .t-buddies__toggle-favourite:hover {
-  background-color: #f89406;
 }
 .t-chat__item .t-item__content {
   cursor: pointer;

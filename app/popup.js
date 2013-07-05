@@ -17,6 +17,7 @@ angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
                     horiz = 0.5 * width - left,
                     horizPlacement = horiz > 0 ? 'right' : 'left',
                     placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
+
                 return placement;
             }
         });
@@ -167,6 +168,11 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
             female: true,
             offline: false,
             faves: true
+        };
+
+        $scope.toggleFriendWatching = function (profile) {
+            profile.isWatched = !profile.isWatched;
+            Mediator.pub('buddies:watch:toggle', profile.id);
         };
 
         Mediator.pub('buddies:data:get');

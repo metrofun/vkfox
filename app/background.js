@@ -128,9 +128,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             return authDeferred;
         },
         getAccessToken: function () {
-            console.log('getAccessToken');
             return this.login().then(function () {
-                console.log('getAccessToken');
                 return model.get('accessToken');
             });
         },
@@ -229,11 +227,15 @@ if (window.name === 'vkfox-login-iframe') {
     chrome.extension.sendMessage(['auth:iframe', decodeURIComponent(window.location.href)]);
 }
 
-angular.module('buddies', ['users', 'request', 'mediator']).run(function (Users, Request, Mediator) {
+angular.module(
+    'buddies',
+    ['users', 'request', 'mediator', 'persistent-set']
+).run(function (Users, Request, Mediator, PersistentSet) {
     var readyDeferred = jQuery.Deferred(),
+        watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (Backbone.Collection.extend({
             model: Backbone.Model.extend({
-                idAttribute: 'uid'
+                idAttribute: 'id'
             }),
             comparator: function (buddie) {
                 if (buddie.get('isFave')) {
@@ -272,6 +274,13 @@ angular.module('buddies', ['users', 'request', 'mediator']).run(function (Users,
     ).then(function (favourites, friends) {
         buddiesColl.add(favourites);
         buddiesColl.add(friends);
+        watchedBuddiesSet.toArray().forEach(function (uid) {
+            var model = buddiesColl.get(uid);
+            console.log(model, uid);
+            if (model) {
+                model.set('isWatched', true);
+            }
+        });
         readyDeferred.resolve();
     });
 
@@ -279,6 +288,20 @@ angular.module('buddies', ['users', 'request', 'mediator']).run(function (Users,
         readyDeferred.then(function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
+    });
+
+    Mediator.sub('buddies:watch:toggle', function (uid) {
+        console.log(uid, watchedBuddiesSet.contains(uid));
+        if (watchedBuddiesSet.contains(uid)) {
+            watchedBuddiesSet.remove(uid);
+            buddiesColl.get(uid).unset('isWatched');
+        } else {
+            watchedBuddiesSet.add(uid);
+            buddiesColl.get(uid).set('isWatched');
+        }
+        if (buddiesColl.get(uid).hasChanged()) {
+            Mediator.pub('buddies:data', buddiesColl.toJSON());
+        }
     });
 });
 
@@ -1605,6 +1628,43 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
     }
 );
 
+angular.module('persistent-set', []).factory('PersistentSet', function () {
+    var constructor = function (name) {
+        var item = localStorage.getItem(name);
+
+        if (item) {
+            this._set = JSON.parse(item);
+        } else {
+            this._set = [];
+        }
+        this._name = name;
+    };
+    constructor.prototype = {
+        _save: function () {
+            localStorage.setItem(
+                this._name,
+                JSON.stringify(this._set)
+            );
+        },
+        toArray: function () {
+            return this._set;
+        },
+        add: function (value) {
+            this._set.push(value);
+            this._save();
+        },
+        contains: function (value) {
+            return this._set.indexOf(value) !== -1;
+        },
+        remove: function (value) {
+            this._set.splice(this._set.indexOf(value), 1);
+            this._save();
+        }
+    };
+
+    return constructor;
+});
+
 angular.module('request', ['mediator', 'auth']).factory(
     'Request',
     function (Auth, Mediator) {
@@ -1874,13 +1934,11 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         var newUids = _.chain(usersGetQueue).pluck('uids').flatten()
             .unique().difference(usersColl.pluck('id')).value();
 
-        console.log('newUids', newUids.length);
         if (newUids.length) {
             Request.api({
                 // TODO limit for uids.length
                 code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "online, photo,sex,nickname,lists"})'
             }).then(function (response) {
-                console.log(response);
                 if (response && response.length) {
                     usersColl.add(response);
                     publishUids();
@@ -1894,7 +1952,6 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         var data, queueItem;
 
         function getProfileById(uid) {
-            console.log(uid, usersColl);
             return _.clone(usersColl.get(Number(uid)));
         }
 

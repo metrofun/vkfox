@@ -20,13 +20,11 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         var newUids = _.chain(usersGetQueue).pluck('uids').flatten()
             .unique().difference(usersColl.pluck('id')).value();
 
-        console.log('newUids', newUids.length);
         if (newUids.length) {
             Request.api({
                 // TODO limit for uids.length
                 code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "online, photo,sex,nickname,lists"})'
             }).then(function (response) {
-                console.log(response);
                 if (response && response.length) {
                     usersColl.add(response);
                     publishUids();
@@ -40,7 +38,6 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         var data, queueItem;
 
         function getProfileById(uid) {
-            console.log(uid, usersColl);
             return _.clone(usersColl.get(Number(uid)));
         }
 

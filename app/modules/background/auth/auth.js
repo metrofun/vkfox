@@ -75,9 +75,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             return authDeferred;
         },
         getAccessToken: function () {
-            console.log('getAccessToken');
             return this.login().then(function () {
-                console.log('getAccessToken');
                 return model.get('accessToken');
             });
         },
