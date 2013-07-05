@@ -1,4 +1,11 @@
 angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
+    .run(function () {
+        jQuery('body').tooltip({
+            selector: '[title]',
+            container: '.app',
+            delay: { show: 1000, hide: false}
+        });
+    })
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.$watch('location.path()', function (path) {
@@ -18,8 +25,7 @@ angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
                 name: 'News'
             }
         ];
-    })
-
+    });
 
 define(['i18n/i18n'], function (I18N) {
     var i18n = new I18N();
@@ -144,7 +150,8 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
         $scope.filters = {
             male: true,
             female: true,
-            offline: false
+            offline: false,
+            faves: true
         };
 
         Mediator.pub('buddies:data:get');
@@ -187,7 +194,7 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
                         return (filters.offline || profile.online) && (
                             (filters.male || profile.sex !== 2)
                             && (filters.female || profile.sex !== 1)
-                        );
+                        ) && (filters.faves || !profile.isFave);
                     } else {
                         return matchProfile(profile, searchClue);
                     }
@@ -1326,6 +1333,11 @@ var r = "";
 r += "Не в сети";
 return r;
 }
+window.i18n["ru"]["Bookmarked"] = function(d){
+var r = "";
+r += "В закладках";
+return r;
+}
 })();
 angular.module('item-list', [])
     .directive('itemList', function () {
@@ -1654,7 +1666,9 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'E'
         };
     })
-    .directive('itemSendMessage', function (request) {
+    .directive('itemSendMessage', function (request, $filter) {
+        var title =  $filter('i18n')('Private message');
+
         return {
             transclude: true,
             require: '^item',
@@ -1663,35 +1677,39 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 uid: '=',
                 chatId: '=?'
             },
-            controller: function ($transclude, $element) {
-                $transclude(function (clone) {
-                    $element.append(clone);
-                });
-            },
-            link: function (scope, element, attrs, itemCtrl) {
-                element.bind('click', function () {
-                    scope.$apply(function () {
-                        itemCtrl.showReply(function (message) {
-                            var params = {
-                                message: message.trim()
-                            };
-
-                            if (scope.chatId) {
-                                params.chatId = scope.chatId;
-                            } else {
-                                params.uid = scope.uid;
-                            }
-
-                            request.api({
-                                code: 'return API.messages.send(' + JSON.stringify(params) + ');'
-                            });
-                        }, 'Private message');
+            compile: function (tElement, tAttrs, transclude) {
+                tAttrs.$set('title', title);
+                return function (scope, element, attrs, itemCtrl) {
+                    transclude(scope, function (clone) {
+                        element.append(clone);
                     });
-                });
+
+                    element.bind('click', function () {
+                        scope.$apply(function () {
+                            itemCtrl.showReply(function (message) {
+                                var params = {
+                                    message: message.trim()
+                                };
+
+                                if (scope.chatId) {
+                                    params.chatId = scope.chatId;
+                                } else {
+                                    params.uid = scope.uid;
+                                }
+
+                                request.api({
+                                    code: 'return API.messages.send(' + JSON.stringify(params) + ');'
+                                });
+                            }, title);
+                        });
+                    });
+                };
             }
         };
     })
-    .directive('itemPostWall', function (request) {
+    .directive('itemPostWall', function (request, $filter) {
+        var title =  $filter('i18n')('Wall post');
+
         return {
             transclude: true,
             require: '^item',
@@ -1699,26 +1717,28 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             scope: {
                 uid: '='
             },
-            controller: function ($transclude, $element) {
-                $transclude(function (clone) {
-                    $element.append(clone);
-                });
-            },
-            link: function (scope, element, attrs, itemCtrl) {
-                element.bind('click', function () {
-                    scope.$apply(function () {
-                        itemCtrl.showReply(function (message) {
-                            var params = {
-                                message: message.trim(),
-                                owner_id: scope.uid
-                            };
-
-                            request.api({
-                                code: 'return API.wall.post(' + JSON.stringify(params) + ');'
-                            });
-                        }, 'Wall post');
+            compile: function (tElement, tAttrs, transclude) {
+                tAttrs.$set('title', title);
+                return function (scope, element, attrs, itemCtrl) {
+                    transclude(scope, function (clone) {
+                        element.append(clone);
                     });
-                });
+
+                    element.bind('click', function () {
+                        scope.$apply(function () {
+                            itemCtrl.showReply(function (message) {
+                                var params = {
+                                    message: message.trim(),
+                                    owner_id: scope.uid
+                                };
+
+                                request.api({
+                                    code: 'return API.wall.post(' + JSON.stringify(params) + ');'
+                                });
+                            }, title);
+                        });
+                    });
+                };
             }
         };
     });

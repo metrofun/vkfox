@@ -61,7 +61,9 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'E'
         };
     })
-    .directive('itemSendMessage', function (request) {
+    .directive('itemSendMessage', function (request, $filter) {
+        var title =  $filter('i18n')('Private message');
+
         return {
             transclude: true,
             require: '^item',
@@ -70,35 +72,39 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 uid: '=',
                 chatId: '=?'
             },
-            controller: function ($transclude, $element) {
-                $transclude(function (clone) {
-                    $element.append(clone);
-                });
-            },
-            link: function (scope, element, attrs, itemCtrl) {
-                element.bind('click', function () {
-                    scope.$apply(function () {
-                        itemCtrl.showReply(function (message) {
-                            var params = {
-                                message: message.trim()
-                            };
-
-                            if (scope.chatId) {
-                                params.chatId = scope.chatId;
-                            } else {
-                                params.uid = scope.uid;
-                            }
-
-                            request.api({
-                                code: 'return API.messages.send(' + JSON.stringify(params) + ');'
-                            });
-                        }, 'Private message');
+            compile: function (tElement, tAttrs, transclude) {
+                tAttrs.$set('title', title);
+                return function (scope, element, attrs, itemCtrl) {
+                    transclude(scope, function (clone) {
+                        element.append(clone);
                     });
-                });
+
+                    element.bind('click', function () {
+                        scope.$apply(function () {
+                            itemCtrl.showReply(function (message) {
+                                var params = {
+                                    message: message.trim()
+                                };
+
+                                if (scope.chatId) {
+                                    params.chatId = scope.chatId;
+                                } else {
+                                    params.uid = scope.uid;
+                                }
+
+                                request.api({
+                                    code: 'return API.messages.send(' + JSON.stringify(params) + ');'
+                                });
+                            }, title);
+                        });
+                    });
+                };
             }
         };
     })
-    .directive('itemPostWall', function (request) {
+    .directive('itemPostWall', function (request, $filter) {
+        var title =  $filter('i18n')('Wall post');
+
         return {
             transclude: true,
             require: '^item',
@@ -106,26 +112,28 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             scope: {
                 uid: '='
             },
-            controller: function ($transclude, $element) {
-                $transclude(function (clone) {
-                    $element.append(clone);
-                });
-            },
-            link: function (scope, element, attrs, itemCtrl) {
-                element.bind('click', function () {
-                    scope.$apply(function () {
-                        itemCtrl.showReply(function (message) {
-                            var params = {
-                                message: message.trim(),
-                                owner_id: scope.uid
-                            };
-
-                            request.api({
-                                code: 'return API.wall.post(' + JSON.stringify(params) + ');'
-                            });
-                        }, 'Wall post');
+            compile: function (tElement, tAttrs, transclude) {
+                tAttrs.$set('title', title);
+                return function (scope, element, attrs, itemCtrl) {
+                    transclude(scope, function (clone) {
+                        element.append(clone);
                     });
-                });
+
+                    element.bind('click', function () {
+                        scope.$apply(function () {
+                            itemCtrl.showReply(function (message) {
+                                var params = {
+                                    message: message.trim(),
+                                    owner_id: scope.uid
+                                };
+
+                                request.api({
+                                    code: 'return API.wall.post(' + JSON.stringify(params) + ');'
+                                });
+                            }, title);
+                        });
+                    });
+                };
             }
         };
     });

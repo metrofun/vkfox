@@ -4,7 +4,7 @@
     "underscore": "~1.4.4",
     "backbone": "~0.9.10",
     "jtoh": "https://github.com/metrofun/jtoh.git",
-    "bootstrap": "~2.3.2",
+    "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.2",
     "requirejs": "~2.1.4",
     "angular-unstable": "~1.1.5",
     "angular-ui-utils": "~0.0.2",

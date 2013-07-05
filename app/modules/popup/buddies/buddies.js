@@ -3,7 +3,8 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
         $scope.filters = {
             male: true,
             female: true,
-            offline: false
+            offline: false,
+            faves: true
         };
 
         Mediator.pub('buddies:data:get');
@@ -46,7 +47,7 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
                         return (filters.offline || profile.online) && (
                             (filters.male || profile.sex !== 2)
                             && (filters.female || profile.sex !== 1)
-                        );
+                        ) && (filters.faves || !profile.isFave);
                     } else {
                         return matchProfile(profile, searchClue);
                     }

@@ -28,7 +28,7 @@ angular.module('buddies', ['users', 'request', 'mediator']).run(function (Users,
                 'id'
             )).then(function (profiles) {
                 profiles.forEach(function (profile) {
-                    profile.isFave = true;
+                    profile.set('isFave', true);
                 });
                 return profiles;
             });

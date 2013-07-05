@@ -1,4 +1,11 @@
 angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
+    .run(function () {
+        jQuery('body').tooltip({
+            selector: '[title]',
+            container: '.app',
+            delay: { show: 1000, hide: false}
+        });
+    })
     .controller('navigationCtrl', function ($scope, $location) {
         $scope.locationPath = $location.path();
         $scope.$watch('location.path()', function (path) {
@@ -18,5 +25,4 @@ angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
                 name: 'News'
             }
         ];
-    })
-
+    });

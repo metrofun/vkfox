@@ -236,7 +236,7 @@ angular.module('buddies', ['users', 'request', 'mediator']).run(function (Users,
                 idAttribute: 'uid'
             }),
             comparator: function (buddie) {
-                if (buddie.get('favourite')) {
+                if (buddie.get('isFave')) {
                     return -1;
                 } else {
                     return buddie.get('originalIndex') || 0;
@@ -259,7 +259,7 @@ angular.module('buddies', ['users', 'request', 'mediator']).run(function (Users,
                 'id'
             )).then(function (profiles) {
                 profiles.forEach(function (profile) {
-                    profile.isFave = true;
+                    profile.set('isFave', true);
                 });
                 return profiles;
             });

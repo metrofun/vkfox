@@ -30,13 +30,19 @@
                     <li><label class="checkbox">
                         <input ng-model="filters.offline" type="checkbox">{{'Offline' | i18n}}
                     </label></li>
+                    <li class="divider"></li>
+                    <li><label class="checkbox">
+                        <input ng-model="filters.faves" type="checkbox">{{'Bookmarked' | i18n}}
+                    </label></li>
             </div>
         </form>
     </div>
     <item-list>
         <item
             item-list-repeat="friend in data | buddiesFilter:filters:25:searchClue"
+            class="{{friend.isFave && 'buddies__item_is-fave'}}"
             owners="friend">
+            <span ng-if="friend.isFave">{{'Bookmarked' | i18n}}</span>
             <item-actions>
                 <item-action
                     item-send-message
@@ -48,9 +54,13 @@
                     uid="friend.id"
                     ng-class="'icon-comment'">
                 </item-action>
+                <!-- <item-action -->
+                    <!-- anchor="{{'/albums' + friend.id | addVKBase}}" -->
+                    <!-- ng-class="'icon-camera'"> -->
+                <!-- </item-action> -->
                 <item-action
-                    anchor="{{'/albums' + dialog.uid | addVKBase}}"
-                    ng-class="'icon-camera'">
+                    anchor="{{'/albums' + friend.id | addVKBase}}"
+                    ng-class="'icon-eye-open'">
                 </item-action>
             </item-actions>
         </item>

@@ -51,4 +51,9 @@ var r = "";
 r += "Не в сети";
 return r;
 }
+window.i18n["ru"]["Bookmarked"] = function(d){
+var r = "";
+r += "В закладках";
+return r;
+}
 })();
