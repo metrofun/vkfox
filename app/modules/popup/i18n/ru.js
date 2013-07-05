@@ -56,4 +56,9 @@ var r = "";
 r += "В закладках";
 return r;
 }
+window.i18n["ru"]["Monitor online status"] = function(d){
+var r = "";
+r += "Следить за онлайн статусом";
+return r;
+}
 })();

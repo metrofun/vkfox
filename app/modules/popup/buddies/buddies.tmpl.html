@@ -54,13 +54,10 @@
                     uid="friend.id"
                     ng-class="'icon-comment'">
                 </item-action>
-                <!-- <item-action -->
-                    <!-- anchor="{{'/albums' + friend.id | addVKBase}}" -->
-                    <!-- ng-class="'icon-camera'"> -->
-                <!-- </item-action> -->
                 <item-action
-                    anchor="{{'/albums' + friend.id | addVKBase}}"
-                    ng-class="'icon-eye-open'">
+                    ng-click=""
+                    ng-class="'icon-eye-open'"
+                    title="{{'Monitor online status' | i18n}}">
                 </item-action>
             </item-actions>
         </item>

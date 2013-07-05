@@ -8,6 +8,7 @@
     "requirejs": "~2.1.4",
     "angular-unstable": "~1.1.5",
     "angular-ui-utils": "~0.0.2",
-    "angular-ui-bootstrap": "~0.3.0"
+    "angular-ui-bootstrap": "~0.3.0",
+    "3.0.0-wip": "https://github.com/twitter/bootstrap/archive/3.0.0-wip.zip"
   }
 }
