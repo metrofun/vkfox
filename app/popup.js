@@ -169,6 +169,7 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
             offline: false,
             faves: true
         };
+        $element.find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {
             profile.isWatched = !profile.isWatched;
