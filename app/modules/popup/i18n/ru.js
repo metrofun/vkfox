@@ -61,4 +61,9 @@ var r = "";
 r += "Следить за онлайн статусом";
 return r;
 }
+window.i18n["ru"]["Mark as read"] = function(d){
+var r = "";
+r += "Отметить прочитанным";
+return r;
+}
 })();

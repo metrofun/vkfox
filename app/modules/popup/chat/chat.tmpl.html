@@ -1,8 +1,7 @@
 <ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
-<div ng-controller="ChatCtrl" class="item-list">
+<item-list ng-controller="ChatCtrl">
     <item
-        ng-repeat="dialog in data" class="chat__item"
-        reply="reply"
+        item-list-repeat="dialog in data"
         owners="dialog.owners">
         <blockquote
             item-send-message
@@ -27,10 +26,16 @@
                 uid="dialog.uid"
                 ng-class="'icon-share-alt'">
             </item-action>
+            <!-- <item-action -->
+                <!-- anchor="{{'/albums' + dialog.uid | addVKBase}}" -->
+                <!-- ng-class="'icon-camera'"> -->
+            <!-- </item-action> -->
             <item-action
-                anchor="{{'/albums' + dialog.uid | addVKBase}}"
-                ng-class="'icon-camera'">
+                ng-class="'chat__item-action_mark-read icon-bookmark'"
+                ng-if="dialog.isUnread"
+                ng-click="markAsRead(dialog.messages)"
+                title="{{'Mark as read' | i18n}}">
             </item-action>
         </item-actions>
     </item>
-</div>
+</item-list>

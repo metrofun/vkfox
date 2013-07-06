@@ -1,9 +1,14 @@
-angular.module('chat', ['item', 'mediator'])
-    .controller('ChatCtrl', function ($scope, Mediator) {
+angular.module('chat', ['item', 'mediator', 'request'])
+    .controller('ChatCtrl', function ($scope, Mediator, Request) {
         Mediator.pub('chat:data:get');
-        Mediator.sub('chat:data', function (data) {
+        Mediator.sub('chat:data', function (dialogs) {
+            $scope.markAsRead = function (messages) {
+                Request.api({code: 'return API.messages.markAsRead({mids: ['
+                    + _.pluck(messages, 'id') + ']});'});
+            };
+
             $scope.$apply(function () {
-                $scope.data = data.dialogs.map(function (dialog) {
+                $scope.data = dialogs.map(function (dialog) {
                     var messageAuthorId = dialog.messages[0].uid, result = {};
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
@@ -22,6 +27,7 @@ angular.module('chat', ['item', 'mediator'])
                     result.messages = dialog.messages;
                     result.chat_id = dialog.chat_id;
                     result.uid = dialog.uid;
+                    result.isUnread = dialog.messages[0].read_state === 0;
 
                     return result;
                 });

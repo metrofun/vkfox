@@ -5318,6 +5318,13 @@ a.badge:focus {
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
 }
+.item__action.chat__item-action_mark-read {
+  opacity: 1;
+  background-color: #ee5f5b;
+}
+.item__action.chat__item-action_mark-read:hover {
+  background-color: #e51d18;
+}
 .item-list {
   overflow: scroll;
   height: 400px;

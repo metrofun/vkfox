@@ -19,7 +19,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/buddies'
+                redirectTo: '/chat'
             });
     });
 

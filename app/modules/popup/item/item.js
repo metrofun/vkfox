@@ -61,7 +61,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'E'
         };
     })
-    .directive('itemSendMessage', function (request, $filter) {
+    .directive('itemSendMessage', function (Request, $filter) {
         var title =  $filter('i18n')('Private message');
 
         return {
@@ -72,12 +72,14 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 uid: '=',
                 chatId: '=?'
             },
-            compile: function (tElement, tAttrs, transclude) {
+            controller: function ($element, $transclude) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
                 return function (scope, element, attrs, itemCtrl) {
-                    transclude(scope, function (clone) {
-                        element.append(clone);
-                    });
 
                     element.bind('click', function () {
                         scope.$apply(function () {
@@ -92,7 +94,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                                     params.uid = scope.uid;
                                 }
 
-                                request.api({
+                                Request.api({
                                     code: 'return API.messages.send(' + JSON.stringify(params) + ');'
                                 });
                             }, title);
@@ -102,7 +104,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             }
         };
     })
-    .directive('itemPostWall', function (request, $filter) {
+    .directive('itemPostWall', function (Request, $filter) {
         var title =  $filter('i18n')('Wall post');
 
         return {
@@ -112,13 +114,14 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             scope: {
                 uid: '='
             },
-            compile: function (tElement, tAttrs, transclude) {
+            controller: function ($element, $transclude) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
                 return function (scope, element, attrs, itemCtrl) {
-                    transclude(scope, function (clone) {
-                        element.append(clone);
-                    });
-
                     element.bind('click', function () {
                         scope.$apply(function () {
                             itemCtrl.showReply(function (message) {
@@ -127,7 +130,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                                     owner_id: scope.uid
                                 };
 
-                                request.api({
+                                Request.api({
                                     code: 'return API.wall.post(' + JSON.stringify(params) + ');'
                                 });
                             }, title);

@@ -521,12 +521,17 @@ define([
     });
 });
 
-angular.module('chat', ['item', 'mediator'])
-    .controller('ChatCtrl', function ($scope, Mediator) {
+angular.module('chat', ['item', 'mediator', 'request'])
+    .controller('ChatCtrl', function ($scope, Mediator, Request) {
         Mediator.pub('chat:data:get');
-        Mediator.sub('chat:data', function (data) {
+        Mediator.sub('chat:data', function (dialogs) {
+            $scope.markAsRead = function (messages) {
+                Request.api({code: 'return API.messages.markAsRead({mids: ['
+                    + _.pluck(messages, 'id') + ']});'});
+            };
+
             $scope.$apply(function () {
-                $scope.data = data.dialogs.map(function (dialog) {
+                $scope.data = dialogs.map(function (dialog) {
                     var messageAuthorId = dialog.messages[0].uid, result = {};
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
@@ -545,6 +550,7 @@ angular.module('chat', ['item', 'mediator'])
                     result.messages = dialog.messages;
                     result.chat_id = dialog.chat_id;
                     result.uid = dialog.uid;
+                    result.isUnread = dialog.messages[0].read_state === 0;
 
                     return result;
                 });
@@ -1365,6 +1371,11 @@ var r = "";
 r += "Следить за онлайн статусом";
 return r;
 }
+window.i18n["ru"]["Mark as read"] = function(d){
+var r = "";
+r += "Отметить прочитанным";
+return r;
+}
 })();
 angular.module('item-list', [])
     .directive('itemList', function () {
@@ -1693,7 +1704,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             restrict: 'E'
         };
     })
-    .directive('itemSendMessage', function (request, $filter) {
+    .directive('itemSendMessage', function (Request, $filter) {
         var title =  $filter('i18n')('Private message');
 
         return {
@@ -1704,12 +1715,14 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                 uid: '=',
                 chatId: '=?'
             },
-            compile: function (tElement, tAttrs, transclude) {
+            controller: function ($element, $transclude) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
                 return function (scope, element, attrs, itemCtrl) {
-                    transclude(scope, function (clone) {
-                        element.append(clone);
-                    });
 
                     element.bind('click', function () {
                         scope.$apply(function () {
@@ -1724,7 +1737,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                                     params.uid = scope.uid;
                                 }
 
-                                request.api({
+                                Request.api({
                                     code: 'return API.messages.send(' + JSON.stringify(params) + ');'
                                 });
                             }, title);
@@ -1734,7 +1747,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             }
         };
     })
-    .directive('itemPostWall', function (request, $filter) {
+    .directive('itemPostWall', function (Request, $filter) {
         var title =  $filter('i18n')('Wall post');
 
         return {
@@ -1744,13 +1757,14 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             scope: {
                 uid: '='
             },
-            compile: function (tElement, tAttrs, transclude) {
+            controller: function ($element, $transclude) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
                 return function (scope, element, attrs, itemCtrl) {
-                    transclude(scope, function (clone) {
-                        element.append(clone);
-                    });
-
                     element.bind('click', function () {
                         scope.$apply(function () {
                             itemCtrl.showReply(function (message) {
@@ -1759,7 +1773,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
                                     owner_id: scope.uid
                                 };
 
-                                request.api({
+                                Request.api({
                                     code: 'return API.wall.post(' + JSON.stringify(params) + ');'
                                 });
                             }, title);
@@ -2132,7 +2146,7 @@ define([
 });
 
 angular.module('request', ['mediator'])
-    .factory('request', function (Mediator) {
+    .factory('Request', function (Mediator) {
         return {
             api: function () {
                 var ajaxDeferred = new jQuery.Deferred(),
@@ -2175,7 +2189,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/buddies'
+                redirectTo: '/chat'
             });
     });
 

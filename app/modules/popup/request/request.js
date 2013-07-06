@@ -1,5 +1,5 @@
 angular.module('request', ['mediator'])
-    .factory('request', function (Mediator) {
+    .factory('Request', function (Mediator) {
         return {
             api: function () {
                 var ajaxDeferred = new jQuery.Deferred(),

@@ -79,7 +79,6 @@ angular.module('request', ['mediator', 'auth']).factory(
                     executeCode = 'return [' + executeCodeTokens + '];';
 
                     Auth.getAccessToken().then(function (accessToken) {
-                        console.log(accessToken);
                         self.post([API_DOMAIN, 'method/', method].join(''), {
                             method: 'execute',
                             code: executeCode,
