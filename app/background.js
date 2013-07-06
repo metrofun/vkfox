@@ -134,7 +134,6 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
         },
         getUserId: function () {
             return this.login().then(function () {
-                console.log(model.get('userId'));
                 return model.get('userId');
             });
         }
@@ -472,17 +471,18 @@ angular.module(
         if (_(attachment).isEmpty()) {
             out = +!!(flags & 2);
 
+            // mimic response from server
             messageDeferred = jQuery.Deferred().resolve({
                 count: 1,
-                items: {
+                items: [{
                     body: update[6],
                     title: update[5],
                     date: update[4],
                     uid: out ? userId:dialogCompanionUid,
                     read_state: +!(flags & 1),
-                    mid: messageId
+                    id: messageId
                     // out: +!!(flags & 2)
-                }
+                }]
             });
         } else {
             messageDeferred = Request.api({
@@ -492,13 +492,12 @@ angular.module(
 
         messageDeferred.done(function (response) {
             var message = response.items[0],
-            dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
+                dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
             dialog = dialogColl.get(dialogId);
             if (dialog) {
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
-                dialogColl.sort();
             } else {
                 dialogColl.add({
                     id: dialogId,
@@ -507,13 +506,11 @@ angular.module(
                     messages: [message]
                 });
 
-                getProfiles().done(function () {
-                    dialogColl.sort();
-                });
+                setDialogsProfiles();
             }
         });
     }
-    function getProfiles() {
+    function setDialogsProfiles() {
         return jQuery.when.apply(jQuery, dialogColl.map(function (dialog) {
             var
             uids = _.uniq(_.flatten(dialog.get('messages').map(function (message) {
@@ -545,10 +542,10 @@ angular.module(
      */
     function removeReadMessages(dialog) {
         var messages = dialog.get('messages'),
-            updatedMessages = [],
+            updatedMessages = [messages[messages.length - 1]],
             dialogCompanionUid = messages[messages.length - 1].uid;
 
-        messages.reverse().some(function (message) {
+        messages.reverse().slice(1).some(function (message) {
             if (message.id !== dialogCompanionUid && message.read_state) {
                 return true;
             } else {
@@ -595,9 +592,10 @@ angular.module(
                 if (messageId && mask) {
                     dialogColl.some(function (dialog) {
                         return dialog.get('messages').some(function (message) {
-                            if (message.mid === messageId) {
+                            if (message.id === messageId) {
                                 message.read_state = mask & 1;
                                 removeReadMessages(dialog);
+                                dialogColl.trigger('change');
                                 return true;
                             }
                         });
@@ -639,13 +637,21 @@ angular.module(
     Auth.getUserId().then(function (uid) {
         userId = uid;
 
-        readyDeferred = getDialogs().then(function () {
-            return jQuery.when(getUnreadMessages(), getProfiles());
+        getDialogs().then(function () {
+            jQuery.when(getUnreadMessages().done(function () {
+                console.log('getUnreadMessages');
+            }), setDialogsProfiles().done(function () {
+                console.log('setDialogsProfiles');
+            })).done(function () {
+                readyDeferred.resolve();
+            });
         });
     });
 
     Mediator.sub('chat:data:get', function () {
+        console.log('get');
         readyDeferred.then(function () {
+            console.log('pub');
             Mediator.pub('chat:data', dialogColl.toJSON());
         });
     });
@@ -653,6 +659,7 @@ angular.module(
         Mediator.sub('longpoll:updates', onUpdates);
 
         dialogColl.on('change', function () {
+            dialogColl.sort();
             Mediator.pub('chat:data', dialogColl.toJSON());
         });
     });
@@ -1715,8 +1722,36 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
 
 angular.module(
     'longpoll',
-    []
-).run(function () {
+    ['request', 'mediator']
+).run(function (Request, Mediator) {
+    var LONG_POLL_WAIT = 5;
+
+    function enableLongPollUpdates() {
+        Request.api({
+            code: 'return API.messages.getLongPollServer();'
+        }).then(fetchUpdates, enableLongPollUpdates);
+    }
+    function fetchUpdates(params) {
+        Request.get('http://' + params.server, {
+            act: 'a_check',
+            key:  params.key,
+            ts: params.ts,
+            wait: LONG_POLL_WAIT,
+            mode: 2
+        }, 'json').then(function (response) {
+            if (!response.updates) {
+                enableLongPollUpdates();
+                return;
+            } else if (response.updates.length) {
+                Mediator.pub('longpoll:updates', response.updates);
+            }
+
+            params.ts = response.ts;
+            fetchUpdates(params);
+        }, enableLongPollUpdates);
+    }
+
+    enableLongPollUpdates();
 });
 
 
@@ -1933,6 +1968,13 @@ angular.module('request', ['mediator', 'auth']).factory(
 
         apiQueriesQueue = [],
         Request = {
+            /*
+             * Makes ajax request and fails if login changed
+             *
+             * @param [Object] options See jQuery.ajax()
+             *
+             * @returns [jQuery.Deferred]
+             */
             ajax: function (options) {
                 return Auth.getAccessToken().then(function (accessToken) {
                     var usedAccessToken = accessToken,
@@ -1949,24 +1991,27 @@ angular.module('request', ['mediator', 'auth']).factory(
                             });
                         },
                         function (response) {
+                            console.log('wtf', arguments);
                             ajaxDeferred.reject.call(ajaxDeferred, response);
                         }
                     );
                     return ajaxDeferred;
                 });
             },
-            get: function (url, data) {
+            get: function (url, data, dataType) {
                 return this.ajax({
                     method: 'GET',
                     url: url,
-                    data: data
+                    data: data,
+                    dataType: dataType
                 });
             },
-            post: function (url, data) {
+            post: function (url, data, dataType) {
                 return this.ajax({
                     method: 'POST',
                     url: url,
-                    data: data
+                    data: data,
+                    dataType: dataType
                 });
             },
             api: function (params) {

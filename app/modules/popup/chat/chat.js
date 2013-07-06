@@ -3,6 +3,7 @@ angular.module('chat', ['item', 'mediator', 'request'])
         Mediator.pub('chat:data:get');
         Mediator.sub('chat:data', function (dialogs) {
             $scope.markAsRead = function (messages) {
+                console.log(messages);
                 Request.api({code: 'return API.messages.markAsRead({mids: ['
                     + _.pluck(messages, 'id') + ']});'});
             };
@@ -27,7 +28,10 @@ angular.module('chat', ['item', 'mediator', 'request'])
                     result.messages = dialog.messages;
                     result.chat_id = dialog.chat_id;
                     result.uid = dialog.uid;
-                    result.isUnread = dialog.messages[0].read_state === 0;
+                    console.log(dialog.messages);
+                    result.isUnread = dialog.messages[
+                        dialog.messages.length - 1
+                    ].read_state === 0;
 
                     return result;
                 });

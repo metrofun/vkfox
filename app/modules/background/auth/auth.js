@@ -81,7 +81,6 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
         },
         getUserId: function () {
             return this.login().then(function () {
-                console.log(model.get('userId'));
                 return model.get('userId');
             });
         }

@@ -9,6 +9,13 @@ angular.module('request', ['mediator', 'auth']).factory(
 
         apiQueriesQueue = [],
         Request = {
+            /*
+             * Makes ajax request and fails if login changed
+             *
+             * @param [Object] options See jQuery.ajax()
+             *
+             * @returns [jQuery.Deferred]
+             */
             ajax: function (options) {
                 return Auth.getAccessToken().then(function (accessToken) {
                     var usedAccessToken = accessToken,
@@ -25,24 +32,27 @@ angular.module('request', ['mediator', 'auth']).factory(
                             });
                         },
                         function (response) {
+                            console.log('wtf', arguments);
                             ajaxDeferred.reject.call(ajaxDeferred, response);
                         }
                     );
                     return ajaxDeferred;
                 });
             },
-            get: function (url, data) {
+            get: function (url, data, dataType) {
                 return this.ajax({
                     method: 'GET',
                     url: url,
-                    data: data
+                    data: data,
+                    dataType: dataType
                 });
             },
-            post: function (url, data) {
+            post: function (url, data, dataType) {
                 return this.ajax({
                     method: 'POST',
                     url: url,
-                    data: data
+                    data: data,
+                    dataType: dataType
                 });
             },
             api: function (params) {

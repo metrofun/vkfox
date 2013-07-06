@@ -2,37 +2,31 @@ angular.module(
     'longpoll',
     ['request', 'mediator']
 ).run(function (Request, Mediator) {
-    var LONG_POLL_WAIT = 25;
+    var LONG_POLL_WAIT = 5;
 
     function enableLongPollUpdates() {
         Request.api({
             code: 'return API.messages.getLongPollServer();'
-        }).done(function (params) {
-            fetchUpdates(params);
-        });
+        }).then(fetchUpdates, enableLongPollUpdates);
     }
     function fetchUpdates(params) {
-        Request.get('http://' + this.params.server, {
+        Request.get('http://' + params.server, {
             act: 'a_check',
-            key:  this.params.key,
-            ts: this.params.ts,
+            key:  params.key,
+            ts: params.ts,
             wait: LONG_POLL_WAIT,
             mode: 2
-        }, function (response) {
-            var data = JSON.parse(jQuery.trim(response));
-
-            if (!data.updates) {
+        }, 'json').then(function (response) {
+            if (!response.updates) {
                 enableLongPollUpdates();
                 return;
-            } else {
-                Mediator.pub('longpoll:updates', data.updates);
+            } else if (response.updates.length) {
+                Mediator.pub('longpoll:updates', response.updates);
             }
 
-            params.ts = data.ts;
+            params.ts = response.ts;
             fetchUpdates(params);
-        }, 'text').fail(function () {
-            enableLongPollUpdates();
-        });
+        }, enableLongPollUpdates);
     }
 
     enableLongPollUpdates();
