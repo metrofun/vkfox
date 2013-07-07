@@ -95,6 +95,9 @@ angular.module('request', ['mediator', 'auth']).factory(
                             access_token: accessToken,
                             v: API_VERSION
                         }).then(function (data) {
+                            if (data.execute_errors) {
+                                console.warn(data.execute_errors);
+                            }
                             var response = data.response, i;
                             for (i = 0; i < response.length; i++) {
                                 queriesToProcess[i].deferred.resolve(response[i]);

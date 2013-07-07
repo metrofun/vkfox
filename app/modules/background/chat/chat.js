@@ -84,7 +84,6 @@ angular.module(
 
             if (uids.length) {
                 return Users.getProfilesById(uids).then(function (data) {
-                    console.log('uids:', uids, 'data:', data);
                     dialog.set('profiles', [].concat(data));
                 });
             } else {
@@ -143,7 +142,6 @@ angular.module(
     function onUpdates(updates) {
         updates.forEach(function (update) {
             var messageId, mask;
-            console.log(update);
 
             // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
             switch (update[0]) {

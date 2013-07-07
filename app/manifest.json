@@ -17,5 +17,5 @@
             "run_at" : "document_end",
             "all_frames" : true
         }],
-        "minimum_chrome_version" : "10"
+        "minimum_chrome_version" : "28"
 }

@@ -12,9 +12,14 @@ angular.module('item-list', [])
             }
         };
     })
-    .directive('itemListRepeat', function ($parse, $animator) {
+    .directive('itemListRepeat', function ($parse, $animator, $timeout) {
         var NG_REMOVED = '$$NG_REMOVED',
-            RENDER_PADDING = 400;
+            RENDER_PADDING = 400,
+            /**
+             * This is the number of items,
+             * that will be added in one event loop
+             */
+            BLOCKS_PER_LOOP = 5;
         /**
          * Computes a hash of an 'obj'.
          * Hash of a:
@@ -68,25 +73,27 @@ angular.module('item-list', [])
                     collectionIdentifier = match[2];
 
                     function updateScrolledBlocks(collection, cursor, nextBlockOrder, nextBlockMap, offset) {
-                        var index, length, block, childScope, nextCursor,
+                        var index = offset || 0,
+                            length = Math.min(index + BLOCKS_PER_LOOP, collection.length),
+                            block, childScope, nextCursor,
                             scrollAreaBottom = itemListElement.offset().top
                                 + itemListElement.height() + itemListElement.scrollTop();
 
-                        // we are not using forEach for perf reasons (trying to avoid #call)
-                        for (index = (offset || 0), length = collection.length; index < length; index++) {
-                            if (cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
-                                itemListElement.one('scroll', $scope.$apply.bind($scope, function () {
-                                    updateScrolledBlocks(
-                                        collection,
-                                        cursor,
-                                        nextBlockOrder,
-                                        nextBlockMap,
-                                        index
-                                    );
-                                }));
-                                return;
-                            }
+                        if (cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
+                            itemListElement.one('scroll', $scope.$apply.bind($scope, function () {
+                                updateScrolledBlocks(
+                                    collection,
+                                    cursor,
+                                    nextBlockOrder,
+                                    nextBlockMap,
+                                    index
+                                );
+                            }));
+                            return;
+                        }
 
+                        // we are not using forEach for perf reasons (trying to avoid #call)
+                        for (; index < length; index++) {
                             block = nextBlockOrder[index];
 
                             if (block.element) {
@@ -127,6 +134,17 @@ angular.module('item-list', [])
                                     nextBlockMap[block.id] = block;
                                 });
                             }
+                        }
+                        if (index < collection.length) {
+                            $timeout(function () {
+                                updateScrolledBlocks(
+                                    collection,
+                                    cursor,
+                                    nextBlockOrder,
+                                    nextBlockMap,
+                                    index
+                                );
+                            });
                         }
                     }
 

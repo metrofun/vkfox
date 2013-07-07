@@ -1,4 +1,4 @@
-angular.module('app', ['auth', 'buddies', 'chat']);
+angular.module('app', ['auth', 'buddies', 'chat', 'newsfeed']);
 
 define([
     'backbone',
@@ -61,9 +61,8 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             [
                 'client_id=' + APP_ID,
                 'scope=539774',
-                'redirect_uri=http://oauth.vk.com/blank.html',
                 'response_type=token',
-                'display=wap'
+                'display=touch'
             ].join('&')
         ].join(''),
         CREATED = 1,
@@ -527,7 +526,6 @@ angular.module(
 
             if (uids.length) {
                 return Users.getProfilesById(uids).then(function (data) {
-                    console.log('uids:', uids, 'data:', data);
                     dialog.set('profiles', [].concat(data));
                 });
             } else {
@@ -586,7 +584,6 @@ angular.module(
     function onUpdates(updates) {
         updates.forEach(function (update) {
             var messageId, mask;
-            console.log(update);
 
             // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
             switch (update[0]) {
@@ -1917,6 +1914,65 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
     }
 );
 
+angular.module('newsfeed', ['mediator', 'request']).run(function (Request, Mediator) {
+    var MAX_ITEMS_COUNT = 50,
+
+        readyDeferred = jQuery.Deferred(),
+        profilesColl = new (Backbone.Collection.extend({
+            model: Backbone.Model.extend({
+                parse: function (profile) {
+                    if (profile.gid) {
+                        profile.id = -profile.gid;
+                    }
+                    return profile;
+                }
+            })
+        }))(),
+        groupItemsColl = new Backbone.Collection(),
+        friendItemsColl = new Backbone.Collection();
+
+    function fetchNewsfeed() {
+        Request.api({code: [
+            'return API.newsfeed.get({"count" : "', MAX_ITEMS_COUNT, '"});'
+        ].join('')}).done(function (response) {
+            profilesColl
+                .add(response.profiles, {parse: true})
+                .add(response.groups, {parse: true});
+
+            response.items.forEach(function (item) {
+                if (item.source_id > 0) {
+                    friendItemsColl.add(item);
+                } else {
+                    groupItemsColl.add(item);
+                }
+            });
+
+            readyDeferred.resolve();
+        });
+    }
+
+    fetchNewsfeed();
+
+    // Subscribe to events from popup
+    Mediator.sub('newsfeed:friends:get', function () {
+        readyDeferred.then(function () {
+            Mediator.pub('newsfeed:friends', {
+                profiles: profilesColl.toJSON(),
+                items: friendItemsColl.toJSON()
+            });
+        });
+    });
+
+    Mediator.sub('newsfeed:groups:get', function () {
+        readyDeferred.then(function () {
+            Mediator.pub('newsfeed:groups', {
+                profiles: profilesColl.toJSON(),
+                items: groupItemsColl.toJSON()
+            });
+        });
+    });
+});
+
 angular.module('persistent-set', []).factory('PersistentSet', function () {
     var constructor = function (name) {
         var item = localStorage.getItem(name);
@@ -2059,6 +2115,9 @@ angular.module('request', ['mediator', 'auth']).factory(
                             access_token: accessToken,
                             v: API_VERSION
                         }).then(function (data) {
+                            if (data.execute_errors) {
+                                console.warn(data.execute_errors);
+                            }
                             var response = data.response, i;
                             for (i = 0; i < response.length; i++) {
                                 queriesToProcess[i].deferred.resolve(response[i]);

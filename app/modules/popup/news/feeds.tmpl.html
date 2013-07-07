@@ -1,26 +1,30 @@
 <item
-    ng-repeat="item in data.items"
+    item-list-repeat="item in data.items"
     owners="data.profiles | where:'id':item.source_id">
     <ng-switch on="item.type">
         <div ng-switch-when="post">
-            {{item.text}}
-            <attachment
-            ng-repeat="attachment in item.attachments"
-            data="attachment[attachment.type]"
-            type="{{attachment.type}}">
-            </attachment>
+            <span ng-bind-html-unsafe="item.text"></span>
+            <br ng-if="item.attachments">
+            <item-attachment
+                ng-repeat="attachment in item.attachments"
+                data="attachment[attachment.type]"
+                type="{{attachment.type}}">
+            </item-attachment>
         </div>
+
         <div ng-switch-when="photo">
-            <attachment ng-repeat="photo in item.photos" data="photo" type="photo">
-            </attachment>
+            <item-attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+            </item-attachment>
         </div>
+
         <div ng-switch-when="wall_photo">
-            <attachment ng-repeat="photo in item.photos" data="photo" type="photo">
-            </attachment>
+            <item-attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+            </item-attachment>
         </div>
+
         <div ng-switch-when="photo_tag">
-            <attachment ng-repeat="photo in item.photo_tags" data="photo" type="photo">
-            </attachment>
+            <item-attachment ng-repeat="photo in item.photo_tags" data="photo" type="photo">
+            </item-attachment>
         </div>
         <div ng-switch-when="note">
             {{item | json}}

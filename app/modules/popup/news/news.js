@@ -16,7 +16,6 @@ angular.module('news', ['mediator'])
         ];
 
         $scope.activeTab = $routeParams.tab;
-        console.log($scope.MyNewsController);
     })
     .controller('MyNewsController', function ($scope, Mediator) {
         Mediator.pub('feedback:data:get');

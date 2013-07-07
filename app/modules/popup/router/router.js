@@ -12,14 +12,14 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
             })
             .when('/news', {
-                redirectTo: '/news/friends'
+                redirectTo: '/news/groups'
             })
             .when('/news/:tab', {
                 controller: 'NewsController',
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/chat'
+                redirectTo: '/news'
             });
     });
 

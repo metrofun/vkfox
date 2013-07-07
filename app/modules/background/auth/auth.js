@@ -8,9 +8,8 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             [
                 'client_id=' + APP_ID,
                 'scope=539774',
-                'redirect_uri=http://oauth.vk.com/blank.html',
                 'response_type=token',
-                'display=wap'
+                'display=touch'
             ].join('&')
         ].join(''),
         CREATED = 1,

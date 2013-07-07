@@ -15,7 +15,6 @@ angular.module('chat', ['item', 'mediator', 'request'])
                         result.author = _(dialog.profiles).findWhere({
                             id: messageAuthorId
                         });
-                        console.log(result.author);
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;

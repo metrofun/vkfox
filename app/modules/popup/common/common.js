@@ -1,14 +1,5 @@
+// TODO rename to filters
 angular.module('common', ['config'])
-    .directive('anchor', function () {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attr) {
-                element.bind('click', function () {
-                    chrome.tabs.create({url: attr.anchor});
-                });
-            }
-        };
-    })
     .filter('where', function () {
         /**
          * Returns object from collection,

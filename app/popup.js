@@ -1,3 +1,14 @@
+angular.module('anchor', []).directive('anchor', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            element.bind('click', function () {
+                chrome.tabs.create({url: attr.anchor});
+            });
+        }
+    };
+});
+
 angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
     .run(function () {
         jQuery('body').tooltip({
@@ -538,7 +549,6 @@ angular.module('chat', ['item', 'mediator', 'request'])
                         result.author = _(dialog.profiles).findWhere({
                             id: messageAuthorId
                         });
-                        console.log(result.author);
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
@@ -869,17 +879,8 @@ define([
     });
 });
 
+// TODO rename to filters
 angular.module('common', ['config'])
-    .directive('anchor', function () {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attr) {
-                element.bind('click', function () {
-                    chrome.tabs.create({url: attr.anchor});
-                });
-            }
-        };
-    })
     .filter('where', function () {
         /**
          * Returns object from collection,
@@ -1394,9 +1395,14 @@ angular.module('item-list', [])
             }
         };
     })
-    .directive('itemListRepeat', function ($parse, $animator) {
+    .directive('itemListRepeat', function ($parse, $animator, $timeout) {
         var NG_REMOVED = '$$NG_REMOVED',
-            RENDER_PADDING = 400;
+            RENDER_PADDING = 400,
+            /**
+             * This is the number of items,
+             * that will be added in one event loop
+             */
+            BLOCKS_PER_LOOP = 5;
         /**
          * Computes a hash of an 'obj'.
          * Hash of a:
@@ -1450,25 +1456,27 @@ angular.module('item-list', [])
                     collectionIdentifier = match[2];
 
                     function updateScrolledBlocks(collection, cursor, nextBlockOrder, nextBlockMap, offset) {
-                        var index, length, block, childScope, nextCursor,
+                        var index = offset || 0,
+                            length = Math.min(index + BLOCKS_PER_LOOP, collection.length),
+                            block, childScope, nextCursor,
                             scrollAreaBottom = itemListElement.offset().top
                                 + itemListElement.height() + itemListElement.scrollTop();
 
-                        // we are not using forEach for perf reasons (trying to avoid #call)
-                        for (index = (offset || 0), length = collection.length; index < length; index++) {
-                            if (cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
-                                itemListElement.one('scroll', $scope.$apply.bind($scope, function () {
-                                    updateScrolledBlocks(
-                                        collection,
-                                        cursor,
-                                        nextBlockOrder,
-                                        nextBlockMap,
-                                        index
-                                    );
-                                }));
-                                return;
-                            }
+                        if (cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
+                            itemListElement.one('scroll', $scope.$apply.bind($scope, function () {
+                                updateScrolledBlocks(
+                                    collection,
+                                    cursor,
+                                    nextBlockOrder,
+                                    nextBlockMap,
+                                    index
+                                );
+                            }));
+                            return;
+                        }
 
+                        // we are not using forEach for perf reasons (trying to avoid #call)
+                        for (; index < length; index++) {
                             block = nextBlockOrder[index];
 
                             if (block.element) {
@@ -1509,6 +1517,17 @@ angular.module('item-list', [])
                                     nextBlockMap[block.id] = block;
                                 });
                             }
+                        }
+                        if (index < collection.length) {
+                            $timeout(function () {
+                                updateScrolledBlocks(
+                                    collection,
+                                    cursor,
+                                    nextBlockOrder,
+                                    nextBlockMap,
+                                    index
+                                );
+                            });
                         }
                     }
 
@@ -1644,7 +1663,7 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     return tpl;
 });
 
-angular.module('item', ['common', 'ui.keypress', 'request'])
+angular.module('item', ['common', 'ui.keypress', 'request', 'anchor'])
     .directive('item', function () {
         return {
             controller: function ($scope) {
@@ -1711,7 +1730,6 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
         var title =  $filter('i18n')('Private message');
 
         return {
-            priority: -9999,
             transclude: true,
             require: '^item',
             restrict: 'A',
@@ -2010,7 +2028,6 @@ angular.module('news', ['mediator'])
         ];
 
         $scope.activeTab = $routeParams.tab;
-        console.log($scope.MyNewsController);
     })
     .controller('MyNewsController', function ($scope, Mediator) {
         Mediator.pub('feedback:data:get');
@@ -2148,6 +2165,18 @@ define([
     });
 });
 
+angular.module('persistent-model', []).factory('PersistentModel', function () {
+    return function (model, name) {
+        var item = localStorage.getItem(name);
+
+        if (item) {
+            model = jQuery.extend(true, model, JSON.parse(item));
+        }
+
+        return model;
+    };
+});
+
 angular.module('request', ['mediator'])
     .factory('Request', function (Mediator) {
         return {
@@ -2185,14 +2214,14 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
             })
             .when('/news', {
-                redirectTo: '/news/friends'
+                redirectTo: '/news/groups'
             })
             .when('/news/:tab', {
                 controller: 'NewsController',
                 templateUrl: '/modules/popup/news/news.tmpl.html'
             })
             .otherwise({
-                redirectTo: '/chat'
+                redirectTo: '/news'
             });
     });
 

@@ -1,4 +1,4 @@
-angular.module('item', ['common', 'ui.keypress', 'request'])
+angular.module('item', ['common', 'ui.keypress', 'request', 'anchor'])
     .directive('item', function () {
         return {
             controller: function ($scope) {
@@ -65,7 +65,6 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
         var title =  $filter('i18n')('Private message');
 
         return {
-            priority: -9999,
             transclude: true,
             require: '^item',
             restrict: 'A',

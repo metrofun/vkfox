@@ -1,1 +1,1 @@
-angular.module('app', ['auth', 'buddies', 'chat']);
+angular.module('app', ['auth', 'buddies', 'chat', 'newsfeed']);

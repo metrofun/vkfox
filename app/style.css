@@ -1,3 +1,6 @@
+[anchor] {
+  cursor: pointer;
+}
 /*!
  * Bootstrap v2.3.2
  *
@@ -5400,11 +5403,28 @@ a.badge:focus {
 .item__action + .item__action {
   margin-left: 0.5em;
 }
-.item__attachment {
-  max-width: 100%;
-}
 .item__picture {
-  box-sizing: border-box;
+  display: block;
+  float: left;
+  width: 50%;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position: center;
+  -webkit-transition: opacity 0.1s linear;
+  -moz-transition: opacity 0.1s linear;
+  -o-transition: opacity 0.1s linear;
+  transition: opacity 0.1s linear;
+  opacity: 0.9;
+}
+.item__picture:after {
+  content: '';
+  display: block;
+  margin-top: 100%;
+}
+.item__picture:hover {
+  opacity: 1;
 }
 .item__reply {
   background-color: #f5f5f5;
