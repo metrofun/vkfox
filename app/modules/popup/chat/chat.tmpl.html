@@ -1,11 +1,11 @@
 <ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
 <item-list ng-controller="ChatCtrl">
     <item
+    class="{{dialog.author && 'chat__item_out'}}"
         item-list-repeat="dialog in data"
         owners="dialog.owners">
         <blockquote
             item-send-message
-            ng-class="{'pull-right': author}"
             chat-id="dialog.chat_id"
             uid="dialog.uid"
             class="chat__item-content">
@@ -17,7 +17,7 @@
                     type="{{attachment.type}}">
                 </item-attachment>
             </p>
-            <small ng-if="author">{{dialog.author | name}}</small>
+            <small ng-if="dialog.author">{{dialog.author | name}}</small>
         </blockquote>
         <item-actions>
             <item-action

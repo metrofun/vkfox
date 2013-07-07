@@ -4,16 +4,8 @@
     border: 0;
     cursor: pointer;
 }
-.chat__item {
-    & + .chat__item {
-        border-top: 1px solid @grayLighter;
-    }
-    &:first-child  {
-        .border-radius(4px 4px 0 0);
-    }
-    &:last-child  {
-       .border-radius(4px 4px 0 0);
-    }
+.chat__item_out .chat__item-content {
+    text-align: right;
 }
 .item__action.chat__item-action_mark-read
 {

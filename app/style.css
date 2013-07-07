@@ -5305,18 +5305,8 @@ a.badge:focus {
   border: 0;
   cursor: pointer;
 }
-.chat__item + .chat__item {
-  border-top: 1px solid #eeeeee;
-}
-.chat__item:first-child {
-  -webkit-border-radius: 4px 4px 0 0;
-  -moz-border-radius: 4px 4px 0 0;
-  border-radius: 4px 4px 0 0;
-}
-.chat__item:last-child {
-  -webkit-border-radius: 4px 4px 0 0;
-  -moz-border-radius: 4px 4px 0 0;
-  border-radius: 4px 4px 0 0;
+.chat__item_out .chat__item-content {
+  text-align: right;
 }
 .item__action.chat__item-action_mark-read {
   opacity: 1;

@@ -523,14 +523,13 @@ define([
 
 angular.module('chat', ['item', 'mediator', 'request'])
     .controller('ChatCtrl', function ($scope, Mediator, Request) {
+        $scope.markAsRead = function (messages) {
+            Request.api({code: 'return API.messages.markAsRead({mids: ['
+                + _.pluck(messages, 'id') + ']});'});
+        };
+
         Mediator.pub('chat:data:get');
         Mediator.sub('chat:data', function (dialogs) {
-            $scope.markAsRead = function (messages) {
-                console.log(messages);
-                Request.api({code: 'return API.messages.markAsRead({mids: ['
-                    + _.pluck(messages, 'id') + ']});'});
-            };
-
             $scope.$apply(function () {
                 $scope.data = dialogs.map(function (dialog) {
                     var messageAuthorId = dialog.messages[0].uid, result = {};
@@ -539,6 +538,7 @@ angular.module('chat', ['item', 'mediator', 'request'])
                         result.author = _(dialog.profiles).findWhere({
                             id: messageAuthorId
                         });
+                        console.log(result.author);
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
@@ -551,7 +551,6 @@ angular.module('chat', ['item', 'mediator', 'request'])
                     result.messages = dialog.messages;
                     result.chat_id = dialog.chat_id;
                     result.uid = dialog.uid;
-                    console.log(dialog.messages);
                     result.isUnread = dialog.messages[
                         dialog.messages.length - 1
                     ].read_state === 0;
@@ -1712,6 +1711,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
         var title =  $filter('i18n')('Private message');
 
         return {
+            priority: -9999,
             transclude: true,
             require: '^item',
             restrict: 'A',
@@ -1727,7 +1727,6 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
                 return function (scope, element, attrs, itemCtrl) {
-
                     element.bind('click', function () {
                         scope.$apply(function () {
                             itemCtrl.showReply(function (message) {

@@ -57,8 +57,9 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             if (force || state === CREATED) {
                 state = IN_PROGRESS;
 
-                authDeferred.reject('relogin');
-                authDeferred = jQuery.Deferred();
+                if (authDeferred.state() === 'resolved') {
+                    authDeferred = jQuery.Deferred();
+                }
 
                 if (!$iframe) {
                     $iframe = angular.element(

@@ -110,8 +110,9 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             if (force || state === CREATED) {
                 state = IN_PROGRESS;
 
-                authDeferred.reject('relogin');
-                authDeferred = jQuery.Deferred();
+                if (authDeferred.state() === 'resolved') {
+                    authDeferred = jQuery.Deferred();
+                }
 
                 if (!$iframe) {
                     $iframe = angular.element(
@@ -526,6 +527,7 @@ angular.module(
 
             if (uids.length) {
                 return Users.getProfilesById(uids).then(function (data) {
+                    console.log('uids:', uids, 'data:', data);
                     dialog.set('profiles', [].concat(data));
                 });
             } else {
@@ -564,15 +566,18 @@ angular.module(
             return !dialog.get('chat_id') && !dialog.get('messages')[0].read_state;
         }),
         unreadHistoryRequests = unreadDialogs.map(function (dialog) {
-            return Request.api({
-                code: 'return API.messages.getHistory({uid: ' + dialog.get('uid') + ', count: ' + MAX_HISTORY_COUNT + '});'
-            });
+            return Request.api({code: 'return API.messages.getHistory({user_id: '
+                + dialog.get('uid') + ', count: '
+                + MAX_HISTORY_COUNT + '});'});
         });
 
         return jQuery.when.apply(jQuery, unreadHistoryRequests).done(function () {
-            _(arguments).each(function (unreadMessages, index) {
-                if (unreadMessages && unreadMessages.count) {
-                    unreadDialogs[index].set('messages', unreadMessages.items.reverse());
+            _(arguments).each(function (historyMessages, index) {
+                if (historyMessages && historyMessages.count) {
+                    unreadDialogs[index].set(
+                        'messages',
+                        historyMessages.items.reverse().map(convertHistoryIntoMessageData)
+                    );
                     removeReadMessages(unreadDialogs[index]);
                 }
             });
@@ -608,8 +613,16 @@ angular.module(
             }
         });
     }
+    function convertHistoryIntoMessageData(history) {
+        var message = history;
+
+        message.uid = history.from_id;
+
+        return message;
+    }
     function convertDialogIntoMessageData(dialog) {
         var message = dialog;
+
         if (message.out) {
             message.uid = userId;
             delete message.out;
@@ -619,7 +632,7 @@ angular.module(
     function getDialogs() {
         return Request.api({
             code: 'return API.messages.getDialogs({preview_length: 0});'
-        }).done(function (response) {
+        }).then(function (response) {
             if (response && response.count) {
                 dialogColl.reset(response.items.map(function (item) {
                     // convert dialog data into message data
@@ -637,21 +650,13 @@ angular.module(
     Auth.getUserId().then(function (uid) {
         userId = uid;
 
-        getDialogs().then(function () {
-            jQuery.when(getUnreadMessages().done(function () {
-                console.log('getUnreadMessages');
-            }), setDialogsProfiles().done(function () {
-                console.log('setDialogsProfiles');
-            })).done(function () {
-                readyDeferred.resolve();
-            });
+        getDialogs().then(getUnreadMessages).then(setDialogsProfiles).then(function () {
+            readyDeferred.resolve();
         });
     });
 
     Mediator.sub('chat:data:get', function () {
-        console.log('get');
         readyDeferred.then(function () {
-            console.log('pub');
             Mediator.pub('chat:data', dialogColl.toJSON());
         });
     });
@@ -2223,6 +2228,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
             idAttribute: 'id'
         })
     }))(),
+    usersGetQueue = [],
     // TODO problem when dropped between onGet and response
     dropOldNonFriendsProfiles = _.debounce(function () {
         usersColl.remove(usersColl.filter(function (model) {
@@ -2230,10 +2236,13 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         }));
         dropOldNonFriendsProfiles();
     }, DROP_PROFILES_INTERVAL),
-    usersGetQueue = [],
     processGetUsersQueue = _.debounce(function () {
-        var newUids = _.chain(usersGetQueue).pluck('uids').flatten()
+        var processedQueue = usersGetQueue,
+            newUids = _.chain(processedQueue).pluck('uids').flatten()
             .unique().difference(usersColl.pluck('id')).value();
+
+        // start new queue
+        usersGetQueue = [];
 
         if (newUids.length) {
             Request.api({
@@ -2242,22 +2251,27 @@ angular.module('users', ['request']).factory('Users', function (Request) {
             }).then(function (response) {
                 if (response && response.length) {
                     usersColl.add(response);
-                    publishUids();
+                    publishUids(processedQueue);
                 }
             }.bind(this));
         } else {
-            publishUids();
+            publishUids(processedQueue);
         }
     }, USERS_GET_DEBOUNCE),
-    publishUids = function () {
+    /**
+     * Resolves items from provided queue
+     *
+     * @param [Array] queue
+     */
+    publishUids = function (queue) {
         var data, queueItem;
 
         function getProfileById(uid) {
             return _.clone(usersColl.get(Number(uid)));
         }
 
-        while (usersGetQueue.length) {
-            queueItem = usersGetQueue.pop();
+        while (queue.length) {
+            queueItem = queue.pop();
             data = queueItem.uids.map(getProfileById, this);
 
             if (data.length === 1) {

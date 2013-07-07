@@ -8,6 +8,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
             idAttribute: 'id'
         })
     }))(),
+    usersGetQueue = [],
     // TODO problem when dropped between onGet and response
     dropOldNonFriendsProfiles = _.debounce(function () {
         usersColl.remove(usersColl.filter(function (model) {
@@ -15,10 +16,13 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         }));
         dropOldNonFriendsProfiles();
     }, DROP_PROFILES_INTERVAL),
-    usersGetQueue = [],
     processGetUsersQueue = _.debounce(function () {
-        var newUids = _.chain(usersGetQueue).pluck('uids').flatten()
+        var processedQueue = usersGetQueue,
+            newUids = _.chain(processedQueue).pluck('uids').flatten()
             .unique().difference(usersColl.pluck('id')).value();
+
+        // start new queue
+        usersGetQueue = [];
 
         if (newUids.length) {
             Request.api({
@@ -27,22 +31,27 @@ angular.module('users', ['request']).factory('Users', function (Request) {
             }).then(function (response) {
                 if (response && response.length) {
                     usersColl.add(response);
-                    publishUids();
+                    publishUids(processedQueue);
                 }
             }.bind(this));
         } else {
-            publishUids();
+            publishUids(processedQueue);
         }
     }, USERS_GET_DEBOUNCE),
-    publishUids = function () {
+    /**
+     * Resolves items from provided queue
+     *
+     * @param [Array] queue
+     */
+    publishUids = function (queue) {
         var data, queueItem;
 
         function getProfileById(uid) {
             return _.clone(usersColl.get(Number(uid)));
         }
 
-        while (usersGetQueue.length) {
-            queueItem = usersGetQueue.pop();
+        while (queue.length) {
+            queueItem = queue.pop();
             data = queueItem.uids.map(getProfileById, this);
 
             if (data.length === 1) {

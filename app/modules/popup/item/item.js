@@ -65,6 +65,7 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
         var title =  $filter('i18n')('Private message');
 
         return {
+            priority: -9999,
             transclude: true,
             require: '^item',
             restrict: 'A',
@@ -80,7 +81,6 @@ angular.module('item', ['common', 'ui.keypress', 'request'])
             compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
                 return function (scope, element, attrs, itemCtrl) {
-
                     element.bind('click', function () {
                         scope.$apply(function () {
                             itemCtrl.showReply(function (message) {
