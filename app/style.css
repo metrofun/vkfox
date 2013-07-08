@@ -5336,6 +5336,9 @@ a.badge:focus {
   opacity: 1 !important;
   background-color: #5bc0de;
 }
+.item__attachment {
+  font-size: 0;
+}
 .item__link {
   display: inline-block;
   overflow: hidden;
@@ -5344,8 +5347,7 @@ a.badge:focus {
   max-width: 100%;
 }
 .item__picture {
-  display: block;
-  float: left;
+  display: inline-block;
   width: 50%;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -5371,8 +5373,7 @@ a.badge:focus {
   opacity: 1;
 }
 .item__video {
-  display: block;
-  float: left;
+  display: inline-block;
   width: 50%;
   -webkit-background-size: cover;
   -moz-background-size: cover;
