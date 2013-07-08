@@ -1,10 +1,10 @@
-<ng-switch
-    on="type" ng-if="data | isObject"
-    class="item__attachment">
+<div
+    class="item__attachment item__attachment_type_{{type}}"
+    ng-switch on="type">
     <img ng-switch-when="app" ng-src="{{data.src}}"/>
-    <p ng-switch-when="audio">
+    <div  ng-switch-when="audio">
         <i class="icon-music"></i> {{data.performer}} - {{data.title}}
-    </p>
+    </div>
     <a ng-switch-when="note" href="/note{{data.owner_id}}_{{data.nid}}">
         <i class="icon-file"></i> {{data.title}}
     </a>
@@ -50,4 +50,5 @@
             <div class="item__video-duration">{{data.duration | duration}}</div>
         </div>
     </div>
-</ng-switch>
+    <div ng-switch-default></div>
+</div>

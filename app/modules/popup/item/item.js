@@ -45,7 +45,6 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
         return {
             templateUrl: '/modules/popup/item/attachment.tmpl.html',
             replace: true,
-            transclude: true,
             restrict: 'E',
             scope: {
                 type: '@',

@@ -68,58 +68,6 @@
    &__action + &__action {
        margin-left: 0.5em;
    }
-   &__link {
-       display: inline-block;
-       .text-overflow();
-       max-width: 100%;
-   }
-   &__video,
-   &__picture {
-       display: block;
-       float: left;
-       width: 50%;
-       .background-size(cover);
-       background-position: center;
-       .transition(opacity 0.1s linear);
-       position: relative;
-       opacity: 0.9;
-
-       &:after {
-           content: '';
-           display: block;
-           margin-top: 100%;
-       }
-       &:hover {
-           opacity: 1;
-       }
-   }
-   &__video {
-       opacity: 1;
-   }
-   &__video-desc {
-       display: block;
-       bottom: 0;
-       right: 0;
-       color: white;
-       position: absolute;
-       opacity: 0.75;
-       background-color: #000;
-       font-size: @fontSizeMini;
-       font-weight: bold;
-       width: 100%;
-       padding: 4px;
-       box-sizing: border-box;
-   }
-   &__video-title {
-       max-width: 75%;
-       display: inline-block;
-       .text-overflow();
-   }
-   &__video-duration {
-       display: inline-block;
-       position: absolute;
-       right: 4px;
-   }
    &__reply {
        background-color: #f5f5f5;
        padding: @itemPadding;

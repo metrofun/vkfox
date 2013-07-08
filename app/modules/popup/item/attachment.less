@@ -1,5 +1,28 @@
 .item__attachment {
-    font-size: 0;
+    width: 100%;
+    overflow: hidden;
+    float: left;
+    margin-top: @baseLineHeight / 2;
+}
+.item__attachment_type_app + .item__attachment_type_app,
+.item__attachment_type_audio + .item__attachment_type_audio,
+.item__attachment_type_note + .item__attachment_type_note,
+.item__attachment_type_doc + .item__attachment_type_doc,
+.item__attachment_type_poll + .item__attachment_type_poll,
+.item__attachment_type_link + .item__attachment_type_link,
+.item__attachment_type_graffiti + .item__attachment_type_graffiti,
+.item__attachment_type_photo + .item__attachment_type_photo,
+.item__attachment_type_posted_photo + .item__attachment_type_posted_photo,
+.item__attachment_type_video + .item__attachment_type_video {
+    margin-top: 0;
+}
+
+.item__attachment_type_graffiti,
+.item__attachment_type_photo,
+.item__attachment_type_posted_photo,
+.item__attachment_type_video {
+    width: 50%;
+    margin-top: 0;
 }
 .item__link {
     display: inline-block;
@@ -7,8 +30,8 @@
     max-width: 100%;
 }
 .item__picture {
-    display: inline-block;
-    width: 50%;
+    width: 100%;
+    float: left;
     .background-size(cover);
     background-position: center;
     .transition(opacity 0.1s linear);
