@@ -1,11 +1,10 @@
-<ng-switch on="type" ng-if="data | isObject">
+<ng-switch
+    on="type" ng-if="data | isObject"
+    class="item__attachment">
     <img ng-switch-when="app" ng-src="{{data.src}}"/>
     <p ng-switch-when="audio">
         <i class="icon-music"></i> {{data.performer}} - {{data.title}}
     </p>
-    <a ng-switch-when="link" href="{{data.url}}">
-        <i class="icon-share-alt"></i> {{data.url}}
-    </a>
     <a ng-switch-when="note" href="/note{{data.owner_id}}_{{data.nid}}">
         <i class="icon-file"></i> {{data.title}}
     </a>
@@ -15,17 +14,40 @@
     <a ng-switch-when="poll" href="{{data.url}}">
         <i class="icon-list-alt"></i> {{data.question}}
     </a>
-    <img ng-switch-when="graffiti" ng-src="{{data.src}}" class="img-polaroid" />
+
+    <!-- TODO DRY -->
+    <a ng-switch-when="link" class="item__link" anchor="{{data.url}}">
+        <i class="icon-share-alt"></i> {{data.url}}
+    </a>
+
     <div
+        ng-switch-when="graffiti"
         anchor="{{data.src_big}}"
-        ng-switch-when="photo"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>
-    <img ng-switch-when="posted_photo" ng-src="{{data.src}}" class="img-polaroid" />
-    <!-- TODO start/end -->
-    <div ng-switch-when="video">
-        <img ng-src="{{data.image}}" class="img-polaroid" />
-        <p><i class="icon-film"></i>{{data.title}}</p>
+
+    <div
+        ng-switch-when="photo"
+        anchor="{{data.src_big}}"
+        class="item__picture"
+        style="background-image: url({{data.src_big}})">
+    </div>
+
+    <div
+        ng-switch-when="posted_photo"
+        anchor="{{data.src_big}}"
+        class="item__picture"
+        style="background-image: url({{data.src_big}})">
+    </div>
+
+    <div
+        ng-switch-when="video"
+        class="item__video"
+        style="background-image: url({{data.image}})">
+        <div class="item__video-desc">
+            <div class="item__video-title">{{data.title}}</div>
+            <div class="item__video-duration">{{data.duration | duration}}</div>
+        </div>
     </div>
 </ng-switch>

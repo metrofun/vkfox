@@ -4,7 +4,7 @@
             <img
             ng-switch-when="false"
             ng-src="{{owners.photo}}"
-            anchor="{{'/id' + owners.id | addVKBase}}"
+            anchor="{{anchor | addVKBase}}"
             class="item__img media-object"/>
             <div ng-switch-when="true" class="item__img media-object">
                 <i class="icon-user"></i>{{owners.length}}

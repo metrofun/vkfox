@@ -2,13 +2,14 @@
   "dependencies": {
     "jquery": "~1.9.1",
     "underscore": "~1.4.4",
-    "backbone": "~0.9.10",
+    "backbone": "https://github.com/jashkenas/backbone.git#~1.0.0",
     "jtoh": "https://github.com/metrofun/jtoh.git",
     "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.2",
     "requirejs": "~2.1.4",
     "angular-unstable": "~1.1.5",
     "angular-ui-utils": "~0.0.2",
     "angular-ui-bootstrap": "~0.3.0",
-    "3.0.0-wip": "https://github.com/twitter/bootstrap/archive/3.0.0-wip.zip"
+    "3.0.0-wip": "https://github.com/twitter/bootstrap/archive/3.0.0-wip.zip",
+    "moment": "~2.1.0"
   }
 }

@@ -1723,6 +1723,38 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
 );
 
 angular.module(
+    'likes',
+    ['request', 'mediator']
+).run(function (Request, Mediator) {
+    /**
+     * @param [Object] params
+     * @param [String] params.action 'delete' or 'add'
+     * @param [String] params.type 'post', 'comment' etc
+     * @param [Number] params.owner_id
+     * @param [Number] params.item_id
+     */
+    Mediator.sub('likes:change', function (params) {
+        var action = params.action;
+
+        delete params.action;
+
+        Request.api({
+            code: 'return API.likes.' + action + '(' + JSON.stringify(params) + ');'
+        }).then(function (response) {
+            Mediator.pub('likes:changed', _.extend(params, {
+                likes: {
+                    count: response.likes,
+                    user_likes: action === 'delete' ? 0:1,
+                    can_like: action === 'delete' ? 1:0
+                }
+            }));
+        });
+
+    });
+});
+
+
+angular.module(
     'longpoll',
     ['request', 'mediator']
 ).run(function (Request, Mediator) {
@@ -1914,7 +1946,10 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
     }
 );
 
-angular.module('newsfeed', ['mediator', 'request']).run(function (Request, Mediator) {
+angular.module(
+    'newsfeed',
+    ['mediator', 'request', 'likes']
+).run(function (Request, Mediator) {
     var MAX_ITEMS_COUNT = 50,
 
         readyDeferred = jQuery.Deferred(),
@@ -1933,7 +1968,7 @@ angular.module('newsfeed', ['mediator', 'request']).run(function (Request, Media
 
     function fetchNewsfeed() {
         Request.api({code: [
-            'return API.newsfeed.get({"count" : "', MAX_ITEMS_COUNT, '"});'
+            'return API.newsfeed.getRecommended({"count" : "', MAX_ITEMS_COUNT, '"});'
         ].join('')}).done(function (response) {
             profilesColl
                 .add(response.profiles, {parse: true})
@@ -1968,6 +2003,41 @@ angular.module('newsfeed', ['mediator', 'request']).run(function (Request, Media
             Mediator.pub('newsfeed:groups', {
                 profiles: profilesColl.toJSON(),
                 items: groupItemsColl.toJSON()
+            });
+        });
+    });
+
+    Mediator.sub('likes:changed', function (params) {
+        readyDeferred.then(function () {
+            var model, whereClause = {
+                type: params.type,
+                source_id: params.owner_id,
+                post_id: params.item_id
+            };
+            if (params.owner_id > 0) {
+                model = friendItemsColl.findWhere(whereClause);
+            } else {
+                model = groupItemsColl.findWhere(whereClause);
+            }
+            if (model) {
+                model.set('likes', params.likes);
+            }
+        });
+    });
+
+    groupItemsColl.on('change', function () {
+        readyDeferred.then(function () {
+            Mediator.pub('newsfeed:groups', {
+                profiles: profilesColl.toJSON(),
+                items: groupItemsColl.toJSON()
+            });
+        });
+    });
+    friendItemsColl.on('change', function () {
+        readyDeferred.then(function () {
+            Mediator.pub('newsfeed:friends', {
+                profiles: profilesColl.toJSON(),
+                items: friendItemsColl.toJSON()
             });
         });
     });

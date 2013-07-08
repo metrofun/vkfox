@@ -3,13 +3,19 @@
     owners="data.profiles | where:'id':item.source_id">
     <ng-switch on="item.type">
         <div ng-switch-when="post">
-            <span ng-bind-html-unsafe="item.text"></span>
-            <br ng-if="item.attachments">
+            <p class="news__item-text" ng-bind-html-unsafe="item.text"></p>
             <item-attachment
                 ng-repeat="attachment in item.attachments"
                 data="attachment[attachment.type]"
                 type="{{attachment.type}}">
             </item-attachment>
+            <item-actions>
+                <item-action-like
+                    owner-id="item.source_id"
+                    item-id="item.post_id"
+                    likes="item.likes">
+                </item-action-like>
+            </item-actions>
         </div>
 
         <div ng-switch-when="photo">
@@ -36,4 +42,3 @@
         </div>
     </ng-switch>
 </item>
-

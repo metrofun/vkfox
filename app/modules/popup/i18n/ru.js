@@ -66,4 +66,9 @@ var r = "";
 r += "Отметить прочитанным";
 return r;
 }
+window.i18n["ru"]["Like"] = function(d){
+var r = "";
+r += "Нравится";
+return r;
+}
 })();

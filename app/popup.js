@@ -881,6 +881,20 @@ define([
 
 // TODO rename to filters
 angular.module('common', ['config'])
+    .filter('duration', function () {
+        /**
+        * Returns time duration in format 'HH:mm'
+        *
+        * @param {Array} seconds
+        *
+        * @returns {String}
+        */
+        return function (seconds) {
+            if (seconds) {
+                return moment.unix(seconds).format('HH:mm');
+            }
+        };
+    })
     .filter('where', function () {
         /**
          * Returns object from collection,
@@ -1380,6 +1394,11 @@ var r = "";
 r += "Отметить прочитанным";
 return r;
 }
+window.i18n["ru"]["Like"] = function(d){
+var r = "";
+r += "Нравится";
+return r;
+}
 })();
 angular.module('item-list', [])
     .directive('itemList', function () {
@@ -1663,13 +1682,20 @@ define(['jtoh', 'jquery', 'item/tpl'], function (jtoh, jQuery, itemTemplate) {
     return tpl;
 });
 
-angular.module('item', ['common', 'ui.keypress', 'request', 'anchor'])
+angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'])
     .directive('item', function () {
         return {
             controller: function ($scope) {
                 $scope.reply = {
                     visible: false
                 };
+                if (!Array.isArray($scope.owners)) {
+                    if ($scope.id > 0) {
+                        $scope.anchor = '/id' + $scope.owners.id;
+                    } else {
+                        $scope.anchor = '/club' + (-$scope.owners.id);
+                    }
+                }
 
                 /**
                  * Show block with text message input
@@ -1798,6 +1824,35 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor'])
                                     code: 'return API.wall.post(' + JSON.stringify(params) + ');'
                                 });
                             }, title);
+                        });
+                    });
+                };
+            }
+        };
+    })
+    .directive('itemActionLike', function (Request, $filter, Mediator) {
+        var title =  $filter('i18n')('Like');
+
+        return {
+            templateUrl: '/modules/popup/item/action-like.tmpl.html',
+            restrict: 'E',
+            scope: {
+                // Default type is 'post'
+                type: '=?',
+                ownerId: '=',
+                itemId: '=',
+                likes: '='
+            },
+            compile: function (tElement, tAttrs) {
+                tAttrs.$set('title', title);
+
+                return function (scope, element) {
+                    element.bind('click', function () {
+                        Mediator.pub('likes:change', {
+                            action: scope.likes.user_likes ? 'delete':'add',
+                            type: scope.type || 'post',
+                            owner_id: scope.ownerId,
+                            item_id: scope.itemId
                         });
                     });
                 };

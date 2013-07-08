@@ -1,5 +1,19 @@
 // TODO rename to filters
 angular.module('common', ['config'])
+    .filter('duration', function () {
+        /**
+        * Returns time duration in format 'HH:mm'
+        *
+        * @param {Array} seconds
+        *
+        * @returns {String}
+        */
+        return function (seconds) {
+            if (seconds) {
+                return moment.unix(seconds).format('HH:mm');
+            }
+        };
+    })
     .filter('where', function () {
         /**
          * Returns object from collection,
