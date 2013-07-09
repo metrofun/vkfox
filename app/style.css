@@ -5334,7 +5334,10 @@ a.badge:focus {
 }
 .item__action-like_liked {
   opacity: 1 !important;
-  background-color: #5bc0de;
+  background-color: #ee5f5b !important;
+}
+.item__action-like_liked:hover {
+  background-color: #e51d18 !important;
 }
 .item__attachment {
   width: 100%;
