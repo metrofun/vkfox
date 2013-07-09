@@ -880,7 +880,45 @@ define([
 });
 
 // TODO rename to filters
-angular.module('common', ['config'])
+angular.module('common', ['config', 'i18n'])
+    .filter('truncate', function ($filter) {
+        var MAX_TEXT_LENGTH = 300,
+            TRUNCATE_LENGTH = 200,
+
+            label = $filter('i18n')('more...');
+
+        jQuery('body').on('click', '.show-more', function (e) {
+            var jTarget = jQuery(e.currentTarget);
+
+            jTarget.replaceWith(jTarget.data('text'));
+        });
+        /**
+         * Truncates long text, and add pseudo-link "show-more"
+         *
+         * @param {String} text
+         *
+         * @returns {String}
+         */
+        return function (text) {
+            var spaceIndex, cutOffIndex;
+
+            if (text) {
+                if (text.length > MAX_TEXT_LENGTH) {
+                    spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
+
+                    cutOffIndex = spaceIndex !== -1 ? spaceIndex: TRUNCATE_LENGTH;
+
+                    return  text.slice(0, cutOffIndex) + [
+                        ' <button class="show-more btn btn-mini" data-text="',
+                        text.slice(cutOffIndex),
+                        '" type="button">', label, '</button>'
+                    ].join('');
+                } else {
+                    return text;
+                }
+            }
+        };
+    })
     .filter('duration', function () {
         /**
         * Returns time duration in format 'HH:mm'
@@ -1397,6 +1435,11 @@ return r;
 window.i18n["ru"]["Like"] = function(d){
 var r = "";
 r += "Нравится";
+return r;
+}
+window.i18n["ru"]["more..."] = function(d){
+var r = "";
+r += "далee...";
 return r;
 }
 })();

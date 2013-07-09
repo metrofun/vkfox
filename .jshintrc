@@ -19,6 +19,7 @@
     "dojo"          : false,
 
     "predef"        : [  // Extra globals.
+        "moment",
         "_",
         "LocalStorage",
         "Backbone",

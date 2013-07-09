@@ -71,4 +71,9 @@ var r = "";
 r += "Нравится";
 return r;
 }
+window.i18n["ru"]["more..."] = function(d){
+var r = "";
+r += "далee...";
+return r;
+}
 })();
