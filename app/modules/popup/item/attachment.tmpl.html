@@ -8,7 +8,7 @@
     <a ng-switch-when="note" href="/note{{data.owner_id}}_{{data.nid}}">
         <i class="icon-file"></i> {{data.title}}
     </a>
-    <a ng-switch-when="doc" href="#">
+    <a ng-switch-when="doc"  class="item__link" href="#">
         <i class="icon-file"></i> {{data.title}}
     </a>
     <a ng-switch-when="poll" href="{{data.url}}">

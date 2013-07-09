@@ -76,4 +76,9 @@ var r = "";
 r += "далee...";
 return r;
 }
+window.i18n["ru"]["Comment"] = function(d){
+var r = "";
+r += "Комментировать";
+return r;
+}
 })();

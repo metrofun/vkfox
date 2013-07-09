@@ -10,6 +10,12 @@
                 type="{{attachment.type}}">
             </item-attachment>
             <item-actions>
+                <item-action
+                    item-comment
+                    owner-id="item.source_id"
+                    post-id="item.post_id"
+                    ng-class="'icon-comment'">
+                </item-action>
                 <item-action-like
                     owner-id="item.source_id"
                     item-id="item.post_id"

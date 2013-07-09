@@ -6,7 +6,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                     visible: false
                 };
                 if (!Array.isArray($scope.owners)) {
-                    if ($scope.id > 0) {
+                    if ($scope.owners.id > 0) {
                         $scope.anchor = '/id' + $scope.owners.id;
                     } else {
                         $scope.anchor = '/club' + (-$scope.owners.id);
@@ -26,8 +26,10 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                 };
 
                 $scope.onReply = function (message) {
-                    $scope.reply.visible = false;
-                    $scope.reply.onSend(message);
+                    if (message.length > 1) {
+                        $scope.reply.visible = false;
+                        $scope.reply.onSend(message);
+                    }
                 };
             },
             templateUrl: '/modules/popup/item/item.tmpl.html',
@@ -145,7 +147,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             }
         };
     })
-    .directive('itemActionLike', function (Request, $filter, Mediator) {
+    .directive('itemActionLike', function ($filter, Mediator) {
         var title =  $filter('i18n')('Like');
 
         return {
@@ -168,6 +170,59 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                             type: scope.type || 'post',
                             owner_id: scope.ownerId,
                             item_id: scope.itemId
+                        });
+                    });
+                };
+            }
+        };
+    })
+    .directive('itemComment', function (Request, $filter) {
+        var title =  $filter('i18n')('Comment');
+
+        return {
+            transclude: true,
+            require: '^item',
+            restrict: 'A',
+            scope: {
+                ownerId: '=?',
+                postId: '=?',
+                gid: '=?',
+                tid: '=?',
+                text: '='
+            },
+            controller: function ($element, $transclude) {
+                $transclude(function (clone) {
+                    $element.append(clone);
+                });
+            },
+            compile: function (tElement, tAttrs) {
+                tAttrs.$set('title', title);
+
+                return function (scope, element, attrs, itemCtrl) {
+                    element.bind('click', function () {
+                        scope.$apply(function () {
+                            itemCtrl.showReply(function (message) {
+                                var params;
+                                if (scope.ownerId && scope.postId) {
+                                    params = JSON.stringify({
+                                        owner_id: scope.ownerId,
+                                        post_id: scope.postId,
+                                        text: message
+                                    });
+                                    Request.api({
+                                        code: 'return API.wall.addComment(' + params + ');'
+                                    });
+                                } else if (scope.gid && scope.tid) {
+                                    params = JSON.stringify({
+                                        gid: scope.gid,
+                                        tid: scope.tid,
+                                        text: message
+                                    });
+                                    Request.api({
+                                        code: 'return API.board.addComment(' + params + ');'
+                                    });
+                                }
+                            }, title);
                         });
                     });
                 };
