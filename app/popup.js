@@ -892,6 +892,17 @@ angular.module('common', ['config', 'i18n'])
 
             jTarget.replaceWith(jTarget.data('text'));
         });
+
+        function escapeQuotes(string) {
+            var entityMap = {
+                '"': '&quot;',
+                "'": '&#39;'
+            };
+
+            return String(string).replace(/["'\/]/g, function (s) {
+                return entityMap[s];
+            });
+        }
         /**
          * Truncates long text, and add pseudo-link "show-more"
          *
@@ -900,19 +911,22 @@ angular.module('common', ['config', 'i18n'])
          * @returns {String}
          */
         return function (text) {
-            var spaceIndex, cutOffIndex;
+            var spaceIndex;
 
             if (text) {
+                text = String(text);
                 if (text.length > MAX_TEXT_LENGTH) {
                     spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
 
-                    cutOffIndex = spaceIndex !== -1 ? spaceIndex: TRUNCATE_LENGTH;
-
-                    return  text.slice(0, cutOffIndex) + [
-                        ' <button class="show-more btn btn-mini" data-text="',
-                        text.slice(cutOffIndex),
-                        '" type="button">', label, '</button>'
-                    ].join('');
+                    if (spaceIndex !== -1) {
+                        return  text.slice(0, spaceIndex) + [
+                            ' <button class="show-more btn btn-mini" data-text="',
+                            escapeQuotes(text.slice(spaceIndex)),
+                            '" type="button">', label, '</button>'
+                        ].join('');
+                    } else {
+                        return text;
+                    }
                 } else {
                     return text;
                 }
