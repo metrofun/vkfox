@@ -96,4 +96,9 @@ var r = "";
 r += "Новые друзья:";
 return r;
 }
+window.i18n["ru"]["Started following you"] = function(d){
+var r = "";
+r += "Хочет добавить в друзья";
+return r;
+}
 })();

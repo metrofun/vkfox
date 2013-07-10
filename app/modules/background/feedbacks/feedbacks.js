@@ -43,8 +43,8 @@ angular.module(
         }
 
 
-        parent.owner_id = Number(parent.owner_id || parent.from_id);
         if (feedbackType) {
+            parent.owner_id = Number(parent.owner_id || parent.from_id);
             itemID  = generateItemID(parentType, parent);
             if (!(itemModel = itemsColl.get(itemID))) {
                 itemModel = createItemModel(parentType, parent, true);
@@ -58,7 +58,11 @@ angular.module(
                 };
             }));
         } else {
-            itemsColl.add(createItemModel(parentType, feedback, false));
+            //follows types are array
+            [].concat(feedback).forEach(function (feedback) {
+                feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
+                itemsColl.add(createItemModel(parentType, feedback, false));
+            });
         }
     }
     /**
@@ -102,14 +106,20 @@ angular.module(
     }
 
     function fetchFeedbacks() {
+        jQuery.when(
         Request.api({code: [
             'return API.notifications.get({"count" : "', MAX_ITEMS_COUNT, '"});'
-        ].join('')}).done(function (response) {
+        ].join('')}),
+        Request.api({code: [
+            'return API.newsfeed.getComments({"last_comments": 1, "count" : "',
+            MAX_ITEMS_COUNT, '"});'
+        ].join('')})).done(function (notifications, comments) {
+            console.log(notifications, comments);
             profilesColl
-                .add(response.profiles, {parse: true})
-                .add(response.groups, {parse: true});
+                .add(notifications.profiles, {parse: true})
+                .add(notifications.groups, {parse: true});
 
-            itemsColl.add(response.items, {parse: true});
+            itemsColl.add(notifications.items, {parse: true});
             readyDeferred.resolve();
         });
     }

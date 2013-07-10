@@ -49,6 +49,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             replace: true,
             restrict: 'E',
             scope: {
+                // TODO why @?
                 type: '@',
                 data: '='
             }
@@ -184,10 +185,10 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             require: '^item',
             restrict: 'A',
             scope: {
+                type: '=?',
                 ownerId: '=?',
-                postId: '=?',
-                gid: '=?',
-                tid: '=?',
+                id: '=?',
+                replyTo: '=?',
                 text: '='
             },
             controller: function ($element, $transclude) {
@@ -198,31 +199,52 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);
 
+                function onReply(scope, message) {
+                    var params = {}, method;
+
+                    switch (scope.type) {
+                    case 'wall':
+                    case 'post':
+                        params.owner_id = scope.ownerId;
+                        params.post_id = scope.id;
+                        method = 'wall.addComment';
+                        params.text = message;
+                        if (scope.replyTo) {
+                            params.reply_to_cid = scope.replyTo;
+                        }
+                        break;
+                    case 'topic':
+                        params.gid = Math.abs(scope.ownerId),
+                        params.tid = scope.id,
+                        params.text = message;
+                        method = 'board.addComment';
+                        break;
+                    case 'photo':
+                        params.oid = scope.ownerId,
+                        params.pid = scope.id,
+                        params.message = message;
+                        method = 'photos.createComment';
+                        break;
+                    case 'video':
+                        params.owner_id = scope.ownerId,
+                        params.video_id = scope.id,
+                        params.message = message;
+                        method = 'video.createComment';
+                        break;
+                    }
+
+                    if (method) {
+                        console.log(params, method);
+                        Request.api({
+                            code: 'return API.' + method + '(' + JSON.stringify(params) + ');'
+                        });
+                    }
+                }
+
                 return function (scope, element, attrs, itemCtrl) {
                     element.bind('click', function () {
                         scope.$apply(function () {
-                            itemCtrl.showReply(function (message) {
-                                var params;
-                                if (scope.ownerId && scope.postId) {
-                                    params = JSON.stringify({
-                                        owner_id: scope.ownerId,
-                                        post_id: scope.postId,
-                                        text: message
-                                    });
-                                    Request.api({
-                                        code: 'return API.wall.addComment(' + params + ');'
-                                    });
-                                } else if (scope.gid && scope.tid) {
-                                    params = JSON.stringify({
-                                        gid: scope.gid,
-                                        tid: scope.tid,
-                                        text: message
-                                    });
-                                    Request.api({
-                                        code: 'return API.board.addComment(' + params + ');'
-                                    });
-                                }
-                            }, title);
+                            itemCtrl.showReply(onReply.bind(null, scope), title);
                         });
                     });
                 };

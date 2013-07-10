@@ -7,7 +7,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
             'authorize?',
             [
                 'client_id=' + APP_ID,
-                'scope=539774',
+                'scope=friends,photos,audio,video,docs,notes,pages,wall,groups,messages,notifications',
                 'response_type=token',
                 'display=touch'
             ].join('&')

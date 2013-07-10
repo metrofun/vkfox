@@ -9,6 +9,9 @@
         <div ng-if="item.type == 'topic'">
             {{item.parent.title}}
         </div>
+        <div ng-if="item.type == 'follow'">
+            {{'Started following you' | i18n}} <i class="icon-user"></i>
+        </div>
         <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
             {{item.parent.text}}
             <item-attachment
@@ -17,6 +20,16 @@
                 type="{{attachment.type}}">
             </item-attachment>
         </div>
+        <item-actions>
+            <item-action
+                item-comment
+                type="item.comment.type"
+                owner-id="item.comment.ownerId"
+                reply-to="item.comment.replyTo"
+                id="item.comment.id"
+                ng-class="'icon-comment'">
+            </item-action>
+        </item-actions>
         <item
             ng-repeat="feedback in item.feedbacks"
             owners="data.profiles | where:'id':feedback.feedback.owner_id">

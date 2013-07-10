@@ -12,8 +12,9 @@
             <item-actions>
                 <item-action
                     item-comment
+                    type="'post'"
                     owner-id="item.source_id"
-                    post-id="item.post_id"
+                    id="item.post_id"
                     ng-class="'icon-comment'">
                 </item-action>
                 <item-action-like
@@ -44,8 +45,10 @@
         <div ng-switch-when="friend">
             <!-- TODO add plurals and gender-->
             {{'New friends:' | i18n}}
-            <span ng-repeat="friend in item.friends | slice:1"><!--
-                --><a anchor="{{'/id' + friend.uid | addVKBase}}">{{data.profiles | where:'id':friend.uid | name }}</a><!--
+            <span ng-repeat="friend in item.friends | slice:1">
+                <a anchor="{{'/id' + friend.uid | addVKBase}}">
+                    {{data.profiles | where:'id':friend.uid | name }}<!--
+                --></a><!--
                 --><span ng-if="!$last">, </span>
             </span>
         </div>
