@@ -119,9 +119,11 @@ angular.module('common', ['config', 'i18n'])
             return path;
         };
     })
-    .filter('isObject', function () {
-        return function (input) {
-            return angular.isObject(input);
+    .filter('slice', function () {
+        return function (arr, start, end) {
+            if (arr) {
+                return arr.slice(start, end);
+            }
         };
     })
     .filter('isArray', function () {

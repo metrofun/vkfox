@@ -1,12 +1,10 @@
-angular.module('anchor', []).directive('anchor', function () {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attr) {
-            element.bind('click', function () {
-                chrome.tabs.create({url: attr.anchor});
-            });
-        }
-    };
+angular.module('anchor', []).run(function () {
+    jQuery('body').on('click', '[anchor]', function (e) {
+        var jTarget = jQuery(e.currentTarget);
+
+        console.log(jTarget.attr('anchor'));
+        chrome.tabs.create({url: jTarget.attr('anchor')});
+    });
 });
 
 angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
@@ -1000,9 +998,11 @@ angular.module('common', ['config', 'i18n'])
             return path;
         };
     })
-    .filter('isObject', function () {
-        return function (input) {
-            return angular.isObject(input);
+    .filter('slice', function () {
+        return function (arr, start, end) {
+            if (arr) {
+                return arr.slice(start, end);
+            }
         };
     })
     .filter('isArray', function () {
@@ -1459,6 +1459,21 @@ return r;
 window.i18n["ru"]["Comment"] = function(d){
 var r = "";
 r += "Комментировать";
+return r;
+}
+window.i18n["ru"]["Liked"] = function(d){
+var r = "";
+r += "Понравилось";
+return r;
+}
+window.i18n["ru"]["Reposted"] = function(d){
+var r = "";
+r += "Поделился записью";
+return r;
+}
+window.i18n["ru"]["New friends:"] = function(d){
+var r = "";
+r += "Новые друзья:";
 return r;
 }
 })();

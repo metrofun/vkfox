@@ -81,4 +81,19 @@ var r = "";
 r += "Комментировать";
 return r;
 }
+window.i18n["ru"]["Liked"] = function(d){
+var r = "";
+r += "Понравилось";
+return r;
+}
+window.i18n["ru"]["Reposted"] = function(d){
+var r = "";
+r += "Поделился записью";
+return r;
+}
+window.i18n["ru"]["New friends:"] = function(d){
+var r = "";
+r += "Новые друзья:";
+return r;
+}
 })();

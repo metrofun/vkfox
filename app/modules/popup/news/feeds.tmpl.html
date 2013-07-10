@@ -25,26 +25,29 @@
         </div>
 
         <div ng-switch-when="photo">
-            <item-attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+            <item-attachment ng-repeat="photo in item.photos | slice:1" data="photo" type="photo">
             </item-attachment>
         </div>
 
         <div ng-switch-when="wall_photo">
-            <item-attachment ng-repeat="photo in item.photos" data="photo" type="photo">
+            <item-attachment ng-repeat="photo in item.photos | slice:1" data="photo" type="photo">
             </item-attachment>
         </div>
 
         <div ng-switch-when="photo_tag">
-            <item-attachment ng-repeat="photo in item.photo_tags" data="photo" type="photo">
+            <item-attachment ng-repeat="photo in item.photo_tags | slice:1" data="photo" type="photo">
             </item-attachment>
         </div>
         <div ng-switch-when="note">
             {{item | json}}
         </div>
         <div ng-switch-when="friend">
-            <!-- TODO I18N -->
-            Added new friend:
-            <span ng-repeat="friend in item.friends">{{data.profiles | where:'id':friend.uid | name }} </span>
+            <!-- TODO add plurals and gender-->
+            {{'New friends:' | i18n}}
+            <span ng-repeat="friend in item.friends | slice:1"><!--
+                --><a anchor="{{'/id' + friend.uid | addVKBase}}">{{data.profiles | where:'id':friend.uid | name }}</a><!--
+                --><span ng-if="!$last">, </span>
+            </span>
         </div>
     </ng-switch>
 </item>

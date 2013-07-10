@@ -1574,8 +1574,8 @@ angular.module(
         }))(),
         itemsColl = new (Backbone.Collection.extend({
             parse: function (rawItems) {
-                console.log(arguments);
-                return rawItems.slice(1).map(processRawItem);
+                // first element contains number of items
+                rawItems.slice(1).forEach(processRawItem);
             }
         }))();
 
@@ -1585,8 +1585,6 @@ angular.module(
      * then adds feedback to parent's feedbacks collection
      *
      * @param {Object} item
-     *
-     * @returns {Object} Returns processed item or already existing parent from itemsColl
      */
     function processRawItem(item) {
         var parentType, parent = item.parent,
@@ -1602,11 +1600,12 @@ angular.module(
         }
 
 
+        parent.owner_id = Number(parent.owner_id || parent.from_id);
         if (feedbackType) {
             itemID  = generateItemID(parentType, parent);
             if (!(itemModel = itemsColl.get(itemID))) {
-                parent.owner_id = Number(parent.owner_id || parent.from_id);
                 itemModel = createItemModel(parentType, parent, true);
+                itemsColl.add(itemModel);
             }
             itemModel.get('feedbacks').add([].concat(feedback).map(function (feedback) {
                 feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
@@ -1615,10 +1614,8 @@ angular.module(
                     feedback: feedback
                 };
             }));
-            return itemModel;
         } else {
-            feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
-            return createItemModel(parentType, feedback, false);
+            itemsColl.add(createItemModel(parentType, feedback, false));
         }
     }
     /**
@@ -2099,7 +2096,7 @@ angular.module(
 
     function fetchNewsfeed() {
         Request.api({code: [
-            'return API.newsfeed.getRecommended({"count" : "', MAX_ITEMS_COUNT, '"});'
+            'return API.newsfeed.get({"count" : "', MAX_ITEMS_COUNT, '"});'
         ].join('')}).done(function (response) {
             profilesColl
                 .add(response.profiles, {parse: true})

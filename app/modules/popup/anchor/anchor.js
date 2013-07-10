@@ -1,10 +1,8 @@
-angular.module('anchor', []).directive('anchor', function () {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attr) {
-            element.bind('click', function () {
-                chrome.tabs.create({url: attr.anchor});
-            });
-        }
-    };
+angular.module('anchor', []).run(function () {
+    jQuery('body').on('click', '[anchor]', function (e) {
+        var jTarget = jQuery(e.currentTarget);
+
+        console.log(jTarget.attr('anchor'));
+        chrome.tabs.create({url: jTarget.attr('anchor')});
+    });
 });

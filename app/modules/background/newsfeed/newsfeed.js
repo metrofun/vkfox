@@ -20,7 +20,7 @@ angular.module(
 
     function fetchNewsfeed() {
         Request.api({code: [
-            'return API.newsfeed.getRecommended({"count" : "', MAX_ITEMS_COUNT, '"});'
+            'return API.newsfeed.get({"count" : "', MAX_ITEMS_COUNT, '"});'
         ].join('')}).done(function (response) {
             profilesColl
                 .add(response.profiles, {parse: true})

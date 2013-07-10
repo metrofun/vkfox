@@ -23,8 +23,12 @@
             <div ng-if="['comment', 'reply'].indexOf(feedback.type) !== -1">
                 {{feedback.feedback.text}}
             </div>
-            <i ng-if="feedback.type == 'like'" class="icon-heart"></i>
-            <i ng-if="feedback.type == 'copy'" class="icon-share-alt"></i>
+            <span ng-if="feedback.type == 'like'">
+                {{'Liked' | i18n}} <i class="icon-heart"></i>
+            </span>
+            <span ng-if="feedback.type == 'copy'">
+                {{'Reposted' | i18n}} <i class="icon-retweet"></i>
+            </span>
         </item>
     </item>
 </div>
