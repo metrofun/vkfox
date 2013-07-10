@@ -5457,6 +5457,11 @@ a.badge:focus {
   position: relative;
   overflow: hidden;
 }
+.item .item {
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+}
 .item + .item {
   border-top: 1px solid #eeeeee;
 }
@@ -5468,19 +5473,17 @@ a.badge:focus {
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
+.item__head {
+  display: block;
+}
 .item__author {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 200px;
-  display: block;
+  max-width: 80%;
+  display: inline-block;
 }
-.item__author > * {
-  clear: both;
-  overflow: hidden;
-  padding-bottom: 1px;
-}
-.item.is-online .item__author:after {
+.item.is-online .item__head:after {
   content: '';
   display: inline-block;
   width: 14px;

@@ -11,7 +11,9 @@
             </div>
         </div>
         <div class="media-body clearfix" ng-transclude>
-            <strong class="item__author media-heading">{{owners | name}}</strong>
+            <strong class="item__head media-heading">
+                <span class="item__author">{{owners | name}}</span>
+            </strong>
         </div>
     </div>
     <div ng-if="reply.visible" class="item__reply">

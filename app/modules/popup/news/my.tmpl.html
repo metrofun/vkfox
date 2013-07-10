@@ -3,19 +3,19 @@
         ng-repeat="item in data.items"
         owners="data.profiles | where:'id':item.parent.owner_id">
         <div ng-if="item.type == 'photo' || item.type == 'video'">
-            <attachment data="item.parent" type="{{item.type}}">
-            </attachment>
+            <item-attachment data="item.parent" type="{{item.type}}">
+            </item-attachment>
         </div>
         <div ng-if="item.type == 'topic'">
             {{item.parent.title}}
         </div>
         <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
             {{item.parent.text}}
-            <attachment
+            <item-attachment
                 ng-repeat="attachment in item.parent.attachments"
                 data="attachment[attachment.type]"
                 type="{{attachment.type}}">
-            </attachment>
+            </item-attachment>
         </div>
         <item
             ng-repeat="feedback in item.feedbacks"

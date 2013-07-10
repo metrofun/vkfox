@@ -2201,11 +2201,10 @@ angular.module('news', ['mediator'])
         $scope.activeTab = $routeParams.tab;
     })
     .controller('MyNewsController', function ($scope, Mediator) {
-        Mediator.pub('feedback:data:get');
-        Mediator.sub('feedback:data', function (data) {
+        Mediator.pub('feedbacks:data:get');
+        Mediator.sub('feedbacks:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data;
-                console.log(data);
             });
         });
     })
@@ -2385,7 +2384,7 @@ angular.module('router', [])
                 templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
             })
             .when('/news', {
-                redirectTo: '/news/groups'
+                redirectTo: '/news/my'
             })
             .when('/news/:tab', {
                 controller: 'NewsController',

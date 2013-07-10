@@ -8,6 +8,12 @@
    position: relative;
    overflow: hidden;
 
+   .item {
+       padding-left: 0;
+       padding-right: 0;
+       width: 100%;
+   }
+
    & + .item {
        border-top: 1px solid @grayLighter;
    }
@@ -18,18 +24,15 @@
         cursor: pointer;
         .border-radius(4px);
    }
+   &__head {
+       display: block;
+   }
    &__author {
        .text-overflow();
-       max-width: 200px;
-       display: block;
-
-       & > * {
-           clear: both;
-           overflow: hidden;
-           padding-bottom: 1px;
-       }
+       max-width: 80%;
+       display: inline-block;
    }
-   &.is-online &__author:after {
+   &.is-online &__head:after {
        content: '';
        display: inline-block;
        width: 14px;
