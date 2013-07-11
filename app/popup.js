@@ -181,7 +181,7 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
 
         $scope.toggleFriendWatching = function (profile) {
             profile.isWatched = !profile.isWatched;
-            Mediator.pub('buddies:watch:toggle', profile.id);
+            Mediator.pub('buddies:watch:toggle', profile.uid);
         };
 
         Mediator.pub('buddies:data:get');
@@ -533,7 +533,7 @@ angular.module('chat', ['item', 'mediator', 'request'])
     .controller('ChatCtrl', function ($scope, Mediator, Request) {
         $scope.markAsRead = function (messages) {
             Request.api({code: 'return API.messages.markAsRead({mids: ['
-                + _.pluck(messages, 'id') + ']});'});
+                + _.pluck(messages, 'mid') + ']});'});
         };
 
         Mediator.pub('chat:data:get');
@@ -544,14 +544,14 @@ angular.module('chat', ['item', 'mediator', 'request'])
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
                         result.author = _(dialog.profiles).findWhere({
-                            id: messageAuthorId
+                            uid: messageAuthorId
                         });
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
                     } else {
                         result.owners = _(dialog.profiles).findWhere({
-                            id: dialog.uid
+                            uid: dialog.uid
                         });
                     }
 
@@ -1771,10 +1771,10 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                     visible: false
                 };
                 if (!Array.isArray($scope.owners)) {
-                    if ($scope.owners.id > 0) {
-                        $scope.anchor = '/id' + $scope.owners.id;
+                    if ($scope.owners.uid > 0) {
+                        $scope.anchor = '/id' + $scope.owners.uid;
                     } else {
-                        $scope.anchor = '/club' + (-$scope.owners.id);
+                        $scope.anchor = '/club' + $scope.owners.gid;
                     }
                 }
 

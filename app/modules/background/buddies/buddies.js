@@ -6,7 +6,7 @@ angular.module(
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (Backbone.Collection.extend({
             model: Backbone.Model.extend({
-                idAttribute: 'id'
+                idAttribute: 'uid'
             }),
             comparator: function (buddie) {
                 if (buddie.get('isWatched')) {
@@ -47,7 +47,7 @@ angular.module(
         }).then(function (response) {
             return Users.getProfilesById(
                 _.pluck(response.slice(1),
-                'id'
+                'uid'
             )).then(function (profiles) {
                 profiles.forEach(function (profile) {
                     profile.set('isFave', true);

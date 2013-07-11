@@ -30,18 +30,15 @@ angular.module(
             out = +!!(flags & 2);
 
             // mimic response from server
-            messageDeferred = jQuery.Deferred().resolve({
-                count: 1,
-                items: [{
-                    body: update[6],
-                    title: update[5],
-                    date: update[4],
-                    uid: out ? userId:dialogCompanionUid,
-                    read_state: +!(flags & 1),
-                    id: messageId
-                    // out: +!!(flags & 2)
-                }]
-            });
+            messageDeferred = jQuery.Deferred().resolve([1, {
+                body: update[6],
+                title: update[5],
+                date: update[4],
+                uid: out ? userId:dialogCompanionUid,
+                read_state: +!(flags & 1),
+                mid: messageId
+                // out: +!!(flags & 2)
+            }]);
         } else {
             messageDeferred = Request.api({
                 code: 'return API.messages.getById({mid: ' + messageId + '});'
@@ -49,7 +46,7 @@ angular.module(
         }
 
         messageDeferred.done(function (response) {
-            var message = response.items[0],
+            var message = response[1],
                 dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
             dialog = dialogColl.get(dialogId);
@@ -104,7 +101,7 @@ angular.module(
             dialogCompanionUid = messages[messages.length - 1].uid;
 
         messages.reverse().slice(1).some(function (message) {
-            if (message.id !== dialogCompanionUid && message.read_state) {
+            if (message.mid !== dialogCompanionUid && message.read_state) {
                 return true;
             } else {
                 updatedMessages.unshift(message);
@@ -129,10 +126,10 @@ angular.module(
 
         return jQuery.when.apply(jQuery, unreadHistoryRequests).done(function () {
             _(arguments).each(function (historyMessages, index) {
-                if (historyMessages && historyMessages.count) {
+                if (historyMessages && historyMessages[0]) {
                     unreadDialogs[index].set(
                         'messages',
-                        historyMessages.items.reverse().map(convertHistoryIntoMessageData)
+                        historyMessages.slice(1).reverse().map(convertHistoryIntoMessageData)
                     );
                     removeReadMessages(unreadDialogs[index]);
                 }
@@ -152,7 +149,7 @@ angular.module(
                 if (messageId && mask) {
                     dialogColl.some(function (dialog) {
                         return dialog.get('messages').some(function (message) {
-                            if (message.id === messageId) {
+                            if (message.mid === messageId) {
                                 message.read_state = mask & 1;
                                 removeReadMessages(dialog);
                                 dialogColl.trigger('change');
@@ -188,8 +185,8 @@ angular.module(
         return Request.api({
             code: 'return API.messages.getDialogs({preview_length: 0});'
         }).then(function (response) {
-            if (response && response.count) {
-                dialogColl.reset(response.items.map(function (item) {
+            if (response && response[0]) {
+                dialogColl.reset(response.slice(1).map(function (item) {
                     // convert dialog data into message data
                     return {
                         id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,

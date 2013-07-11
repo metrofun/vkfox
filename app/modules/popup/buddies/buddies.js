@@ -10,7 +10,7 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
 
         $scope.toggleFriendWatching = function (profile) {
             profile.isWatched = !profile.isWatched;
-            Mediator.pub('buddies:watch:toggle', profile.id);
+            Mediator.pub('buddies:watch:toggle', profile.uid);
         };
 
         Mediator.pub('buddies:data:get');

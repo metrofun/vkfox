@@ -10,6 +10,8 @@ angular.module(
                 parse: function (profile) {
                     if (profile.gid) {
                         profile.id = -profile.gid;
+                    } else {
+                        profile.id = profile.uid;
                     }
                     return profile;
                 }
@@ -18,7 +20,7 @@ angular.module(
         itemsColl = new (Backbone.Collection.extend({
             parse: function (rawItems) {
                 // first element contains number of items
-                rawItems.slice(1).forEach(processRawItem);
+                rawItems.forEach(processRawItem);
             }
         }))();
 
@@ -113,13 +115,13 @@ angular.module(
         Request.api({code: [
             'return API.newsfeed.getComments({"last_comments": 1, "count" : "',
             MAX_ITEMS_COUNT, '"});'
-        ].join('')})).done(function (notifications, comments) {
-            console.log(notifications, comments);
+        ].join('')})).done(function (notifications) {
+            // TODO comments
             profilesColl
                 .add(notifications.profiles, {parse: true})
                 .add(notifications.groups, {parse: true});
 
-            itemsColl.add(notifications.items, {parse: true});
+            itemsColl.add(notifications.items.slice(1), {parse: true});
             readyDeferred.resolve();
         });
     }

@@ -2,7 +2,7 @@ angular.module('chat', ['item', 'mediator', 'request'])
     .controller('ChatCtrl', function ($scope, Mediator, Request) {
         $scope.markAsRead = function (messages) {
             Request.api({code: 'return API.messages.markAsRead({mids: ['
-                + _.pluck(messages, 'id') + ']});'});
+                + _.pluck(messages, 'mid') + ']});'});
         };
 
         Mediator.pub('chat:data:get');
@@ -13,14 +13,14 @@ angular.module('chat', ['item', 'mediator', 'request'])
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
                         result.author = _(dialog.profiles).findWhere({
-                            id: messageAuthorId
+                            uid: messageAuthorId
                         });
                     }
                     if (dialog.chat_id) {
                         result.owners = dialog.profiles;
                     } else {
                         result.owners = _(dialog.profiles).findWhere({
-                            id: dialog.uid
+                            uid: dialog.uid
                         });
                     }
 

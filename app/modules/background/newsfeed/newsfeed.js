@@ -10,6 +10,8 @@ angular.module(
                 parse: function (profile) {
                     if (profile.gid) {
                         profile.id = -profile.gid;
+                    } else {
+                        profile.id = profile.uid;
                     }
                     return profile;
                 }

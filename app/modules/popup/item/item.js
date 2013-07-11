@@ -6,10 +6,10 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                     visible: false
                 };
                 if (!Array.isArray($scope.owners)) {
-                    if ($scope.owners.id > 0) {
-                        $scope.anchor = '/id' + $scope.owners.id;
+                    if ($scope.owners.uid > 0) {
+                        $scope.anchor = '/id' + $scope.owners.uid;
                     } else {
-                        $scope.anchor = '/club' + (-$scope.owners.id);
+                        $scope.anchor = '/club' + $scope.owners.gid;
                     }
                 }
 

@@ -5,7 +5,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
 
     usersColl = new (Backbone.Collection.extend({
         model: Backbone.Model.extend({
-            idAttribute: 'id'
+            idAttribute: 'uid'
         })
     }))(),
     usersGetQueue = [],
@@ -19,7 +19,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
     processGetUsersQueue = _.debounce(function () {
         var processedQueue = usersGetQueue,
             newUids = _.chain(processedQueue).pluck('uids').flatten()
-            .unique().difference(usersColl.pluck('id')).value();
+                .unique().difference(usersColl.pluck('id')).value();
 
         // start new queue
         usersGetQueue = [];
