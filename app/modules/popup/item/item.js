@@ -177,24 +177,19 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             }
         };
     })
-    .directive('itemComment', function (Request, $filter) {
+    .directive('itemActionComment', function (Request, $filter) {
         var title =  $filter('i18n')('Comment');
 
         return {
-            transclude: true,
             require: '^item',
-            restrict: 'A',
+            template: '<i class="item__action icon-comment"></i>',
+            restrict: 'E',
             scope: {
                 type: '=?',
                 ownerId: '=?',
                 id: '=?',
                 replyTo: '=?',
                 text: '='
-            },
-            controller: function ($element, $transclude) {
-                $transclude(function (clone) {
-                    $element.append(clone);
-                });
             },
             compile: function (tElement, tAttrs) {
                 tAttrs.$set('title', title);

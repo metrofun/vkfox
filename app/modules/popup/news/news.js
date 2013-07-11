@@ -25,53 +25,66 @@ angular.module('news', ['mediator'])
 
                 if (data.items && data.items.length) {
                     data.items.forEach(function (item) {
-                        var comment;
+                        var comment, parent = item.parent, type;
+
                         switch (item.type) {
                         case 'wall':
                         case 'post':
-                            comment = {
-                                ownerId: item.parent.owner_id,
-                                id: item.parent.id,
-                                type: 'post'
-                            };
+                            if (parent.comments.can_post) {
+                                comment = {
+                                    ownerId: parent.owner_id,
+                                    id: parent.id,
+                                    type: 'post'
+                                };
+                            }
                             break;
                         case 'comment':
-                            if (item.parent.post) {
+                            if (parent.post && parent.post.comments.can_post) {
                                 comment = {
-                                    ownerId: item.parent.post.from_id,
-                                    id: item.parent.post.id,
+                                    ownerId: parent.post.from_id,
+                                    id: parent.post.id,
                                     replyTo: item.parent.id,
                                     type: 'post'
                                 };
-                            } else if (item.parent.topic) {
+                            } else if (parent.topic && !parent.topic.is_closed) {
                                 comment = {
-                                    ownerId: item.parent.topic.owner_id,
-                                    id: item.parent.topic.tid,
-                                    replyTo: item.parent.id,
+                                    ownerId: parent.topic.owner_id,
+                                    id: parent.topic.tid,
                                     type: 'topic'
                                 };
                             } else {
-                                throw 'not implemented';
+                                if (parent.photo) {
+                                    type = 'photo';
+                                } else if (parent.video) {
+                                    type = 'video';
+                                }
+                                if (type) {
+                                    comment = {
+                                        ownerId: parent[type].owner_id,
+                                        id: parent[type].id,
+                                        type: type
+                                    };
+                                }
                             }
                             break;
                         case 'topic':
                             comment = {
-                                ownerId: item.parent.owner_id,
-                                id: item.parent.id,
+                                ownerId: parent.owner_id,
+                                id: parent.id,
                                 type: 'topic'
                             };
                             break;
                         case 'photo':
                             comment = {
-                                ownerId: item.parent.owner_id,
-                                id: item.parent.pid,
+                                ownerId: parent.owner_id,
+                                id: parent.pid,
                                 type: 'photo'
                             };
                             break;
                         case 'video':
                             comment = {
-                                ownerId: item.parent.owner_id,
-                                id: item.parent.post.id,
+                                ownerId: parent.owner_id,
+                                id: parent.id,
                                 type: 'video'
                             };
                             break;
