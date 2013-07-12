@@ -139,6 +139,25 @@ angular.module(
 
     fetchFeedbacks();
 
+    readyDeferred.then(function () {
+        Mediator.sub('likes:changed', function (params) {
+            itemsColl.some(function (model) {
+                var parent  = model.get('parent'),
+                    type = model.get('type'),
+                    matches = false;
+
+                matches = (parent.to_id === params.owner_id)
+                    && (type === 'wall' && params.type === 'post' || type === params.type)
+                    && (parent.id === params.item_id);
+
+                if (matches) {
+                    parent.likes = params.likes;
+                    itemsColl.trigger('change');
+                }
+            });
+        });
+    });
+
     Mediator.sub('feedbacks:data:get', function () {
         readyDeferred.then(publishData);
     });

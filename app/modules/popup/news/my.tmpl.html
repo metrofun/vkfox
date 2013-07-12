@@ -1,6 +1,6 @@
-<div ng-controller="MyNewsController" class="t-item-list">
+<item-list ng-controller="MyNewsController">
     <item
-        ng-repeat="item in data.items"
+        item-list-repeat="item in data.items"
         owners="data.profiles | where:'id':item.parent.owner_id">
         <div ng-if="item.type == 'photo' || item.type == 'video'">
             <item-attachment data="item.parent" type="{{item.type}}">
@@ -29,7 +29,7 @@
                 id="item.comment.id">
             </item-action-comment>
             <item-action-like
-                owner-id="item.parent.owner_id"
+                owner-id="item.parent.to_id || item.parent.owner_id"
                 item-id="item.parent.id"
                 likes="item.parent.likes">
             </item-action-like>
@@ -48,4 +48,4 @@
             </span>
         </item>
     </item>
-</div>
+</item-list>

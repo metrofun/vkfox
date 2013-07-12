@@ -5345,6 +5345,9 @@ a.badge:focus {
   float: left;
   margin-top: 8px;
 }
+.item__attachment:first-child {
+  margin-top: 0;
+}
 .item__attachment_type_app + .item__attachment_type_app,
 .item__attachment_type_audio + .item__attachment_type_audio,
 .item__attachment_type_note + .item__attachment_type_note,

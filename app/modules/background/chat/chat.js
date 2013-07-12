@@ -52,7 +52,7 @@ angular.module(
             }]);
         } else {
             messageDeferred = Request.api({
-                code: 'return API.messages.getById({mid: ' + messageId + '});'
+                code: 'return API.messages.getById({chat_active: 1, mid: ' + messageId + '});'
             });
         }
 
@@ -65,10 +65,12 @@ angular.module(
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
             } else {
+                // TODO add parse function and move this code into dialogColl
                 dialogColl.add({
                     id: dialogId,
                     uid: dialogCompanionUid,
                     chat_id: message.chat_id,
+                    chat_active: message.chat_active,
                     messages: [message]
                 });
 

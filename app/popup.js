@@ -1996,7 +1996,6 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                     }
 
                     if (method) {
-                        console.log(params, method);
                         Request.api({
                             code: 'return API.' + method + '(' + JSON.stringify(params) + ');'
                         });

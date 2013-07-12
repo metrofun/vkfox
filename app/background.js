@@ -499,7 +499,7 @@ angular.module(
             }]);
         } else {
             messageDeferred = Request.api({
-                code: 'return API.messages.getById({mid: ' + messageId + '});'
+                code: 'return API.messages.getById({chat_active: 1, mid: ' + messageId + '});'
             });
         }
 
@@ -512,10 +512,12 @@ angular.module(
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
             } else {
+                // TODO add parse function and move this code into dialogColl
                 dialogColl.add({
                     id: dialogId,
                     uid: dialogCompanionUid,
                     chat_id: message.chat_id,
+                    chat_active: message.chat_active,
                     messages: [message]
                 });
 
@@ -1516,6 +1518,25 @@ angular.module(
 
     fetchFeedbacks();
 
+    readyDeferred.then(function () {
+        Mediator.sub('likes:changed', function (params) {
+            itemsColl.some(function (model) {
+                var parent  = model.get('parent'),
+                    type = model.get('type'),
+                    matches = false;
+
+                matches = (parent.to_id === params.owner_id)
+                    && (type === 'wall' && params.type === 'post' || type === params.type)
+                    && (parent.id === params.item_id);
+
+                if (matches) {
+                    parent.likes = params.likes;
+                    itemsColl.trigger('change');
+                }
+            });
+        });
+    });
+
     Mediator.sub('feedbacks:data:get', function () {
         readyDeferred.then(publishData);
     });
@@ -1693,6 +1714,32 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
         });
     }
 );
+
+angular.module(
+    'items-collection',
+    ['request', 'mediator', 'likes']
+).factory('ProfilesCollection', function (Request, Mediator) {
+    return Backbone.Collection.extend({
+        initialize: function () {
+            Mediator.sub('likes:changed', function (params) {
+                var model, whereClause = {
+                    type: params.type,
+                    source_id: params.owner_id,
+                    post_id: params.item_id
+                };
+                if (params.owner_id > 0) {
+                    model = friendItemsColl.findWhere(whereClause);
+                } else {
+                    model = groupItemsColl.findWhere(whereClause);
+                }
+                if (model) {
+                    model.set('likes', params.likes);
+                }
+            });
+
+        }
+    });
+});
 
 angular.module(
     'likes',
@@ -1982,8 +2029,8 @@ angular.module(
         });
     });
 
-    Mediator.sub('likes:changed', function (params) {
-        readyDeferred.then(function () {
+    readyDeferred.then(function () {
+        Mediator.sub('likes:changed', function (params) {
             var model, whereClause = {
                 type: params.type,
                 source_id: params.owner_id,

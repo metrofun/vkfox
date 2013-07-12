@@ -31,7 +31,7 @@
             <!-- </item-action> -->
             <item-action
                 ng-class="'chat__item-action_mark-read icon-bookmark'"
-                ng-if="dialog.isUnread"
+                ng-if="dialog.isUnread && !dialog.author"
                 ng-click="markAsRead(dialog.messages)"
                 title="{{'Mark as read' | i18n}}">
             </item-action>

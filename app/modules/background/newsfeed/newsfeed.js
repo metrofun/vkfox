@@ -61,8 +61,8 @@ angular.module(
         });
     });
 
-    Mediator.sub('likes:changed', function (params) {
-        readyDeferred.then(function () {
+    readyDeferred.then(function () {
+        Mediator.sub('likes:changed', function (params) {
             var model, whereClause = {
                 type: params.type,
                 source_id: params.owner_id,
