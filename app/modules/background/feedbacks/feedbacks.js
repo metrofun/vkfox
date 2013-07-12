@@ -1,28 +1,39 @@
 angular.module(
     'feedbacks',
-    ['mediator', 'request', 'likes']
-).run(function (Request, Mediator) {
-    var MAX_ITEMS_COUNT = 50,
+    ['mediator', 'request', 'likes', 'profiles-collection']
+).run(function (Request, Mediator, ProfilesCollection) {
+    var
+    MAX_ITEMS_COUNT = 50,
 
-        readyDeferred = jQuery.Deferred(),
-        profilesColl = new (Backbone.Collection.extend({
-            model: Backbone.Model.extend({
-                parse: function (profile) {
-                    if (profile.gid) {
-                        profile.id = -profile.gid;
-                    } else {
-                        profile.id = profile.uid;
-                    }
-                    return profile;
+    readyDeferred = jQuery.Deferred(),
+    profilesColl = new (ProfilesCollection.extend({
+        model: Backbone.Model.extend({
+            parse: function (profile) {
+                if (profile.gid) {
+                    profile.id = -profile.gid;
+                } else {
+                    profile.id = profile.uid;
                 }
-            })
-        }))(),
-        itemsColl = new (Backbone.Collection.extend({
-            parse: function (rawItems) {
-                // first element contains number of items
-                rawItems.forEach(processRawItem);
+                return profile;
             }
-        }))();
+        })
+    }))(),
+    itemsColl = new (Backbone.Collection.extend({
+        parse: function (rawItems) {
+            // first element contains number of items
+            rawItems.forEach(processRawItem);
+        }
+    }))(),
+    /**
+     * Notifies about current state of module.
+     * Has a tiny debounce to make only one publish per event loop
+     */
+    publishData = _.debounce(function publishData() {
+        Mediator.pub('feedbacks:data', {
+            profiles: profilesColl.toJSON(),
+            items: itemsColl.toJSON()
+        });
+    }, 0);
 
     /**
      * Handles news' item.
@@ -129,11 +140,12 @@ angular.module(
     fetchFeedbacks();
 
     Mediator.sub('feedbacks:data:get', function () {
-        readyDeferred.then(function () {
-            Mediator.pub('feedbacks:data', {
-                profiles: profilesColl.toJSON(),
-                items: itemsColl.toJSON()
-            });
-        });
+        readyDeferred.then(publishData);
+    });
+
+    // Notify about changes
+    readyDeferred.then(function () {
+        itemsColl.on('change', publishData);
+        profilesColl.on('change', publishData);
     });
 });

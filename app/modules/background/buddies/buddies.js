@@ -1,10 +1,10 @@
 angular.module(
     'buddies',
-    ['users', 'request', 'mediator', 'persistent-set']
-).run(function (Users, Request, Mediator, PersistentSet) {
+    ['users', 'request', 'mediator', 'persistent-set', 'profiles-collection']
+).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection) {
     var readyDeferred = jQuery.Deferred(),
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
-        buddiesColl = new (Backbone.Collection.extend({
+        buddiesColl = new (ProfilesCollection.extend({
             model: Backbone.Model.extend({
                 idAttribute: 'uid'
             }),
@@ -50,7 +50,7 @@ angular.module(
                 'uid'
             )).then(function (profiles) {
                 profiles.forEach(function (profile) {
-                    profile.set('isFave', true);
+                    profile.isFave = true;
                 });
                 return profiles;
             });
@@ -81,6 +81,11 @@ angular.module(
 
     Mediator.sub('buddies:data:get', function () {
         readyDeferred.then(function () {
+            Mediator.pub('buddies:data', buddiesColl.toJSON());
+        });
+    });
+    readyDeferred.then(function () {
+        buddiesColl.on('change', function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
     });

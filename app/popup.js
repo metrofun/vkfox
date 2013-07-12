@@ -529,7 +529,7 @@ define([
     });
 });
 
-angular.module('chat', ['item', 'mediator', 'request'])
+angular.module('chat', ['item', 'mediator', 'request', 'ngSanitize'])
     .controller('ChatCtrl', function ($scope, Mediator, Request) {
         $scope.markAsRead = function (messages) {
             Request.api({code: 'return API.messages.markAsRead({mids: ['
@@ -537,20 +537,22 @@ angular.module('chat', ['item', 'mediator', 'request'])
         };
 
         Mediator.pub('chat:data:get');
-        Mediator.sub('chat:data', function (dialogs) {
+        Mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
-                $scope.data = dialogs.map(function (dialog) {
+                $scope.data = data.dialogs.map(function (dialog) {
                     var messageAuthorId = dialog.messages[0].uid, result = {};
 
                     if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
-                        result.author = _(dialog.profiles).findWhere({
+                        result.author = _(data.profiles).findWhere({
                             uid: messageAuthorId
                         });
                     }
                     if (dialog.chat_id) {
-                        result.owners = dialog.profiles;
+                        result.owners = dialog.chat_active.map(function (uid) {
+                            return _(data.profiles).findWhere({uid: uid});
+                        });
                     } else {
-                        result.owners = _(dialog.profiles).findWhere({
+                        result.owners = _(data.profiles).findWhere({
                             uid: dialog.uid
                         });
                     }
@@ -2217,7 +2219,7 @@ angular.module('mediator', [])
         };
     });
 
-angular.module('news', ['mediator'])
+angular.module('news', ['mediator', 'ngSanitize'])
     .controller('NewsController', function ($scope, $routeParams) {
         $scope.tabs = [
             {

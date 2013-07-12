@@ -1,8 +1,8 @@
-/*jshint bitwise:false */
+/*jshint bitwise:false, latedef: false */
 angular.module(
     'chat',
-    ['request', 'mediator', 'persistent-set', 'auth', 'longpoll']
-).run(function (Users, Request, Mediator, Auth) {
+    ['request', 'mediator', 'persistent-set', 'auth', 'longpoll', 'profiles-collection']
+).run(function (Users, Request, Mediator, Auth, ProfilesCollection) {
     var
     MAX_HISTORY_COUNT = 10,
 
@@ -12,9 +12,20 @@ angular.module(
             return - messages[messages.length - 1].date;
         }
     }))(),
-    userId, readyDeferred = jQuery.Deferred();
+    profilesColl = new ProfilesCollection(),
+    userId, readyDeferred = jQuery.Deferred(),
 
-    /*
+    /**
+     * Notifies about current state of module.
+     * Has a tiny debounce to make only one publish per event loop
+     */
+    publishData = _.debounce(function publishData() {
+        Mediator.pub('chat:data', {
+            dialogs: dialogColl.toJSON(),
+            profiles: profilesColl.toJSON()
+        });
+    }, 0);
+    /**
      * @param {Object} update Update object from long poll
      */
     function addNewMessage(update) {
@@ -66,28 +77,30 @@ angular.module(
         });
     }
     function setDialogsProfiles() {
-        return jQuery.when.apply(jQuery, dialogColl.map(function (dialog) {
-            var
-            uids = _.uniq(_.flatten(dialog.get('messages').map(function (message) {
+        var uids = dialogColl.reduce(function (uids, dialog) {
+            dialog.get('messages').map(function (message) {
                 var chatActive = message.chat_active;
                 if (chatActive) {
-                    return chatActive.map(function (uid) {
-                        return parseInt(uid, 10);
-                    }).concat(userId);
+                    uids = uids.concat(chatActive.map(function (uid) {
+                        return Number(uid);
+                    })).concat(userId);
                 } else {
-                    return [message.uid, dialog.get('uid')];
+                    uids = uids.concat([message.uid, dialog.get('uid')]);
                 }
-            })));
+            });
+            return uids;
+        }, []);
 
-            if (uids.length) {
-                return Users.getProfilesById(uids).then(function (data) {
-                    dialog.set('profiles', [].concat(data));
-                });
-            } else {
-                dialog.set('profiles', []);
-                return jQuery.Deferred().resolve();
-            }
-        }));
+        uids = _.uniq(uids);
+
+        if (uids.length) {
+            return Users.getProfilesById(uids).then(function (data) {
+                profilesColl.reset(data);
+            });
+        } else {
+            profilesColl.reset();
+            return jQuery.Deferred().resolve();
+        }
     }
     /*
      * Removes read messages from dialog,
@@ -191,6 +204,7 @@ angular.module(
                     return {
                         id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,
                         chat_id: item.chat_id,
+                        chat_active: item.chat_active,
                         uid: item.uid,
                         messages: [convertDialogIntoMessageData(item)]
                     };
@@ -208,16 +222,16 @@ angular.module(
     });
 
     Mediator.sub('chat:data:get', function () {
-        readyDeferred.then(function () {
-            Mediator.pub('chat:data', dialogColl.toJSON());
-        });
+        readyDeferred.then(publishData);
     });
     readyDeferred.then(function () {
         Mediator.sub('longpoll:updates', onUpdates);
 
+        // Notify about changes
         dialogColl.on('change', function () {
             dialogColl.sort();
-            Mediator.pub('chat:data', dialogColl.toJSON());
+            publishData();
         });
+        profilesColl.on('change', publishData);
     });
 });

@@ -52,7 +52,9 @@ angular.module('users', ['request']).factory('Users', function (Request) {
 
         while (queue.length) {
             queueItem = queue.pop();
-            data = queueItem.uids.map(getProfileById, this);
+            data = queueItem.uids.map(function (uid) {
+                return getProfileById(uid).toJSON();
+            });
 
             if (data.length === 1) {
                 queueItem.deferred.resolve(data[0]);

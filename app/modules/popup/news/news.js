@@ -1,4 +1,4 @@
-angular.module('news', ['mediator'])
+angular.module('news', ['mediator', 'ngSanitize'])
     .controller('NewsController', function ($scope, $routeParams) {
         $scope.tabs = [
             {
