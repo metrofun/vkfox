@@ -9,6 +9,8 @@
         <div ng-if="item.type == 'topic'">
             {{item.parent.title}}
         </div>
+        <div ng-if="item.type == 'mention'" ng-bind-html="item.parent.text">
+        </div>
         <div ng-if="item.type == 'follow'">
             {{'Started following you' | i18n}} <i class="icon-user"></i>
         </div>

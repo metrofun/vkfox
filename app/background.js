@@ -1522,12 +1522,15 @@ angular.module(
         Mediator.sub('likes:changed', function (params) {
             itemsColl.some(function (model) {
                 var parent  = model.get('parent'),
-                    type = model.get('type'),
                     matches = false;
 
                 matches = (parent.to_id === params.owner_id)
-                    && (type === 'wall' && params.type === 'post' || type === params.type)
+                    && (params.type === parent.post_type  || params.type === model.get('type'))
                     && (parent.id === params.item_id);
+
+                console.log((parent.to_id === params.owner_id),
+                (params.type === parent.post_type || params.type === model.get('type')),
+                (parent.id === params.item_id), matches);
 
                 if (matches) {
                     parent.likes = params.likes;
@@ -1714,32 +1717,6 @@ define(['backbone', 'underscore', 'request/request', 'mediator/mediator'],
         });
     }
 );
-
-angular.module(
-    'items-collection',
-    ['request', 'mediator', 'likes']
-).factory('ProfilesCollection', function (Request, Mediator) {
-    return Backbone.Collection.extend({
-        initialize: function () {
-            Mediator.sub('likes:changed', function (params) {
-                var model, whereClause = {
-                    type: params.type,
-                    source_id: params.owner_id,
-                    post_id: params.item_id
-                };
-                if (params.owner_id > 0) {
-                    model = friendItemsColl.findWhere(whereClause);
-                } else {
-                    model = groupItemsColl.findWhere(whereClause);
-                }
-                if (model) {
-                    model.set('likes', params.likes);
-                }
-            });
-
-        }
-    });
-});
 
 angular.module(
     'likes',
@@ -1971,6 +1948,7 @@ angular.module(
     ['mediator', 'request', 'likes']
 ).run(function (Request, Mediator) {
     var MAX_ITEMS_COUNT = 50,
+        UPDATE_PERIOD = 1000,
 
         readyDeferred = jQuery.Deferred(),
         profilesColl = new (Backbone.Collection.extend({
@@ -1986,12 +1964,23 @@ angular.module(
             })
         }))(),
         groupItemsColl = new Backbone.Collection(),
-        friendItemsColl = new Backbone.Collection();
+        friendItemsColl = new Backbone.Collection(),
+        autoUpdateParams = {};
 
     function fetchNewsfeed() {
+        var params = _.extend({
+            count: MAX_ITEMS_COUNT
+        }, autoUpdateParams);
+
+        console.log('newsfeed params:', params);
         Request.api({code: [
-            'return API.newsfeed.get({"count" : "', MAX_ITEMS_COUNT, '"});'
+            'return API.newsfeed.get(',
+            JSON.stringify(params),
+            ');'
         ].join('')}).done(function (response) {
+            autoUpdateParams.offset = response.new_offset;
+            autoUpdateParams.from = response.new_from;
+
             profilesColl
                 .add(response.profiles, {parse: true})
                 .add(response.groups, {parse: true});
@@ -2004,6 +1993,7 @@ angular.module(
                 }
             });
 
+            setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
     }

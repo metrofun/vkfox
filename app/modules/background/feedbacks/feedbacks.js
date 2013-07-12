@@ -143,11 +143,10 @@ angular.module(
         Mediator.sub('likes:changed', function (params) {
             itemsColl.some(function (model) {
                 var parent  = model.get('parent'),
-                    type = model.get('type'),
                     matches = false;
 
                 matches = (parent.to_id === params.owner_id)
-                    && (type === 'wall' && params.type === 'post' || type === params.type)
+                    && (params.type === parent.post_type  || params.type === model.get('type'))
                     && (parent.id === params.item_id);
 
                 if (matches) {

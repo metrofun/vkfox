@@ -3,6 +3,7 @@ angular.module(
     ['mediator', 'request', 'likes']
 ).run(function (Request, Mediator) {
     var MAX_ITEMS_COUNT = 50,
+        UPDATE_PERIOD = 1000,
 
         readyDeferred = jQuery.Deferred(),
         profilesColl = new (Backbone.Collection.extend({
@@ -18,12 +19,23 @@ angular.module(
             })
         }))(),
         groupItemsColl = new Backbone.Collection(),
-        friendItemsColl = new Backbone.Collection();
+        friendItemsColl = new Backbone.Collection(),
+        autoUpdateParams = {};
 
     function fetchNewsfeed() {
+        var params = _.extend({
+            count: MAX_ITEMS_COUNT
+        }, autoUpdateParams);
+
+        console.log('newsfeed params:', params);
         Request.api({code: [
-            'return API.newsfeed.get({"count" : "', MAX_ITEMS_COUNT, '"});'
+            'return API.newsfeed.get(',
+            JSON.stringify(params),
+            ');'
         ].join('')}).done(function (response) {
+            autoUpdateParams.offset = response.new_offset;
+            autoUpdateParams.from = response.new_from;
+
             profilesColl
                 .add(response.profiles, {parse: true})
                 .add(response.groups, {parse: true});
@@ -36,6 +48,7 @@ angular.module(
                 }
             });
 
+            setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
     }

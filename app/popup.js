@@ -2250,6 +2250,8 @@ angular.module('news', ['mediator', 'ngSanitize'])
                         switch (item.type) {
                         case 'wall':
                         case 'post':
+                        case 'mention':
+                            console.log(item);
                             if (parent.comments.can_post) {
                                 comment = {
                                     ownerId: parent.owner_id,
