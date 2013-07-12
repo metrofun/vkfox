@@ -5483,7 +5483,7 @@ a.badge:focus {
   max-width: 80%;
   display: inline-block;
 }
-.item.is-online .item__head:after {
+.item__head.is-online:after {
   content: '';
   display: inline-block;
   width: 14px;

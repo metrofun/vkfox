@@ -1,19 +1,21 @@
 angular.module('users', ['request']).factory('Users', function (Request) {
     var
-    DROP_PROFILES_INTERVAL = 30000,
+    DROP_PROFILES_INTERVAL = 500,
     USERS_GET_DEBOUNCE = 400,
 
+    inProgress = false,
     usersColl = new (Backbone.Collection.extend({
         model: Backbone.Model.extend({
             idAttribute: 'uid'
         })
     }))(),
     usersGetQueue = [],
-    // TODO problem when dropped between onGet and response
     dropOldNonFriendsProfiles = _.debounce(function () {
-        usersColl.remove(usersColl.filter(function (model) {
-            return !model.get('isFriend');
-        }));
+        if (!inProgress) {
+            usersColl.remove(usersColl.filter(function (model) {
+                return !model.get('isFriend');
+            }));
+        }
         dropOldNonFriendsProfiles();
     }, DROP_PROFILES_INTERVAL),
     processGetUsersQueue = _.debounce(function () {
@@ -25,6 +27,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         usersGetQueue = [];
 
         if (newUids.length) {
+            inProgress = true;
             Request.api({
                 // TODO limit for uids.length
                 code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "online, photo,sex,nickname,lists"})'
@@ -32,6 +35,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
                 if (response && response.length) {
                     usersColl.add(response);
                     publishUids(processedQueue);
+                    inProgress = false;
                 }
             }.bind(this));
         } else {

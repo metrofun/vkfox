@@ -2065,18 +2065,46 @@ angular.module('persistent-set', []).factory('PersistentSet', function () {
 
 angular.module(
     'profiles-collection',
-    ['request', 'mediator', 'longpoll']
-).factory('ProfilesCollection', function (Request, Mediator) {
+    ['request', 'mediator', 'longpoll', 'users']
+).factory('ProfilesCollection', function (Request, Mediator, Users) {
+    var UPDATE_NON_FRIENDS_PERIOD = 1000;
+
     return Backbone.Collection.extend({
         initialize: function () {
-            Mediator.sub('longpoll:updates', this._onUpdates.bind(this));
+            Mediator.sub('longpoll:updates', this._onFriendUpdates.bind(this));
+
+            this._updateNonFriends();
+        },
+        _updateNonFriends: function () {
+            var
+            self = this,
+            uids = this.where({
+                isFriend: undefined,
+                // don't select groups profiles
+                gid: undefined
+            }).map(function (model) {
+                return model.get('uid');
+            });
+
+            if (uids.length) {
+                Users.getProfilesById(uids).then(function (profiles) {
+                    profiles.forEach(function (profile) {
+                        var model = self.get(profile.uid);
+                        if (model) {
+                            model.set('online', profile.online);
+                        }
+                    });
+                });
+            }
+
+            setTimeout(this._updateNonFriends.bind(this), UPDATE_NON_FRIENDS_PERIOD);
         },
         /**
          * @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
          *
          * @param [Array] updates
          */
-        _onUpdates: function (updates) {
+        _onFriendUpdates: function (updates) {
             updates.forEach(function (update) {
                 var type = update[0],
                     userId = Math.abs(update[1]), model;
@@ -2357,20 +2385,22 @@ define([
 
 angular.module('users', ['request']).factory('Users', function (Request) {
     var
-    DROP_PROFILES_INTERVAL = 30000,
+    DROP_PROFILES_INTERVAL = 500,
     USERS_GET_DEBOUNCE = 400,
 
+    inProgress = false,
     usersColl = new (Backbone.Collection.extend({
         model: Backbone.Model.extend({
             idAttribute: 'uid'
         })
     }))(),
     usersGetQueue = [],
-    // TODO problem when dropped between onGet and response
     dropOldNonFriendsProfiles = _.debounce(function () {
-        usersColl.remove(usersColl.filter(function (model) {
-            return !model.get('isFriend');
-        }));
+        if (!inProgress) {
+            usersColl.remove(usersColl.filter(function (model) {
+                return !model.get('isFriend');
+            }));
+        }
         dropOldNonFriendsProfiles();
     }, DROP_PROFILES_INTERVAL),
     processGetUsersQueue = _.debounce(function () {
@@ -2382,6 +2412,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
         usersGetQueue = [];
 
         if (newUids.length) {
+            inProgress = true;
             Request.api({
                 // TODO limit for uids.length
                 code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "online, photo,sex,nickname,lists"})'
@@ -2389,6 +2420,7 @@ angular.module('users', ['request']).factory('Users', function (Request) {
                 if (response && response.length) {
                     usersColl.add(response);
                     publishUids(processedQueue);
+                    inProgress = false;
                 }
             }.bind(this));
         } else {
