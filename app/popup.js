@@ -919,9 +919,9 @@ angular.module('common', ['config', 'i18n'])
 
                     if (spaceIndex !== -1) {
                         return  text.slice(0, spaceIndex) + [
-                            ' <button class="show-more btn btn-mini" data-text="',
+                            ' <span class="show-more btn btn-mini" data-text="',
                             escapeQuotes(text.slice(spaceIndex)),
-                            '" type="button">', label, '</button>'
+                            '" type="button">', label, '</span>'
                         ].join('');
                     } else {
                         return text;
@@ -2251,7 +2251,6 @@ angular.module('news', ['mediator', 'ngSanitize'])
                         case 'wall':
                         case 'post':
                         case 'mention':
-                            console.log(item);
                             if (parent.comments.can_post) {
                                 comment = {
                                     ownerId: parent.owner_id,

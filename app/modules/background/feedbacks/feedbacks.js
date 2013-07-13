@@ -69,7 +69,9 @@ angular.module(
                     type: feedbackType,
                     feedback: feedback
                 };
-            }));
+                // NOTE we need to prepend to the beginning
+                // because feedbacks are rendered in opposite order than perents
+            }), {at: 0});
         } else {
             //follows types are array
             [].concat(feedback).forEach(function (feedback) {

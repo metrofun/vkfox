@@ -1448,7 +1448,9 @@ angular.module(
                     type: feedbackType,
                     feedback: feedback
                 };
-            }));
+                // NOTE we need to prepend to the beginning
+                // because feedbacks are rendered in opposite order than perents
+            }), {at: 0});
         } else {
             //follows types are array
             [].concat(feedback).forEach(function (feedback) {
@@ -1527,10 +1529,6 @@ angular.module(
                 matches = (parent.to_id === params.owner_id)
                     && (params.type === parent.post_type  || params.type === model.get('type'))
                     && (parent.id === params.item_id);
-
-                console.log((parent.to_id === params.owner_id),
-                (params.type === parent.post_type || params.type === model.get('type')),
-                (parent.id === params.item_id), matches);
 
                 if (matches) {
                     parent.likes = params.likes;
@@ -1972,30 +1970,81 @@ angular.module(
             count: MAX_ITEMS_COUNT
         }, autoUpdateParams);
 
-        console.log('newsfeed params:', params);
         Request.api({code: [
-            'return API.newsfeed.get(',
+            'return {newsfeed: API.newsfeed.get(',
             JSON.stringify(params),
-            ');'
+            '), time: API.utils.getServerTime()};'
         ].join('')}).done(function (response) {
-            autoUpdateParams.offset = response.new_offset;
-            autoUpdateParams.from = response.new_from;
+            var newsfeed = response.newsfeed;
+
+            autoUpdateParams.start_time = response.time;
+            autoUpdateParams.from = newsfeed.new_from;
 
             profilesColl
-                .add(response.profiles, {parse: true})
-                .add(response.groups, {parse: true});
+                .add(newsfeed.profiles, {parse: true})
+                .add(newsfeed.groups, {parse: true});
 
-            response.items.forEach(function (item) {
+            discardOddWallPhotos(newsfeed.items).forEach(function (item) {
                 if (item.source_id > 0) {
-                    friendItemsColl.add(item);
+                    friendItemsColl.add(item, {at: 0});
                 } else {
-                    groupItemsColl.add(item);
+                    // console.log(item);
+                    groupItemsColl.add(item, {at: 0});
                 }
             });
 
+            removeOldItems();
             setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
+    }
+
+    /**
+     * API returns 'wall_photo' item for every post item with photo.
+     *
+     * @param {Array} items
+     * return {Array} filtered array of items
+     */
+    function discardOddWallPhotos(items) {
+        return items.filter(function (item) {
+            if (item.type === 'wall_photo') {
+                return !(_.findWhere(items, {
+                    type: 'post',
+                    date: item.date,
+                    source_id: item.source_id
+                }));
+            }
+            return true;
+        });
+    }
+    function removeOldItems() {
+        var required_uids;
+
+        if (true || friendItemsColl.size() > MAX_ITEMS_COUNT || groupItemsColl.size() > MAX_ITEMS_COUNT) {
+            // slice items
+            friendItemsColl.reset(friendItemsColl.slice(0, MAX_ITEMS_COUNT));
+            groupItemsColl.reset(groupItemsColl.slice(0, MAX_ITEMS_COUNT));
+
+
+            // gather required profiles' ids from new friends
+            required_uids = _(friendItemsColl.where({
+                type: 'friend'
+            }).map(function (model) {
+                // first element contains quantity
+                return model.get('friends').slice(1);
+            })).chain().flatten().pluck('uid').value();
+
+            // gather required profiles from source_ids
+            required_uids = _(required_uids.concat(
+                groupItemsColl.pluck('source_id'),
+                friendItemsColl.pluck('source_id')
+            )).uniq();
+
+            profilesColl.reset(profilesColl.filter(function (model) {
+                return required_uids.indexOf(model.get('id')) !== -1;
+            }));
+            console.log(profilesColl);
+        }
     }
 
     fetchNewsfeed();
@@ -2037,16 +2086,14 @@ angular.module(
         });
     });
 
-    groupItemsColl.on('change', function () {
-        readyDeferred.then(function () {
+    readyDeferred.then(function () {
+        groupItemsColl.on('change add', function () {
             Mediator.pub('newsfeed:groups', {
                 profiles: profilesColl.toJSON(),
                 items: groupItemsColl.toJSON()
             });
         });
-    });
-    friendItemsColl.on('change', function () {
-        readyDeferred.then(function () {
+        friendItemsColl.on('change add', function () {
             Mediator.pub('newsfeed:friends', {
                 profiles: profilesColl.toJSON(),
                 items: friendItemsColl.toJSON()
