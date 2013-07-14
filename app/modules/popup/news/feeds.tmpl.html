@@ -3,7 +3,11 @@
     owners="data.profiles | where:'id':item.source_id">
     <ng-switch on="item.type">
         <div ng-switch-when="post">
-            <p class="news__item-text" ng-bind-html-unsafe="item.text | truncate"></p>
+            <p
+                ng-if="item.text"
+                ng-bind-html-unsafe="item.text | truncate"
+                class="news__item-text">
+            </p>
             <item-attachment
                 ng-repeat="attachment in item.attachments"
                 data="attachment[attachment.type]"

@@ -1397,10 +1397,14 @@ angular.module(
             }
         })
     }))(),
+    FeedbacksCollection = Backbone.Collection.extend({
+        comparator: function (model) {
+            return model.get('date');
+        }
+    }),
     itemsColl = new (Backbone.Collection.extend({
-        parse: function (rawItems) {
-            // first element contains number of items
-            rawItems.forEach(processRawItem);
+        comparator: function (model) {
+            return -model.get('date');
         }
     }))(),
     /**
@@ -1414,14 +1418,45 @@ angular.module(
         });
     }, 0);
 
+
     /**
-     * Handles news' item.
-     * If parent is already in collection,
-     * then adds feedback to parent's feedbacks collection
+     * Processes raw comments item and adds it to itemsColl,
+     * doesn't sort itemsColl
      *
      * @param {Object} item
      */
-    function processRawItem(item) {
+    function addRawCommentsItem(item) {
+        var parentType = item.type,
+            parent = item, itemModel, itemID;
+
+        parent.owner_id = Number(parent.from_id || parent.source_id);
+        itemID  = generateItemID(parentType, parent);
+        if (!(itemModel = itemsColl.get(itemID))) {
+            itemModel = createItemModel(parentType, parent, true);
+            itemsColl.add(itemModel, {sort: false});
+        }
+        if (!itemModel.has('date') || itemModel.get('date') < item.date) {
+            itemModel.set('date', _.last(item.comments.list).date);
+        }
+        itemModel.get('feedbacks').add(item.comments.list.map(function (feedback) {
+            feedback.owner_id = Number(feedback.from_id);
+            return {
+                id: generateItemID('comment', feedback),
+                type: 'comment',
+                feedback: feedback,
+                date: feedback.date
+            };
+        }));
+    }
+    /**
+     * Handles news' item.
+     * If parent is already in collection,
+     * then adds feedback to parent's feedbacks collection.
+     * Doesn't sort itemsColl
+     *
+     * @param {Object} item
+     */
+    function addRawNotificationsItem(item) {
         var parentType, parent = item.parent,
             feedbackType, feedback = item.feedback,
             itemID, itemModel, typeTokens;
@@ -1436,26 +1471,32 @@ angular.module(
 
 
         if (feedbackType) {
-            parent.owner_id = Number(parent.owner_id || parent.from_id);
+            parent.owner_id = Number(parent.from_id || parent.owner_id);
             itemID  = generateItemID(parentType, parent);
             if (!(itemModel = itemsColl.get(itemID))) {
                 itemModel = createItemModel(parentType, parent, true);
-                itemsColl.add(itemModel);
+                itemsColl.add(itemModel, {sort: false});
+            }
+            if (!itemModel.has('date') || itemModel.get('date') < item.date) {
+                itemModel.set('date', item.date);
             }
             itemModel.get('feedbacks').add([].concat(feedback).map(function (feedback) {
-                feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
+                feedback.owner_id = Number(feedback.from_id || feedback.owner_id);
                 return {
+                    id: generateItemID(feedbackType, feedback),
                     type: feedbackType,
-                    feedback: feedback
+                    feedback: feedback,
+                    date: item.date
                 };
-                // NOTE we need to prepend to the beginning
-                // because feedbacks are rendered in opposite order than perents
-            }), {at: 0});
+            }));
         } else {
             //follows types are array
             [].concat(feedback).forEach(function (feedback) {
+                var itemModel;
                 feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
-                itemsColl.add(createItemModel(parentType, feedback, false));
+                itemModel = createItemModel(parentType, feedback, false);
+                itemModel.set('date', item.date);
+                itemsColl.add(itemModel);
             });
         }
     }
@@ -1470,7 +1511,7 @@ angular.module(
     function generateItemID(type, parent) {
         if (parent.owner_id) {
             return [
-                type, parent.id || parent.pid,
+                type, parent.id || parent.pid || parent.cid || parent.post_id,
                 'user', parent.owner_id
             ].join(':');
         } else {
@@ -1494,7 +1535,7 @@ angular.module(
         });
         if (canHaveFeedbacks) {
             // TODO implement sorting
-            itemModel.set('feedbacks', new Backbone.Collection());
+            itemModel.set('feedbacks', new FeedbacksCollection());
         }
         return itemModel;
     }
@@ -1507,13 +1548,18 @@ angular.module(
         Request.api({code: [
             'return API.newsfeed.getComments({"last_comments": 1, "count" : "',
             MAX_ITEMS_COUNT, '"});'
-        ].join('')})).done(function (notifications) {
+        ].join('')})).done(function (notifications, comments) {
             // TODO comments
             profilesColl
+                .add(comments.profiles, {parse: true})
+                .add(comments.groups, {parse: true})
                 .add(notifications.profiles, {parse: true})
                 .add(notifications.groups, {parse: true});
 
-            itemsColl.add(notifications.items.slice(1), {parse: true});
+            notifications.items.slice(1).forEach(addRawNotificationsItem);
+            comments.items.forEach(addRawCommentsItem);
+            itemsColl.sort();
+            console.log(itemsColl);
             readyDeferred.resolve();
         });
     }
@@ -1993,7 +2039,10 @@ angular.module(
                 }
             });
 
-            removeOldItems();
+            // try to remove old items, if new were inserted
+            if (newsfeed.items.length) {
+                freeSpace();
+            }
             setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
@@ -2017,10 +2066,14 @@ angular.module(
             return true;
         });
     }
-    function removeOldItems() {
+    /**
+     * Deletes items, when there a re more then MAX_ITEMS_COUNT.
+     * Also removes unnecessary profiles after that
+     */
+    function freeSpace() {
         var required_uids;
 
-        if (true || friendItemsColl.size() > MAX_ITEMS_COUNT || groupItemsColl.size() > MAX_ITEMS_COUNT) {
+        if (friendItemsColl.size() > MAX_ITEMS_COUNT || groupItemsColl.size() > MAX_ITEMS_COUNT) {
             // slice items
             friendItemsColl.reset(friendItemsColl.slice(0, MAX_ITEMS_COUNT));
             groupItemsColl.reset(groupItemsColl.slice(0, MAX_ITEMS_COUNT));
@@ -2043,7 +2096,6 @@ angular.module(
             profilesColl.reset(profilesColl.filter(function (model) {
                 return required_uids.indexOf(model.get('id')) !== -1;
             }));
-            console.log(profilesColl);
         }
     }
 

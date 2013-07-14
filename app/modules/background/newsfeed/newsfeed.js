@@ -84,7 +84,7 @@ angular.module(
     function freeSpace() {
         var required_uids;
 
-        if (true || friendItemsColl.size() > MAX_ITEMS_COUNT || groupItemsColl.size() > MAX_ITEMS_COUNT) {
+        if (friendItemsColl.size() > MAX_ITEMS_COUNT || groupItemsColl.size() > MAX_ITEMS_COUNT) {
             // slice items
             friendItemsColl.reset(friendItemsColl.slice(0, MAX_ITEMS_COUNT));
             groupItemsColl.reset(groupItemsColl.slice(0, MAX_ITEMS_COUNT));
@@ -107,7 +107,6 @@ angular.module(
             profilesColl.reset(profilesColl.filter(function (model) {
                 return required_uids.indexOf(model.get('id')) !== -1;
             }));
-            console.log(profilesColl);
         }
     }
 
