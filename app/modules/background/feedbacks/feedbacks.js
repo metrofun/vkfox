@@ -4,6 +4,7 @@ angular.module(
 ).run(function (Request, Mediator, ProfilesCollection) {
     var
     MAX_ITEMS_COUNT = 50,
+    UPDATE_PERIOD = 1000,
 
     readyDeferred = jQuery.Deferred(),
     profilesColl = new (ProfilesCollection.extend({
@@ -28,6 +29,15 @@ angular.module(
             return -model.get('date');
         }
     }))(),
+    autoUpdateNotificationsParams = {
+        count: MAX_ITEMS_COUNT,
+        //everything except comments
+        filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
+    },
+    autoUpdateCommentsParams = {
+        last_comments: 1,
+        count: MAX_ITEMS_COUNT
+    },
     /**
      * Notifies about current state of module.
      * Has a tiny debounce to make only one publish per event loop
@@ -162,26 +172,39 @@ angular.module(
     }
 
     function fetchFeedbacks() {
-        jQuery.when(
         Request.api({code: [
-            'return API.notifications.get({"count" : "', MAX_ITEMS_COUNT, '"});'
-        ].join('')}),
-        Request.api({code: [
-            'return API.newsfeed.getComments({"last_comments": 1, "count" : "',
-            MAX_ITEMS_COUNT, '"});'
-        ].join('')})).done(function (notifications, comments) {
-            // TODO comments
-            profilesColl
-                .add(comments.profiles, {parse: true})
-                .add(comments.groups, {parse: true})
-                .add(notifications.profiles, {parse: true})
-                .add(notifications.groups, {parse: true});
+            'return {time: API.utils.getServerTime(),',
+            ' notifications: API.notifications.get(',
+            JSON.stringify(autoUpdateNotificationsParams), '),',
+            ' comments: API.newsfeed.getComments(',
+            JSON.stringify(autoUpdateCommentsParams), ')',
+            '};'
+        ].join('')}).done(function (response) {
+            var notifications = response.notifications,
+                comments = response.comments;
 
-            notifications.items.slice(1).forEach(addRawNotificationsItem);
-            comments.items.forEach(addRawCommentsItem);
-            itemsColl.sort();
-            console.log(itemsColl);
+            autoUpdateNotificationsParams.start_time = response.time;
+            autoUpdateNotificationsParams.from = notifications.new_from;
+            autoUpdateCommentsParams.start_time = response.time;
+            autoUpdateCommentsParams.from = comments.new_from;
+
+            // first item in notifications contains quantity
+            if ((notifications.items && notifications.length > 1)
+                || (comments.items && comments.items.length)) {
+                // TODO comments
+                profilesColl
+                    .add(comments.profiles, {parse: true})
+                    .add(comments.groups, {parse: true})
+                    .add(notifications.profiles, {parse: true})
+                    .add(notifications.groups, {parse: true});
+
+                notifications.items.slice(1).forEach(addRawNotificationsItem);
+                comments.items.forEach(addRawCommentsItem);
+                itemsColl.sort();
+                console.log(response);
+            }
             readyDeferred.resolve();
+            setTimeout(fetchFeedbacks, UPDATE_PERIOD);
         });
     }
 
@@ -211,7 +234,7 @@ angular.module(
 
     // Notify about changes
     readyDeferred.then(function () {
-        itemsColl.on('change', publishData);
+        itemsColl.on('change sort', publishData);
         profilesColl.on('change', publishData);
     });
 });

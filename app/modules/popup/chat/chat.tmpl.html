@@ -9,7 +9,7 @@
             chat-id="dialog.chat_id"
             uid="dialog.uid"
             class="chat__item-content">
-            <p ng-repeat="message in dialog.messages" ng-bind-html="message.body | truncate">
+            <p ng-repeat="message in dialog.messages" ng-bind-html-unsafe="message.body | truncate">
                 <item-attachment
                     ng-repeat="attachment in message.attachments"
                     data="attachment[attachment.type]"
