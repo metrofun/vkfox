@@ -231,7 +231,7 @@ angular.module(
     'buddies',
     ['users', 'request', 'mediator', 'persistent-set', 'profiles-collection']
 ).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection) {
-    var readyDeferred = jQuery.Deferred(),
+    var readyDeferred,
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (ProfilesCollection.extend({
             model: Backbone.Model.extend({
@@ -247,6 +247,15 @@ angular.module(
                 }
             }
         }))();
+
+    /**
+     * Initialize all state
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        buddiesColl.reset();
+    }
+    initialize();
 
     /**
      * After changing and unchanging any field of buddie,
@@ -286,26 +295,31 @@ angular.module(
         });
     }
 
-    jQuery.when(
-        getFavouriteUsers(),
-        Users.getFriendsProfiles()
-    ).then(function (favourites, friends) {
-        buddiesColl.add(favourites);
-        buddiesColl.add(friends);
+    // entry point
+    Mediator.sub('auth:success', function () {
+        initialize();
 
-        saveOriginalBuddiesOrder();
+        jQuery.when(
+            getFavouriteUsers(),
+            Users.getFriendsProfiles()
+        ).then(function (favourites, friends) {
+            buddiesColl.add(favourites);
+            buddiesColl.add(friends);
 
-        watchedBuddiesSet.toArray().forEach(function (uid) {
-            var model = buddiesColl.get(uid);
-            if (model) {
-                model.set('isWatched', true);
+            saveOriginalBuddiesOrder();
+
+            watchedBuddiesSet.toArray().forEach(function (uid) {
+                var model = buddiesColl.get(uid);
+                if (model) {
+                    model.set('isWatched', true);
+                }
+            });
+            // resort if any profile was changed
+            if (watchedBuddiesSet.size()) {
+                buddiesColl.sort();
             }
+            readyDeferred.resolve();
         });
-        // resort if any profile was changed
-        if (watchedBuddiesSet.size()) {
-            buddiesColl.sort();
-        }
-        readyDeferred.resolve();
     });
 
     Mediator.sub('buddies:data:get', function () {
@@ -460,7 +474,7 @@ angular.module(
         }
     }))(),
     profilesColl = new ProfilesCollection(),
-    userId, readyDeferred = jQuery.Deferred(),
+    userId, readyDeferred,
 
     /**
      * Notifies about current state of module.
@@ -472,6 +486,16 @@ angular.module(
             profiles: profilesColl.toJSON()
         });
     }, 0);
+    /**
+     * Initialize all internal state
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        dialogColl.reset();
+        profilesColl.reset();
+    }
+    initialize();
+
     /**
      * @param {Object} update Update object from long poll
      */
@@ -662,9 +686,10 @@ angular.module(
         });
     }
 
-    Auth.getUserId().then(function (uid) {
-        userId = uid;
+    Mediator.sub('auth:success', function (data) {
+        initialize();
 
+        userId = data.userId;
         getDialogs().then(getUnreadMessages).then(setDialogsProfiles).then(function () {
             readyDeferred.resolve();
         });
@@ -1385,7 +1410,8 @@ angular.module(
     MAX_ITEMS_COUNT = 50,
     UPDATE_PERIOD = 1000,
 
-    readyDeferred = jQuery.Deferred(),
+    readyDeferred, rotateId,
+    autoUpdateNotificationsParams, autoUpdateCommentsParams,
     profilesColl = new (ProfilesCollection.extend({
         model: Backbone.Model.extend({
             parse: function (profile) {
@@ -1408,15 +1434,6 @@ angular.module(
             return -model.get('date');
         }
     }))(),
-    autoUpdateNotificationsParams = {
-        count: MAX_ITEMS_COUNT,
-        //everything except comments
-        filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
-    },
-    autoUpdateCommentsParams = {
-        last_comments: 1,
-        count: MAX_ITEMS_COUNT
-    },
     /**
      * Notifies about current state of module.
      * Has a tiny debounce to make only one publish per event loop
@@ -1428,7 +1445,25 @@ angular.module(
         });
     }, 0);
 
-
+    /**
+     * Initialize all variables
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        autoUpdateNotificationsParams = {
+            count: MAX_ITEMS_COUNT,
+            //everything except comments
+            filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
+        },
+        autoUpdateCommentsParams = {
+            last_comments: 1,
+            count: MAX_ITEMS_COUNT
+        },
+        itemsColl.reset();
+        profilesColl.reset();
+        clearTimeout(rotateId);
+    }
+    initialize();
     /**
      * Processes raw comments item and adds it to itemsColl,
      * doesn't sort itemsColl
@@ -1583,11 +1618,15 @@ angular.module(
                 console.log(response);
             }
             readyDeferred.resolve();
-            setTimeout(fetchFeedbacks, UPDATE_PERIOD);
+            rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);
         });
     }
 
-    fetchFeedbacks();
+    // entry point
+    Mediator.sub('auth:success', function () {
+        initialize();
+        fetchFeedbacks();
+    });
 
     readyDeferred.then(function () {
         Mediator.sub('likes:changed', function (params) {
@@ -2017,7 +2056,6 @@ angular.module(
     var MAX_ITEMS_COUNT = 50,
         UPDATE_PERIOD = 1000,
 
-        readyDeferred = jQuery.Deferred(),
         profilesColl = new (Backbone.Collection.extend({
             model: Backbone.Model.extend({
                 parse: function (profile) {
@@ -2032,16 +2070,12 @@ angular.module(
         }))(),
         groupItemsColl = new Backbone.Collection(),
         friendItemsColl = new Backbone.Collection(),
-        autoUpdateParams = {};
+        rotateId, readyDeferred, autoUpdateParams;
 
     function fetchNewsfeed() {
-        var params = _.extend({
-            count: MAX_ITEMS_COUNT
-        }, autoUpdateParams);
-
         Request.api({code: [
             'return {newsfeed: API.newsfeed.get(',
-            JSON.stringify(params),
+            JSON.stringify(autoUpdateParams),
             '), time: API.utils.getServerTime()};'
         ].join('')}).done(function (response) {
             var newsfeed = response.newsfeed;
@@ -2066,7 +2100,7 @@ angular.module(
             if (newsfeed.items.length) {
                 freeSpace();
             }
-            setTimeout(fetchNewsfeed, UPDATE_PERIOD);
+            rotateId = setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
     }
@@ -2121,8 +2155,26 @@ angular.module(
             }));
         }
     }
+    /**
+     * Initialize all variables
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        autoUpdateParams = {
+            count: MAX_ITEMS_COUNT
+        };
+        profilesColl.reset();
+        groupItemsColl.reset();
+        friendItemsColl.reset();
+        clearTimeout(rotateId);
+    }
+    initialize();
 
-    fetchNewsfeed();
+    // entry point
+    Mediator.sub('auth:success', function () {
+        initialize();
+        fetchNewsfeed();
+    });
 
     // Subscribe to events from popup
     Mediator.sub('newsfeed:friends:get', function () {
@@ -2317,7 +2369,6 @@ angular.module('request', ['mediator', 'auth']).factory(
                             });
                         },
                         function (response) {
-                            console.log('wtf', arguments);
                             ajaxDeferred.reject.call(ajaxDeferred, response);
                         }
                     );
@@ -2388,6 +2439,9 @@ angular.module('request', ['mediator', 'auth']).factory(
                                 queriesToProcess[i].deferred.resolve(response[i]);
                             }
                             self.processApiQueries();
+                        }, function () {
+                            // force relogin on API error
+                            Auth.login(true);
                         });
                     });
                 }
@@ -2542,18 +2596,17 @@ define([
     });
 });
 
-angular.module('users', ['request']).factory('Users', function (Request) {
+angular.module('users', ['request', 'mediator']).factory('Users', function (Request, Mediator) {
     var
     DROP_PROFILES_INTERVAL = 500,
     USERS_GET_DEBOUNCE = 400,
 
-    inProgress = false,
+    inProgress, usersGetQueue, friendsProfilesDefer,
     usersColl = new (Backbone.Collection.extend({
         model: Backbone.Model.extend({
             idAttribute: 'uid'
         })
     }))(),
-    usersGetQueue = [],
     dropOldNonFriendsProfiles = _.debounce(function () {
         if (!inProgress) {
             usersColl.remove(usersColl.filter(function (model) {
@@ -2604,21 +2657,30 @@ angular.module('users', ['request']).factory('Users', function (Request) {
                 return getProfileById(uid).toJSON();
             });
 
-            if (data.length === 1) {
-                queueItem.deferred.resolve(data[0]);
-            } else {
-                queueItem.deferred.resolve(data);
-            }
+            queueItem.deferred.resolve(data);
         }
     };
+    /**
+     * Initialize all variables
+     */
+    function initialize() {
+        inProgress = false;
+        usersColl.reset();
+        usersGetQueue = [],
+        friendsProfilesDefer = null;
+    }
+    initialize();
+
+    Mediator.sub('auth:success', function () {
+        initialize();
+    });
 
     dropOldNonFriendsProfiles();
 
-
     return {
         getFriendsProfiles: function () {
-            if (!this._friendsProfilesDefer) {
-                this._friendsProfilesDefer = Request.api({
+            if (!friendsProfilesDefer) {
+                friendsProfilesDefer = Request.api({
                     code: 'return API.friends.get({ fields : "photo,sex,nickname,lists", order: "hints" })'
                 }).then(function (response) {
                     if (response && response.length) {
@@ -2631,11 +2693,11 @@ angular.module('users', ['request']).factory('Users', function (Request) {
                 }.bind(this));
             }
 
-            return this._friendsProfilesDefer;
+            return friendsProfilesDefer;
         },
         /**
          * Returns profiles by ids
-         * @param [Array<<Number>>|Number] uids Array of user's uds
+         * @param [Array<<Number>>] uids Array of user's uds
          *
          * @returns {jQuery.Deferred} Returns promise that will be fulfilled with profiles
          */

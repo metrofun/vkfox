@@ -1,15 +1,14 @@
-angular.module('users', ['request']).factory('Users', function (Request) {
+angular.module('users', ['request', 'mediator']).factory('Users', function (Request, Mediator) {
     var
     DROP_PROFILES_INTERVAL = 500,
     USERS_GET_DEBOUNCE = 400,
 
-    inProgress = false,
+    inProgress, usersGetQueue, friendsProfilesDefer,
     usersColl = new (Backbone.Collection.extend({
         model: Backbone.Model.extend({
             idAttribute: 'uid'
         })
     }))(),
-    usersGetQueue = [],
     dropOldNonFriendsProfiles = _.debounce(function () {
         if (!inProgress) {
             usersColl.remove(usersColl.filter(function (model) {
@@ -60,21 +59,30 @@ angular.module('users', ['request']).factory('Users', function (Request) {
                 return getProfileById(uid).toJSON();
             });
 
-            if (data.length === 1) {
-                queueItem.deferred.resolve(data[0]);
-            } else {
-                queueItem.deferred.resolve(data);
-            }
+            queueItem.deferred.resolve(data);
         }
     };
+    /**
+     * Initialize all variables
+     */
+    function initialize() {
+        inProgress = false;
+        usersColl.reset();
+        usersGetQueue = [],
+        friendsProfilesDefer = null;
+    }
+    initialize();
+
+    Mediator.sub('auth:success', function () {
+        initialize();
+    });
 
     dropOldNonFriendsProfiles();
 
-
     return {
         getFriendsProfiles: function () {
-            if (!this._friendsProfilesDefer) {
-                this._friendsProfilesDefer = Request.api({
+            if (!friendsProfilesDefer) {
+                friendsProfilesDefer = Request.api({
                     code: 'return API.friends.get({ fields : "photo,sex,nickname,lists", order: "hints" })'
                 }).then(function (response) {
                     if (response && response.length) {
@@ -87,11 +95,11 @@ angular.module('users', ['request']).factory('Users', function (Request) {
                 }.bind(this));
             }
 
-            return this._friendsProfilesDefer;
+            return friendsProfilesDefer;
         },
         /**
          * Returns profiles by ids
-         * @param [Array<<Number>>|Number] uids Array of user's uds
+         * @param [Array<<Number>>] uids Array of user's uds
          *
          * @returns {jQuery.Deferred} Returns promise that will be fulfilled with profiles
          */

@@ -6,7 +6,8 @@ angular.module(
     MAX_ITEMS_COUNT = 50,
     UPDATE_PERIOD = 1000,
 
-    readyDeferred = jQuery.Deferred(),
+    readyDeferred, rotateId,
+    autoUpdateNotificationsParams, autoUpdateCommentsParams,
     profilesColl = new (ProfilesCollection.extend({
         model: Backbone.Model.extend({
             parse: function (profile) {
@@ -29,15 +30,6 @@ angular.module(
             return -model.get('date');
         }
     }))(),
-    autoUpdateNotificationsParams = {
-        count: MAX_ITEMS_COUNT,
-        //everything except comments
-        filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
-    },
-    autoUpdateCommentsParams = {
-        last_comments: 1,
-        count: MAX_ITEMS_COUNT
-    },
     /**
      * Notifies about current state of module.
      * Has a tiny debounce to make only one publish per event loop
@@ -49,7 +41,25 @@ angular.module(
         });
     }, 0);
 
-
+    /**
+     * Initialize all variables
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        autoUpdateNotificationsParams = {
+            count: MAX_ITEMS_COUNT,
+            //everything except comments
+            filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
+        },
+        autoUpdateCommentsParams = {
+            last_comments: 1,
+            count: MAX_ITEMS_COUNT
+        },
+        itemsColl.reset();
+        profilesColl.reset();
+        clearTimeout(rotateId);
+    }
+    initialize();
     /**
      * Processes raw comments item and adds it to itemsColl,
      * doesn't sort itemsColl
@@ -204,11 +214,15 @@ angular.module(
                 console.log(response);
             }
             readyDeferred.resolve();
-            setTimeout(fetchFeedbacks, UPDATE_PERIOD);
+            rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);
         });
     }
 
-    fetchFeedbacks();
+    // entry point
+    Mediator.sub('auth:success', function () {
+        initialize();
+        fetchFeedbacks();
+    });
 
     readyDeferred.then(function () {
         Mediator.sub('likes:changed', function (params) {

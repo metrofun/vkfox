@@ -5,7 +5,6 @@ angular.module(
     var MAX_ITEMS_COUNT = 50,
         UPDATE_PERIOD = 1000,
 
-        readyDeferred = jQuery.Deferred(),
         profilesColl = new (Backbone.Collection.extend({
             model: Backbone.Model.extend({
                 parse: function (profile) {
@@ -20,16 +19,12 @@ angular.module(
         }))(),
         groupItemsColl = new Backbone.Collection(),
         friendItemsColl = new Backbone.Collection(),
-        autoUpdateParams = {};
+        rotateId, readyDeferred, autoUpdateParams;
 
     function fetchNewsfeed() {
-        var params = _.extend({
-            count: MAX_ITEMS_COUNT
-        }, autoUpdateParams);
-
         Request.api({code: [
             'return {newsfeed: API.newsfeed.get(',
-            JSON.stringify(params),
+            JSON.stringify(autoUpdateParams),
             '), time: API.utils.getServerTime()};'
         ].join('')}).done(function (response) {
             var newsfeed = response.newsfeed;
@@ -54,7 +49,7 @@ angular.module(
             if (newsfeed.items.length) {
                 freeSpace();
             }
-            setTimeout(fetchNewsfeed, UPDATE_PERIOD);
+            rotateId = setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
     }
@@ -109,8 +104,26 @@ angular.module(
             }));
         }
     }
+    /**
+     * Initialize all variables
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        autoUpdateParams = {
+            count: MAX_ITEMS_COUNT
+        };
+        profilesColl.reset();
+        groupItemsColl.reset();
+        friendItemsColl.reset();
+        clearTimeout(rotateId);
+    }
+    initialize();
 
-    fetchNewsfeed();
+    // entry point
+    Mediator.sub('auth:success', function () {
+        initialize();
+        fetchNewsfeed();
+    });
 
     // Subscribe to events from popup
     Mediator.sub('newsfeed:friends:get', function () {

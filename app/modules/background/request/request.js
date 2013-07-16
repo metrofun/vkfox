@@ -32,7 +32,6 @@ angular.module('request', ['mediator', 'auth']).factory(
                             });
                         },
                         function (response) {
-                            console.log('wtf', arguments);
                             ajaxDeferred.reject.call(ajaxDeferred, response);
                         }
                     );
@@ -103,6 +102,9 @@ angular.module('request', ['mediator', 'auth']).factory(
                                 queriesToProcess[i].deferred.resolve(response[i]);
                             }
                             self.processApiQueries();
+                        }, function () {
+                            // force relogin on API error
+                            Auth.login(true);
                         });
                     });
                 }

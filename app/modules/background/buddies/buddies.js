@@ -2,7 +2,7 @@ angular.module(
     'buddies',
     ['users', 'request', 'mediator', 'persistent-set', 'profiles-collection']
 ).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection) {
-    var readyDeferred = jQuery.Deferred(),
+    var readyDeferred,
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (ProfilesCollection.extend({
             model: Backbone.Model.extend({
@@ -18,6 +18,15 @@ angular.module(
                 }
             }
         }))();
+
+    /**
+     * Initialize all state
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        buddiesColl.reset();
+    }
+    initialize();
 
     /**
      * After changing and unchanging any field of buddie,
@@ -57,26 +66,31 @@ angular.module(
         });
     }
 
-    jQuery.when(
-        getFavouriteUsers(),
-        Users.getFriendsProfiles()
-    ).then(function (favourites, friends) {
-        buddiesColl.add(favourites);
-        buddiesColl.add(friends);
+    // entry point
+    Mediator.sub('auth:success', function () {
+        initialize();
 
-        saveOriginalBuddiesOrder();
+        jQuery.when(
+            getFavouriteUsers(),
+            Users.getFriendsProfiles()
+        ).then(function (favourites, friends) {
+            buddiesColl.add(favourites);
+            buddiesColl.add(friends);
 
-        watchedBuddiesSet.toArray().forEach(function (uid) {
-            var model = buddiesColl.get(uid);
-            if (model) {
-                model.set('isWatched', true);
+            saveOriginalBuddiesOrder();
+
+            watchedBuddiesSet.toArray().forEach(function (uid) {
+                var model = buddiesColl.get(uid);
+                if (model) {
+                    model.set('isWatched', true);
+                }
+            });
+            // resort if any profile was changed
+            if (watchedBuddiesSet.size()) {
+                buddiesColl.sort();
             }
+            readyDeferred.resolve();
         });
-        // resort if any profile was changed
-        if (watchedBuddiesSet.size()) {
-            buddiesColl.sort();
-        }
-        readyDeferred.resolve();
     });
 
     Mediator.sub('buddies:data:get', function () {

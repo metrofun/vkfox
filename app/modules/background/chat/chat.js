@@ -13,7 +13,7 @@ angular.module(
         }
     }))(),
     profilesColl = new ProfilesCollection(),
-    userId, readyDeferred = jQuery.Deferred(),
+    userId, readyDeferred,
 
     /**
      * Notifies about current state of module.
@@ -25,6 +25,16 @@ angular.module(
             profiles: profilesColl.toJSON()
         });
     }, 0);
+    /**
+     * Initialize all internal state
+     */
+    function initialize() {
+        readyDeferred = jQuery.Deferred();
+        dialogColl.reset();
+        profilesColl.reset();
+    }
+    initialize();
+
     /**
      * @param {Object} update Update object from long poll
      */
@@ -215,9 +225,10 @@ angular.module(
         });
     }
 
-    Auth.getUserId().then(function (uid) {
-        userId = uid;
+    Mediator.sub('auth:success', function (data) {
+        initialize();
 
+        userId = data.userId;
         getDialogs().then(getUnreadMessages).then(setDialogsProfiles).then(function () {
             readyDeferred.resolve();
         });
