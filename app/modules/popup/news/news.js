@@ -1,21 +1,20 @@
-angular.module('news', ['mediator', 'ngSanitize'])
+angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
     .controller('NewsController', function ($scope, $routeParams) {
-        $scope.tabs = [
+        $scope.subtabs = [
             {
-                href: '/news/my',
+                href: 'news/my',
                 text: 'My'
             },
             {
-                href: '/news/friends',
+                href: 'news/friends',
                 text: 'Friends'
             },
             {
-                href: '/news/groups',
+                href: 'news/groups',
                 text: 'Groups'
             }
         ];
-
-        $scope.activeTab = $routeParams.tab;
+        $scope.activeSubTab = $routeParams.subtab;
     })
     .controller('MyNewsController', function ($scope, Mediator) {
         Mediator.pub('feedbacks:data:get');

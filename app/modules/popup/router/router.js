@@ -5,21 +5,29 @@ angular.module('router', [])
         $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension):/);
 
         $routeProvider
-            .when('/chat', {
-                templateUrl: '/modules/popup/chat/chat.tmpl.html'
-            })
-            .when('/buddies', {
-                templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
-            })
             .when('/news', {
                 redirectTo: '/news/my'
             })
-            .when('/news/:tab', {
-                controller: 'NewsController',
-                templateUrl: '/modules/popup/news/news.tmpl.html'
+            .when('/:tab', {
+                templateUrl: function (params) {
+                    return [
+                        '/modules/popup/', params.tab,
+                        '/', params.tab, '.tmpl.html'
+                        ].join('');
+                }
             })
-            .otherwise({
-                redirectTo: '/news'
+            .when('/:tab/:subtab', {
+                templateUrl: function (params) {
+                    return [
+                        '/modules/popup/', params.tab,
+                        '/', params.tab, '.tmpl.html'
+                    ].join('');
+                }
             });
+    })
+    .run(function ($location) {
+        //default tab
+        $location.path('/news/my');
+        $location.replace();
     });
 

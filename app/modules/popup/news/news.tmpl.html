@@ -1,17 +1,18 @@
-<ng-include src="'/modules/popup/app/navigation.tmpl.html'"></ng-include>
-<div class="navbar navbar-static-top">
-    <form class="navbar-inner form-inline navbar-form t-updates__controls">
-        <div class="btn-group" data-toggle="buttons-radio">
-            {{activeTab}}
-            <a
-                ng-repeat="tab in tabs"
-                ng-class="{active: tab.href === '/news/' + activeTab}"
-                class="btn"
-                href="{{tab.href}}"
-                data-toggle="tab">
-                {{tab.text}}
-            </a>
-        </div>
-    </form>
+<navigation></navigation>
+<div ng-controller="NewsController">
+    <div class="navbar navbar-static-top">
+        <form class="navbar-inner form-inline navbar-form t-updates__controls">
+            <div class="btn-group" data-toggle="buttons-radio">
+                <a
+                    ng-repeat="tab in subtabs"
+                    ng-class="{active: tab.href === 'news/' + activeSubTab}"
+                    class="btn"
+                    href="/{{tab.href}}"
+                    data-toggle="tab">
+                    {{tab.text}}
+                </a>
+            </div>
+        </form>
+    </div>
+    <ng-include src="'/modules/popup/news/' + activeSubTab + '.tmpl.html'"></ng-include>
 </div>
-<ng-include src="'/modules/popup/news/' + activeTab + '.tmpl.html'"></ng-include>

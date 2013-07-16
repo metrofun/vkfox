@@ -6,50 +6,33 @@ angular.module('anchor', []).run(function () {
     });
 });
 
-angular.module('app', ['router', 'item', 'common', 'news', 'chat', 'buddies'])
-    .run(function () {
-        jQuery('body').tooltip({
-            selector: '[title]',
-            container: '.app',
-            delay: { show: 1000, hide: false},
-            placement: function () {
-                var $container = jQuery(this.options.container),
-                    containerOffset = $container.offset(),
-                    offset = this.$element.offset(),
-                    top = offset.top - containerOffset.top,
-                    left = offset.left - containerOffset.top,
-                    height = $container.outerHeight(),
-                    width = $container.outerWidth(),
-                    vert = 0.5 * height - top,
-                    vertPlacement = vert > 0 ? 'bottom' : 'top',
-                    horiz = 0.5 * width - left,
-                    horizPlacement = horiz > 0 ? 'right' : 'left',
-                    placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
+angular.module(
+    'app',
+    ['router', 'item', 'common', 'news', 'chat', 'buddies']
+).run(function () {
+    jQuery('body').tooltip({
+        selector: '[title]',
+        container: '.app',
+        delay: { show: 1000, hide: false},
+        placement: function () {
+            var $container = jQuery(this.options.container),
+                containerOffset = $container.offset(),
+                offset = this.$element.offset(),
+                top = offset.top - containerOffset.top,
+                left = offset.left - containerOffset.top,
+                height = $container.outerHeight(),
+                width = $container.outerWidth(),
+                vert = 0.5 * height - top,
+                vertPlacement = vert > 0 ? 'bottom' : 'top',
+                horiz = 0.5 * width - left,
+                horizPlacement = horiz > 0 ? 'right' : 'left',
+                placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
 
-                return placement;
-            }
-        });
-    })
-    .controller('navigationCtrl', function ($scope, $location) {
-        $scope.locationPath = $location.path();
-        $scope.$watch('location.path()', function (path) {
-            $scope.locationPath = path;
-        });
-        $scope.tabs = [
-            {
-                href: '/chat',
-                name: 'Chat'
-            },
-            {
-                href: '/buddies',
-                name: 'Buddies'
-            },
-            {
-                href: '/news',
-                name: 'News'
-            }
-        ];
+            return placement;
+        }
     });
+});
+
 
 define(['i18n/i18n'], function (I18N) {
     var i18n = new I18N();
@@ -2218,24 +2201,49 @@ angular.module('mediator', [])
         };
     });
 
-angular.module('news', ['mediator', 'ngSanitize'])
+angular.module('navigation', ['ui.route'])
+    .directive('navigation', function ($routeParams) {
+        return {
+            controller: function ($scope) {
+                $scope.tabs = [
+                    {
+                        href: 'chat',
+                        name: 'Chat'
+                    },
+                    {
+                        href: 'buddies',
+                        name: 'Buddies'
+                    },
+                    {
+                        href: 'news',
+                        name: 'News'
+                    }
+                ];
+                $scope.activeTab = $routeParams.tab;
+            },
+            templateUrl: '/modules/popup/navigation/navigation.tmpl.html',
+            replace: true,
+            restrict: 'E'
+        };
+    });
+
+angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
     .controller('NewsController', function ($scope, $routeParams) {
-        $scope.tabs = [
+        $scope.subtabs = [
             {
-                href: '/news/my',
+                href: 'news/my',
                 text: 'My'
             },
             {
-                href: '/news/friends',
+                href: 'news/friends',
                 text: 'Friends'
             },
             {
-                href: '/news/groups',
+                href: 'news/groups',
                 text: 'Groups'
             }
         ];
-
-        $scope.activeTab = $routeParams.tab;
+        $scope.activeSubTab = $routeParams.subtab;
     })
     .controller('MyNewsController', function ($scope, Mediator) {
         Mediator.pub('feedbacks:data:get');
@@ -2485,22 +2493,30 @@ angular.module('router', [])
         $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension):/);
 
         $routeProvider
-            .when('/chat', {
-                templateUrl: '/modules/popup/chat/chat.tmpl.html'
-            })
-            .when('/buddies', {
-                templateUrl: '/modules/popup/buddies/buddies.tmpl.html'
-            })
             .when('/news', {
                 redirectTo: '/news/my'
             })
-            .when('/news/:tab', {
-                controller: 'NewsController',
-                templateUrl: '/modules/popup/news/news.tmpl.html'
+            .when('/:tab', {
+                templateUrl: function (params) {
+                    return [
+                        '/modules/popup/', params.tab,
+                        '/', params.tab, '.tmpl.html'
+                        ].join('');
+                }
             })
-            .otherwise({
-                redirectTo: '/news'
+            .when('/:tab/:subtab', {
+                templateUrl: function (params) {
+                    return [
+                        '/modules/popup/', params.tab,
+                        '/', params.tab, '.tmpl.html'
+                    ].join('');
+                }
             });
+    })
+    .run(function ($location) {
+        //default tab
+        $location.path('/news/my');
+        $location.replace();
     });
 
 
