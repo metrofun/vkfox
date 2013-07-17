@@ -1,3 +1,4 @@
+/*global i18n */
 angular.module('i18n', [])
     .config(function ($filterProvider) {
         $filterProvider.register('i18n', function () {
@@ -13,11 +14,12 @@ angular.module('i18n', [])
 
             return function (input) {
                 if (input) {
+                    console.log([].slice.call(arguments, 1));
                     return messages[input].apply(
                         messages,
                         [].slice.call(arguments, 1)
-                    )
+                    );
                 }
-            }
+            };
         });
     });

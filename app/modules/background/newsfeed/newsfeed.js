@@ -108,7 +108,9 @@ angular.module(
      * Initialize all variables
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             Mediator.pub('newsfeed:friends', {
                 profiles: profilesColl.toJSON(),

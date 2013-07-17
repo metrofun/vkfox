@@ -19,32 +19,39 @@ module.exports = function (grunt) {
                 }
             },
             popupJs: {
-                files: 'app/modules/popup/**/*.js',
+                files: [
+                    'app/modules/popup/**/*.js',
+                    'app/modules/common/**/*.js'
+                ],
                 tasks: ['concat:popupJs'],
                 options: {
                     interrupt: true
                 }
             },
             backgroundJs: {
-                files: 'app/modules/background/**/*.js',
+                files: [
+                    'app/modules/background/**/*.js',
+                    'app/modules/common/**/*.js'
+                ],
                 tasks: ['concat:backgroundJs'],
                 options: {
                     interrupt: true
                 }
             },
             messages: {
-                files: 'app/modules/popup/i18n/**/*.json',
+                files: 'app/modules/common/i18n/**/*.json',
                 tasks: ['messageformat'],
                 options: {
                     interrupt: true
                 }
             }
         },
+        //localization
         messageformat: {
             ru: {
                 locale: 'ru',
-                inputdir: 'app/modules/popup/i18n/ru',
-                output: 'app/modules/popup/i18n/ru.js'
+                inputdir: 'app/modules/common/i18n/ru',
+                output: 'app/modules/common/i18n/ru.js'
             }
         },
         concat: {
@@ -57,12 +64,14 @@ module.exports = function (grunt) {
             },
             popupJs: {
                 src: [
+                    'app/modules/common/**/*.js',
                     'app/modules/popup/**/*.js'
                 ],
                 dest: 'app/popup.js'
             },
             backgroundJs: {
                 src: [
+                    'app/modules/common/**/*.js',
                     'app/modules/background/**/*.js'
                 ],
                 dest: 'app/background.js'
@@ -90,7 +99,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.registerTask(
         'default',
-        ['concat', 'messageformat', 'less:all', 'clean:less', 'watch']
+        ['messageformat', 'concat', 'less:all', 'clean:less', 'watch']
     );
 
 };

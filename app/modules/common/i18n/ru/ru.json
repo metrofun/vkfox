@@ -15,5 +15,6 @@
     "Liked": "Понравилось",
     "Reposted": "Поделился записью",
     "New friends:": "Новые друзья:",
-    "Started following you": "Хочет добавить в друзья"
+    "Started following you": "Хочет добавить в друзья",
+    "Sent a message": "{NAME} {GENDER, select, male{прислал} female{прислала} other{прислал}} вам сообщение"
 }

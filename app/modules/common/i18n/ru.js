@@ -101,4 +101,38 @@ var r = "";
 r += "Хочет добавить в друзья";
 return r;
 }
+window.i18n["ru"]["Sent a message"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+r += d["NAME"];
+r += " ";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "прислал";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "прислала";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "прислал";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вам сообщение";
+return r;
+}
 })();

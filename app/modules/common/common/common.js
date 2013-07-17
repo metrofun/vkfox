@@ -1,4 +1,4 @@
-// TODO rename to filters
+// TODO rename to utils
 angular.module('common', ['config', 'i18n'])
     .filter('truncate', function ($filter) {
         var MAX_TEXT_LENGTH = 300,
@@ -131,5 +131,3 @@ angular.module('common', ['config', 'i18n'])
             return angular.isArray(input);
         };
     });
-
-

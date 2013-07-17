@@ -6,7 +6,15 @@
         "background": {
             "page": "background.html"
         },
-        "permissions": ["tabs", "http://*.vk.com/*", "https://*.vk.com/*", "bookmarks", "notifications"],
+        "permissions": [
+            "tabs",
+            "http://*.vk.me/*",
+            "http://*.vk.com/*",
+            "https://*.vk.me/*",
+            "https://*.vk.com/*",
+            "bookmarks",
+            "notifications"
+        ],
         "browser_action": {
             "default_title": "VKfox",
             "default_popup": "popup.html"

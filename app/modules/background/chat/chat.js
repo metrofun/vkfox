@@ -1,8 +1,15 @@
 /*jshint bitwise:false, latedef: false */
-angular.module(
-    'chat',
-    ['request', 'mediator', 'persistent-set', 'auth', 'longpoll', 'profiles-collection']
-).run(function (Users, Request, Mediator, Auth, ProfilesCollection) {
+angular.module('chat', [
+    'request',
+    'mediator',
+    'persistent-set',
+    'auth',
+    'longpoll',
+    'profiles-collection',
+    'notifications',
+    'i18n',
+    'common'
+]).run(function (Users, Request, Mediator, Auth, ProfilesCollection, Notifications, $filter) {
     var
     MAX_HISTORY_COUNT = 10,
 
@@ -12,7 +19,12 @@ angular.module(
             return - messages[messages.length - 1].date;
         }
     }))(),
-    profilesColl = new ProfilesCollection(),
+    profilesColl = new (ProfilesCollection.extend({
+        model: Backbone.Model.extend({
+            idAttribute: 'uid'
+        })
+    }))(),
+
     userId, readyDeferred,
 
     /**
@@ -32,7 +44,9 @@ angular.module(
         dialogColl.reset();
         profilesColl.reset();
 
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             publishData();
         });
@@ -70,7 +84,7 @@ angular.module(
             });
         }
 
-        messageDeferred.done(function (response) {
+        messageDeferred.then(function (response) {
             var message = response[1],
                 dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
@@ -78,6 +92,8 @@ angular.module(
             if (dialog) {
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
+
+                return message;
             } else {
                 // TODO add parse function and move this code into dialogColl
                 dialogColl.add({
@@ -88,8 +104,22 @@ angular.module(
                     messages: [message]
                 });
 
-                setDialogsProfiles();
+                return setDialogsProfiles().then(function () {
+                    return message;
+                });
             }
+        }).then(function (message) {
+            var profile = profilesColl.get(message.uid).toJSON(),
+                gender = profile.sex === 1 ? 'female':'male';
+
+            Notifications.create({
+                title: $filter('i18n')('Sent a message', {
+                    NAME: $filter('name')(profile),
+                    GENDER: gender
+                }),
+                message: message.body,
+                image: profile.photo
+            });
         });
     }
     function setDialogsProfiles() {

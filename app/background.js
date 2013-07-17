@@ -1,3 +1,304 @@
+// TODO rename to utils
+angular.module('common', ['config', 'i18n'])
+    .filter('truncate', function ($filter) {
+        var MAX_TEXT_LENGTH = 300,
+            TRUNCATE_LENGTH = 200,
+
+            label = $filter('i18n')('more...');
+
+        jQuery('body').on('click', '.show-more', function (e) {
+            var jTarget = jQuery(e.currentTarget);
+
+            jTarget.replaceWith(jTarget.data('text'));
+        });
+
+        function escapeQuotes(string) {
+            var entityMap = {
+                '"': '&quot;',
+                "'": '&#39;'
+            };
+
+            return String(string).replace(/["']/g, function (s) {
+                return entityMap[s];
+            });
+        }
+        /**
+         * Truncates long text, and add pseudo-link "show-more"
+         *
+         * @param {String} text
+         *
+         * @returns {String}
+         */
+        return function (text) {
+            var spaceIndex;
+
+            if (text) {
+                text = String(text);
+                if (text.length > MAX_TEXT_LENGTH) {
+                    spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
+
+                    if (spaceIndex !== -1) {
+                        return  text.slice(0, spaceIndex) + [
+                            ' <span class="show-more btn btn-mini" data-text="',
+                            escapeQuotes(text.slice(spaceIndex)),
+                            '" type="button">', label, '</span>'
+                        ].join('');
+                    } else {
+                        return text;
+                    }
+                } else {
+                    return text;
+                }
+            }
+        };
+    })
+    .filter('duration', function () {
+        /**
+        * Returns time duration in format 'HH:mm'
+        *
+        * @param {Array} seconds
+        *
+        * @returns {String}
+        */
+        return function (seconds) {
+            if (seconds) {
+                return moment.unix(seconds).format('HH:mm');
+            }
+        };
+    })
+    .filter('where', function () {
+        /**
+         * Returns object from collection,
+         * by it's key/value pair
+         *
+         * @param {Array} input
+         * @param {String} property
+         * @param {Mixed} value
+         *
+         * @returns {Object}
+         */
+        return function (input, property, value) {
+            var obj;
+            if (input) {
+                obj  = {};
+                obj[property] = value;
+                return _(input).findWhere(obj);
+            }
+        };
+    })
+    .filter('name', function () {
+        /**
+         * Returns names from profile's data
+         *
+         * @param {Object|Array} input
+         *
+         * @returns {String} String
+         */
+        return function (input) {
+            if (input) {
+                return [].concat(input).map(function (owner) {
+                    //group profile
+                    if (owner.name) {
+                        return owner.name;
+                    //user profile
+                    } else {
+                        return owner.first_name + ' ' + owner.last_name;
+                    }
+                }).join(', ');
+            }
+        };
+    })
+    .filter('addVKBase', function (VK_BASE) {
+        return function (path) {
+            if (path.indexOf(VK_BASE) === -1) {
+                if (path.charAt(0) === '/') {
+                    path = path.substr(1);
+                }
+                path = VK_BASE + path;
+            }
+            return path;
+        };
+    })
+    .filter('slice', function () {
+        return function (arr, start, end) {
+            if (arr) {
+                return arr.slice(start, end);
+            }
+        };
+    })
+    .filter('isArray', function () {
+        return function (input) {
+            return angular.isArray(input);
+        };
+    });
+
+angular.module('config', [])
+    .constant('VK_BASE', 'http://vk.com/');
+
+/*global i18n */
+angular.module('i18n', [])
+    .config(function ($filterProvider) {
+        $filterProvider.register('i18n', function () {
+            var DEFAULT_LANGUAGE = 'ru',
+                language = navigator.language.split('_')[0],
+                messages;
+
+            messages = i18n[language];
+
+            if (!messages) {
+                messages = i18n[DEFAULT_LANGUAGE];
+            }
+
+            return function (input) {
+                if (input) {
+                    console.log([].slice.call(arguments, 1));
+                    return messages[input].apply(
+                        messages,
+                        [].slice.call(arguments, 1)
+                    );
+                }
+            };
+        });
+    });
+
+(function(){ window.i18n || (window.i18n = {}) 
+var MessageFormat = { locale: {} };
+MessageFormat.locale.ru = function (n) {
+  if ((n % 10) == 1 && (n % 100) != 11) {
+    return 'one';
+  }
+  if ((n % 10) >= 2 && (n % 10) <= 4 &&
+      ((n % 100) < 12 || (n % 100) > 14) && n == Math.floor(n)) {
+    return 'few';
+  }
+  if ((n % 10) === 0 || ((n % 10) >= 5 && (n % 10) <= 9) ||
+      ((n % 100) >= 11 && (n % 100) <= 14) && n == Math.floor(n)) {
+    return 'many';
+  }
+  return 'other';
+};
+
+window.i18n["ru"] = {}
+window.i18n["ru"]["Private message"] = function(d){
+var r = "";
+r += "Личное сообщение";
+return r;
+}
+window.i18n["ru"]["Wall post"] = function(d){
+var r = "";
+r += "Сообщение на стене";
+return r;
+}
+window.i18n["ru"]["Filters"] = function(d){
+var r = "";
+r += "Фильтры";
+return r;
+}
+window.i18n["ru"]["Search"] = function(d){
+var r = "";
+r += "Имя или Фамилия";
+return r;
+}
+window.i18n["ru"]["Male"] = function(d){
+var r = "";
+r += "Мужчины";
+return r;
+}
+window.i18n["ru"]["Female"] = function(d){
+var r = "";
+r += "Женщины";
+return r;
+}
+window.i18n["ru"]["Offline"] = function(d){
+var r = "";
+r += "Не в сети";
+return r;
+}
+window.i18n["ru"]["Bookmarked"] = function(d){
+var r = "";
+r += "В закладках";
+return r;
+}
+window.i18n["ru"]["Monitor online status"] = function(d){
+var r = "";
+r += "Следить за онлайн статусом";
+return r;
+}
+window.i18n["ru"]["Mark as read"] = function(d){
+var r = "";
+r += "Отметить прочитанным";
+return r;
+}
+window.i18n["ru"]["Like"] = function(d){
+var r = "";
+r += "Нравится";
+return r;
+}
+window.i18n["ru"]["more..."] = function(d){
+var r = "";
+r += "далee...";
+return r;
+}
+window.i18n["ru"]["Comment"] = function(d){
+var r = "";
+r += "Комментировать";
+return r;
+}
+window.i18n["ru"]["Liked"] = function(d){
+var r = "";
+r += "Понравилось";
+return r;
+}
+window.i18n["ru"]["Reposted"] = function(d){
+var r = "";
+r += "Поделился записью";
+return r;
+}
+window.i18n["ru"]["New friends:"] = function(d){
+var r = "";
+r += "Новые друзья:";
+return r;
+}
+window.i18n["ru"]["Started following you"] = function(d){
+var r = "";
+r += "Хочет добавить в друзья";
+return r;
+}
+window.i18n["ru"]["Sent a message"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+r += d["NAME"];
+r += " ";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "прислал";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "прислала";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "прислал";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вам сообщение";
+return r;
+}
+})();
 angular.module('app', ['auth', 'buddies', 'chat', 'newsfeed', 'feedbacks']);
 
 define([
@@ -252,7 +553,9 @@ angular.module(
      * Initialize all state
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
@@ -465,10 +768,17 @@ define([
 });
 
 /*jshint bitwise:false, latedef: false */
-angular.module(
-    'chat',
-    ['request', 'mediator', 'persistent-set', 'auth', 'longpoll', 'profiles-collection']
-).run(function (Users, Request, Mediator, Auth, ProfilesCollection) {
+angular.module('chat', [
+    'request',
+    'mediator',
+    'persistent-set',
+    'auth',
+    'longpoll',
+    'profiles-collection',
+    'notifications',
+    'i18n',
+    'common'
+]).run(function (Users, Request, Mediator, Auth, ProfilesCollection, Notifications, $filter) {
     var
     MAX_HISTORY_COUNT = 10,
 
@@ -478,7 +788,12 @@ angular.module(
             return - messages[messages.length - 1].date;
         }
     }))(),
-    profilesColl = new ProfilesCollection(),
+    profilesColl = new (ProfilesCollection.extend({
+        model: Backbone.Model.extend({
+            idAttribute: 'uid'
+        })
+    }))(),
+
     userId, readyDeferred,
 
     /**
@@ -498,7 +813,9 @@ angular.module(
         dialogColl.reset();
         profilesColl.reset();
 
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             publishData();
         });
@@ -536,7 +853,7 @@ angular.module(
             });
         }
 
-        messageDeferred.done(function (response) {
+        messageDeferred.then(function (response) {
             var message = response[1],
                 dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
@@ -544,6 +861,8 @@ angular.module(
             if (dialog) {
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
+
+                return message;
             } else {
                 // TODO add parse function and move this code into dialogColl
                 dialogColl.add({
@@ -554,8 +873,22 @@ angular.module(
                     messages: [message]
                 });
 
-                setDialogsProfiles();
+                return setDialogsProfiles().then(function () {
+                    return message;
+                });
             }
+        }).then(function (message) {
+            var profile = profilesColl.get(message.uid).toJSON(),
+                gender = profile.sex === 1 ? 'female':'male';
+
+            Notifications.create({
+                title: $filter('i18n')('Sent a message', {
+                    NAME: $filter('name')(profile),
+                    GENDER: gender
+                }),
+                message: message.body,
+                image: profile.photo
+            });
         });
     }
     function setDialogsProfiles() {
@@ -1459,7 +1792,9 @@ angular.module(
      * Initialize all variables
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             publishData();
         });
@@ -1629,7 +1964,6 @@ angular.module(
                 notifications.items.slice(1).forEach(addRawNotificationsItem);
                 comments.items.forEach(addRawCommentsItem);
                 itemsColl.sort();
-                console.log(response);
             }
             readyDeferred.resolve();
             rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);
@@ -2172,7 +2506,9 @@ angular.module(
      * Initialize all variables
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             Mediator.pub('newsfeed:friends', {
                 profiles: profilesColl.toJSON(),
@@ -2251,6 +2587,50 @@ angular.module(
             });
         });
     });
+});
+
+angular.module('notifications', []).factory('Notifications', function () {
+    function getBase64FromImage(url, onSuccess, onError) {
+        var xhr = new XMLHttpRequest();
+
+        xhr.responseType = "arraybuffer";
+        xhr.open("GET", url);
+
+        xhr.onload = function () {
+            var base64, binary, bytes, mediaType;
+
+            bytes = new Uint8Array(xhr.response);
+            //NOTE String.fromCharCode.apply(String, ...
+            //may cause "Maximum call stack size exceeded"
+            binary = [].map.call(bytes, function (byte) {
+                return String.fromCharCode(byte);
+            }).join('');
+            mediaType = xhr.getResponseHeader('content-type');
+            base64 = [
+                'data:',
+                mediaType ? mediaType + ';':'',
+                'base64,',
+                btoa(binary)
+            ].join('');
+            onSuccess(base64);
+        };
+        xhr.onerror = onError;
+        xhr.send();
+    }
+    return {
+        create: function (options) {
+            console.log(options);
+            // TODO on error
+            getBase64FromImage(options.image, function (base64) {
+                chrome.notifications.create(_.uniqueId(), {
+                    type: 'basic',
+                    title: options.title,
+                    message: options.message,
+                    iconUrl: base64
+                }, function () {});
+            });
+        }
+    };
 });
 
 angular.module('persistent-set', []).factory('PersistentSet', function () {

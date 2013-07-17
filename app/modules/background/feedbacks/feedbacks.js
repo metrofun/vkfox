@@ -45,7 +45,9 @@ angular.module(
      * Initialize all variables
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             publishData();
         });
@@ -215,7 +217,6 @@ angular.module(
                 notifications.items.slice(1).forEach(addRawNotificationsItem);
                 comments.items.forEach(addRawCommentsItem);
                 itemsColl.sort();
-                console.log(response);
             }
             readyDeferred.resolve();
             rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);

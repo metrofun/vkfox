@@ -23,7 +23,9 @@ angular.module(
      * Initialize all state
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
+        if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            readyDeferred = jQuery.Deferred();
+        }
         readyDeferred.then(function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
