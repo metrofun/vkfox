@@ -253,6 +253,10 @@ angular.module(
      */
     function initialize() {
         readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            Mediator.pub('buddies:data', buddiesColl.toJSON());
+        });
+
         buddiesColl.reset();
     }
     initialize();
@@ -327,6 +331,7 @@ angular.module(
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
     });
+
     readyDeferred.then(function () {
         buddiesColl.on('change', function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
@@ -490,9 +495,13 @@ angular.module(
      * Initialize all internal state
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
         dialogColl.reset();
         profilesColl.reset();
+
+        readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            publishData();
+        });
     }
     initialize();
 
@@ -686,6 +695,17 @@ angular.module(
         });
     }
 
+    readyDeferred.then(function () {
+        Mediator.sub('longpoll:updates', onUpdates);
+
+        // Notify about changes
+        dialogColl.on('change', function () {
+            dialogColl.sort();
+            publishData();
+        });
+        profilesColl.on('change', publishData);
+    });
+
     Mediator.sub('auth:success', function (data) {
         initialize();
 
@@ -697,16 +717,6 @@ angular.module(
 
     Mediator.sub('chat:data:get', function () {
         readyDeferred.then(publishData);
-    });
-    readyDeferred.then(function () {
-        Mediator.sub('longpoll:updates', onUpdates);
-
-        // Notify about changes
-        dialogColl.on('change', function () {
-            dialogColl.sort();
-            publishData();
-        });
-        profilesColl.on('change', publishData);
     });
 });
 
@@ -1450,6 +1460,10 @@ angular.module(
      */
     function initialize() {
         readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            publishData();
+        });
+
         autoUpdateNotificationsParams = {
             count: MAX_ITEMS_COUNT,
             //everything except comments
@@ -1629,6 +1643,11 @@ angular.module(
     });
 
     readyDeferred.then(function () {
+        publishData();
+
+        itemsColl.on('change sort', publishData);
+        profilesColl.on('change', publishData);
+
         Mediator.sub('likes:changed', function (params) {
             itemsColl.some(function (model) {
                 var parent  = model.get('parent'),
@@ -1648,12 +1667,6 @@ angular.module(
 
     Mediator.sub('feedbacks:data:get', function () {
         readyDeferred.then(publishData);
-    });
-
-    // Notify about changes
-    readyDeferred.then(function () {
-        itemsColl.on('change sort', publishData);
-        profilesColl.on('change', publishData);
     });
 });
 
@@ -2160,6 +2173,17 @@ angular.module(
      */
     function initialize() {
         readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            Mediator.pub('newsfeed:friends', {
+                profiles: profilesColl.toJSON(),
+                items: friendItemsColl.toJSON()
+            });
+            Mediator.pub('newsfeed:groups', {
+                profiles: profilesColl.toJSON(),
+                items: groupItemsColl.toJSON()
+            });
+        });
+
         autoUpdateParams = {
             count: MAX_ITEMS_COUNT
         };
@@ -2435,10 +2459,16 @@ angular.module('request', ['mediator', 'auth']).factory(
                                 console.warn(data.execute_errors);
                             }
                             var response = data.response, i;
-                            for (i = 0; i < response.length; i++) {
-                                queriesToProcess[i].deferred.resolve(response[i]);
+                            if (Array.isArray(response)) {
+                                for (i = 0; i < response.length; i++) {
+                                    queriesToProcess[i].deferred.resolve(response[i]);
+                                }
+                                self.processApiQueries();
+                            } else {
+                                console.warn(data);
+                                // force relogin on API error
+                                Auth.login(true);
                             }
-                            self.processApiQueries();
                         }, function () {
                             // force relogin on API error
                             Auth.login(true);

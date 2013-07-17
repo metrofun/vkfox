@@ -98,10 +98,16 @@ angular.module('request', ['mediator', 'auth']).factory(
                                 console.warn(data.execute_errors);
                             }
                             var response = data.response, i;
-                            for (i = 0; i < response.length; i++) {
-                                queriesToProcess[i].deferred.resolve(response[i]);
+                            if (Array.isArray(response)) {
+                                for (i = 0; i < response.length; i++) {
+                                    queriesToProcess[i].deferred.resolve(response[i]);
+                                }
+                                self.processApiQueries();
+                            } else {
+                                console.warn(data);
+                                // force relogin on API error
+                                Auth.login(true);
                             }
-                            self.processApiQueries();
                         }, function () {
                             // force relogin on API error
                             Auth.login(true);

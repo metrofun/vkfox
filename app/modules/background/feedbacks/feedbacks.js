@@ -46,6 +46,10 @@ angular.module(
      */
     function initialize() {
         readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            publishData();
+        });
+
         autoUpdateNotificationsParams = {
             count: MAX_ITEMS_COUNT,
             //everything except comments
@@ -225,6 +229,11 @@ angular.module(
     });
 
     readyDeferred.then(function () {
+        publishData();
+
+        itemsColl.on('change sort', publishData);
+        profilesColl.on('change', publishData);
+
         Mediator.sub('likes:changed', function (params) {
             itemsColl.some(function (model) {
                 var parent  = model.get('parent'),
@@ -244,11 +253,5 @@ angular.module(
 
     Mediator.sub('feedbacks:data:get', function () {
         readyDeferred.then(publishData);
-    });
-
-    // Notify about changes
-    readyDeferred.then(function () {
-        itemsColl.on('change sort', publishData);
-        profilesColl.on('change', publishData);
     });
 });

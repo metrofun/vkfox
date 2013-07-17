@@ -109,6 +109,17 @@ angular.module(
      */
     function initialize() {
         readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            Mediator.pub('newsfeed:friends', {
+                profiles: profilesColl.toJSON(),
+                items: friendItemsColl.toJSON()
+            });
+            Mediator.pub('newsfeed:groups', {
+                profiles: profilesColl.toJSON(),
+                items: groupItemsColl.toJSON()
+            });
+        });
+
         autoUpdateParams = {
             count: MAX_ITEMS_COUNT
         };

@@ -29,9 +29,13 @@ angular.module(
      * Initialize all internal state
      */
     function initialize() {
-        readyDeferred = jQuery.Deferred();
         dialogColl.reset();
         profilesColl.reset();
+
+        readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            publishData();
+        });
     }
     initialize();
 
@@ -225,6 +229,17 @@ angular.module(
         });
     }
 
+    readyDeferred.then(function () {
+        Mediator.sub('longpoll:updates', onUpdates);
+
+        // Notify about changes
+        dialogColl.on('change', function () {
+            dialogColl.sort();
+            publishData();
+        });
+        profilesColl.on('change', publishData);
+    });
+
     Mediator.sub('auth:success', function (data) {
         initialize();
 
@@ -236,15 +251,5 @@ angular.module(
 
     Mediator.sub('chat:data:get', function () {
         readyDeferred.then(publishData);
-    });
-    readyDeferred.then(function () {
-        Mediator.sub('longpoll:updates', onUpdates);
-
-        // Notify about changes
-        dialogColl.on('change', function () {
-            dialogColl.sort();
-            publishData();
-        });
-        profilesColl.on('change', publishData);
     });
 });

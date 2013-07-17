@@ -24,6 +24,10 @@ angular.module(
      */
     function initialize() {
         readyDeferred = jQuery.Deferred();
+        readyDeferred.then(function () {
+            Mediator.pub('buddies:data', buddiesColl.toJSON());
+        });
+
         buddiesColl.reset();
     }
     initialize();
@@ -98,6 +102,7 @@ angular.module(
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
     });
+
     readyDeferred.then(function () {
         buddiesColl.on('change', function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());

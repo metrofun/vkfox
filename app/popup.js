@@ -881,7 +881,7 @@ angular.module('common', ['config', 'i18n'])
                 "'": '&#39;'
             };
 
-            return String(string).replace(/["'\/]/g, function (s) {
+            return String(string).replace(/["']/g, function (s) {
                 return entityMap[s];
             });
         }
