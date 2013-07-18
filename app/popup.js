@@ -2320,6 +2320,7 @@ angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
             $scope.$apply(function () {
                 $scope.data = data;
 
+                console.log(data.items);
                 if (data.items && data.items.length) {
                     data.items.forEach(function (item) {
                         var comment, parent = item.parent, type;
@@ -2331,7 +2332,7 @@ angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
                             if (parent.comments.can_post) {
                                 comment = {
                                     ownerId: parent.owner_id,
-                                    id: parent.id,
+                                    id: parent.id || parent.post_id,
                                     type: 'post'
                                 };
                             }
@@ -2368,7 +2369,7 @@ angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
                         case 'topic':
                             comment = {
                                 ownerId: parent.owner_id,
-                                id: parent.id,
+                                id: parent.id || parent.post_id,
                                 type: 'topic'
                             };
                             break;
@@ -2382,7 +2383,7 @@ angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
                         case 'video':
                             comment = {
                                 ownerId: parent.owner_id,
-                                id: parent.id,
+                                id: parent.id || parent.vid,
                                 type: 'video'
                             };
                             break;

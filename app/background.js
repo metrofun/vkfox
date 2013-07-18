@@ -1847,15 +1847,20 @@ var feedback_data = {
 	"new_offset": 0
 }
 
-angular.module(
-    'feedbacks',
-    ['mediator', 'request', 'likes', 'profiles-collection']
-).run(function (Request, Mediator, ProfilesCollection) {
+angular.module('feedbacks', [
+    'mediator',
+    'request',
+    'likes',
+    'profiles-collection',
+    'persistent-model',
+    'notifications'
+]).run(function (Request, Mediator, ProfilesCollection, Notifications, PersistentModel, $filter) {
     var
     MAX_ITEMS_COUNT = 50,
     UPDATE_PERIOD = 1000,
 
-    readyDeferred, rotateId,
+    readyDeferred = jQuery.Deferred(),
+    rotateId, persistentModel, userId,
     autoUpdateNotificationsParams, autoUpdateCommentsParams,
     profilesColl = new (ProfilesCollection.extend({
         model: Backbone.Model.extend({
@@ -1898,6 +1903,13 @@ angular.module(
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
+            persistentModel = new PersistentModel({}, {
+                name: ['feedbacks', 'background', userId].join(':')
+            });
+            persistentModel.on('change:latestFeedbackId', function () {
+                console.log(arguments);
+            });
+
             publishData();
         });
 
@@ -1913,8 +1925,8 @@ angular.module(
         itemsColl.reset();
         profilesColl.reset();
         clearTimeout(rotateId);
+        fetchFeedbacks();
     }
-    initialize();
     /**
      * Processes raw comments item and adds it to itemsColl,
      * doesn't sort itemsColl
@@ -1923,16 +1935,13 @@ angular.module(
      */
     function addRawCommentsItem(item) {
         var parentType = item.type,
-            parent = item, itemModel, itemID;
+            parent = item, itemModel, itemID, lastCommentDate;
 
         parent.owner_id = Number(parent.from_id || parent.source_id);
         itemID  = generateItemID(parentType, parent);
         if (!(itemModel = itemsColl.get(itemID))) {
             itemModel = createItemModel(parentType, parent, true);
             itemsColl.add(itemModel, {sort: false});
-        }
-        if (!itemModel.has('date') || itemModel.get('date') < item.date) {
-            itemModel.set('date', _.last(item.comments.list).date);
         }
         itemModel.get('feedbacks').add(item.comments.list.map(function (feedback) {
             feedback.owner_id = Number(feedback.from_id);
@@ -1943,6 +1952,11 @@ angular.module(
                 date: feedback.date
             };
         }));
+        lastCommentDate = itemModel.get('feedbacks').last().get('date');
+        if (!itemModel.has('date') || itemModel.get('date') < lastCommentDate) {
+            itemModel.set('date', lastCommentDate);
+        }
+        itemModel.trigger('change');
     }
     /**
      * Handles news' item.
@@ -1973,9 +1987,6 @@ angular.module(
                 itemModel = createItemModel(parentType, parent, true);
                 itemsColl.add(itemModel, {sort: false});
             }
-            if (!itemModel.has('date') || itemModel.get('date') < item.date) {
-                itemModel.set('date', item.date);
-            }
             itemModel.get('feedbacks').add([].concat(feedback).map(function (feedback) {
                 feedback.owner_id = Number(feedback.from_id || feedback.owner_id);
                 return {
@@ -1985,6 +1996,11 @@ angular.module(
                     date: item.date
                 };
             }));
+            if (!itemModel.has('date') || itemModel.get('date') < item.date) {
+                console.log(itemModel.get('feedbacks').last(), item);
+                itemModel.set('date', itemModel.get('feedbacks').last().get('date'));
+            }
+            itemModel.trigger('change');
         } else {
             //follows types are array
             [].concat(feedback).forEach(function (feedback) {
@@ -2065,7 +2081,6 @@ angular.module(
 
                 notifications.items.slice(1).forEach(addRawNotificationsItem);
                 comments.items.forEach(addRawCommentsItem);
-                itemsColl.sort();
             }
             readyDeferred.resolve();
             rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);
@@ -2073,15 +2088,23 @@ angular.module(
     }
 
     // entry point
-    Mediator.sub('auth:success', function () {
+    Mediator.sub('auth:success', function (data) {
+        userId = data.userId;
         initialize();
-        fetchFeedbacks();
     });
 
     readyDeferred.then(function () {
         publishData();
 
-        itemsColl.on('change sort', publishData);
+        itemsColl.on('add change', function () {
+            itemsColl.sort();
+            console.log('new feedbacks', arguments);
+            persistentModel.set(
+                'latestFeedbackId',
+                itemsColl.first().get('feedbacks').last().id
+            );
+            publishData();
+        });
         profilesColl.on('change', publishData);
 
         Mediator.sub('likes:changed', function (params) {

@@ -7,7 +7,7 @@
             </item-attachment>
         </div>
         <div ng-if="item.type == 'topic'">
-            {{item.parent.title}}
+            {{item.parent.text}}
         </div>
         <div ng-if="item.type == 'mention'" ng-bind-html-unsafe="item.parent.text | truncate">
         </div>
