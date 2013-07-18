@@ -2576,7 +2576,6 @@ angular.module('tooltip', []).run(function () {
 
     // Hide popup on click
     jQuery('body').on('show', '[title]', function (e) {
-        console.log(e);
         jQuery(e.target).one('click', function () {
             jQuery(this).data('tooltip').$tip.remove();
         });

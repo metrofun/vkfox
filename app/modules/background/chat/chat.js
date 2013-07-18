@@ -8,8 +8,9 @@ angular.module('chat', [
     'profiles-collection',
     'notifications',
     'i18n',
-    'common'
-]).run(function (Users, Request, Mediator, Auth, ProfilesCollection, Notifications, $filter) {
+    'common',
+    'persistent-model'
+]).run(function (Users, Request, Mediator, Auth, ProfilesCollection, Notifications, PersistentModel, $filter) {
     var
     MAX_HISTORY_COUNT = 10,
 
@@ -24,8 +25,8 @@ angular.module('chat', [
             idAttribute: 'uid'
         })
     }))(),
-
-    userId, readyDeferred,
+    persistentModel, userId,
+    readyDeferred = jQuery.Deferred(),
 
     /**
      * Notifies about current state of module.
@@ -48,10 +49,34 @@ angular.module('chat', [
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
+            persistentModel = new PersistentModel({}, {
+                name: ['chat', 'background', userId].join(':')
+            });
+
+            persistentModel.on('change:latestMessageId', function () {
+                var messages = dialogColl.first().get('messages'),
+                    message = messages[messages.length - 1],
+                    profile, gender;
+
+                persistentModel.set('latestMessageId', message.mid);
+
+                if (userId !== message.uid) {
+                    profile = profilesColl.get(message.uid).toJSON(),
+                    gender = profile.sex === 1 ? 'female':'male';
+
+                    Notifications.create({
+                        title: $filter('i18n')('Sent a message', {
+                            NAME: $filter('name')(profile),
+                            GENDER: gender
+                        }),
+                        message: message.body,
+                        image: profile.photo
+                    });
+                }
+            });
             publishData();
         });
     }
-    initialize();
 
     /**
      * @param {Object} update Update object from long poll
@@ -108,18 +133,6 @@ angular.module('chat', [
                     return message;
                 });
             }
-        }).then(function (message) {
-            var profile = profilesColl.get(message.uid).toJSON(),
-                gender = profile.sex === 1 ? 'female':'male';
-
-            Notifications.create({
-                title: $filter('i18n')('Sent a message', {
-                    NAME: $filter('name')(profile),
-                    GENDER: gender
-                }),
-                message: message.body,
-                image: profile.photo
-            });
         });
     }
     function setDialogsProfiles() {
@@ -264,7 +277,20 @@ angular.module('chat', [
 
         // Notify about changes
         dialogColl.on('change', function () {
+            var messages;
+
             dialogColl.sort();
+
+            // Update latest message id,
+            // required for notifications
+            if (dialogColl.size()) {
+                messages = dialogColl.first().get('messages');
+                persistentModel.set(
+                    'latestMessageId',
+                    messages[messages.length - 1].mid
+                );
+            }
+
             publishData();
         });
         profilesColl.on('change', publishData);
