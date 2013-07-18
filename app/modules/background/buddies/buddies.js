@@ -1,7 +1,11 @@
-angular.module(
-    'buddies',
-    ['users', 'request', 'mediator', 'persistent-set', 'profiles-collection']
-).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection) {
+angular.module('buddies', [
+    'users',
+    'request',
+    'mediator',
+    'persistent-set',
+    'profiles-collection',
+    'notifications'
+]).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection, Notifications, $filter) {
     var readyDeferred,
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (ProfilesCollection.extend({
@@ -106,7 +110,22 @@ angular.module(
     });
 
     readyDeferred.then(function () {
-        buddiesColl.on('change', function () {
+        buddiesColl.on('change', function (model) {
+            var profile = model.toJSON(), gender;
+
+            // Notify about watched buddies
+            if (profile.isWatched && model.changed.hasOwnProperty('online')) {
+                gender = profile.sex === 1 ? 'female':'male';
+
+                Notifications.create({
+                    title: $filter('name')(profile),
+                    message: $filter('i18n')(
+                        profile.online ? 'is online':'went offline',
+                        {GENDER: gender}
+                    ),
+                    image: model.get('photo')
+                });
+            }
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
     });

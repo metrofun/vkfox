@@ -297,6 +297,64 @@ r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
 r += " вам сообщение";
 return r;
 }
+window.i18n["ru"]["is online"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "появился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "появилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "появился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " в сети";
+return r;
+}
+window.i18n["ru"]["went offline"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "вышел";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "вышла";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "вышел";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " из сети";
+return r;
+}
 })();
 angular.module('anchor', []).run(function () {
     jQuery('body').on('click', '[anchor]', function (e) {

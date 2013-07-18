@@ -16,5 +16,7 @@
     "Reposted": "Поделился записью",
     "New friends:": "Новые друзья:",
     "Started following you": "Хочет добавить в друзья",
-    "Sent a message": "{NAME} {GENDER, select, male{прислал} female{прислала} other{прислал}} вам сообщение"
+    "Sent a message": "{NAME} {GENDER, select, male{прислал} female{прислала} other{прислал}} вам сообщение",
+    "is online": "{GENDER, select, male{появился} female{появилась} other{появился}} в сети",
+    "went offline": "{GENDER, select, male{вышел} female{вышла} other{вышел}} из сети"
 }

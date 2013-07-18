@@ -11,7 +11,6 @@ angular.module('persistent-model', []).factory('PersistentModel', function () {
         initialize: function (attributes, options) {
             var item;
 
-            console.log(arguments);
             this._name = options.name;
             item = localStorage.getItem(this._name);
 

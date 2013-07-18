@@ -297,6 +297,64 @@ r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
 r += " вам сообщение";
 return r;
 }
+window.i18n["ru"]["is online"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "появился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "появилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "появился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " в сети";
+return r;
+}
+window.i18n["ru"]["went offline"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "вышел";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "вышла";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "вышел";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " из сети";
+return r;
+}
 })();
 angular.module('app', ['auth', 'buddies', 'chat', 'newsfeed', 'feedbacks']);
 
@@ -527,10 +585,14 @@ if (window.name === 'vkfox-login-iframe') {
     chrome.extension.sendMessage(['auth:iframe', decodeURIComponent(window.location.href)]);
 }
 
-angular.module(
-    'buddies',
-    ['users', 'request', 'mediator', 'persistent-set', 'profiles-collection']
-).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection) {
+angular.module('buddies', [
+    'users',
+    'request',
+    'mediator',
+    'persistent-set',
+    'profiles-collection',
+    'notifications'
+]).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection, Notifications, $filter) {
     var readyDeferred,
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (ProfilesCollection.extend({
@@ -635,7 +697,22 @@ angular.module(
     });
 
     readyDeferred.then(function () {
-        buddiesColl.on('change', function () {
+        buddiesColl.on('change', function (model) {
+            var profile = model.toJSON(), gender;
+
+            // Notify about watched buddies
+            if (profile.isWatched && model.changed.hasOwnProperty('online')) {
+                gender = profile.sex === 1 ? 'female':'male';
+
+                Notifications.create({
+                    title: $filter('name')(profile),
+                    message: $filter('i18n')(
+                        profile.online ? 'is online':'went offline',
+                        {GENDER: gender}
+                    ),
+                    image: model.get('photo')
+                });
+            }
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
     });
@@ -2671,7 +2748,6 @@ angular.module('persistent-model', []).factory('PersistentModel', function () {
         initialize: function (attributes, options) {
             var item;
 
-            console.log(arguments);
             this._name = options.name;
             item = localStorage.getItem(this._name);
 
