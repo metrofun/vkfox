@@ -27,6 +27,14 @@ angular.module('notifications', []).factory('Notifications', function () {
         xhr.send();
     }
     return {
+        /**
+         * Show new notifications
+         *
+         * @param {Object} options
+         * @param {String} options.title
+         * @param {String} [options.photo]
+         * @param {String} [options.message='']
+         */
         create: function (options) {
             console.log(options);
             // TODO on error
@@ -34,7 +42,7 @@ angular.module('notifications', []).factory('Notifications', function () {
                 chrome.notifications.create(_.uniqueId(), {
                     type: 'basic',
                     title: options.title,
-                    message: options.message,
+                    message: options.message || '',
                     iconUrl: base64
                 }, function () {});
             });

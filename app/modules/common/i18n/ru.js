@@ -96,12 +96,12 @@ var r = "";
 r += "Новые друзья:";
 return r;
 }
-window.i18n["ru"]["Started following you"] = function(d){
+window.i18n["ru"]["started following you"] = function(d){
 var r = "";
-r += "Хочет добавить в друзья";
+r += "хочет добавить в друзья";
 return r;
 }
-window.i18n["ru"]["Sent a message"] = function(d){
+window.i18n["ru"]["sent a message"] = function(d){
 var r = "";
 if(!d){
 throw new Error("MessageFormat: No data passed to function.");
@@ -132,7 +132,7 @@ return r;
 }
 };
 r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
-r += " вам сообщение";
+r += " сообщение";
 return r;
 }
 window.i18n["ru"]["is online"] = function(d){
@@ -191,6 +191,301 @@ return r;
 };
 r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
 r += " из сети";
+return r;
+}
+window.i18n["ru"]["left a comment"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+r += d["NAME"];
+r += " ";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оставил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оставила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оставил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " комментарий";
+return r;
+}
+window.i18n["ru"]["mentioned you"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "упомянул";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "упомянула";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "упомянул";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вас";
+return r;
+}
+window.i18n["ru"]["posted on your wall"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "написал";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "написала";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "написал";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " на стене";
+return r;
+}
+window.i18n["ru"]["liked your comment"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " ваш комментарий";
+return r;
+}
+window.i18n["ru"]["liked your post"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашу запись";
+return r;
+}
+window.i18n["ru"]["liked your photo"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " ваше фото";
+return r;
+}
+window.i18n["ru"]["liked your video"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " ваше видео";
+return r;
+}
+window.i18n["ru"]["shared your post"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "поделился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "поделилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "поделился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашей записью";
+return r;
+}
+window.i18n["ru"]["shared your photo"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "поделился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "поделилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "поделился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашим фото";
+return r;
+}
+window.i18n["ru"]["shared your video"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "поделился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "поделилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "поделился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашим видео";
 return r;
 }
 })();

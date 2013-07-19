@@ -258,12 +258,12 @@ var r = "";
 r += "Новые друзья:";
 return r;
 }
-window.i18n["ru"]["Started following you"] = function(d){
+window.i18n["ru"]["started following you"] = function(d){
 var r = "";
-r += "Хочет добавить в друзья";
+r += "хочет добавить в друзья";
 return r;
 }
-window.i18n["ru"]["Sent a message"] = function(d){
+window.i18n["ru"]["sent a message"] = function(d){
 var r = "";
 if(!d){
 throw new Error("MessageFormat: No data passed to function.");
@@ -294,7 +294,7 @@ return r;
 }
 };
 r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
-r += " вам сообщение";
+r += " сообщение";
 return r;
 }
 window.i18n["ru"]["is online"] = function(d){
@@ -353,6 +353,301 @@ return r;
 };
 r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
 r += " из сети";
+return r;
+}
+window.i18n["ru"]["left a comment"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+r += d["NAME"];
+r += " ";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оставил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оставила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оставил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " комментарий";
+return r;
+}
+window.i18n["ru"]["mentioned you"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "упомянул";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "упомянула";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "упомянул";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вас";
+return r;
+}
+window.i18n["ru"]["posted on your wall"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "написал";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "написала";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "написал";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " на стене";
+return r;
+}
+window.i18n["ru"]["liked your comment"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " ваш комментарий";
+return r;
+}
+window.i18n["ru"]["liked your post"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашу запись";
+return r;
+}
+window.i18n["ru"]["liked your photo"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " ваше фото";
+return r;
+}
+window.i18n["ru"]["liked your video"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "оценил";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "оценила";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "оценил";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " ваше видео";
+return r;
+}
+window.i18n["ru"]["shared your post"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "поделился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "поделилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "поделился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашей записью";
+return r;
+}
+window.i18n["ru"]["shared your photo"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "поделился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "поделилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "поделился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашим фото";
+return r;
+}
+window.i18n["ru"]["shared your video"] = function(d){
+var r = "";
+if(!d){
+throw new Error("MessageFormat: No data passed to function.");
+}
+var lastkey_1 = "GENDER";
+var k_1=d[lastkey_1];
+var off_0 = 0;
+var pf_0 = { 
+"male" : function(d){
+var r = "";
+r += "поделился";
+return r;
+},
+"female" : function(d){
+var r = "";
+r += "поделилась";
+return r;
+},
+"other" : function(d){
+var r = "";
+r += "поделился";
+return r;
+}
+};
+r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
+r += " вашим видео";
 return r;
 }
 })();
@@ -910,7 +1205,7 @@ angular.module('chat', [
                     gender = profile.sex === 1 ? 'female':'male';
 
                     Notifications.create({
-                        title: $filter('i18n')('Sent a message', {
+                        title: $filter('i18n')('sent a message', {
                             NAME: $filter('name')(profile),
                             GENDER: gender
                         }),
@@ -1895,6 +2190,79 @@ angular.module('feedbacks', [
         });
     }, 0);
 
+    function tryNotification() {
+        var itemModel = itemsColl.first(),
+            lastFeedback, notificationItem, type, parentType,
+            profile, ownerId, gender, title, message, name;
+
+        if (itemModel.has('feedbacks')) { // notification has parent, e.g. comment to post, like to video etc
+            lastFeedback = itemModel.get('feedbacks').last(),
+            notificationItem = lastFeedback.get('feedback');
+            type = lastFeedback.get('type');
+            parentType = itemModel.get('type');
+        } else { // notification is parent itself, e.g. wall post, friend request etc
+            notificationItem = itemModel.get('parent');
+            type = itemModel.get('type');
+        }
+
+        ownerId = notificationItem.owner_id;
+
+        // Don't show self messages
+        if (ownerId !== userId || true) {
+            profile = profilesColl.get(ownerId).toJSON(),
+            name = $filter('name')(profile),
+            gender = profile.sex === 1 ? 'female':'male';
+
+            switch (type) {
+            case 'follow':
+                title = name + ' ' + $filter('i18n')('started following you', {
+                    GENDER: gender
+                });
+                break;
+            case 'mention':
+                title = name + ' ' + $filter('i18n')('mentioned you', {
+                    GENDER: gender
+                });
+                message = notificationItem.text;
+                break;
+            case 'wall':
+                title = name + ' ' + $filter('i18n')('posted on your wall', {
+                    GENDER: gender
+                });
+                message = notificationItem.text;
+                break;
+            case 'like':
+                title = name + ' ' + $filter('i18n')('liked your ' + parentType, {
+                    GENDER: gender
+                });
+                break;
+            case 'copy':
+                title = name + ' ' + $filter('i18n')('shared your ' + parentType, {
+                    GENDER: gender
+                });
+                break;
+            case 'comment':
+            // 'mention_commentS' type in notifications
+            case 'comments':
+            case 'reply':
+                title = $filter('i18n')('left a comment', {
+                    NAME: name,
+                    GENDER: gender
+                });
+                message = notificationItem.text;
+                break;
+            }
+
+            if (title) {
+                Notifications.create({
+                    title: title,
+                    message: message,
+                    image: profile.photo
+                });
+            }
+        }
+    }
+
     /**
      * Initialize all variables
      */
@@ -1906,17 +2274,15 @@ angular.module('feedbacks', [
             persistentModel = new PersistentModel({}, {
                 name: ['feedbacks', 'background', userId].join(':')
             });
-            persistentModel.on('change:latestFeedbackId', function () {
-                console.log(arguments);
-            });
+            persistentModel.on('change:latestFeedbackId', tryNotification);
 
             publishData();
         });
 
         autoUpdateNotificationsParams = {
-            count: MAX_ITEMS_COUNT,
+            count: MAX_ITEMS_COUNT
             //everything except comments
-            filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
+            // filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
         },
         autoUpdateCommentsParams = {
             last_comments: 1,
@@ -1988,17 +2354,26 @@ angular.module('feedbacks', [
                 itemsColl.add(itemModel, {sort: false});
             }
             itemModel.get('feedbacks').add([].concat(feedback).map(function (feedback) {
+                var id;
+
                 feedback.owner_id = Number(feedback.from_id || feedback.owner_id);
+
+                if (feedbackType === 'like' || feedbackType === 'copy') {
+                    // 'like' and 'post', so we need to pass 'parent'
+                    // to make difference for two likes from the same user to different objects
+                    id  = generateItemID(feedbackType, parent);
+                } else {
+                    id  = generateItemID(feedbackType, feedback);
+                }
                 return {
-                    id: generateItemID(feedbackType, feedback),
+                    id: id,
                     type: feedbackType,
                     feedback: feedback,
                     date: item.date
                 };
             }));
             if (!itemModel.has('date') || itemModel.get('date') < item.date) {
-                console.log(itemModel.get('feedbacks').last(), item);
-                itemModel.set('date', itemModel.get('feedbacks').last().get('date'));
+                itemModel.set('date', item.date);
             }
             itemModel.trigger('change');
         } else {
@@ -2008,7 +2383,7 @@ angular.module('feedbacks', [
                 feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
                 itemModel = createItemModel(parentType, feedback, false);
                 itemModel.set('date', item.date);
-                itemsColl.add(itemModel);
+                itemsColl.add(itemModel, {sort: false});
             });
         }
     }
@@ -2070,9 +2445,9 @@ angular.module('feedbacks', [
             autoUpdateCommentsParams.from = comments.new_from;
 
             // first item in notifications contains quantity
-            if ((notifications.items && notifications.length > 1)
+            if ((notifications.items && notifications.items.length > 1)
                 || (comments.items && comments.items.length)) {
-                // TODO comments
+                console.log('fetch', notifications.items);
                 profilesColl
                     .add(comments.profiles, {parse: true})
                     .add(comments.groups, {parse: true})
@@ -2097,11 +2472,13 @@ angular.module('feedbacks', [
         publishData();
 
         itemsColl.on('add change', function () {
+            var firstModel = itemsColl.first();
+
             itemsColl.sort();
-            console.log('new feedbacks', arguments);
+            console.log((firstModel.has('feedbacks') ? firstModel.get('feedbacks').last():firstModel).get('id'));
             persistentModel.set(
                 'latestFeedbackId',
-                itemsColl.first().get('feedbacks').last().id
+                (firstModel.has('feedbacks') ? firstModel.get('feedbacks').last():firstModel).get('id')
             );
             publishData();
         });
@@ -2743,6 +3120,14 @@ angular.module('notifications', []).factory('Notifications', function () {
         xhr.send();
     }
     return {
+        /**
+         * Show new notifications
+         *
+         * @param {Object} options
+         * @param {String} options.title
+         * @param {String} [options.photo]
+         * @param {String} [options.message='']
+         */
         create: function (options) {
             console.log(options);
             // TODO on error
@@ -2750,7 +3135,7 @@ angular.module('notifications', []).factory('Notifications', function () {
                 chrome.notifications.create(_.uniqueId(), {
                     type: 'basic',
                     title: options.title,
-                    message: options.message,
+                    message: options.message || '',
                     iconUrl: base64
                 }, function () {});
             });

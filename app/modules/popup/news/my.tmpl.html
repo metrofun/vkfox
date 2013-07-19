@@ -12,7 +12,7 @@
         <div ng-if="item.type == 'mention'" ng-bind-html-unsafe="item.parent.text | truncate">
         </div>
         <div ng-if="item.type == 'follow'">
-            {{'Started following you' | i18n}} <i class="icon-user"></i>
+            {{'started following you' | i18n}} <i class="icon-user"></i>
         </div>
         <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
             <p ng-if="item.parent.text" ng-bind-html-unsafe="item.parent.text | truncate"></p>
@@ -39,7 +39,11 @@
         <item
             ng-repeat="feedback in item.feedbacks"
             owners="data.profiles | where:'id':feedback.feedback.owner_id">
-            <div ng-if="['comment', 'reply'].indexOf(feedback.type) !== -1">
+            <!--
+               - 'mention_commentS' type in notifications
+               - @see http://vk.com/dev/notifications.get
+               -->
+            <div ng-if="['comment', 'comments', 'reply'].indexOf(feedback.type) !== -1">
                 {{feedback.feedback.text}}
             </div>
             <span ng-if="feedback.type == 'like'">

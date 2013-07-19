@@ -15,8 +15,18 @@
     "Liked": "Понравилось",
     "Reposted": "Поделился записью",
     "New friends:": "Новые друзья:",
-    "Started following you": "Хочет добавить в друзья",
-    "Sent a message": "{NAME} {GENDER, select, male{прислал} female{прислала} other{прислал}} вам сообщение",
+    "started following you": "хочет добавить в друзья",
+    "sent a message": "{NAME} {GENDER, select, male{прислал} female{прислала} other{прислал}} сообщение",
     "is online": "{GENDER, select, male{появился} female{появилась} other{появился}} в сети",
-    "went offline": "{GENDER, select, male{вышел} female{вышла} other{вышел}} из сети"
+    "went offline": "{GENDER, select, male{вышел} female{вышла} other{вышел}} из сети",
+    "left a comment": "{NAME} {GENDER, select, male{оставил} female{оставила} other{оставил}} комментарий",
+    "mentioned you": "{GENDER, select, male{упомянул} female{упомянула} other{упомянул}} вас",
+    "posted on your wall": "{GENDER, select, male{написал} female{написала} other{написал}} на стене",
+    "liked your comment": "{GENDER, select, male{оценил} female{оценила} other{оценил}} ваш комментарий",
+    "liked your post": "{GENDER, select, male{оценил} female{оценила} other{оценил}} вашу запись",
+    "liked your photo": "{GENDER, select, male{оценил} female{оценила} other{оценил}} ваше фото",
+    "liked your video": "{GENDER, select, male{оценил} female{оценила} other{оценил}} ваше видео",
+    "shared your post": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашей записью",
+    "shared your photo": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим фото",
+    "shared your video": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим видео"
 }
