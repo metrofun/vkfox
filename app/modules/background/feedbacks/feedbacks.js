@@ -327,17 +327,16 @@ angular.module('feedbacks', [
     readyDeferred.then(function () {
         publishData();
 
-        itemsColl.on('add change', function () {
+        itemsColl.on('add change', _.debounce(function () {
             var firstModel = itemsColl.first();
 
             itemsColl.sort();
-            console.log((firstModel.has('feedbacks') ? firstModel.get('feedbacks').last():firstModel).get('id'));
             persistentModel.set(
                 'latestFeedbackId',
                 (firstModel.has('feedbacks') ? firstModel.get('feedbacks').last():firstModel).get('id')
             );
             publishData();
-        });
+        }));
         profilesColl.on('change', publishData);
 
         Mediator.sub('likes:changed', function (params) {

@@ -97,10 +97,11 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                                 };
 
                                 if (scope.chatId) {
-                                    params.chatId = scope.chatId;
+                                    params.chat_id = scope.chatId;
                                 } else {
                                     params.uid = scope.uid;
                                 }
+                                console.log(scope, params);
 
                                 Request.api({
                                     code: 'return API.messages.send(' + JSON.stringify(params) + ');'
