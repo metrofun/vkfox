@@ -1200,7 +1200,7 @@ angular.module('chat', [
 
                 persistentModel.set('latestMessageId', message.mid);
 
-                if (userId !== message.uid) {
+                if (!message.out) {
                     profile = profilesColl.get(message.uid).toJSON(),
                     gender = profile.sex === 1 ? 'female':'male';
 
@@ -1226,22 +1226,20 @@ angular.module('chat', [
             flags = update[2],
             attachment = update[7],
             dialog, messageDeferred,
-            dialogCompanionUid = update[3],
-            out;
+            dialogCompanionUid = update[3];
 
         // For messages from chat attachment contains "from" property
         if (_(attachment).isEmpty()) {
-            out = +!!(flags & 2);
 
             // mimic response from server
             messageDeferred = jQuery.Deferred().resolve([1, {
                 body: update[6],
                 title: update[5],
                 date: update[4],
-                uid: out ? userId:dialogCompanionUid,
+                uid: dialogCompanionUid,
                 read_state: +!(flags & 1),
-                mid: messageId
-                // out: +!!(flags & 2)
+                mid: messageId,
+                out: +!!(flags & 2)
             }]);
         } else {
             messageDeferred = Request.api({
@@ -1250,6 +1248,7 @@ angular.module('chat', [
         }
 
         messageDeferred.then(function (response) {
+            console.log(response[1]);
             var message = response[1],
                 dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
@@ -1269,13 +1268,13 @@ angular.module('chat', [
                     messages: [message]
                 });
 
-                return setDialogsProfiles().then(function () {
+                return fetchProfiles().then(function () {
                     return message;
                 });
             }
         });
     }
-    function setDialogsProfiles() {
+    function fetchProfiles() {
         var uids = dialogColl.reduce(function (uids, dialog) {
             dialog.get('messages').map(function (message) {
                 var chatActive = message.chat_active;
@@ -1290,16 +1289,14 @@ angular.module('chat', [
             return uids;
         }, []);
 
+        uids.push(userId);
         uids = _.uniq(uids);
 
-        if (uids.length) {
-            return Users.getProfilesById(uids).then(function (data) {
-                profilesColl.reset(data);
-            });
-        } else {
-            profilesColl.reset();
-            return jQuery.Deferred().resolve();
-        }
+        return Users.getProfilesById(uids).then(function (data) {
+            profilesColl.reset(data);
+            // mark self profile
+            profilesColl.get(userId).set('isSelf', true);
+        });
     }
     /*
      * Removes read messages from dialog,
@@ -1309,17 +1306,18 @@ angular.module('chat', [
      */
     function removeReadMessages(dialog) {
         var messages = dialog.get('messages'),
-            updatedMessages = [messages[messages.length - 1]],
-            dialogCompanionUid = messages[messages.length - 1].uid;
+            result = [messages.pop()],
+            originalOut = result[0].out;
 
-        messages.reverse().slice(1).some(function (message) {
-            if (message.mid !== dialogCompanionUid && message.read_state) {
-                return true;
+        messages.reverse().some(function (message) {
+            if (message.out === originalOut && message.read_state === 0) {
+                result.unshift(message);
             } else {
-                updatedMessages.unshift(message);
+                // stop copying messages
+                return true;
             }
         });
-        dialog.set('messages', updatedMessages);
+        dialog.set('messages', result);
     }
     /*
      * If last message in dialog is unread,
@@ -1341,7 +1339,7 @@ angular.module('chat', [
                 if (historyMessages && historyMessages[0]) {
                     unreadDialogs[index].set(
                         'messages',
-                        historyMessages.slice(1).reverse().map(convertHistoryIntoMessageData)
+                        historyMessages.slice(1).reverse()
                     );
                     removeReadMessages(unreadDialogs[index]);
                 }
@@ -1377,22 +1375,6 @@ angular.module('chat', [
             }
         });
     }
-    function convertHistoryIntoMessageData(history) {
-        var message = history;
-
-        message.uid = history.from_id;
-
-        return message;
-    }
-    function convertDialogIntoMessageData(dialog) {
-        var message = dialog;
-
-        if (message.out) {
-            message.uid = userId;
-            delete message.out;
-        }
-        return message;
-    }
     function getDialogs() {
         return Request.api({
             code: 'return API.messages.getDialogs({preview_length: 0});'
@@ -1405,7 +1387,7 @@ angular.module('chat', [
                         chat_id: item.chat_id,
                         chat_active: item.chat_active,
                         uid: item.uid,
-                        messages: [convertDialogIntoMessageData(item)]
+                        messages: [item]
                     };
                 }));
             }
@@ -1440,7 +1422,7 @@ angular.module('chat', [
         initialize();
 
         userId = data.userId;
-        getDialogs().then(getUnreadMessages).then(setDialogsProfiles).then(function () {
+        getDialogs().then(getUnreadMessages).then(fetchProfiles).then(function () {
             readyDeferred.resolve();
         });
     });

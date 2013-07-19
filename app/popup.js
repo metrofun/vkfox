@@ -1154,11 +1154,16 @@ angular.module('chat', ['item', 'mediator', 'request', 'ngSanitize'])
         Mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
                 $scope.data = data.dialogs.map(function (dialog) {
-                    var messageAuthorId = dialog.messages[0].uid, result = {};
+                    var firstMessage = dialog.messages[0], result = {};
 
-                    if ((dialog.chat_id || dialog.uid !== messageAuthorId)) {
+                    if (dialog.messages[0].out) {
+                        // find logined user profile
                         result.author = _(data.profiles).findWhere({
-                            uid: messageAuthorId
+                            isSelf: true
+                        });
+                    } else if (dialog.chat_id) {
+                        result.author = _(data.profiles).findWhere({
+                            uid: firstMessage.uid
                         });
                     }
                     if (dialog.chat_id) {
