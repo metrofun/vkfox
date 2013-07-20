@@ -3,15 +3,11 @@
     "jquery": "~1.9.1",
     "underscore": "~1.4.4",
     "backbone": "https://github.com/jashkenas/backbone.git#~1.0.0",
-    "jtoh": "https://github.com/metrofun/jtoh.git",
-    "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.2",
-    "requirejs": "~2.1.4",
+    "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.3",
     "angular-unstable": "~1.1.5",
     "angular-ui-utils": "~0.0.2",
-    "angular-ui-bootstrap": "~0.3.0",
     "3.0.0-wip": "https://github.com/twitter/bootstrap/archive/3.0.0-wip.zip",
     "moment": "~2.1.0",
-    "angular-sanitize": "~1.0.7",
-    "Flat-UI": "https://github.com/designmodo/Flat-UI.git"
+    "angular-sanitize": "~1.0.7"
   }
 }
