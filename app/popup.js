@@ -1176,6 +1176,7 @@ angular.module('chat', ['item', 'mediator', 'request', 'ngSanitize'])
                         });
                     }
 
+                    result.id = dialog.id;
                     result.messages = dialog.messages;
                     result.chat_id = dialog.chat_id;
                     result.uid = dialog.uid;
@@ -1895,19 +1896,36 @@ angular.module('item-list', [])
                 return function ($scope, $element, $attr, itemListController) {
                     var animate = $animator($scope, $attr),
                         expression = $attr.itemListRepeat,
-                        match = expression.match(/^\s*([\$\w]+)\s+in\s+(.*?)$/),
+                        match = expression.match(/^\s*([\$\w]+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/),
                         collectionIdentifier, valueIdentifier,
+                        trackByExp, trackByIdFn, trackByExpGetter,
+                        hashFnLocals = {},
                         lastBlockMap = {},
                         itemListElement = itemListController.getElement();
 
                     itemListElement = itemListElement;
                     if (!match) {
-                        throw new Error("Expected itemListRepeat in form of '_item_ in _collection_' but got '" +
+                        throw new Error("Expected itemListRepeat in form of '_item_ in _collection_[ track by _id_]' but got '" +
                         expression + "'.");
                     }
 
                     valueIdentifier = match[1];
                     collectionIdentifier = match[2];
+                    trackByExp = match[4];
+
+                    if (trackByExp) {
+                        trackByExpGetter = $parse(trackByExp);
+                        trackByIdFn = function (value) {
+                            hashFnLocals[valueIdentifier] = value;
+                            console.log(hashFnLocals, trackByExp, trackByExpGetter($scope, hashFnLocals));
+                            return trackByExpGetter($scope, hashFnLocals);
+                        };
+                    } else {
+                        trackByIdFn = function (value) {
+                            return hashKey(value);
+                        };
+                    }
+
 
                     function updateScrolledBlocks(collection, cursor, nextBlockOrder, nextBlockMap, offset) {
                         var index = offset || 0,
@@ -2001,7 +2019,7 @@ angular.module('item-list', [])
                         // locate existing items
                         length = nextBlockOrder.length = collection.length;
                         for (index = 0; index < length; index++) {
-                            trackById = hashKey(collection[index]);
+                            trackById = trackByIdFn(collection[index]);
                             if (lastBlockMap[trackById]) {
                                 block = lastBlockMap[trackById];
                                 delete lastBlockMap[trackById];
@@ -2914,24 +2932,8 @@ define(['backbone'], function (Backbone) {
 angular.module('tooltip', []).run(function () {
     jQuery('body').tooltip({
         selector: '[title]',
-        container: '.app',
         delay: { show: 1000, hide: false},
-        placement: function () {
-            var $container = jQuery(this.options.container),
-                containerOffset = $container.offset(),
-                offset = this.$element.offset(),
-                top = offset.top - containerOffset.top,
-                left = offset.left - containerOffset.top,
-                height = $container.outerHeight(),
-                width = $container.outerWidth(),
-                vert = 0.5 * height - top,
-                vertPlacement = vert > 0 ? 'bottom' : 'top',
-                horiz = 0.5 * width - left,
-                horizPlacement = horiz > 0 ? 'right' : 'left',
-                placement = Math.abs(horiz) > Math.abs(vert) ?  horizPlacement : vertPlacement;
-
-            return placement;
-        }
+        placement: 'left'
     });
 
     // Hide popup on click

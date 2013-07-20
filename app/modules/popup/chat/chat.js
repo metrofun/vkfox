@@ -31,6 +31,7 @@ angular.module('chat', ['item', 'mediator', 'request', 'ngSanitize'])
                         });
                     }
 
+                    result.id = dialog.id;
                     result.messages = dialog.messages;
                     result.chat_id = dialog.chat_id;
                     result.uid = dialog.uid;

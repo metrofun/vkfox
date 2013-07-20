@@ -58,19 +58,36 @@ angular.module('item-list', [])
                 return function ($scope, $element, $attr, itemListController) {
                     var animate = $animator($scope, $attr),
                         expression = $attr.itemListRepeat,
-                        match = expression.match(/^\s*([\$\w]+)\s+in\s+(.*?)$/),
+                        match = expression.match(/^\s*([\$\w]+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/),
                         collectionIdentifier, valueIdentifier,
+                        trackByExp, trackByIdFn, trackByExpGetter,
+                        hashFnLocals = {},
                         lastBlockMap = {},
                         itemListElement = itemListController.getElement();
 
                     itemListElement = itemListElement;
                     if (!match) {
-                        throw new Error("Expected itemListRepeat in form of '_item_ in _collection_' but got '" +
+                        throw new Error("Expected itemListRepeat in form of '_item_ in _collection_[ track by _id_]' but got '" +
                         expression + "'.");
                     }
 
                     valueIdentifier = match[1];
                     collectionIdentifier = match[2];
+                    trackByExp = match[4];
+
+                    if (trackByExp) {
+                        trackByExpGetter = $parse(trackByExp);
+                        trackByIdFn = function (value) {
+                            hashFnLocals[valueIdentifier] = value;
+                            console.log(hashFnLocals, trackByExp, trackByExpGetter($scope, hashFnLocals));
+                            return trackByExpGetter($scope, hashFnLocals);
+                        };
+                    } else {
+                        trackByIdFn = function (value) {
+                            return hashKey(value);
+                        };
+                    }
+
 
                     function updateScrolledBlocks(collection, cursor, nextBlockOrder, nextBlockMap, offset) {
                         var index = offset || 0,
@@ -164,7 +181,7 @@ angular.module('item-list', [])
                         // locate existing items
                         length = nextBlockOrder.length = collection.length;
                         for (index = 0; index < length; index++) {
-                            trackById = hashKey(collection[index]);
+                            trackById = trackByIdFn(collection[index]);
                             if (lastBlockMap[trackById]) {
                                 block = lastBlockMap[trackById];
                                 delete lastBlockMap[trackById];

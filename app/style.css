@@ -5319,8 +5319,8 @@ a.badge:focus {
   background-color: #e51d18;
 }
 .item-list {
-  overflow: scroll;
   height: 400px;
+  overflow-y: scroll;
 }
 .item-list__content {
   margin: 10px;
@@ -5330,7 +5330,6 @@ a.badge:focus {
   -webkit-box-shadow: 0 1px 4px #999999;
   -moz-box-shadow: 0 1px 4px #999999;
   box-shadow: 0 1px 4px #999999;
-  overflow: hidden;
 }
 .item__action-like_liked {
   opacity: 1 !important;
@@ -5342,7 +5341,7 @@ a.badge:focus {
 .item__attachment {
   width: 100%;
   overflow: hidden;
-  float: left;
+  display: inline-block;
   margin-top: 8px;
 }
 .item__attachment:first-child {
@@ -5376,7 +5375,8 @@ a.badge:focus {
 }
 .item__picture {
   width: 100%;
-  float: left;
+  display: inline-block;
+  vertical-align: top;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -5402,7 +5402,8 @@ a.badge:focus {
 }
 .item__video {
   width: 100%;
-  float: left;
+  display: inline-block;
+  vertical-align: top;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -5458,7 +5459,6 @@ a.badge:focus {
   padding: 10px;
   margin: 0;
   position: relative;
-  overflow: hidden;
 }
 .item .item {
   padding-left: 0;

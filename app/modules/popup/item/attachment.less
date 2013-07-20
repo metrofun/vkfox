@@ -1,7 +1,7 @@
 .item__attachment {
     width: 100%;
     overflow: hidden;
-    float: left;
+    display: inline-block;
     margin-top: @baseLineHeight / 2;
 
     &:first-child {
@@ -35,7 +35,8 @@
 }
 .item__picture {
     width: 100%;
-    float: left;
+    display: inline-block;
+    vertical-align: top;
     .background-size(cover);
     background-position: center;
     .transition(opacity 0.1s linear);

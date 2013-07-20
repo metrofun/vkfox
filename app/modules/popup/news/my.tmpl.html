@@ -1,6 +1,6 @@
 <item-list ng-controller="MyNewsController">
     <item
-        item-list-repeat="item in data.items"
+        item-list-repeat="item in data.items track by item.id"
         owners="data.profiles | where:'id':item.parent.owner_id">
         <div ng-if="item.type == 'photo' || item.type == 'video'">
             <item-attachment data="item.parent" type="{{item.type}}">

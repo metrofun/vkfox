@@ -241,7 +241,6 @@ angular.module('chat', [
         }).then(function (response) {
             if (response && response[0]) {
                 dialogColl.reset(response.slice(1).map(function (item) {
-                    // convert dialog data into message data
                     return {
                         id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,
                         chat_id: item.chat_id,

@@ -1381,7 +1381,6 @@ angular.module('chat', [
         }).then(function (response) {
             if (response && response[0]) {
                 dialogColl.reset(response.slice(1).map(function (item) {
-                    // convert dialog data into message data
                     return {
                         id: item.chat_id ? 'chat_id_' + item.chat_id:'uid_' + item.uid,
                         chat_id: item.chat_id,
@@ -2898,8 +2897,20 @@ angular.module(
                 }
             })
         }))(),
-        groupItemsColl = new Backbone.Collection(),
-        friendItemsColl = new Backbone.Collection(),
+        ItemsColl = Backbone.Collection.extend({
+            model: Backbone.Model.extend({
+                toJSON: function () {
+                    // due to performance considerations,
+                    // we track items by cid (uniq id) in view
+                    var result = _.clone(this.attributes);
+                    result.cid = this.cid;
+
+                    return result;
+                }
+            })
+        }),
+        groupItemsColl = new ItemsColl(),
+        friendItemsColl = new ItemsColl(),
         rotateId, readyDeferred, autoUpdateParams;
 
     function fetchNewsfeed() {
