@@ -108,7 +108,6 @@ angular.module('chat', [
         }
 
         messageDeferred.then(function (response) {
-            console.log(response[1]);
             var message = response[1],
                 dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 

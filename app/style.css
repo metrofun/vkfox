@@ -5288,20 +5288,6 @@ a.badge:focus {
   opacity: 1 !important;
   background-color: #5bc0de;
 }
-.t-buddies__controls {
-  padding: 0 10px 5px !important;
-  min-height: auto;
-}
-.t-buddies__dropdown {
-  min-width: auto;
-}
-.t-buddies__dropdown-label {
-  margin: -3px -20px !important;
-  padding: 3px 20px !important;
-}
-.t-buddies__item-list {
-  min-height: 100px;
-}
 .chat__item-content {
   padding: 0;
   margin: 0;
@@ -5330,6 +5316,22 @@ a.badge:focus {
   -webkit-box-shadow: 0 1px 4px #999999;
   -moz-box-shadow: 0 1px 4px #999999;
   box-shadow: 0 1px 4px #999999;
+}
+.item-list__content .item:first-child {
+  -webkit-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
+}
+.item-list__content .item:last-child {
+  -webkit-border-bottom-right-radius: 4px;
+  -moz-border-radius-bottomright: 4px;
+  border-bottom-right-radius: 4px;
+  -webkit-border-bottom-left-radius: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  border-bottom-left-radius: 4px;
 }
 .item__action-like_liked {
   opacity: 1 !important;
@@ -5574,13 +5576,6 @@ a.badge:focus {
 .item__action-active {
   opacity: 1;
 }
-.t-updates__controls {
-  padding: 0 10px 5px !important;
-  min-height: auto;
-}
-.t-chat__item .t-item__content {
-  cursor: pointer;
-  border: 0;
-  margin: 0;
-  padding: 0;
+.news__form {
+  padding: 0 10px !important;
 }

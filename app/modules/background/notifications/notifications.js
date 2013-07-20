@@ -36,7 +36,6 @@ angular.module('notifications', []).factory('Notifications', function () {
          * @param {String} [options.message='']
          */
         create: function (options) {
-            console.log(options);
             // TODO on error
             getBase64FromImage(options.image, function (base64) {
                 chrome.notifications.create(_.uniqueId(), {
