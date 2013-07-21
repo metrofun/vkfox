@@ -45,6 +45,11 @@
                -->
             <div ng-if="['comment', 'comments', 'reply'].indexOf(feedback.type) !== -1">
                 {{feedback.feedback.text}}
+                <item-attachment
+                    ng-repeat="attachment in feedback.feedback.attachments"
+                    data="attachment[attachment.type]"
+                    type="{{attachment.type}}">
+                </item-attachment>
             </div>
             <span ng-if="feedback.type == 'like'">
                 {{'Liked' | i18n}} <i class="icon-heart"></i>
