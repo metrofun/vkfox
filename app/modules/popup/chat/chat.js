@@ -1,4 +1,4 @@
-angular.module('chat', ['item', 'mediator', 'request', 'ngSanitize'])
+angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
     .controller('ChatCtrl', function ($scope, Mediator, Request) {
         $scope.markAsRead = function (messages) {
             Request.api({code: 'return API.messages.markAsRead({mids: ['

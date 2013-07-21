@@ -5,7 +5,7 @@
         <div ng-switch-when="post">
             <p
                 ng-if="item.text"
-                ng-bind-html-unsafe="item.text | truncate"
+                ng-bind-html-unsafe="item.text | rectify"
                 class="news__item-text">
             </p>
             <item-attachment

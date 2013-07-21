@@ -79,7 +79,6 @@ angular.module('item-list', [])
                         trackByExpGetter = $parse(trackByExp);
                         trackByIdFn = function (value) {
                             hashFnLocals[valueIdentifier] = value;
-                            console.log(hashFnLocals, trackByExp, trackByExpGetter($scope, hashFnLocals));
                             return trackByExpGetter($scope, hashFnLocals);
                         };
                     } else {

@@ -2,7 +2,7 @@ angular.module('tooltip', []).run(function () {
     jQuery('body').tooltip({
         selector: '[title]',
         delay: { show: 1000, hide: false},
-        placement: 'left'
+        placement: 'bottom'
     });
 
     // Hide popup on click

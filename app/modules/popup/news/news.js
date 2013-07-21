@@ -1,4 +1,4 @@
-angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
+angular.module('news', ['mediator', 'navigation', 'rectify'])
     .controller('NewsController', function ($scope, $routeParams) {
         $scope.subtabs = [
             {
@@ -22,7 +22,6 @@ angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
             $scope.$apply(function () {
                 $scope.data = data;
 
-                console.log(data.items);
                 if (data.items && data.items.length) {
                     data.items.forEach(function (item) {
                         var comment, parent = item.parent, type;

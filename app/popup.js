@@ -1,57 +1,5 @@
 // TODO rename to utils
 angular.module('common', ['config', 'i18n'])
-    .filter('truncate', function ($filter) {
-        var MAX_TEXT_LENGTH = 300,
-            TRUNCATE_LENGTH = 200,
-
-            label = $filter('i18n')('more...');
-
-        jQuery('body').on('click', '.show-more', function (e) {
-            var jTarget = jQuery(e.currentTarget);
-
-            jTarget.replaceWith(jTarget.data('text'));
-        });
-
-        function escapeQuotes(string) {
-            var entityMap = {
-                '"': '&quot;',
-                "'": '&#39;'
-            };
-
-            return String(string).replace(/["']/g, function (s) {
-                return entityMap[s];
-            });
-        }
-        /**
-         * Truncates long text, and add pseudo-link "show-more"
-         *
-         * @param {String} text
-         *
-         * @returns {String}
-         */
-        return function (text) {
-            var spaceIndex;
-
-            if (text) {
-                text = String(text);
-                if (text.length > MAX_TEXT_LENGTH) {
-                    spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
-
-                    if (spaceIndex !== -1) {
-                        return  text.slice(0, spaceIndex) + [
-                            ' <span class="show-more btn btn-mini" data-text="',
-                            escapeQuotes(text.slice(spaceIndex)),
-                            '" type="button">', label, '</span>'
-                        ].join('');
-                    } else {
-                        return text;
-                    }
-                } else {
-                    return text;
-                }
-            }
-        };
-    })
     .filter('duration', function () {
         /**
         * Returns time duration in format 'HH:mm'
@@ -730,7 +678,7 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
     });
 
 
-angular.module('chat', ['item', 'mediator', 'request', 'ngSanitize'])
+angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
     .controller('ChatCtrl', function ($scope, Mediator, Request) {
         $scope.markAsRead = function (messages) {
             Request.api({code: 'return API.messages.markAsRead({mids: ['
@@ -858,7 +806,6 @@ angular.module('item-list', [])
                         trackByExpGetter = $parse(trackByExp);
                         trackByIdFn = function (value) {
                             hashFnLocals[valueIdentifier] = value;
-                            console.log(hashFnLocals, trackByExp, trackByExpGetter($scope, hashFnLocals));
                             return trackByExpGetter($scope, hashFnLocals);
                         };
                     } else {
@@ -1296,7 +1243,7 @@ angular.module('navigation', ['ui.route'])
         };
     });
 
-angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
+angular.module('news', ['mediator', 'navigation', 'rectify'])
     .controller('NewsController', function ($scope, $routeParams) {
         $scope.subtabs = [
             {
@@ -1320,7 +1267,6 @@ angular.module('news', ['mediator', 'ngSanitize', 'navigation'])
             $scope.$apply(function () {
                 $scope.data = data;
 
-                console.log(data.items);
                 if (data.items && data.items.length) {
                     data.items.forEach(function (item) {
                         var comment, parent = item.parent, type;
@@ -1423,6 +1369,79 @@ angular.module('persistent-model', []).factory('PersistentModel', function () {
     };
 });
 
+/*global linkify */
+angular.module(
+    'rectify', ['i18n']
+).filter('rectify', function ($filter) {
+    var MAX_TEXT_LENGTH = 300,
+        TRUNCATE_LENGTH = 200,
+
+        label = $filter('i18n')('more...');
+
+    jQuery('body').on('click', '.show-more', function (e) {
+        var jTarget = jQuery(e.currentTarget);
+
+        jTarget.replaceWith(linkify(jTarget.data('text')));
+    });
+
+    /**
+     * Also replaces next wiki format: [id12345|Dmitrii],
+     * or [club32194285|Читать прoдoлжение..]
+     * with <a anchor="http://vk.com/id12345">Dmitrii</a>
+     *
+     * @param {String} text
+     * @returns {String} html
+     */
+    function linkify(text) {
+        return text.replace(
+            /\[((?:id|club)\d+)\|([^\]"']+)\]/g,
+            '<a anchor="http://vk.com/$1">$2</a>'
+        );
+    }
+
+    function escapeQuotes(string) {
+        var entityMap = {
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+
+        return String(string).replace(/["']/g, function (s) {
+            return entityMap[s];
+        });
+    }
+    /**
+     * Truncates long text, and add pseudo-link "show-more"
+     * Also replaces next wiki format: [id12345|Dmitrii]
+     * with <a anchor="http://vk.com/id12345">Dmitrii</a>
+     *
+     * @param {String} text
+     *
+     * @returns {String} html-string
+     */
+    return function (text) {
+        var spaceIndex;
+
+        if (text) {
+            text = String(text);
+            if (text.length > MAX_TEXT_LENGTH) {
+                spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
+
+                if (spaceIndex !== -1) {
+                    return  linkify(text.slice(0, spaceIndex)) + [
+                        ' <span class="show-more btn btn-mini" data-text="',
+                        escapeQuotes(text.slice(spaceIndex)),
+                        '" type="button">', label, '</span>'
+                    ].join('');
+                } else {
+                    return linkify(text);
+                }
+            } else {
+                return linkify(text);
+            }
+        }
+    };
+});
+
 angular.module('request', ['mediator'])
     .factory('Request', function (Mediator) {
         return {
@@ -1484,7 +1503,7 @@ angular.module('tooltip', []).run(function () {
     jQuery('body').tooltip({
         selector: '[title]',
         delay: { show: 1000, hide: false},
-        placement: 'left'
+        placement: 'bottom'
     });
 
     // Hide popup on click

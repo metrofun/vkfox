@@ -8,6 +8,6 @@
     "angular-ui-utils": "~0.0.2",
     "3.0.0-wip": "https://github.com/twitter/bootstrap/archive/3.0.0-wip.zip",
     "moment": "~2.1.0",
-    "angular-sanitize": "~1.0.7"
+    "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git"
   }
 }

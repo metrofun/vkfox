@@ -9,13 +9,13 @@
         <div ng-if="item.type == 'topic'">
             {{item.parent.text}}
         </div>
-        <div ng-if="item.type == 'mention'" ng-bind-html-unsafe="item.parent.text | truncate">
+        <div ng-if="item.type == 'mention'" ng-bind-html-unsafe="item.parent.text | rectify">
         </div>
         <div ng-if="item.type == 'follow'">
             {{'started following you' | i18n}} <i class="icon-user"></i>
         </div>
         <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
-            <p ng-if="item.parent.text" ng-bind-html-unsafe="item.parent.text | truncate"></p>
+            <p ng-if="item.parent.text" ng-bind-html-unsafe="item.parent.text | rectify"></p>
             <item-attachment
                 ng-repeat="attachment in item.parent.attachments"
                 data="attachment[attachment.type]"
@@ -44,7 +44,7 @@
                - @see http://vk.com/dev/notifications.get
                -->
             <div ng-if="['comment', 'comments', 'reply'].indexOf(feedback.type) !== -1">
-                {{feedback.feedback.text}}
+                <span ng-bind-html-unsafe="feedback.feedback.text | rectify"></span>
                 <item-attachment
                     ng-repeat="attachment in feedback.feedback.attachments"
                     data="attachment[attachment.type]"

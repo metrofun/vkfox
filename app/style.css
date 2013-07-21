@@ -5272,6 +5272,13 @@ a.badge:focus {
   position: fixed;
 }
 /* @baseFontSize:          14px; */
+@font-face {
+  font-family: emoji;
+  src: url('https://github.com/android/platform_frameworks_base/raw/master/data/fonts/AndroidEmoji.ttf');
+}
+* {
+  font-family: emoji !important;
+}
 .app {
   background: #eeeeee;
   width: 320px;
