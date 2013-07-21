@@ -61,7 +61,11 @@ angular.module('chat', [
                 persistentModel.set('latestMessageId', message.mid);
 
                 if (!message.out) {
-                    profile = profilesColl.get(message.uid).toJSON(),
+                    try {
+                        profile = profilesColl.get(message.uid).toJSON();
+                    } catch (e) {
+                        debugger;
+                    }
                     gender = profile.sex === 1 ? 'female':'male';
 
                     Notifications.create({
