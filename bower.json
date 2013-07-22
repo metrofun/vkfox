@@ -6,8 +6,8 @@
     "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.3",
     "angular-unstable": "~1.1.5",
     "angular-ui-utils": "~0.0.2",
-    "3.0.0-wip": "https://github.com/twitter/bootstrap/archive/3.0.0-wip.zip",
     "moment": "~2.1.0",
-    "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git"
+    "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git",
+    "emoji": "~0.2.1"
   }
 }
