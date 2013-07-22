@@ -1,16 +1,15 @@
-/*global jEmoji*/
+/*global linkify, jEmoji*/
 angular.module(
     'rectify', ['i18n']
 ).filter('rectify', function ($filter) {
-    var MAX_TEXT_LENGTH = 3,
-        TRUNCATE_LENGTH = 2,
+    var MAX_TEXT_LENGTH = 300,
+        TRUNCATE_LENGTH = 200,
 
         label = $filter('i18n')('more...');
 
     jQuery('body').on('click', '.show-more', function (e) {
         var jTarget = jQuery(e.currentTarget);
 
-        console.log(jTarget.data('emoji'));
         jTarget.replaceWith(linkifyAndEmoji(
             jTarget.data('text'),
             jTarget.data('emoji') === 'yes'
@@ -18,7 +17,8 @@ angular.module(
     });
 
     /**
-     * Replaces next wiki format: [id12345|Dmitrii],
+     * Replaces all links with correspndenting anchors,
+     * replaces next wiki format: [id12345|Dmitrii],
      * or [club32194285|Читать прoдoлжение..]
      * with <a anchor="http://vk.com/id12345">Dmitrii</a>
      * And repaces emoji unicodes with corrspondenting images
@@ -27,7 +27,14 @@ angular.module(
      * @returns {String} html
      */
     function linkifyAndEmoji(text, hasEmoji) {
-        var linkifiedText = text.replace(
+        var linkifiedText = linkify(text, {
+            callback: function (text, href) {
+                return href ? '<a anchor="' + href + '">' + text + '</a>' : text;
+            }
+        });
+
+        //replace wiki layout
+        linkifiedText = linkifiedText.replace(
             /\[((?:id|club)\d+)\|([^\]"']+)\]/g,
             '<a anchor="http://vk.com/$1">$2</a>'
         );
@@ -47,7 +54,7 @@ angular.module(
     }
     /**
      * Truncates long text, and add pseudo-link "show-more"
-     * Replaces next wiki format: [id12345|Dmitrii]
+     * Replaces text links and next wiki format: [id12345|Dmitrii]
      * with <a anchor="http://vk.com/id12345">Dmitrii</a>
      * And repaces emoji unicodes with corrspondenting images
      *
@@ -65,7 +72,7 @@ angular.module(
                 spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
 
                 if (spaceIndex !== -1) {
-                    return  linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
+                    return linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
                         ' <span class="show-more btn btn-mini" data-text="',
                         escapeQuotes(text.slice(spaceIndex)), '" ',
                         hasEmoji ? 'data-emoji="yes" ':'',
