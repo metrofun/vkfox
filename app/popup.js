@@ -1252,12 +1252,12 @@ angular.module('navigation', ['ui.route'])
                         name: 'Chat'
                     },
                     {
-                        href: 'buddies',
-                        name: 'Buddies'
-                    },
-                    {
                         href: 'news',
                         name: 'News'
+                    },
+                    {
+                        href: 'buddies',
+                        name: 'Buddies'
                     }
                 ];
                 $scope.activeTab = $routeParams.tab;

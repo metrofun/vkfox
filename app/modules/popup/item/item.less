@@ -18,7 +18,7 @@
    }
 
    & + .item {
-       border-top: 1px solid @grayLighter;
+       border-top: 1px solid @clouds;
    }
 
    &__img {
@@ -26,7 +26,6 @@
         height: @itemIconSize;
         /* .background-size(cover); */
         background-position: center;
-        .transition(opacity 0.1s linear);
         position: relative;
         opacity: 0.9;
         .box-shadow(inset 0px 0px 1px rgba(0,0,0,.07));
@@ -68,17 +67,14 @@
        opacity: 1;
    }
    &__action {
-       -moz-transition: opacity 0.1s ease 0.1s;
-       -webkit-transition: opacity 0.1s ease 0.1s;
-       -o-transition: opacity 0.1s ease 0.1s;
-       transition: opacity 0.1s ease 0.1s;
+       .transition(opacity 0.1s ease 0.1s);
        opacity: 0;
        text-decoration: none !important;
        display: inline-block;
        cursor: pointer;
        background-image: url("@{iconWhiteInvertSpritePath}");
 
-       .app__color-with-hover(@blue);
+       .app__color-with-hover(@peterRiver);
    }
    &__action ~ &__action {
        margin-left: 0.5em;

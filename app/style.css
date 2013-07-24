@@ -5271,6 +5271,7 @@ a.badge:focus {
 .affix {
   position: fixed;
 }
+/* see http://flatuicolors.com/ */
 .app {
   width: 320px;
   height: 480px;
@@ -5446,10 +5447,6 @@ a.badge:focus {
   -o-background-size: cover;
   background-size: cover;
   background-position: center;
-  -webkit-transition: opacity 0.1s linear;
-  -moz-transition: opacity 0.1s linear;
-  -o-transition: opacity 0.1s linear;
-  transition: opacity 0.1s linear;
   position: relative;
   opacity: 0.9;
   -webkit-box-shadow: inset 0px 0px 1px rgba(0, 0, 0, 0.5);
@@ -5473,10 +5470,6 @@ a.badge:focus {
   -o-background-size: cover;
   background-size: cover;
   background-position: center;
-  -webkit-transition: opacity 0.1s linear;
-  -moz-transition: opacity 0.1s linear;
-  -o-transition: opacity 0.1s linear;
-  transition: opacity 0.1s linear;
   position: relative;
   opacity: 0.9;
   -webkit-box-shadow: inset 0px 0px 1px rgba(0, 0, 0, 0.5);
@@ -5533,7 +5526,7 @@ a.badge:focus {
   border: none;
 }
 .item + .item {
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #ecf0f1;
 }
 .item__img {
   width: 35px;
@@ -5541,10 +5534,6 @@ a.badge:focus {
   /* .background-size(cover); */
 
   background-position: center;
-  -webkit-transition: opacity 0.1s linear;
-  -moz-transition: opacity 0.1s linear;
-  -o-transition: opacity 0.1s linear;
-  transition: opacity 0.1s linear;
   position: relative;
   opacity: 0.9;
   -webkit-box-shadow: inset 0px 0px 1px rgba(0, 0, 0, 0.07);
@@ -5591,8 +5580,8 @@ a.badge:focus {
   opacity: 1;
 }
 .item__action {
-  -moz-transition: opacity 0.1s ease 0.1s;
   -webkit-transition: opacity 0.1s ease 0.1s;
+  -moz-transition: opacity 0.1s ease 0.1s;
   -o-transition: opacity 0.1s ease 0.1s;
   transition: opacity 0.1s ease 0.1s;
   opacity: 0;
@@ -5600,10 +5589,10 @@ a.badge:focus {
   display: inline-block;
   cursor: pointer;
   background-image: url("modules/popup/app/glyphicons-halflings-white-invert.png");
-  background-color: #049cdb;
+  background-color: #3498db;
 }
 .item__action:hover {
-  background-color: #036690;
+  background-color: #1d6fa5;
 }
 .item__action ~ .item__action {
   margin-left: 0.5em;
