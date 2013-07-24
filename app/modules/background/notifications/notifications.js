@@ -1,5 +1,6 @@
 angular.module('notifications', ['mediator']).factory('Notifications', function (Mediator) {
-    var notificationQueue = new Backbone.Collection();
+    var QUEUE_TYPES = ['chat', 'news'],
+        notificationQueue = new Backbone.Collection();
 
     function getBase64FromImage(url, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
@@ -63,7 +64,9 @@ angular.module('notifications', ['mediator']).factory('Notifications', function 
          * @param {String} [options.message='']
          */
         create: function (type, options) {
-            notificationQueue.push({type: type});
+            if (QUEUE_TYPES.indexOf(type) !== -1) {
+                notificationQueue.push({type: type});
+            }
 
             // TODO on error
             getBase64FromImage(options.image, function (base64) {

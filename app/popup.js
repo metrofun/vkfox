@@ -594,6 +594,36 @@ r += " вашим видео";
 return r;
 }
 })();
+angular.module('persistent-model', []).factory('PersistentModel', function () {
+    return Backbone.Model.extend({
+        /**
+         * Stores and restores model from localStorage.
+         * Requires 'name' in options, for localStorage key name
+         *
+         * @param {Object} attributes
+         * @param {Object} options
+         * @param {String} options.name
+         */
+        initialize: function (attributes, options) {
+            var item;
+
+            this._name = options.name;
+            item = localStorage.getItem(this._name);
+
+            if (item) {
+                this.set(JSON.parse(item), {
+                    silent: true
+                });
+            }
+
+            this.on('change', this._save.bind(this));
+        },
+        _save: function () {
+            localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
+        }
+    });
+});
+
 angular.module('anchor', []).run(function () {
     jQuery('body').on('click', '[anchor]', function (e) {
         var jTarget = jQuery(e.currentTarget);
@@ -1465,7 +1495,7 @@ angular.module('request', ['mediator'])
         };
     });
 
-angular.module('router', ['mediator'])
+angular.module('router', ['mediator', 'persistent-model'])
     .config(function ($routeProvider, $locationProvider, $compileProvider) {
         $locationProvider.html5Mode(true);
 
@@ -1492,21 +1522,26 @@ angular.module('router', ['mediator'])
                 }
             });
     })
-    .run(function ($location, $rootScope, Mediator) {
-        // notify about chaning tab
+    .run(function ($location, $rootScope, Mediator, PersistentModel) {
+        // default tab is chat
+        var model = new PersistentModel(
+            {lastPath: '/chat'},
+            {name: 'router'}
+        );
         $rootScope.$on('$routeChangeSuccess', function (scope, current) {
             Mediator.pub('router:change', current.params);
+            if (current.params.tab) {
+                model.set('lastPath', $location.path());
+            }
         });
         Mediator.sub('notifications:queue', function (queue) {
             $rootScope.$apply(function () {
                 if (queue.length) {
-                    /**
-                    * queue contains updates from tabs.
-                    * Property 'type' holds value
-                    */
+                    // queue contains updates from tabs.
+                    // Property 'type' holds value
                     $location.path('/' + queue[queue.length - 1].type);
                 } else {
-                    $location.path('/buddies');
+                    $location.path(model.get('lastPath'));
                 }
                 $location.replace();
             });

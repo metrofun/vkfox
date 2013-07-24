@@ -594,6 +594,36 @@ r += " вашим видео";
 return r;
 }
 })();
+angular.module('persistent-model', []).factory('PersistentModel', function () {
+    return Backbone.Model.extend({
+        /**
+         * Stores and restores model from localStorage.
+         * Requires 'name' in options, for localStorage key name
+         *
+         * @param {Object} attributes
+         * @param {Object} options
+         * @param {String} options.name
+         */
+        initialize: function (attributes, options) {
+            var item;
+
+            this._name = options.name;
+            item = localStorage.getItem(this._name);
+
+            if (item) {
+                this.set(JSON.parse(item), {
+                    silent: true
+                });
+            }
+
+            this.on('change', this._save.bind(this));
+        },
+        _save: function () {
+            localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
+        }
+    });
+});
+
 angular.module('app', ['auth', 'buddies', 'chat', 'newsfeed', 'feedbacks']);
 
 angular.module('auth', []).factory('Auth', function (Mediator) {
@@ -1802,7 +1832,8 @@ angular.module(
 });
 
 angular.module('notifications', ['mediator']).factory('Notifications', function (Mediator) {
-    var notificationQueue = new Backbone.Collection();
+    var QUEUE_TYPES = ['chat', 'news'],
+        notificationQueue = new Backbone.Collection();
 
     function getBase64FromImage(url, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
@@ -1866,7 +1897,9 @@ angular.module('notifications', ['mediator']).factory('Notifications', function 
          * @param {String} [options.message='']
          */
         create: function (type, options) {
-            notificationQueue.push({type: type});
+            if (QUEUE_TYPES.indexOf(type) !== -1) {
+                notificationQueue.push({type: type});
+            }
 
             // TODO on error
             getBase64FromImage(options.image, function (base64) {
@@ -1879,36 +1912,6 @@ angular.module('notifications', ['mediator']).factory('Notifications', function 
             });
         }
     };
-});
-
-angular.module('persistent-model', []).factory('PersistentModel', function () {
-    return Backbone.Model.extend({
-        /**
-         * Stores and restores model from localStorage.
-         * Requires 'name' in options, for localStorage key name
-         *
-         * @param {Object} attributes
-         * @param {Object} options
-         * @param {String} options.name
-         */
-        initialize: function (attributes, options) {
-            var item;
-
-            this._name = options.name;
-            item = localStorage.getItem(this._name);
-
-            if (item) {
-                this.set(JSON.parse(item), {
-                    silent: true
-                });
-            }
-
-            this.on('change', this._save.bind(this));
-        },
-        _save: function () {
-            localStorage.setItem(this._name, JSON.stringify(this.toJSON()));
-        }
-    });
 });
 
 angular.module('persistent-set', []).factory('PersistentSet', function () {
