@@ -1,6 +1,6 @@
+@itemIconSize: 35px;
 .item {
    @itemPadding: 10px;
-   @iconSize: 32px;
 
    background: @white;
    padding: @itemPadding;
@@ -11,6 +11,10 @@
        padding-left: 0;
        padding-right: 0;
        width: 100%;
+
+       & + .item {
+           border: none;
+       }
    }
 
    & + .item {
@@ -18,10 +22,19 @@
    }
 
    &__img {
-        width: @iconSize;
-        height: @iconSize;
-        cursor: pointer;
-        .border-radius(4px);
+        width: @itemIconSize;
+        height: @itemIconSize;
+        /* .background-size(cover); */
+        background-position: center;
+        .transition(opacity 0.1s linear);
+        position: relative;
+        opacity: 0.9;
+        .box-shadow(inset 0px 0px 1px rgba(0,0,0,.07));
+        .border-radius(@itemIconSize / 2);
+
+        &:hover {
+            opacity: 1;
+        }
    }
    &__head {
        display: block;
@@ -67,7 +80,7 @@
 
        .app__color-with-hover(@blue);
    }
-   &__action + &__action {
+   &__action ~ &__action {
        margin-left: 0.5em;
    }
    &__reply {
@@ -88,7 +101,7 @@
            position: absolute;
            .rotate(45deg);
            top: -6px;
-           left: @iconSize / 2 + 6px;
+           left: @itemIconSize / 2 + 6px;
            content: '';
         }
 

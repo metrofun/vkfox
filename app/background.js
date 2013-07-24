@@ -136,11 +136,6 @@ var r = "";
 r += "Сообщение на стене";
 return r;
 }
-window.i18n["ru"]["Filters"] = function(d){
-var r = "";
-r += "Фильтры";
-return r;
-}
 window.i18n["ru"]["Search"] = function(d){
 var r = "";
 r += "Имя или Фамилия";
@@ -183,7 +178,7 @@ return r;
 }
 window.i18n["ru"]["more..."] = function(d){
 var r = "";
-r += "далee...";
+r += "далee";
 return r;
 }
 window.i18n["ru"]["Comment"] = function(d){
@@ -612,7 +607,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
                 'client_id=' + APP_ID,
                 'scope=friends,photos,audio,video,docs,notes,pages,wall,groups,messages,notifications',
                 'response_type=token',
-                'display=page'
+                'display=wap'
             ].join('&')
         ].join(''),
         CREATED = 1,
@@ -729,8 +724,6 @@ angular.module('buddies', [
         readyDeferred.then(function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
-
-        buddiesColl.reset();
     }
     initialize();
 
@@ -780,8 +773,7 @@ angular.module('buddies', [
             getFavouriteUsers(),
             Users.getFriendsProfiles()
         ).then(function (favourites, friends) {
-            buddiesColl.add(favourites);
-            buddiesColl.add(friends);
+            buddiesColl.reset([].concat(favourites, friends));
 
             saveOriginalBuddiesOrder();
 
@@ -813,7 +805,7 @@ angular.module('buddies', [
             if (profile.isWatched && model.changed.hasOwnProperty('online')) {
                 gender = profile.sex === 1 ? 'female':'male';
 
-                Notifications.create({
+                Notifications.create('buddies', {
                     title: $filter('name')(profile),
                     message: $filter('i18n')(
                         profile.online ? 'is online':'went offline',
@@ -911,7 +903,7 @@ angular.module('chat', [
                     }
                     gender = profile.sex === 1 ? 'female':'male';
 
-                    Notifications.create({
+                    Notifications.create('chat', {
                         title: $filter('i18n')('sent a message', {
                             NAME: $filter('name')(profile),
                             GENDER: gender
@@ -1249,7 +1241,7 @@ angular.module('feedbacks', [
             }
 
             if (title) {
-                Notifications.create({
+                Notifications.create('news', {
                     title: title,
                     message: message,
                     image: profile.photo
@@ -1798,7 +1790,23 @@ angular.module(
     });
 });
 
-angular.module('notifications', []).factory('Notifications', function () {
+angular.module('notifications', ['mediator']).factory('Notifications', function (Mediator) {
+    var notificationQueue = new Backbone.Collection();
+
+    chrome.browserAction.setBadgeBackgroundColor({
+        color: [231, 76, 60, 255]
+    });
+    Mediator.sub('auth:success', function () {
+        notificationQueue.reset();
+    });
+    notificationQueue.on('add remove reset', function () {
+        var count = notificationQueue.size();
+
+        chrome.browserAction.setBadgeText({
+            text: count ? String(count):''
+        });
+    });
+
     function getBase64FromImage(url, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
 
@@ -1835,7 +1843,9 @@ angular.module('notifications', []).factory('Notifications', function () {
          * @param {String} [options.photo]
          * @param {String} [options.message='']
          */
-        create: function (options) {
+        create: function (type, options) {
+            notificationQueue.push({type: type});
+
             // TODO on error
             getBase64FromImage(options.image, function (base64) {
                 chrome.notifications.create(_.uniqueId(), {

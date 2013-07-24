@@ -26,11 +26,6 @@ var r = "";
 r += "Сообщение на стене";
 return r;
 }
-window.i18n["ru"]["Filters"] = function(d){
-var r = "";
-r += "Фильтры";
-return r;
-}
 window.i18n["ru"]["Search"] = function(d){
 var r = "";
 r += "Имя или Фамилия";
@@ -73,7 +68,7 @@ return r;
 }
 window.i18n["ru"]["more..."] = function(d){
 var r = "";
-r += "далee...";
+r += "далee";
 return r;
 }
 window.i18n["ru"]["Comment"] = function(d){

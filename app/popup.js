@@ -136,11 +136,6 @@ var r = "";
 r += "Сообщение на стене";
 return r;
 }
-window.i18n["ru"]["Filters"] = function(d){
-var r = "";
-r += "Фильтры";
-return r;
-}
 window.i18n["ru"]["Search"] = function(d){
 var r = "";
 r += "Имя или Фамилия";
@@ -183,7 +178,7 @@ return r;
 }
 window.i18n["ru"]["more..."] = function(d){
 var r = "";
-r += "далee...";
+r += "далee";
 return r;
 }
 window.i18n["ru"]["Comment"] = function(d){
@@ -1406,7 +1401,7 @@ angular.module(
 
         //replace wiki layout
         linkifiedText = linkifiedText.replace(
-            /\[((?:id|club)\d+)\|([^\]"']+)\]/g,
+            /\[((?:id|club)\d+)\|([^\]]+)\]/g,
             '<a anchor="http://vk.com/$1">$2</a>'
         );
 
@@ -1443,8 +1438,8 @@ angular.module(
                 spaceIndex = text.indexOf(' ', TRUNCATE_LENGTH);
 
                 if (spaceIndex !== -1) {
-                    return  linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
-                        ' <span class="show-more btn btn-mini" data-text="',
+                    return linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
+                        ' <span class="show-more btn" data-text="',
                         escapeQuotes(text.slice(spaceIndex)), '" ',
                         hasEmoji ? 'data-emoji="yes" ':'',
                         'type="button">', label, '</span>'
@@ -1497,7 +1492,7 @@ angular.module('router', [])
                     return [
                         '/modules/popup/', params.tab,
                         '/', params.tab, '.tmpl.html'
-                        ].join('');
+                    ].join('');
                 }
             })
             .when('/:tab/:subtab', {
@@ -1511,7 +1506,7 @@ angular.module('router', [])
     })
     .run(function ($location) {
         //default tab
-        $location.path('/news/my');
+        $location.path('/buddies');
         $location.replace();
     });
 

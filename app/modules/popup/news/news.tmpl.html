@@ -1,18 +1,22 @@
 <navigation></navigation>
 <div ng-controller="NewsController">
     <div class="navbar navbar-static-top">
-        <form class="navbar-inner form-inline navbar-form news__form">
-            <div class="btn-group" data-toggle="buttons-radio">
-                <a
-                    ng-repeat="tab in subtabs"
-                    ng-class="{active: tab.href === 'news/' + activeSubTab}"
-                    class="btn"
-                    href="/{{tab.href}}"
-                    data-toggle="tab">
-                    {{tab.text}}
-                </a>
+        <div class="navbar-inner">
+            <div class="container">
+                <ul class="nav">
+                    <li
+                        ng-class="{active: tab.href === 'news/' + activeSubTab}"
+                        ng-repeat="tab in subtabs"
+                        ng-class="{active: tab.href === activeTab}">
+                        <a
+                            href="/{{tab.href}}"
+                            data-toggle="tab">
+                            {{tab.text}}
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </form>
+        </div>
     </div>
     <ng-include src="'/modules/popup/news/' + activeSubTab + '.tmpl.html'"></ng-include>
 </div>

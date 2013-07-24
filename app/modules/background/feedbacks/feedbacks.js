@@ -110,7 +110,7 @@ angular.module('feedbacks', [
             }
 
             if (title) {
-                Notifications.create({
+                Notifications.create('news', {
                     title: title,
                     message: message,
                     image: profile.photo

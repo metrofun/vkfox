@@ -68,7 +68,7 @@ angular.module('chat', [
                     }
                     gender = profile.sex === 1 ? 'female':'male';
 
-                    Notifications.create({
+                    Notifications.create('chat', {
                         title: $filter('i18n')('sent a message', {
                             NAME: $filter('name')(profile),
                             GENDER: gender

@@ -1,11 +1,12 @@
 <div class="item">
     <div class="media">
         <div ng-switch on="owners | isArray" class="pull-left">
-            <img
-            ng-switch-when="false"
-            ng-src="{{owners.photo}}"
-            anchor="{{anchor | addVKBase}}"
-            class="item__img media-object"/>
+            <div
+                ng-switch-when="false"
+                style="background-image:url({{owners.photo}})"
+                anchor="{{anchor | addVKBase}}"
+                class="item__img media-object">
+            </div>
             <div ng-switch-when="true" class="item__img media-object">
                 <i class="icon-user"></i>{{owners.length}}
             </div>

@@ -9,7 +9,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
                 'client_id=' + APP_ID,
                 'scope=friends,photos,audio,video,docs,notes,pages,wall,groups,messages,notifications',
                 'response_type=token',
-                'display=page'
+                'display=wap'
             ].join('&')
         ].join(''),
         CREATED = 1,

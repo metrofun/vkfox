@@ -1,0 +1,21 @@
+.btn {
+    margin-top: 5px;
+    background: @clouds;
+    border-radius: 3px;
+    border: none;
+    text-shadow: none;
+    box-shadow: none;
+    border-bottom: 2px solid darken(@clouds, 15%);
+    padding: 4px 8px;
+    font-size: 14px;
+
+    &:hover {
+        color: inherit;
+        background: @clouds;
+        text-shadow: none;
+        box-shadow: none;
+    }
+}
+.btn:active {
+    color: lighten(black, 60%);
+}

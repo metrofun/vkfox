@@ -35,7 +35,7 @@ angular.module(
 
         //replace wiki layout
         linkifiedText = linkifiedText.replace(
-            /\[((?:id|club)\d+)\|([^\]"']+)\]/g,
+            /\[((?:id|club)\d+)\|([^\]]+)\]/g,
             '<a anchor="http://vk.com/$1">$2</a>'
         );
 
@@ -73,7 +73,7 @@ angular.module(
 
                 if (spaceIndex !== -1) {
                     return linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
-                        ' <span class="show-more btn btn-mini" data-text="',
+                        ' <span class="show-more btn" data-text="',
                         escapeQuotes(text.slice(spaceIndex)), '" ',
                         hasEmoji ? 'data-emoji="yes" ':'',
                         'type="button">', label, '</span>'

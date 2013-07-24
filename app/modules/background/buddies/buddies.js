@@ -33,8 +33,6 @@ angular.module('buddies', [
         readyDeferred.then(function () {
             Mediator.pub('buddies:data', buddiesColl.toJSON());
         });
-
-        buddiesColl.reset();
     }
     initialize();
 
@@ -84,8 +82,7 @@ angular.module('buddies', [
             getFavouriteUsers(),
             Users.getFriendsProfiles()
         ).then(function (favourites, friends) {
-            buddiesColl.add(favourites);
-            buddiesColl.add(friends);
+            buddiesColl.reset([].concat(favourites, friends));
 
             saveOriginalBuddiesOrder();
 
@@ -117,7 +114,7 @@ angular.module('buddies', [
             if (profile.isWatched && model.changed.hasOwnProperty('online')) {
                 gender = profile.sex === 1 ? 'female':'male';
 
-                Notifications.create({
+                Notifications.create('buddies', {
                     title: $filter('name')(profile),
                     message: $filter('i18n')(
                         profile.online ? 'is online':'went offline',

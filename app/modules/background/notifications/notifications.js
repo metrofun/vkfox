@@ -1,4 +1,20 @@
-angular.module('notifications', []).factory('Notifications', function () {
+angular.module('notifications', ['mediator']).factory('Notifications', function (Mediator) {
+    var notificationQueue = new Backbone.Collection();
+
+    chrome.browserAction.setBadgeBackgroundColor({
+        color: [231, 76, 60, 255]
+    });
+    Mediator.sub('auth:success', function () {
+        notificationQueue.reset();
+    });
+    notificationQueue.on('add remove reset', function () {
+        var count = notificationQueue.size();
+
+        chrome.browserAction.setBadgeText({
+            text: count ? String(count):''
+        });
+    });
+
     function getBase64FromImage(url, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
 
@@ -35,7 +51,9 @@ angular.module('notifications', []).factory('Notifications', function () {
          * @param {String} [options.photo]
          * @param {String} [options.message='']
          */
-        create: function (options) {
+        create: function (type, options) {
+            notificationQueue.push({type: type});
+
             // TODO on error
             getBase64FromImage(options.image, function (base64) {
                 chrome.notifications.create(_.uniqueId(), {

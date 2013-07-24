@@ -13,7 +13,7 @@ angular.module('router', [])
                     return [
                         '/modules/popup/', params.tab,
                         '/', params.tab, '.tmpl.html'
-                        ].join('');
+                    ].join('');
                 }
             })
             .when('/:tab/:subtab', {
@@ -27,7 +27,7 @@ angular.module('router', [])
     })
     .run(function ($location) {
         //default tab
-        $location.path('/news/my');
+        $location.path('/buddies');
         $location.replace();
     });
 

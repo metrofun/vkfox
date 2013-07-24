@@ -1,22 +1,20 @@
 <navigation></navigation>
 <div ng-controller="buddiesCtrl" class="buddies">
     <div class="navbar navbar-static-top">
-        <form class="navbar-inner form-inline navbar-form">
-            <div class="input-prepend">
-                <span class="add-on"><i class="icon-search"></i></span>
+        <div class="navbar-inner">
+            <label class="buddies__search">
+                <i class="icon-search"></i>
                 <input
-                    class="span2"
                     id="prependedInput"
                     type="text"
                     ng-model="searchClue"
                     placeholder="{{'Search' | i18n}}">
-            </div>
+                </input>
+            </label>
             <div
-                class="dropdown btn-group pull-right">
-                <button
-                    class="btn dropdown-toggle" type="button">
-                    {{'Filters' | i18n}} <div class="caret"></div>
-                </button>
+                role="menu"
+                class="dropdown buddies__filter pull-right">
+                <i class="icon-list dropdown-toggle"></i>
                 <ul class="dropdown-menu">
                     <li><label class="checkbox">
                         <input ng-model="filters.male" type="checkbox">{{'Male' | i18n}}
@@ -33,11 +31,12 @@
                         <input ng-model="filters.faves" type="checkbox">{{'Bookmarked' | i18n}}
                     </label></li>
             </div>
-        </form>
+        </div>
     </div>
     <item-list>
         <item
             item-list-repeat="friend in data | buddiesFilter:filters:25:searchClue track by friend.uid"
+            ng-class="'buddies__item'"
             owners="friend">
             <span ng-if="friend.isFave">{{'Bookmarked' | i18n}}</span>
             <item-actions>
