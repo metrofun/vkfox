@@ -5286,11 +5286,12 @@ a.badge:focus {
   padding: 4px 8px;
   font-size: 14px;
 }
-.btn:hover {
-  color: inherit;
-  background: #ecf0f1;
+.btn:hover,
+.btn:active {
   text-shadow: none;
   box-shadow: none;
+  background: #ecf0f1;
+  color: inherit;
 }
 .btn:active {
   color: #999999;
@@ -5304,6 +5305,9 @@ a.badge:focus {
 }
 .buddies__item .media-body {
   line-height: 35px;
+}
+.buddies__item_is-fave .media-body {
+  line-height: normal;
 }
 .buddies__item-action_active.item__action {
   opacity: 1 !important;
@@ -5331,6 +5335,7 @@ a.badge:focus {
 }
 .buddies__filter {
   line-height: 40px;
+  cursor: pointer;
 }
 .buddies__filter.open .dropdown-toggle {
   opacity: 0.6;
@@ -5690,6 +5695,10 @@ a.badge:focus {
 }
 .news__form {
   padding: 0 10px !important;
+}
+.rectify__button {
+  display: inline-block;
+  vertical-align: baseline;
 }
 .tooltip-inner {
   border-radius: 0;

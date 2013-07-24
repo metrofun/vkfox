@@ -9,11 +9,12 @@
     padding: 4px 8px;
     font-size: 14px;
 
-    &:hover {
-        color: inherit;
-        background: @clouds;
+    &:hover,
+    &:active {
         text-shadow: none;
         box-shadow: none;
+        background: @clouds;
+        color: inherit;
     }
 }
 .btn:active {

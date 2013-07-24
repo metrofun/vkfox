@@ -28,6 +28,9 @@ angular.module('buddies', [
      */
     function initialize() {
         if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            if (readyDeferred) {
+                readyDeferred.reject();
+            }
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {

@@ -607,7 +607,8 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
                 'client_id=' + APP_ID,
                 'scope=friends,photos,audio,video,docs,notes,pages,wall,groups,messages,notifications',
                 'response_type=token',
-                'display=wap'
+                'redirect_uri=http://oauth.vk.com/blank.html',
+                'display=page'
             ].join('&')
         ].join(''),
         CREATED = 1,
@@ -719,6 +720,9 @@ angular.module('buddies', [
      */
     function initialize() {
         if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            if (readyDeferred) {
+                readyDeferred.reject();
+            }
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
@@ -881,6 +885,9 @@ angular.module('chat', [
         profilesColl.reset();
 
         if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            if (readyDeferred) {
+                readyDeferred.reject();
+            }
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
@@ -892,8 +899,6 @@ angular.module('chat', [
                 var messages = dialogColl.first().get('messages'),
                     message = messages[messages.length - 1],
                     profile, gender;
-
-                persistentModel.set('latestMessageId', message.mid);
 
                 if (!message.out) {
                     try {
@@ -954,6 +959,7 @@ angular.module('chat', [
             if (dialog) {
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
+                dialog.trigger('change');
 
                 return message;
             } else {
@@ -1015,7 +1021,7 @@ angular.module('chat', [
                 return true;
             }
         });
-        dialog.set('messages', result);
+        dialog.set({'messages': result}, {silent: true});
     }
     /*
      * If last message in dialog is unread,
@@ -1035,10 +1041,9 @@ angular.module('chat', [
         return jQuery.when.apply(jQuery, unreadHistoryRequests).done(function () {
             _(arguments).each(function (historyMessages, index) {
                 if (historyMessages && historyMessages[0]) {
-                    unreadDialogs[index].set(
-                        'messages',
-                        historyMessages.slice(1).reverse()
-                    );
+                    unreadDialogs[index].set({
+                        'messages': historyMessages.slice(1).reverse()
+                    }, {silent: 'yes'});
                     removeReadMessages(unreadDialogs[index]);
                 }
             });
@@ -1255,6 +1260,9 @@ angular.module('feedbacks', [
      */
     function initialize() {
         if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            if (readyDeferred) {
+                readyDeferred.reject();
+            }
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
@@ -1708,6 +1716,9 @@ angular.module(
      */
     function initialize() {
         if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            if (readyDeferred) {
+                readyDeferred.reject();
+            }
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
@@ -1793,20 +1804,6 @@ angular.module(
 angular.module('notifications', ['mediator']).factory('Notifications', function (Mediator) {
     var notificationQueue = new Backbone.Collection();
 
-    chrome.browserAction.setBadgeBackgroundColor({
-        color: [231, 76, 60, 255]
-    });
-    Mediator.sub('auth:success', function () {
-        notificationQueue.reset();
-    });
-    notificationQueue.on('add remove reset', function () {
-        var count = notificationQueue.size();
-
-        chrome.browserAction.setBadgeText({
-            text: count ? String(count):''
-        });
-    });
-
     function getBase64FromImage(url, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
 
@@ -1834,6 +1831,31 @@ angular.module('notifications', ['mediator']).factory('Notifications', function 
         xhr.onerror = onError;
         xhr.send();
     }
+
+    chrome.browserAction.setBadgeBackgroundColor({
+        color: [231, 76, 60, 255]
+    });
+    notificationQueue.on('add remove reset', function () {
+        var count = notificationQueue.size();
+
+        chrome.browserAction.setBadgeText({
+            text: count ? String(count):''
+        });
+    });
+    Mediator.sub('auth:success', function () {
+        notificationQueue.reset();
+    });
+    // Remove seen updates
+    Mediator.sub('router:change', function (params) {
+        if (params.tab && notificationQueue.size()) {
+            notificationQueue.remove(notificationQueue.where({
+                type: params.tab
+            }));
+        }
+    });
+    Mediator.sub('notifications:queue:get', function () {
+        Mediator.pub('notifications:queue', notificationQueue.toJSON());
+    });
     return {
         /**
          * Show new notifications

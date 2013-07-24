@@ -73,7 +73,7 @@ angular.module(
 
                 if (spaceIndex !== -1) {
                     return linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
-                        ' <span class="show-more btn" data-text="',
+                        ' <span class="show-more btn rectify__button" data-text="',
                         escapeQuotes(text.slice(spaceIndex)), '" ',
                         hasEmoji ? 'data-emoji="yes" ':'',
                         'type="button">', label, '</span>'

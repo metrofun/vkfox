@@ -1352,18 +1352,6 @@ angular.module('news', ['mediator', 'navigation', 'rectify'])
         });
     });
 
-angular.module('persistent-model', []).factory('PersistentModel', function () {
-    return function (model, name) {
-        var item = localStorage.getItem(name);
-
-        if (item) {
-            model = jQuery.extend(true, model, JSON.parse(item));
-        }
-
-        return model;
-    };
-});
-
 /*global linkify, jEmoji*/
 angular.module(
     'rectify', ['i18n']
@@ -1439,7 +1427,7 @@ angular.module(
 
                 if (spaceIndex !== -1) {
                     return linkifyAndEmoji(text.slice(0, spaceIndex), hasEmoji) + [
-                        ' <span class="show-more btn" data-text="',
+                        ' <span class="show-more btn rectify__button" data-text="',
                         escapeQuotes(text.slice(spaceIndex)), '" ',
                         hasEmoji ? 'data-emoji="yes" ':'',
                         'type="button">', label, '</span>'
@@ -1477,7 +1465,7 @@ angular.module('request', ['mediator'])
         };
     });
 
-angular.module('router', [])
+angular.module('router', ['mediator'])
     .config(function ($routeProvider, $locationProvider, $compileProvider) {
         $locationProvider.html5Mode(true);
 
@@ -1504,12 +1492,27 @@ angular.module('router', [])
                 }
             });
     })
-    .run(function ($location) {
-        //default tab
-        $location.path('/buddies');
-        $location.replace();
+    .run(function ($location, $rootScope, Mediator) {
+        // notify about chaning tab
+        $rootScope.$on('$routeChangeSuccess', function (scope, current) {
+            Mediator.pub('router:change', current.params);
+        });
+        Mediator.sub('notifications:queue', function (queue) {
+            $rootScope.$apply(function () {
+                if (queue.length) {
+                    /**
+                    * queue contains updates from tabs.
+                    * Property 'type' holds value
+                    */
+                    $location.path('/' + queue[queue.length - 1].type);
+                } else {
+                    $location.path('/buddies');
+                }
+                $location.replace();
+            });
+        });
+        Mediator.pub('notifications:queue:get');
     });
-
 
 angular.module('tooltip', []).run(function () {
     jQuery('body').tooltip({

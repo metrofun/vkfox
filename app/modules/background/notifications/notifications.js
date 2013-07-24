@@ -1,20 +1,6 @@
 angular.module('notifications', ['mediator']).factory('Notifications', function (Mediator) {
     var notificationQueue = new Backbone.Collection();
 
-    chrome.browserAction.setBadgeBackgroundColor({
-        color: [231, 76, 60, 255]
-    });
-    Mediator.sub('auth:success', function () {
-        notificationQueue.reset();
-    });
-    notificationQueue.on('add remove reset', function () {
-        var count = notificationQueue.size();
-
-        chrome.browserAction.setBadgeText({
-            text: count ? String(count):''
-        });
-    });
-
     function getBase64FromImage(url, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
 
@@ -42,6 +28,31 @@ angular.module('notifications', ['mediator']).factory('Notifications', function 
         xhr.onerror = onError;
         xhr.send();
     }
+
+    chrome.browserAction.setBadgeBackgroundColor({
+        color: [231, 76, 60, 255]
+    });
+    notificationQueue.on('add remove reset', function () {
+        var count = notificationQueue.size();
+
+        chrome.browserAction.setBadgeText({
+            text: count ? String(count):''
+        });
+    });
+    Mediator.sub('auth:success', function () {
+        notificationQueue.reset();
+    });
+    // Remove seen updates
+    Mediator.sub('router:change', function (params) {
+        if (params.tab && notificationQueue.size()) {
+            notificationQueue.remove(notificationQueue.where({
+                type: params.tab
+            }));
+        }
+    });
+    Mediator.sub('notifications:queue:get', function () {
+        Mediator.pub('notifications:queue', notificationQueue.toJSON());
+    });
     return {
         /**
          * Show new notifications

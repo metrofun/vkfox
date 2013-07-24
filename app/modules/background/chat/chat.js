@@ -46,6 +46,9 @@ angular.module('chat', [
         profilesColl.reset();
 
         if (!readyDeferred || readyDeferred.state() === 'resolved') {
+            if (readyDeferred) {
+                readyDeferred.reject();
+            }
             readyDeferred = jQuery.Deferred();
         }
         readyDeferred.then(function () {
@@ -57,8 +60,6 @@ angular.module('chat', [
                 var messages = dialogColl.first().get('messages'),
                     message = messages[messages.length - 1],
                     profile, gender;
-
-                persistentModel.set('latestMessageId', message.mid);
 
                 if (!message.out) {
                     try {
@@ -119,6 +120,7 @@ angular.module('chat', [
             if (dialog) {
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
+                dialog.trigger('change');
 
                 return message;
             } else {
@@ -180,7 +182,7 @@ angular.module('chat', [
                 return true;
             }
         });
-        dialog.set('messages', result);
+        dialog.set({'messages': result}, {silent: true});
     }
     /*
      * If last message in dialog is unread,
@@ -200,10 +202,9 @@ angular.module('chat', [
         return jQuery.when.apply(jQuery, unreadHistoryRequests).done(function () {
             _(arguments).each(function (historyMessages, index) {
                 if (historyMessages && historyMessages[0]) {
-                    unreadDialogs[index].set(
-                        'messages',
-                        historyMessages.slice(1).reverse()
-                    );
+                    unreadDialogs[index].set({
+                        'messages': historyMessages.slice(1).reverse()
+                    }, {silent: 'yes'});
                     removeReadMessages(unreadDialogs[index]);
                 }
             });

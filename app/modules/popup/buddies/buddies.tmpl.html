@@ -8,6 +8,7 @@
                     id="prependedInput"
                     type="text"
                     ng-model="searchClue"
+                    class="span2"
                     placeholder="{{'Search' | i18n}}">
                 </input>
             </label>
@@ -36,7 +37,7 @@
     <item-list>
         <item
             item-list-repeat="friend in data | buddiesFilter:filters:25:searchClue track by friend.uid"
-            ng-class="'buddies__item'"
+            class="buddies__item {{friend.isFave && 'buddies__item_is-fave'}}"
             owners="friend">
             <span ng-if="friend.isFave">{{'Bookmarked' | i18n}}</span>
             <item-actions>
