@@ -3,15 +3,15 @@ angular.module('news', ['mediator', 'navigation', 'rectify'])
         $scope.subtabs = [
             {
                 href: 'news/my',
-                text: 'My'
+                text: 'my'
             },
             {
                 href: 'news/friends',
-                text: 'Friends'
+                text: 'friends_nominative'
             },
             {
                 href: 'news/groups',
-                text: 'Groups'
+                text: 'groups_nominative'
             }
         ];
         $scope.activeSubTab = $routeParams.subtab;

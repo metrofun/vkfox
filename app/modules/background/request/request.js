@@ -65,10 +65,9 @@ angular.module('request', ['mediator', 'auth']).factory(
             },
             processApiQueries: _.debounce(function () {
                 if (apiQueriesQueue.length) {
-                    var self = this, queriesToProcess = apiQueriesQueue.slice(0, API_QUERIES_PER_REQUEST),
+                    var self = this, queriesToProcess = apiQueriesQueue.splice(0, API_QUERIES_PER_REQUEST),
                         executeCodeTokens = [], executeCode,  i, method, params;
 
-                    apiQueriesQueue = apiQueriesQueue.slice(API_QUERIES_PER_REQUEST);
                     for (i = 0; i < queriesToProcess.length; i++) {
                         params = queriesToProcess[i].params;
                         method = params.method || 'execute';

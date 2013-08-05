@@ -1,4 +1,10 @@
 {
+    "chat": "чат",
+    "news": "новости",
+    "buddies": "люди",
+    "my": "мои",
+    "friends_nominative": "друзей",
+    "groups_nominative": "групп",
     "Private message": "Личное сообщение",
     "Wall post": "Сообщение на стене",
     "Search": "Имя или Фамилия",
@@ -15,6 +21,7 @@
     "Reposted": "Поделился записью",
     "New friends:": "Новые друзья:",
     "started following you": "хочет добавить в друзья",
+    "friend request accepted": "заявка в друзья подтверждена",
     "sent a message": "{NAME} {GENDER, select, male{прислал} female{прислала} other{прислал}} сообщение",
     "is online": "{GENDER, select, male{появился} female{появилась} other{появился}} в сети",
     "went offline": "{GENDER, select, male{вышел} female{вышла} other{вышел}} из сети",

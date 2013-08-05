@@ -126,6 +126,36 @@ MessageFormat.locale.ru = function (n) {
 };
 
 window.i18n["ru"] = {}
+window.i18n["ru"]["chat"] = function(d){
+var r = "";
+r += "чат";
+return r;
+}
+window.i18n["ru"]["news"] = function(d){
+var r = "";
+r += "новости";
+return r;
+}
+window.i18n["ru"]["buddies"] = function(d){
+var r = "";
+r += "люди";
+return r;
+}
+window.i18n["ru"]["my"] = function(d){
+var r = "";
+r += "мои";
+return r;
+}
+window.i18n["ru"]["friends_nominative"] = function(d){
+var r = "";
+r += "друзей";
+return r;
+}
+window.i18n["ru"]["groups_nominative"] = function(d){
+var r = "";
+r += "групп";
+return r;
+}
 window.i18n["ru"]["Private message"] = function(d){
 var r = "";
 r += "Личное сообщение";
@@ -204,6 +234,11 @@ return r;
 window.i18n["ru"]["started following you"] = function(d){
 var r = "";
 r += "хочет добавить в друзья";
+return r;
+}
+window.i18n["ru"]["friend request accepted"] = function(d){
+var r = "";
+r += "заявка в друзья подтверждена";
 return r;
 }
 window.i18n["ru"]["sent a message"] = function(d){
@@ -649,7 +684,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
         state = CREATED, authDeferred = jQuery.Deferred();
 
     // FIXME http://code.google.com/p/chromium/issues/detail?id=63122
-    chrome.extension.onRequest.addListener(function () {});
+    // chrome.extension.onRequest.addListener(function () {});
 
     Mediator.sub('auth:iframe', function (url) {
         try {
@@ -668,6 +703,21 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
     model.on('change:accessToken', function () {
         Mediator.pub('auth:success', model.toJSON());
     });
+
+    /**
+     * Removes all cookies for auth domain
+     */
+    function resetAuthCookies() {
+        chrome.cookies.getAll({domain: AUTH_DOMAIN}, function (cookieArray) {
+            var i, cookie;
+            // remove each cookie
+            for (i = 0; i < cookieArray.length; ++i) {
+                cookie = cookieArray[i];
+                console.log(cookie);
+                chrome.cookies.remove({ name: cookie.name, url: cookie.path });
+            }
+        });
+    }
 
     return {
         retry: _.debounce(function () {
@@ -688,6 +738,8 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
                 if (authDeferred.state() === 'resolved') {
                     authDeferred = jQuery.Deferred();
                 }
+
+                resetAuthCookies();
 
                 if (!$iframe) {
                     $iframe = angular.element(
@@ -804,9 +856,9 @@ angular.module('buddies', [
         initialize();
 
         jQuery.when(
-            getFavouriteUsers(),
-            Users.getFriendsProfiles()
-        ).then(function (favourites, friends) {
+            Users.getFriendsProfiles(),
+            getFavouriteUsers()
+        ).then(function (friends, favourites) {
             buddiesColl.reset([].concat(favourites, friends));
 
             saveOriginalBuddiesOrder();
@@ -1236,6 +1288,11 @@ angular.module('feedbacks', [
             gender = profile.sex === 1 ? 'female':'male';
 
             switch (type) {
+            case 'friend_accepted':
+                title = name + ' ' + $filter('i18n')('friend request accepted', {
+                    GENDER: gender
+                });
+                break;
             case 'follow':
                 title = name + ' ' + $filter('i18n')('started following you', {
                     GENDER: gender
@@ -1362,7 +1419,10 @@ angular.module('feedbacks', [
             feedbackType, feedback = item.feedback,
             itemID, itemModel, typeTokens;
 
-        if (item.type.indexOf('_') !== -1) {
+        if (item.type === 'friend_accepted') {
+            parentType = item.type;
+            parent = item.feedback;
+        } else if (item.type.indexOf('_') !== -1) {
             typeTokens = item.type.split('_');
             feedbackType = typeTokens[0];
             parentType = typeTokens[1];
@@ -1402,7 +1462,7 @@ angular.module('feedbacks', [
             }
             itemModel.trigger('change');
         } else {
-            //follows types are array
+            //follows and friend_accepter types are array
             [].concat(feedback).forEach(function (feedback) {
                 var itemModel;
                 feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
@@ -1472,7 +1532,6 @@ angular.module('feedbacks', [
             // first item in notifications contains quantity
             if ((notifications.items && notifications.items.length > 1)
                 || (comments.items && comments.items.length)) {
-                console.log('fetch', notifications.items);
                 profilesColl
                     .add(comments.profiles, {parse: true})
                     .add(comments.groups, {parse: true})
@@ -1608,7 +1667,6 @@ angular.module('mediator', [])
 
         return {
             pub: function () {
-                // dispatcher.trigger.apply(dispatcher, arguments);
                 chrome.extension.sendMessage([].slice.call(arguments));
             },
             sub: function () {
@@ -2087,10 +2145,9 @@ angular.module('request', ['mediator', 'auth']).factory(
             },
             processApiQueries: _.debounce(function () {
                 if (apiQueriesQueue.length) {
-                    var self = this, queriesToProcess = apiQueriesQueue.slice(0, API_QUERIES_PER_REQUEST),
+                    var self = this, queriesToProcess = apiQueriesQueue.splice(0, API_QUERIES_PER_REQUEST),
                         executeCodeTokens = [], executeCode,  i, method, params;
 
-                    apiQueriesQueue = apiQueriesQueue.slice(API_QUERIES_PER_REQUEST);
                     for (i = 0; i < queriesToProcess.length; i++) {
                         params = queriesToProcess[i].params;
                         method = params.method || 'execute';
@@ -2197,7 +2254,7 @@ angular.module('users', ['request', 'mediator']).factory('Users', function (Requ
                     publishUids(processedQueue);
                     inProgress = false;
                 }
-            }.bind(this));
+            });
         } else {
             publishUids(processedQueue);
         }

@@ -126,6 +126,36 @@ MessageFormat.locale.ru = function (n) {
 };
 
 window.i18n["ru"] = {}
+window.i18n["ru"]["chat"] = function(d){
+var r = "";
+r += "чат";
+return r;
+}
+window.i18n["ru"]["news"] = function(d){
+var r = "";
+r += "новости";
+return r;
+}
+window.i18n["ru"]["buddies"] = function(d){
+var r = "";
+r += "люди";
+return r;
+}
+window.i18n["ru"]["my"] = function(d){
+var r = "";
+r += "мои";
+return r;
+}
+window.i18n["ru"]["friends_nominative"] = function(d){
+var r = "";
+r += "друзей";
+return r;
+}
+window.i18n["ru"]["groups_nominative"] = function(d){
+var r = "";
+r += "групп";
+return r;
+}
 window.i18n["ru"]["Private message"] = function(d){
 var r = "";
 r += "Личное сообщение";
@@ -204,6 +234,11 @@ return r;
 window.i18n["ru"]["started following you"] = function(d){
 var r = "";
 r += "хочет добавить в друзья";
+return r;
+}
+window.i18n["ru"]["friend request accepted"] = function(d){
+var r = "";
+r += "заявка в друзья подтверждена";
 return r;
 }
 window.i18n["ru"]["sent a message"] = function(d){
@@ -1227,7 +1262,6 @@ angular.module('mediator', [])
 
         return {
             pub: function () {
-                // dispatcher.trigger.apply(dispatcher, arguments);
                 chrome.extension.sendMessage([].slice.call(arguments));
             },
             sub: function () {
@@ -1249,15 +1283,15 @@ angular.module('navigation', ['ui.route'])
                 $scope.tabs = [
                     {
                         href: 'chat',
-                        name: 'Chat'
+                        name: 'chat'
                     },
                     {
                         href: 'news',
-                        name: 'News'
+                        name: 'news'
                     },
                     {
                         href: 'buddies',
-                        name: 'Buddies'
+                        name: 'buddies'
                     }
                 ];
                 $scope.activeTab = $routeParams.tab;
@@ -1273,15 +1307,15 @@ angular.module('news', ['mediator', 'navigation', 'rectify'])
         $scope.subtabs = [
             {
                 href: 'news/my',
-                text: 'My'
+                text: 'my'
             },
             {
                 href: 'news/friends',
-                text: 'Friends'
+                text: 'friends_nominative'
             },
             {
                 href: 'news/groups',
-                text: 'Groups'
+                text: 'groups_nominative'
             }
         ];
         $scope.activeSubTab = $routeParams.subtab;

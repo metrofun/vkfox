@@ -70,6 +70,11 @@ angular.module('feedbacks', [
             gender = profile.sex === 1 ? 'female':'male';
 
             switch (type) {
+            case 'friend_accepted':
+                title = name + ' ' + $filter('i18n')('friend request accepted', {
+                    GENDER: gender
+                });
+                break;
             case 'follow':
                 title = name + ' ' + $filter('i18n')('started following you', {
                     GENDER: gender
@@ -196,7 +201,10 @@ angular.module('feedbacks', [
             feedbackType, feedback = item.feedback,
             itemID, itemModel, typeTokens;
 
-        if (item.type.indexOf('_') !== -1) {
+        if (item.type === 'friend_accepted') {
+            parentType = item.type;
+            parent = item.feedback;
+        } else if (item.type.indexOf('_') !== -1) {
             typeTokens = item.type.split('_');
             feedbackType = typeTokens[0];
             parentType = typeTokens[1];
@@ -236,7 +244,7 @@ angular.module('feedbacks', [
             }
             itemModel.trigger('change');
         } else {
-            //follows types are array
+            //follows and friend_accepter types are array
             [].concat(feedback).forEach(function (feedback) {
                 var itemModel;
                 feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
@@ -306,7 +314,6 @@ angular.module('feedbacks', [
             // first item in notifications contains quantity
             if ((notifications.items && notifications.items.length > 1)
                 || (comments.items && comments.items.length)) {
-                console.log('fetch', notifications.items);
                 profilesColl
                     .add(comments.profiles, {parse: true})
                     .add(comments.groups, {parse: true})

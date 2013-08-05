@@ -8,7 +8,6 @@ angular.module('mediator', [])
 
         return {
             pub: function () {
-                // dispatcher.trigger.apply(dispatcher, arguments);
                 chrome.extension.sendMessage([].slice.call(arguments));
             },
             sub: function () {

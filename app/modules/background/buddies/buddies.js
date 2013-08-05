@@ -82,9 +82,9 @@ angular.module('buddies', [
         initialize();
 
         jQuery.when(
-            getFavouriteUsers(),
-            Users.getFriendsProfiles()
-        ).then(function (favourites, friends) {
+            Users.getFriendsProfiles(),
+            getFavouriteUsers()
+        ).then(function (friends, favourites) {
             buddiesColl.reset([].concat(favourites, friends));
 
             saveOriginalBuddiesOrder();

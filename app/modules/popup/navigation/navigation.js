@@ -5,15 +5,15 @@ angular.module('navigation', ['ui.route'])
                 $scope.tabs = [
                     {
                         href: 'chat',
-                        name: 'Chat'
+                        name: 'chat'
                     },
                     {
                         href: 'news',
-                        name: 'News'
+                        name: 'news'
                     },
                     {
                         href: 'buddies',
-                        name: 'Buddies'
+                        name: 'buddies'
                     }
                 ];
                 $scope.activeTab = $routeParams.tab;

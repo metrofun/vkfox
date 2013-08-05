@@ -36,7 +36,7 @@ angular.module('users', ['request', 'mediator']).factory('Users', function (Requ
                     publishUids(processedQueue);
                     inProgress = false;
                 }
-            }.bind(this));
+            });
         } else {
             publishUids(processedQueue);
         }

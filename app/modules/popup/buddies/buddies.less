@@ -2,11 +2,8 @@
     &:extend(.dropdown-menu > li > a all);
     .user-select(none)
 }
-.buddies__item .media-body {
-    line-height: @itemIconSize;
-}
-.buddies__item_is-fave .media-body {
-    line-height: normal;
+.buddies__item:not(.buddies__item_is-fave) .media-body {
+    margin-top: 10px;
 }
 .buddies__item-action_active.item__action {
     opacity: 1 !important;
@@ -66,7 +63,7 @@
             border-bottom: 6px solid #ffffff;
             border-left: 6px solid transparent;
             content: '';
-}
+        }
 
         label {
             padding: 3px 10px 3px 30px;

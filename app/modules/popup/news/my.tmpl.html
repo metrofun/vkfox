@@ -14,6 +14,9 @@
         <div ng-if="item.type == 'follow'">
             {{'started following you' | i18n}} <i class="icon-user"></i>
         </div>
+        <div ng-if="item.type == 'friend_accepted'">
+            {{'friend request accepted' | i18n}} <i class="icon-plus"></i>
+        </div>
         <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
             <p ng-if="item.parent.text" ng-bind-html-unsafe="item.parent.text | rectify"></p>
             <item-attachment

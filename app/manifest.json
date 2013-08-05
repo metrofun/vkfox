@@ -17,6 +17,7 @@
             "http://*.vk.com/*",
             "https://*.vk.me/*",
             "https://*.vk.com/*",
+            "cookies",
             "bookmarks",
             "notifications"
         ],

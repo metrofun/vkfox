@@ -21,7 +21,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
         state = CREATED, authDeferred = jQuery.Deferred();
 
     // FIXME http://code.google.com/p/chromium/issues/detail?id=63122
-    chrome.extension.onRequest.addListener(function () {});
+    // chrome.extension.onRequest.addListener(function () {});
 
     Mediator.sub('auth:iframe', function (url) {
         try {
@@ -40,6 +40,21 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
     model.on('change:accessToken', function () {
         Mediator.pub('auth:success', model.toJSON());
     });
+
+    /**
+     * Removes all cookies for auth domain
+     */
+    function resetAuthCookies() {
+        chrome.cookies.getAll({domain: AUTH_DOMAIN}, function (cookieArray) {
+            var i, cookie;
+            // remove each cookie
+            for (i = 0; i < cookieArray.length; ++i) {
+                cookie = cookieArray[i];
+                console.log(cookie);
+                chrome.cookies.remove({ name: cookie.name, url: cookie.path });
+            }
+        });
+    }
 
     return {
         retry: _.debounce(function () {
@@ -60,6 +75,8 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
                 if (authDeferred.state() === 'resolved') {
                     authDeferred = jQuery.Deferred();
                 }
+
+                resetAuthCookies();
 
                 if (!$iframe) {
                     $iframe = angular.element(
