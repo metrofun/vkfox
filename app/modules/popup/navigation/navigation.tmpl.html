@@ -1,13 +1,19 @@
-<div class="navbar navbar-inverse navbar-static-top">
+<div class="navigation navbar navbar-inverse navbar-static-top">
     <div class="navbar-inner">
         <div class="container">
-            <ul class="nav navigation">
+            <ul class="nav">
                 <li
                     ng-repeat="tab in tabs"
                     ng-class="{active: tab.href === activeTab}">
                     <a href="/{{tab.href}}">{{tab.name | i18n}}</a>
                 </li>
             </ul>
+            <div class="navigation__actions">
+                <i
+                    anchor="{{'/plugin_vkfox' | addVKBase}}"
+                    class="navigation__action navigation__help icon-question-sign"></i>
+                <i class="navigation__action navigation__config icon-cog"></i>
+            </div>
         </div>
     </div>
 </div>
