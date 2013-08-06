@@ -1,4 +1,7 @@
 .DS_Store
 app/vendor
+app/background.js
+app/popup.js
+app/style.css
 components
 node_modules
