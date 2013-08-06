@@ -44,22 +44,18 @@
        display: inline-block;
    }
    &__head.is-online:after {
-       content: '';
+       &:extend([class^="icon-"]);
+       content: @ok-sign;
        display: inline-block;
-       width: 14px;
-       height: 14px;
-       line-height: 14px;
-       background-image: url("@{iconWhiteInvertSpritePath}");
-       background-repeat: no-repeat;
-       .icon-ok-sign();
-       background-color: @green;
        margin-left: 6px;
+       color: @nephritis;
+       vertical-align: top;
    }
    &__actions {
        position: absolute;
        right: @itemPadding;
        top: @itemPadding;
-       font-size: 12px;
+       font-size: 14px;
    }
    &:hover .item__action {
        opacity: 1;
@@ -70,8 +66,6 @@
        text-decoration: none !important;
        display: inline-block;
        cursor: pointer;
-       background-image: url("@{iconWhiteInvertSpritePath}");
-
        .app__color-with-hover(@peterRiver);
    }
    &__action ~ &__action {

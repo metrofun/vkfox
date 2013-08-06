@@ -1,18 +1,5 @@
-angular.module('auth', []).factory('Auth', function (Mediator) {
-    var APP_ID = 1920884,
-        AUTH_DOMAIN = 'http://oauth.vk.com/',
-        RETRY_INTERVAL = 10000,
-        AUTH_URI = [
-            AUTH_DOMAIN,
-            'authorize?',
-            [
-                'client_id=' + APP_ID,
-                'scope=friends,photos,audio,video,docs,notes,pages,wall,groups,messages,notifications',
-                'response_type=token',
-                'redirect_uri=http://oauth.vk.com/blank.html',
-                'display=page'
-            ].join('&')
-        ].join(''),
+angular.module('auth', []).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, VK_BASE) {
+    var RETRY_INTERVAL = 10000,
         CREATED = 1,
         IN_PROGRESS = 1,
         READY = 2,
@@ -20,10 +7,16 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
         $iframe, model = new Backbone.Model(),
         state = CREATED, authDeferred = jQuery.Deferred();
 
-    // FIXME http://code.google.com/p/chromium/issues/detail?id=63122
-    // chrome.extension.onRequest.addListener(function () {});
-
     Mediator.sub('auth:iframe', function (url) {
+        console.log('auth:iframe', arguments);
+        // close all login windows
+        chrome.tabs.query({url: AUTH_DOMAIN + '*'}, function (tabs) {
+            tabs.forEach(function (tab) {
+                console.log('remove tab', tab.id);
+                chrome.tabs.remove(tab.id);
+            });
+        });
+
         try {
             model.set('userId',  parseInt(url.match(/user_id=(\w+)(?:&|$)/i)[1], 10));
             model.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
@@ -37,6 +30,15 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
         }
     }.bind(this));
 
+    Mediator.sub('auth:state:get', function () {
+        Mediator.pub('auth:state', state);
+    });
+
+    Mediator.sub('auth:relogin', function () {
+        resetAuthCookies();
+        chrome.tabs.create({url: AUTH_URI});
+    });
+
     model.on('change:accessToken', function () {
         Mediator.pub('auth:success', model.toJSON());
     });
@@ -45,7 +47,7 @@ angular.module('auth', []).factory('Auth', function (Mediator) {
      * Removes all cookies for auth domain
      */
     function resetAuthCookies() {
-        chrome.cookies.getAll({domain: AUTH_DOMAIN}, function (cookieArray) {
+        chrome.cookies.getAll({domain: VK_BASE}, function (cookieArray) {
             var i, cookie;
             // remove each cookie
             for (i = 0; i < cookieArray.length; ++i) {

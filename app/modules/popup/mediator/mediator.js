@@ -2,13 +2,14 @@ angular.module('mediator', [])
     .factory('Mediator', function () {
         var dispatcher = _.clone(Backbone.Events);
 
-        chrome.extension.onMessage.addListener(function (messageData) {
+        chrome.runtime.onMessage.addListener(function (messageData) {
             dispatcher.trigger.apply(dispatcher, messageData);
+            messageData = null;
         });
 
         return {
             pub: function () {
-                chrome.extension.sendMessage([].slice.call(arguments));
+                chrome.runtime.sendMessage([].slice.call(arguments));
             },
             sub: function () {
                 dispatcher.on.apply(dispatcher, arguments);

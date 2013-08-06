@@ -8,6 +8,7 @@
     "angular-ui-utils": "~0.0.2",
     "moment": "~2.1.0",
     "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git",
-    "emoji": "~0.2.1"
+    "emoji": "~0.2.1",
+    "font-awesome": "~3.2.1"
   }
 }

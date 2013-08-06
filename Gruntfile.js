@@ -64,6 +64,17 @@ module.exports = function (grunt) {
             },
             popupJs: {
                 src: [
+                    'components/emoji/lib/emoji.js',
+                    'components/moment/moment.js',
+                    'components/javascript-linkify/ba-linkify.js',
+                    'components/jquery/jquery.js',
+                    'components/bootstrap/js/bootstrap-tooltip.js',
+                    'components/bootstrap/js/bootstrap-dropdown.js',
+                    'components/underscore/underscore.js',
+                    'components/backbone/backbone.js',
+                    'components/angular-unstable/angular.js',
+                    'components/angular-ui-utils/modules/keypress/keypress.js',
+                    'components/angular-ui-utils/modules/route/route.js',
                     'app/modules/common/**/*.js',
                     'app/modules/popup/**/*.js'
                 ],
@@ -71,6 +82,10 @@ module.exports = function (grunt) {
             },
             backgroundJs: {
                 src: [
+                    'components/jquery/jquery.js',
+                    'components/underscore/underscore.js',
+                    'components/backbone/backbone.js',
+                    'components/angular-unstable/angular.js',
                     'app/modules/common/**/*.js',
                     'app/modules/background/**/*.js'
                 ],
@@ -89,6 +104,24 @@ module.exports = function (grunt) {
         },
         clean: {
             less: ['<%= concat.less.dest %>']
+        },
+        copy: {
+            vendor: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: 'components/emoji/lib/*',
+                        dest: 'app/vendor/emoji/'
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: 'components/font-awesome/font/*',
+                        dest: 'app/vendor/font-awesome/'
+                    }
+                ]
+            }
         }
     });
 
@@ -97,9 +130,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.registerTask(
         'default',
-        ['messageformat', 'concat', 'less:all', 'clean:less', 'watch']
+        ['copy:vendor', 'messageformat', 'concat', 'less:all', 'clean:less', 'watch']
     );
 
 };

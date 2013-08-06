@@ -31,8 +31,8 @@
         },
         "content_scripts": [{
             "matches" : ["http://oauth.vk.com/*"],
-            "js" : ["modules/background/auth/vk.js"],
-            "run_at" : "document_end",
+            "js" : ["modules/background/auth/oauth.vk.com.js"],
+            "run_at" : "document_start",
             "all_frames" : true
         }],
         "minimum_chrome_version" : "28"
