@@ -25,7 +25,7 @@ angular.module('router', ['mediator', 'persistent-model'])
                 }
             });
     })
-    .run(function ($location, $rootScope, Mediator, PersistentModel, AUTH_URI) {
+    .run(function ($location, $rootScope, Mediator, PersistentModel) {
         // default tab is chat
         var model = new PersistentModel(
             {lastPath: '/chat'},

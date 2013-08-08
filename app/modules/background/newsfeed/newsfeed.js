@@ -19,13 +19,13 @@ angular.module(
         }))(),
         ItemsColl = Backbone.Collection.extend({
             model: Backbone.Model.extend({
-                toJSON: function () {
-                    // due to performance considerations,
-                    // we track items by cid (uniq id) in view
-                    var result = _.clone(this.attributes);
-                    result.cid = this.cid;
-
-                    return result;
+                parse: function (item) {
+                    item.id = [
+                        item.source_id,
+                        item.post_id,
+                        item.type
+                    ].join(':');
+                    return item;
                 }
             })
         }),
@@ -41,6 +41,10 @@ angular.module(
         ].join('')}).done(function (response) {
             var newsfeed = response.newsfeed;
 
+            // TODO remove debug
+            if (autoUpdateParams.start_time === response.time) {
+                console.warn('duplicate requests for newsfeed');
+            }
             autoUpdateParams.start_time = response.time;
             autoUpdateParams.from = newsfeed.new_from;
 
@@ -48,14 +52,7 @@ angular.module(
                 .add(newsfeed.profiles, {parse: true})
                 .add(newsfeed.groups, {parse: true});
 
-            discardOddWallPhotos(newsfeed.items).forEach(function (item) {
-                if (item.source_id > 0) {
-                    friendItemsColl.add(item, {at: 0});
-                } else {
-                    // console.log(item);
-                    groupItemsColl.add(item, {at: 0});
-                }
-            });
+            discardOddWallPhotos(newsfeed.items).forEach(processRawItem);
 
             // try to remove old items, if new were inserted
             if (newsfeed.items.length) {
@@ -67,6 +64,50 @@ angular.module(
     }
 
     /**
+     * Generates unique id for every item,
+     * or merges new item into existing one with the same id;
+     * For example new wall_photos will be merged with existing for the user
+     */
+    function processRawItem(item) {
+        var collection, propertyName, collisionItem,
+            typeToPropertyMap = {
+                'wall_photo': 'photos',
+                'photo': 'photos',
+                'photo_tag': 'photo_tags',
+                'note': 'notes',
+                'friend': 'friends'
+            };
+
+        item.id = [item.source_id, item.post_id, item.type].join(':');
+
+        if (item.source_id > 0) {
+            collisionItem = friendItemsColl.get(item.id);
+            friendItemsColl.remove(collisionItem);
+        } else {
+            collisionItem = groupItemsColl.get(item.id);
+            groupItemsColl.remove(collisionItem);
+        }
+
+        if (collisionItem) {
+            collisionItem = collisionItem.toJSON();
+
+            if (collisionItem.type !== 'post') {
+                // type "photo" item has "photos" property; note - notes etc
+                propertyName = typeToPropertyMap[collisionItem.type];
+                collection = item[propertyName].slice(1).concat(
+                    collisionItem[propertyName].slice(1)
+                );
+                item[propertyName] = [collection.length].concat(collection);
+            }
+        }
+
+        if (item.source_id > 0) {
+            friendItemsColl.add(item, {at: 0});
+        } else {
+            groupItemsColl.add(item, {at: 0});
+        }
+    }
+    /**
      * API returns 'wall_photo' item for every post item with photo.
      *
      * @param {Array} items
@@ -74,18 +115,40 @@ angular.module(
      */
     function discardOddWallPhotos(items) {
         return items.filter(function (item) {
+            var wallPhotos, attachedPhotos;
+
             if (item.type === 'wall_photo') {
-                return !(_.findWhere(items, {
+                wallPhotos = item.photos.slice(1);
+                // collect all attachments from source_id's posts
+                attachedPhotos = _.where(items, {
                     type: 'post',
-                    date: item.date,
                     source_id: item.source_id
-                }));
+                }).reduce(function (attachedPhotos, post) {
+                    if (post.attachments) {
+                        attachedPhotos = attachedPhotos.concat(
+                            _.where(post.attachments, {
+                                type: 'photo'
+                            }).map(function (attachment) {
+                                return attachment.photo;
+                            })
+                        );
+                    }
+                    return attachedPhotos;
+                }, []);
+                //exclude attachedPhotos from wallPhotos
+                wallPhotos = wallPhotos.filter(function (wallPhoto) {
+                    return !(_.findWhere(attachedPhotos, {
+                        pid: wallPhoto.pid
+                    }));
+                });
+                item.photos = [wallPhotos.length].concat(wallPhotos);
+                return  wallPhotos.length;
             }
             return true;
         });
     }
     /**
-     * Deletes items, when there a re more then MAX_ITEMS_COUNT.
+     * Deletes items, when there are more then MAX_ITEMS_COUNT.
      * Also removes unnecessary profiles after that
      */
     function freeSpace() {

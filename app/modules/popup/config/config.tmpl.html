@@ -1,0 +1,44 @@
+<navigation></navigation>
+<form
+    ng-controller="configCtrl"
+    class="config">
+    <label>
+        Notifications
+        <input
+            ng-model="notificationsEnabled"
+            type="checkbox" />
+    </label>
+    <label>
+        Sound
+        <input
+            ng-model="soundEnabled"
+            ng-disabled="!notificationsEnabled"
+            type="checkbox" />
+    </label>
+    <label>
+        Signal
+        <select ng-disabled="!notificationsEnabled || !soundEnabled">
+            <option value="">standart</option>
+            <option value="">original</option>
+        </select>
+    </label>
+    <label>
+        Volume
+        <input
+            ng-disabled="!notificationsEnabled || !soundEnabled"
+            type="range"/>
+    </label>
+    <label>
+        Popups
+        <input
+            ng-model="popupsEnabled"
+            ng-disabled="!notificationsEnabled"
+            type="checkbox"/>
+    </label>
+    <label>
+        Show text
+        <input
+            ng-disabled="!notificationsEnabled || !popupsEnabled"
+            type="checkbox"/>
+    </label>
+</form>

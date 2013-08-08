@@ -1,8 +1,8 @@
 angular.module(
     'longpoll',
-    ['request', 'mediator']
+    ['request', 'mediator', 'config']
 ).run(function (Request, Mediator) {
-    var LONG_POLL_WAIT = 5;
+    var LONG_POLL_WAIT = 20;
 
     function enableLongPollUpdates() {
         Request.api({

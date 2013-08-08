@@ -99,6 +99,7 @@ angular.module('news', ['mediator', 'navigation', 'rectify'])
         Mediator.pub('newsfeed:friends:get');
         Mediator.sub('newsfeed:friends', function (data) {
             $scope.$apply(function () {
+                console.log(data);
                 $scope.data = data;
             });
         });

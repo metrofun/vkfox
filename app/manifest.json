@@ -30,7 +30,7 @@
             "default_popup": "popup.html"
         },
         "content_scripts": [{
-            "matches" : ["http://oauth.vk.com/*"],
+            "matches" : ["http://oauth.vk.com/*", "https://oauth.vk.com/*"],
             "js" : ["modules/background/auth/oauth.vk.com.js"],
             "run_at" : "document_start",
             "all_frames" : true

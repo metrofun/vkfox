@@ -8,7 +8,6 @@ angular.module('auth', []).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH
         state = CREATED, authDeferred = jQuery.Deferred();
 
     Mediator.sub('auth:iframe', function (url) {
-        console.log('auth:iframe', arguments);
         // close all login windows
         chrome.tabs.query({url: AUTH_DOMAIN + '*'}, function (tabs) {
             tabs.forEach(function (tab) {

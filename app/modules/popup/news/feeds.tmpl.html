@@ -1,5 +1,5 @@
 <item
-    item-list-repeat="item in data.items track by item.cid"
+    item-list-repeat="item in data.items track by item.id"
     owners="data.profiles | where:'id':item.source_id">
     <ng-switch on="item.type">
         <div ng-switch-when="post">
