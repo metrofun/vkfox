@@ -5,17 +5,26 @@
     position: relative;
 }
 .navigation__actions {
-    border-left: 1px solid darken(@peterRiver, 15%);
+    /* border-left: 1px solid darken(@peterRiver, 15%); */
     height: 40px;
-    padding: 0 10px;
+    margin-right: 13px;
     position: absolute;
     top: 0;
     right: 0;
 }
 .navigation__action {
-    line-height: 40px;
+    display: inline-block;
+    line-height: 41px;
     vertical-align: middle;
     cursor: pointer;
     .app__color-with-hover (white);
     font-size: 16px;
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    & + .navigation__action {
+        margin-left: 9px;
+    }
 }

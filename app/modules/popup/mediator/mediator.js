@@ -1,24 +1,22 @@
-angular.module('mediator', [])
-    .factory('Mediator', function () {
-        var dispatcher = _.clone(Backbone.Events);
+angular.module('mediator')
+    .factory('Mediator', function (MediatorDispatcher) {
+        var Mediator = Object.create(MediatorDispatcher),
+            activePort;
 
-        chrome.runtime.onMessage.addListener(function (messageData) {
-            dispatcher.trigger.apply(dispatcher, messageData);
-            messageData = null;
+        activePort = chrome.runtime.connect();
+        activePort.onMessage.addListener(function (messageData) {
+            MediatorDispatcher.pub.apply(MediatorDispatcher, messageData);
         });
 
-        return {
-            pub: function () {
-                chrome.runtime.sendMessage([].slice.call(arguments));
-            },
-            sub: function () {
-                dispatcher.on.apply(dispatcher, arguments);
-            },
-            once: function () {
-                dispatcher.once.apply(dispatcher, arguments);
-            },
-            unsub: function () {
-                dispatcher.off.apply(dispatcher, arguments);
+        Mediator.pub = function () {
+            MediatorDispatcher.pub.apply(MediatorDispatcher, arguments);
+
+            if (activePort) {
+                activePort.postMessage([].slice.call(arguments));
+            } else {
+                console.log('FUUUU');
             }
         };
+
+        return Mediator;
     });

@@ -1,6 +1,6 @@
 angular.module(
     'newsfeed',
-    ['mediator', 'request', 'likes']
+    ['auth', 'mediator', 'request', 'likes']
 ).run(function (Request, Mediator) {
     var MAX_ITEMS_COUNT = 50,
         UPDATE_PERIOD = 1000,
@@ -31,7 +31,9 @@ angular.module(
         }),
         groupItemsColl = new ItemsColl(),
         friendItemsColl = new ItemsColl(),
-        rotateId, readyDeferred, autoUpdateParams;
+        rotateId,
+        readyDeferred = jQuery.Deferred(),
+        autoUpdateParams;
 
     function fetchNewsfeed() {
         Request.api({code: [
@@ -46,7 +48,6 @@ angular.module(
                 console.warn('duplicate requests for newsfeed');
             }
             autoUpdateParams.start_time = response.time;
-            autoUpdateParams.from = newsfeed.new_from;
 
             profilesColl
                 .add(newsfeed.profiles, {parse: true})
@@ -58,6 +59,7 @@ angular.module(
             if (newsfeed.items.length) {
                 freeSpace();
             }
+            clearTimeout(rotateId);
             rotateId = setTimeout(fetchNewsfeed, UPDATE_PERIOD);
             readyDeferred.resolve();
         });
@@ -69,14 +71,23 @@ angular.module(
      * For example new wall_photos will be merged with existing for the user
      */
     function processRawItem(item) {
-        var collection, propertyName, collisionItem,
+        var propertyName, collisionItem,
             typeToPropertyMap = {
                 'wall_photo': 'photos',
                 'photo': 'photos',
                 'photo_tag': 'photo_tags',
                 'note': 'notes',
                 'friend': 'friends'
-            };
+            },
+            // used to eliminate duplicate items during merge
+            collection = new (Backbone.Collection.extend({
+                model: Backbone.Model.extend({
+                    parse: function (item) {
+                        item.id = item.pid || item.nid || item.pid;
+                        return item;
+                    }
+                })
+            }))();
 
         item.id = [item.source_id, item.post_id, item.type].join(':');
 
@@ -92,12 +103,17 @@ angular.module(
             collisionItem = collisionItem.toJSON();
 
             if (collisionItem.type !== 'post') {
+                // TODO remove it
+                if (collisionItem.type === 'friend') {
+                    console.log('collision', item, autoUpdateParams.start_time);
+                }
                 // type "photo" item has "photos" property; note - notes etc
                 propertyName = typeToPropertyMap[collisionItem.type];
-                collection = item[propertyName].slice(1).concat(
-                    collisionItem[propertyName].slice(1)
-                );
-                item[propertyName] = [collection.length].concat(collection);
+
+                collection.add(item[propertyName].slice(1), {parse: true});
+                collection.add(collisionItem[propertyName].slice(1), {parse: true});
+
+                item[propertyName] = [collection.size()].concat(collection.toJSON());
             }
         }
 
@@ -207,13 +223,12 @@ angular.module(
         groupItemsColl.reset();
         friendItemsColl.reset();
         clearTimeout(rotateId);
+        fetchNewsfeed();
     }
-    initialize();
 
     // entry point
     Mediator.sub('auth:success', function () {
         initialize();
-        fetchNewsfeed();
     });
 
     // Subscribe to events from popup

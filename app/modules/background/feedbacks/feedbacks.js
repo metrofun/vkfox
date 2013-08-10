@@ -307,9 +307,7 @@ angular.module('feedbacks', [
                 comments = response.comments;
 
             autoUpdateNotificationsParams.start_time = response.time;
-            autoUpdateNotificationsParams.from = notifications.new_from;
             autoUpdateCommentsParams.start_time = response.time;
-            autoUpdateCommentsParams.from = comments.new_from;
 
             // first item in notifications contains quantity
             if ((notifications.items && notifications.items.length > 1)
@@ -324,6 +322,7 @@ angular.module('feedbacks', [
                 comments.items.forEach(addRawCommentsItem);
             }
             readyDeferred.resolve();
+            clearTimeout(rotateId);
             rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);
         });
     }

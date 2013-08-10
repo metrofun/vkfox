@@ -1,4 +1,7 @@
-angular.module('auth', []).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, VK_BASE) {
+angular.module('auth', ['config'])
+    .run(function (Auth) {
+        Auth.login();
+    }).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, VK_BASE) {
     var RETRY_INTERVAL = 10000,
         CREATED = 1,
         IN_PROGRESS = 1,
@@ -51,7 +54,6 @@ angular.module('auth', []).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH
             // remove each cookie
             for (i = 0; i < cookieArray.length; ++i) {
                 cookie = cookieArray[i];
-                console.log(cookie);
                 chrome.cookies.remove({ name: cookie.name, url: cookie.path });
             }
         });
