@@ -14,22 +14,34 @@
             </label>
             <div
                 role="menu"
-                class="dropdown buddies__filter pull-right">
+                class="dropdown buddies__filter pull-right open">
                 <i class="icon-reorder dropdown-toggle"></i>
                 <ul class="dropdown-menu">
                     <li><label class="checkbox">
-                        <input ng-model="filters.male" type="checkbox">{{'Male' | i18n}}
+                        <input
+                            class="buddies__checkbox"
+                            ng-model="filters.male"
+                            type="checkbox">{{'Male' | i18n}}
                     </label></li>
                     <li><label class="checkbox">
-                        <input ng-model="filters.female" type="checkbox">{{'Female' | i18n}}
+                        <input
+                            class="buddies__checkbox"
+                            ng-model="filters.female"
+                            type="checkbox">{{'Female' | i18n}}
                     </label></li>
                     <li class="divider"></li>
                     <li><label class="checkbox">
-                        <input ng-model="filters.offline" type="checkbox">{{'Offline' | i18n}}
+                        <input
+                            class="buddies__checkbox"
+                            ng-model="filters.offline"
+                            type="checkbox">{{'Offline' | i18n}}
                     </label></li>
                     <li class="divider"></li>
                     <li><label class="checkbox">
-                        <input ng-model="filters.faves" type="checkbox">{{'Bookmarked' | i18n}}
+                        <input
+                            class="buddies__checkbox"
+                            ng-model="filters.faves"
+                            type="checkbox">{{'Bookmarked' | i18n}}
                     </label></li>
             </div>
         </div>

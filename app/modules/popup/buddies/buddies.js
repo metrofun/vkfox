@@ -61,4 +61,3 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
             }
         };
     });
-

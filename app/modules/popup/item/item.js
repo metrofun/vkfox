@@ -198,6 +198,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                 function onReply(scope, message) {
                     var params = {}, method;
 
+                    console.log(scope);
                     switch (scope.type) {
                     case 'wall':
                     case 'post':

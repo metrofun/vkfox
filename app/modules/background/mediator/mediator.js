@@ -3,10 +3,6 @@ angular.module('mediator')
         var Mediator = Object.create(MediatorDispatcher),
             activePort;
 
-        chrome.runtime.onMessage.addListener(function (messageData) {
-            MediatorDispatcher.pub.apply(MediatorDispatcher, messageData);
-        });
-
         chrome.runtime.onConnect.addListener(function (port) {
             activePort = port;
             port.onMessage.addListener(function (messageData) {

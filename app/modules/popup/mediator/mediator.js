@@ -11,11 +11,7 @@ angular.module('mediator')
         Mediator.pub = function () {
             MediatorDispatcher.pub.apply(MediatorDispatcher, arguments);
 
-            if (activePort) {
-                activePort.postMessage([].slice.call(arguments));
-            } else {
-                console.log('FUUUU');
-            }
+            activePort.postMessage([].slice.call(arguments));
         };
 
         return Mediator;

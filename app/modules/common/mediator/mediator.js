@@ -4,7 +4,6 @@ angular.module('mediator', [])
 
         return {
             pub: function () {
-                console.log(arguments);
                 dispatcher.trigger.apply(dispatcher, arguments);
             },
             sub: function () {

@@ -6,6 +6,7 @@ angular.module('request', ['mediator', 'auth']).factory(
         API_DOMAIN = 'https://api.vk.com/',
         API_REQUESTS_DEBOUNCE = 400,
         API_VERSION = 4.99,
+        XHR_TIMEOUT = 30000,
 
         apiQueriesQueue = [],
         Request = {
@@ -17,6 +18,8 @@ angular.module('request', ['mediator', 'auth']).factory(
              * @returns [jQuery.Deferred]
              */
             ajax: function (options) {
+                options.timeout = XHR_TIMEOUT;
+
                 return Auth.getAccessToken().then(function (accessToken) {
                     var usedAccessToken = accessToken,
                         ajaxDeferred = jQuery.Deferred();
@@ -25,14 +28,14 @@ angular.module('request', ['mediator', 'auth']).factory(
                         function (response) {
                             Auth.getAccessToken().then(function (accessToken) {
                                 if (accessToken === usedAccessToken) {
-                                    ajaxDeferred.resolve.call(ajaxDeferred, response);
+                                    ajaxDeferred.resolve(response);
                                 } else {
-                                    ajaxDeferred.reject.call(ajaxDeferred, response);
+                                    ajaxDeferred.reject(response);
                                 }
                             });
                         },
                         function (response) {
-                            ajaxDeferred.reject.call(ajaxDeferred, response);
+                            ajaxDeferred.reject(response);
                         }
                     );
                     return ajaxDeferred;

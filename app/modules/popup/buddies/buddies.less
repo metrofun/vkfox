@@ -9,6 +9,35 @@
     opacity: 1 !important;
     .app__color-with-hover(@sunFlower);
 }
+.buddies .checkbox {
+    overflow: hidden;
+}
+.buddies__checkbox
+{
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-size: 14px;
+    margin-left: -60px !important;
+}
+.buddies__checkbox:before
+{
+    top: -5px;
+    position: relative;
+    .icon-FontAwesome();
+    display: inline-block;
+    margin-left: 40px;
+    content: @check-empty;
+}
+.buddies__checkbox:checked:before
+{
+    content: @check;
+}
+label:hover .buddies__checkbox:before
+{
+    color: white;
+}
 .buddies__search {
     margin: 0;
     line-height: 40px;

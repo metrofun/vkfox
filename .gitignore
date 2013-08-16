@@ -5,3 +5,5 @@ app/popup.js
 app/style.css
 components
 node_modules
+background.components.min.js
+popup.components.min.js

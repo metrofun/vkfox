@@ -90,6 +90,7 @@ angular.module('users', ['request', 'mediator']).factory('Users', function (Requ
                             friendData.isFriend = true;
                         });
                         usersColl.add(response);
+                        console.log('getFriendsProfiles:', usersColl.size());
                     }
                     return response;
                 }.bind(this));

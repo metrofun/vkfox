@@ -10,7 +10,7 @@ angular.module(
 
             this._updateNonFriends();
         },
-        _updateNonFriends: function () {
+        _updateNonFriends: _.debounce(function () {
             var
             self = this,
             uids = this.where({
@@ -21,6 +21,7 @@ angular.module(
                 return model.get('uid');
             });
 
+            console.log('_updateNonFriends; uids.length:', uids.length);
             if (uids.length) {
                 Users.getProfilesById(uids).then(function (profiles) {
                     profiles.forEach(function (profile) {
@@ -29,11 +30,12 @@ angular.module(
                             model.set('online', profile.online);
                         }
                     });
-                });
+                }).always(this._updateNonFriends.bind(this));
+            } else {
+                this._updateNonFriends();
             }
 
-            setTimeout(this._updateNonFriends.bind(this), UPDATE_NON_FRIENDS_PERIOD);
-        },
+        }, UPDATE_NON_FRIENDS_PERIOD),
         /**
          * @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
          *

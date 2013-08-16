@@ -31,7 +31,7 @@ angular.module(
         }),
         groupItemsColl = new ItemsColl(),
         friendItemsColl = new ItemsColl(),
-        rotateId,
+        fetchNewsfeedDebounced,
         readyDeferred = jQuery.Deferred(),
         autoUpdateParams;
 
@@ -43,15 +43,11 @@ angular.module(
         ].join('')}).done(function (response) {
             var newsfeed = response.newsfeed;
 
-            // TODO remove debug
-            if (autoUpdateParams.start_time === response.time) {
-                console.warn('duplicate requests for newsfeed');
-            }
             autoUpdateParams.start_time = response.time;
 
             profilesColl
-                .add(newsfeed.profiles, {parse: true})
-                .add(newsfeed.groups, {parse: true});
+            .add(newsfeed.profiles, {parse: true})
+            .add(newsfeed.groups, {parse: true});
 
             discardOddWallPhotos(newsfeed.items).forEach(processRawItem);
 
@@ -59,11 +55,11 @@ angular.module(
             if (newsfeed.items.length) {
                 freeSpace();
             }
-            clearTimeout(rotateId);
-            rotateId = setTimeout(fetchNewsfeed, UPDATE_PERIOD);
+            fetchNewsfeedDebounced();
             readyDeferred.resolve();
         });
     }
+    fetchNewsfeedDebounced = _.debounce(fetchNewsfeed, UPDATE_PERIOD);
 
     /**
      * Generates unique id for every item,
@@ -103,10 +99,6 @@ angular.module(
             collisionItem = collisionItem.toJSON();
 
             if (collisionItem.type !== 'post') {
-                // TODO remove it
-                if (collisionItem.type === 'friend') {
-                    console.log('collision', item, autoUpdateParams.start_time);
-                }
                 // type "photo" item has "photos" property; note - notes etc
                 propertyName = typeToPropertyMap[collisionItem.type];
 
@@ -222,7 +214,6 @@ angular.module(
         profilesColl.reset();
         groupItemsColl.reset();
         friendItemsColl.reset();
-        clearTimeout(rotateId);
         fetchNewsfeed();
     }
 
@@ -269,17 +260,17 @@ angular.module(
     });
 
     readyDeferred.then(function () {
-        groupItemsColl.on('change add', function () {
+        groupItemsColl.on('change add', _.debounce(function () {
             Mediator.pub('newsfeed:groups', {
                 profiles: profilesColl.toJSON(),
                 items: groupItemsColl.toJSON()
             });
-        });
-        friendItemsColl.on('change add', function () {
+        }), 0);
+        friendItemsColl.on('change add', _.debounce(function () {
             Mediator.pub('newsfeed:friends', {
                 profiles: profilesColl.toJSON(),
                 items: friendItemsColl.toJSON()
             });
-        });
+        }), 0);
     });
 });

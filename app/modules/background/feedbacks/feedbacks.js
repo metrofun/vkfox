@@ -4,14 +4,15 @@ angular.module('feedbacks', [
     'likes',
     'profiles-collection',
     'persistent-model',
-    'notifications'
+    'notifications',
+    'common'
 ]).run(function (Request, Mediator, ProfilesCollection, Notifications, PersistentModel, $filter) {
     var
     MAX_ITEMS_COUNT = 50,
     UPDATE_PERIOD = 1000,
 
     readyDeferred = jQuery.Deferred(),
-    rotateId, persistentModel, userId,
+    persistentModel, userId,
     autoUpdateNotificationsParams, autoUpdateCommentsParams,
     profilesColl = new (ProfilesCollection.extend({
         model: Backbone.Model.extend({
@@ -25,6 +26,7 @@ angular.module('feedbacks', [
             }
         })
     }))(),
+    fetchFeedbacksDebounced,
     FeedbacksCollection = Backbone.Collection.extend({
         comparator: function (model) {
             return model.get('date');
@@ -65,9 +67,14 @@ angular.module('feedbacks', [
 
         // Don't show self messages
         if (ownerId !== userId || true) {
-            profile = profilesColl.get(ownerId).toJSON(),
-            name = $filter('name')(profile),
-            gender = profile.sex === 1 ? 'female':'male';
+            try {
+                profile = profilesColl.get(ownerId).toJSON(),
+                name = $filter('name')(profile),
+                gender = profile.sex === 1 ? 'female':'male';
+            } catch (e) {
+                console.log(ownerId, profile, name);
+                throw e;
+            }
 
             switch (type) {
             case 'friend_accepted':
@@ -144,9 +151,9 @@ angular.module('feedbacks', [
         });
 
         autoUpdateNotificationsParams = {
-            count: MAX_ITEMS_COUNT
-            //everything except comments
-            // filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
+            count: MAX_ITEMS_COUNT,
+            // everything except comments
+            filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
         },
         autoUpdateCommentsParams = {
             last_comments: 1,
@@ -154,7 +161,6 @@ angular.module('feedbacks', [
         },
         itemsColl.reset();
         profilesColl.reset();
-        clearTimeout(rotateId);
         fetchFeedbacks();
     }
     /**
@@ -322,10 +328,10 @@ angular.module('feedbacks', [
                 comments.items.forEach(addRawCommentsItem);
             }
             readyDeferred.resolve();
-            clearTimeout(rotateId);
-            rotateId = setTimeout(fetchFeedbacks, UPDATE_PERIOD);
+            fetchFeedbacksDebounced();
         });
     }
+    fetchFeedbacksDebounced = _.debounce(fetchFeedbacks, UPDATE_PERIOD);
 
     // entry point
     Mediator.sub('auth:success', function (data) {

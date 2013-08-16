@@ -2,43 +2,63 @@
 <form
     ng-controller="configCtrl"
     class="config">
-    <label>
-        Notifications
+    <div class="config__row">
+        <i class="icon-bullhorn config__icon"></i>
+        <label class="config__label">Notifications</label>
         <input
+            class="config__input config__checkbox"
             ng-model="notificationsEnabled"
             type="checkbox" />
-    </label>
-    <label>
-        Sound
+    </div>
+    <div class="config__row">
+        <i class="icon-volume-up config__icon"></i>
+        <label class="config__label">Sound</label>
         <input
+            class="config__input config__checkbox"
             ng-model="soundEnabled"
             ng-disabled="!notificationsEnabled"
             type="checkbox" />
-    </label>
-    <label>
-        Signal
-        <select ng-disabled="!notificationsEnabled || !soundEnabled">
+    </div>
+    <div class="config__row">
+        <label class="config__label">Signal</label>
+        <select class="config__input" ng-disabled="!notificationsEnabled || !soundEnabled">
             <option value="">standart</option>
             <option value="">original</option>
         </select>
-    </label>
-    <label>
-        Volume
+        <!-- <div -->
+            <!-- role="menu" -->
+            <!-- class="dropdown buddies__filter pull-right"> -->
+            <!-- <i class="icon-reorder dropdown-toggle"></i> -->
+            <!-- <ul class="dropdown-menu"> -->
+                <!-- <li><label class="checkbox"> -->
+                    <!-- <input ng-model="filters.male" type="radio">standart -->
+                    <!-- </label></li> -->
+                <!-- <li><label class="checkbox"> -->
+                    <!-- <input ng-model="filters.female" type="radio">original -->
+                    <!-- </label></li> -->
+                <!-- </div> -->
+    </div>
+    <div class="config__row">
+        <label class="config__label">Volume</label>
         <input
+            class="config__input"
             ng-disabled="!notificationsEnabled || !soundEnabled"
             type="range"/>
-    </label>
-    <label>
-        Popups
+    </div>
+    <div class="config__row">
+        <i class="config__icon icon-bell-alt"></i>
+        <label class="config__label">Popups</label>
         <input
+            class="config__input config__checkbox"
             ng-model="popupsEnabled"
             ng-disabled="!notificationsEnabled"
             type="checkbox"/>
-    </label>
-    <label>
-        Show text
+    </div>
+    <div class="config__row">
+        <label class="config__label">Show text</label>
         <input
+            class="config__input config__checkbox"
             ng-disabled="!notificationsEnabled || !popupsEnabled"
             type="checkbox"/>
-    </label>
+    </div>
 </form>
