@@ -2,14 +2,16 @@ angular.module(
     'longpoll',
     ['request', 'mediator', 'config']
 ).run(function (Request, Mediator) {
-    var LONG_POLL_WAIT = 20;
+    var LONG_POLL_WAIT = 20,
+        FETCH_DEBOUNCE = 1000,
+        fetchUpdates;
 
     function enableLongPollUpdates() {
         Request.api({
             code: 'return API.messages.getLongPollServer();'
-        }).then(fetchUpdates, enableLongPollUpdates);
+        }).then(fetchUpdates);
     }
-    function fetchUpdates(params) {
+    fetchUpdates = _.debounce(function (params) {
         Request.get('http://' + params.server, {
             act: 'a_check',
             key:  params.key,
@@ -26,9 +28,11 @@ angular.module(
 
             params.ts = response.ts;
             fetchUpdates(params);
-        }, enableLongPollUpdates);
-    }
+        });
+    }, FETCH_DEBOUNCE);
 
-    enableLongPollUpdates();
+    Mediator.sub('auth:success', function () {
+        enableLongPollUpdates();
+    });
 });
 

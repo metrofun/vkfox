@@ -21,7 +21,6 @@ angular.module(
                 return model.get('uid');
             });
 
-            console.log('_updateNonFriends; uids.length:', uids.length);
             if (uids.length) {
                 Users.getProfilesById(uids).then(function (profiles) {
                     profiles.forEach(function (profile) {
