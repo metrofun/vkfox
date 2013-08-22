@@ -1,0 +1,52 @@
+<navigation></navigation>
+<form
+    ng-controller="settingsCtrl"
+    class="settings">
+    <div class="settings__row">
+        <i class="icon-bullhorn settings__icon"></i>
+        <label class="settings__label">{{'notifications' | i18n}}</label>
+        <input
+            class="settings__input settings__checkbox"
+            ng-model="notificationsEnabled"
+            type="checkbox" />
+    </div>
+    <div class="settings__row">
+        <i class="icon-volume-up settings__icon"></i>
+        <label class="settings__label">{{'sound' | i18n}}</label>
+        <input
+            class="settings__input settings__checkbox"
+            ng-model="soundEnabled"
+            ng-disabled="!notificationsEnabled"
+            type="checkbox" />
+    </div>
+    <div class="settings__row">
+        <label class="settings__label">{{'signal' | i18n}}</label>
+        <select class="settings__input" ng-disabled="!notificationsEnabled || !soundEnabled">
+            <option value="">standart</option>
+            <option value="">original</option>
+        </select>
+    </div>
+    <div class="settings__row">
+        <label class="settings__label">{{'volume' | i18n}}</label>
+        <input
+            class="settings__input"
+            ng-disabled="!notificationsEnabled || !soundEnabled"
+            type="range"/>
+    </div>
+    <div class="settings__row">
+        <i class="settings__icon icon-bell-alt"></i>
+        <label class="settings__label">{{'popups' | i18n}}</label>
+        <input
+            class="settings__input settings__checkbox"
+            ng-model="popupsEnabled"
+            ng-disabled="!notificationsEnabled"
+            type="checkbox"/>
+    </div>
+    <div class="settings__row">
+        <label class="settings__label">{{'show text' | i18n}}</label>
+        <input
+            class="settings__input settings__checkbox"
+            ng-disabled="!notificationsEnabled || !popupsEnabled"
+            type="checkbox"/>
+    </div>
+</form>

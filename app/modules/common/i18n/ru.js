@@ -518,4 +518,34 @@ r += (pf_0[ k_1 ] || pf_0[ "other" ])( d );
 r += " вашим видео";
 return r;
 }
+window.i18n["ru"]["notifications"] = function(d){
+var r = "";
+r += "уведомления";
+return r;
+}
+window.i18n["ru"]["sound"] = function(d){
+var r = "";
+r += "звук";
+return r;
+}
+window.i18n["ru"]["signal"] = function(d){
+var r = "";
+r += "сигнал";
+return r;
+}
+window.i18n["ru"]["volume"] = function(d){
+var r = "";
+r += "громкость";
+return r;
+}
+window.i18n["ru"]["popups"] = function(d){
+var r = "";
+r += "всплывающие окна";
+return r;
+}
+window.i18n["ru"]["show text"] = function(d){
+var r = "";
+r += "показывать текст";
+return r;
+}
 })();

@@ -1,37 +1,40 @@
-.config {
+.settings {
     padding: 10px;
 }
 
-.config__row {
+.settings__row {
     font-size: 16px;
     overflow: hidden;
     position: relative;
     padding-left: 20px;
     line-height: 25px;
 
-    .config__icon {
+    .settings__icon {
         position: absolute;
         left: 0;
         vertical-align: middle;
         line-height: inherit;
     }
 
-    & + .config__row {
+    & + .settings__row {
         margin-top: 10px;
     }
 }
 
-.config__label {
+.settings__label {
     margin: 0;
     float: left;
     vertical-align: middle;
     line-height: inherit;
 }
-.config__input {
+.settings__label:first-letter {
+    text-transform: capitalize;
+}
+.settings__input {
     float: right;
 }
 
-.config__checkbox {
+.settings__checkbox {
     font-weight: bold;
     display: inline-block;
     padding: 0 !important;
@@ -44,8 +47,8 @@
     line-height: 15px !important;
     font-size: 14px;
 }
-.config__checkbox:before,
-.config__checkbox:after {
+.settings__checkbox:before,
+.settings__checkbox:after {
     .icon-FontAwesome();
     transition: color .2s;
     position: absolute;
@@ -55,35 +58,39 @@
     height: 100%;
     box-sizing: border-box;
 }
-.config__checkbox:hover::before,
-.config__checkbox:checked:hover::after {
+.settings__checkbox:hover::before,
+.settings__checkbox:checked:hover::after {
     background: darken(@clouds, 5%);
 }
-.config__checkbox:before {
+.settings__checkbox:after {
+    .border-right-radius(3px);
+}
+.settings__checkbox:before {
+    .border-left-radius(3px);
     content: @ok;
     background: @clouds;
     color: @asbestos;
     left: 0;
     top: 0;
 }
-.config__checkbox[disabled]:before,
-.config__checkbox[disabled]:after {
+.settings__checkbox[disabled]:before,
+.settings__checkbox[disabled]:after {
     background: @clouds !important;
     color: darken(@clouds, 5%) !important;
     transition: none;
 }
-.config__checkbox:checked::before {
+.settings__checkbox:checked::before {
     color: white;
     background: @peterRiver;
 }
-.config__checkbox:after {
+.settings__checkbox:after {
     content: @remove;
     background: @peterRiver;
     color: white;
     right: 0;
     top: 0;
 }
-.config__checkbox:checked::after {
+.settings__checkbox:checked::after {
     color: @asbestos;
     background: @clouds;
 }

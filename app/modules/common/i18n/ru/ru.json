@@ -34,5 +34,11 @@
     "liked your video": "{GENDER, select, male{оценил} female{оценила} other{оценил}} ваше видео",
     "shared your post": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашей записью",
     "shared your photo": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим фото",
-    "shared your video": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим видео"
+    "shared your video": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим видео",
+    "notifications": "уведомления",
+    "sound": "звук",
+    "signal": "сигнал",
+    "volume": "громкость",
+    "popups": "всплывающие окна",
+    "show text": "показывать текст"
 }

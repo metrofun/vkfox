@@ -19,6 +19,7 @@ angular.module(
     /**
      * Replaces all links with correspndenting anchors,
      * replaces next wiki format: [id12345|Dmitrii],
+     * [id12345:bp_234567_1234|Dmitrii]
      * or [club32194285|Читать прoдoлжение..]
      * with <a anchor="http://vk.com/id12345">Dmitrii</a>
      * And repaces emoji unicodes with corrspondenting images
@@ -35,7 +36,7 @@ angular.module(
 
         //replace wiki layout
         linkifiedText = linkifiedText.replace(
-            /\[((?:id|club)\d+)\|([^\]]+)\]/g,
+            /\[((?:id|club)\d+)(?::bp-\d+_\d+)?\|([^\]]+)\]/g,
             '<a anchor="http://vk.com/$1">$2</a>'
         );
 
