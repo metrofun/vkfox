@@ -1,13 +1,13 @@
 <navigation></navigation>
 <form
-    ng-controller="settingsCtrl"
+    ng-controller="settingsNotificationsCtrl"
     class="settings">
     <div class="settings__row">
         <i class="icon-bullhorn settings__icon"></i>
         <label class="settings__label">{{'notifications' | i18n}}</label>
         <input
             class="settings__input settings__checkbox"
-            ng-model="notificationsEnabled"
+            ng-model="notifications.enabled"
             type="checkbox" />
     </div>
     <div class="settings__row">
@@ -15,22 +15,29 @@
         <label class="settings__label">{{'sound' | i18n}}</label>
         <input
             class="settings__input settings__checkbox"
-            ng-model="soundEnabled"
-            ng-disabled="!notificationsEnabled"
+            ng-model="notifications.sound.enabled"
+            ng-disabled="!notifications.enabled"
             type="checkbox" />
     </div>
     <div class="settings__row">
         <label class="settings__label">{{'signal' | i18n}}</label>
-        <select class="settings__input" ng-disabled="!notificationsEnabled || !soundEnabled">
-            <option value="">standart</option>
-            <option value="">original</option>
+        <select
+            class="settings__input"
+            ng-model="notifications.sound.signal"
+            ng-disabled="!notifications.enabled || !notifications.sound.enabled">
+            <option value="audio/standart.mp3">standart</option>
+            <option value="audio/original.mp3">original</option>
         </select>
     </div>
     <div class="settings__row">
         <label class="settings__label">{{'volume' | i18n}}</label>
         <input
             class="settings__input"
-            ng-disabled="!notificationsEnabled || !soundEnabled"
+            ng-model="notifications.sound.volume"
+            ng-disabled="!notifications.enabled || !notifications.sound.enabled"
+            step="0.1"
+            min="0"
+            max="1"
             type="range"/>
     </div>
     <div class="settings__row">
@@ -38,15 +45,16 @@
         <label class="settings__label">{{'popups' | i18n}}</label>
         <input
             class="settings__input settings__checkbox"
-            ng-model="popupsEnabled"
-            ng-disabled="!notificationsEnabled"
+            ng-model="notifications.popups.enabled"
+            ng-disabled="!notifications.enabled"
             type="checkbox"/>
     </div>
     <div class="settings__row">
         <label class="settings__label">{{'show text' | i18n}}</label>
         <input
             class="settings__input settings__checkbox"
-            ng-disabled="!notificationsEnabled || !popupsEnabled"
+            ng-model="notifications.popups.showText"
+            ng-disabled="!notifications.enabled || !notifications.popups.enabled"
             type="checkbox"/>
     </div>
 </form>
