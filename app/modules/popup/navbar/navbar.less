@@ -6,15 +6,14 @@
 
     & .nav > li > a {
         text-shadow: none;
+        outline: none;
         color: @asbestos;
     }
-    & .nav > li > a:hover,
-    & .nav > li > a:focus {
+    & .nav > li > a:hover {
         background: darken(@clouds, 5%);
     }
 
 
-    & .nav .active > a:focus,
     & .nav .active > a:hover,
     & .nav .active > a {
         box-shadow: none;
@@ -27,14 +26,13 @@
     border-color: darken(@peterRiver, 15%);
 
     & .nav > li > a {
+        outline: none;
         color: white;
     }
-    & .nav > li > a:hover,
-    & .nav > li > a:focus {
+    & .nav > li > a:hover {
         background: darken(@peterRiver, 5%);
     }
 
-    & .nav .active > a:focus,
     & .nav .active > a:hover,
     & .nav .active > a {
         background: darken(@peterRiver, 10%);
