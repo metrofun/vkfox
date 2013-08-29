@@ -109,7 +109,7 @@ angular.module('notifications', ['mediator', 'persistent-model'])
             * @param {String} [options.message='']
             */
             create: function (type, options) {
-                var popups = notificationSettings.get('popups').enabled,
+                var popups = notificationSettings.get('popups'),
                     sound = notificationSettings.get('sound');
 
                 if (QUEUE_TYPES.indexOf(type) !== -1) {
@@ -128,7 +128,6 @@ angular.module('notifications', ['mediator', 'persistent-model'])
                             }, function () {});
                         });
                     }
-                    console.log(sound.enabled, audioInProgress);
                     if (sound.enabled && !audioInProgress) {
                         audioInProgress = true;
 

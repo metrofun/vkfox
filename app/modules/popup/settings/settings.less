@@ -1,5 +1,7 @@
 .settings {
     padding: 10px;
+    height: 441px;
+    box-sizing: border-box;
 }
 
 .settings__row {
@@ -50,7 +52,6 @@
 .settings__checkbox:before,
 .settings__checkbox:after {
     .icon-FontAwesome();
-    transition: color .2s;
     position: absolute;
     display: block;
     width: 40px;
@@ -77,7 +78,6 @@
 .settings__checkbox[disabled]:after {
     background: @clouds !important;
     color: darken(@clouds, 5%) !important;
-    transition: none;
 }
 .settings__checkbox:checked::before {
     color: white;
