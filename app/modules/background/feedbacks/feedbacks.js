@@ -66,7 +66,7 @@ angular.module('feedbacks', [
         ownerId = notificationItem.owner_id;
 
         // Don't show self messages
-        if (ownerId !== userId || true) {
+        if (ownerId !== userId) {
             try {
                 profile = profilesColl.get(ownerId).toJSON(),
                 name = $filter('name')(profile),
