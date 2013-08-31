@@ -70,6 +70,9 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             restrict: 'E'
         };
     })
+    /**
+     * Sends message on click and marks everything as read
+     */
     .directive('itemSendMessage', function (Request, $filter) {
         var title =  $filter('i18n')('Private message');
 
@@ -106,6 +109,13 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                                 Request.api({
                                     code: 'return API.messages.send(' + JSON.stringify(params) + ');'
                                 });
+                                // mark messages if not from chat
+                                if (params.uid) {
+                                    Request.api({
+                                        code: 'return API.messages.markAsRead({message_ids: API.messages.getHistory({user_id:'
+                                        + params.uid + '})@.mid});'
+                                    });
+                                }
                             }, title);
                         });
                     });

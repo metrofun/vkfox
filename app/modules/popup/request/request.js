@@ -12,7 +12,6 @@ angular.module('request', ['mediator'])
                 });
                 Mediator.once('request:' + id, function (data) {
                     ajaxDeferred[data.method].apply(ajaxDeferred, data['arguments']);
-                    console.log(data['arguments']);
                 });
 
                 return ajaxDeferred;

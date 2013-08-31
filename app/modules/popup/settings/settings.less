@@ -63,6 +63,21 @@
 .settings__checkbox:checked:hover::after {
     background: darken(@clouds, 5%);
 }
+.settings__checkbox:checked::before {
+    color: white;
+    background: @peterRiver;
+}
+.settings__checkbox:after {
+    content: @remove;
+    background: @peterRiver;
+    color: white;
+    right: 0;
+    top: 0;
+}
+.settings__checkbox:checked::after {
+    color: @asbestos;
+    background: @clouds;
+}
 .settings__checkbox:after {
     .border-right-radius(3px);
 }
@@ -78,19 +93,4 @@
 .settings__checkbox[disabled]:after {
     background: @clouds !important;
     color: darken(@clouds, 5%) !important;
-}
-.settings__checkbox:checked::before {
-    color: white;
-    background: @peterRiver;
-}
-.settings__checkbox:after {
-    content: @remove;
-    background: @peterRiver;
-    color: white;
-    right: 0;
-    top: 0;
-}
-.settings__checkbox:checked::after {
-    color: @asbestos;
-    background: @clouds;
 }

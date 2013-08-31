@@ -118,11 +118,13 @@ angular.module('buddies', [
                 gender = profile.sex === 1 ? 'female':'male';
 
                 Notifications.create('buddies', {
-                    title: $filter('name')(profile),
-                    message: $filter('i18n')(
-                        profile.online ? 'is online':'went offline',
-                        {GENDER: gender}
-                    ),
+                    title: [
+                        $filter('name')(profile),
+                        $filter('i18n')(
+                            profile.online ? 'is online':'went offline',
+                            {GENDER: gender}
+                        )
+                    ].join(' '),
                     image: model.get('photo')
                 });
             }
