@@ -10,7 +10,17 @@ angular.module('chat', [
     'i18n',
     'common',
     'persistent-model'
-]).run(function (Users, Request, Mediator, Auth, ProfilesCollection, Notifications, PersistentModel, $filter) {
+]).run(function (
+    Users,
+    Request,
+    Mediator,
+    Auth,
+    ProfilesCollection,
+    Notifications,
+    PersistentModel,
+    $filter,
+    NOTIFICATIONS_CHAT
+) {
     var
     MAX_HISTORY_COUNT = 10,
 
@@ -62,14 +72,14 @@ angular.module('chat', [
                     profile, gender;
 
                 if (!message.out) {
-                    try {
-                        profile = profilesColl.get(message.uid).toJSON();
-                    } catch (e) {
-                        debugger;
-                    }
+                    // try {
+                    profile = profilesColl.get(message.uid).toJSON();
+                    // } catch (e) {
+                        // debugger;
+                    // }
                     gender = profile.sex === 1 ? 'female':'male';
 
-                    Notifications.create('chat', {
+                    Notifications.create(NOTIFICATIONS_CHAT, {
                         title: $filter('i18n')('sent a message', {
                             NAME: $filter('name')(profile),
                             GENDER: gender
@@ -212,7 +222,7 @@ angular.module('chat', [
     }
     function onUpdates(updates) {
         updates.forEach(function (update) {
-            var messageId, mask;
+            var messageId, mask, readState;
 
             // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
             switch (update[0]) {
@@ -220,12 +230,16 @@ angular.module('chat', [
             case 3:
                 messageId = update[1],
                 mask = update[2];
-                if (messageId && mask) {
+                readState = mask & 1;
+                if (messageId && mask && readState) {
                     dialogColl.some(function (dialog) {
                         return dialog.get('messages').some(function (message) {
                             if (message.mid === messageId) {
-                                message.read_state = mask & 1;
+                                message.read_state = readState;
                                 removeReadMessages(dialog);
+                                if (readState) {
+                                    Mediator.pub('chat:message:read', message);
+                                }
                                 dialogColl.trigger('change');
                                 return true;
                             }

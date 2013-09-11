@@ -1,6 +1,9 @@
+/*jshint bitwise:false */
 angular.module('notifications', ['mediator', 'persistent-model'])
     .constant('STANDART_SIGNAL', 'audio/standart.mp3')
     .constant('ORIGINAL_SIGNAL', 'audio/original.mp3')
+    .constant('NOTIFICATIONS_CHAT', 'chat')
+    .constant('NOTIFICATIONS_NEWS', 'news')
     .factory('notificationSettings', function (Mediator, PersistentModel, STANDART_SIGNAL) {
         var notificationSettings = new PersistentModel(
             {
@@ -27,7 +30,11 @@ angular.module('notifications', ['mediator', 'persistent-model'])
 
         return notificationSettings;
     })
-    .factory('notificationQueue', function (notificationSettings, Mediator) {
+    .factory('notificationQueue', function (
+        notificationSettings,
+        Mediator,
+        NOTIFICATIONS_CHAT
+    ) {
         var notificationQueue = new Backbone.Collection();
 
         chrome.browserAction.setBadgeBackgroundColor({
@@ -60,14 +67,27 @@ angular.module('notifications', ['mediator', 'persistent-model'])
                 }));
             }
         });
+        // remove notifications about read messages
+        Mediator.sub('chat:message:read', function (message) {
+            if (!message.out) {
+                notificationQueue.remove(notificationQueue.findWhere({
+                    type: NOTIFICATIONS_CHAT
+                }));
+            }
+        });
         Mediator.sub('notifications:queue:get', function () {
             Mediator.pub('notifications:queue', notificationQueue.toJSON());
         });
 
         return notificationQueue;
     })
-    .factory('Notifications', function (notificationQueue, notificationSettings) {
-        var QUEUE_TYPES = ['chat', 'news'],
+    .factory('Notifications', function (
+        notificationQueue,
+        notificationSettings,
+        NOTIFICATIONS_CHAT,
+        NOTIFICATIONS_NEWS
+    ) {
+        var QUEUE_TYPES = [NOTIFICATIONS_CHAT, NOTIFICATIONS_NEWS],
             audioInProgress = false,
             audio = new Audio();
 

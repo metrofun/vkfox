@@ -28,7 +28,7 @@ angular.module(
 
             params.ts = response.ts;
             fetchUpdates(params);
-        });
+        }, enableLongPollUpdates);
     }, FETCH_DEBOUNCE);
 
     Mediator.sub('auth:success', function () {

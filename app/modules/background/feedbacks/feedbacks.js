@@ -6,7 +6,15 @@ angular.module('feedbacks', [
     'persistent-model',
     'notifications',
     'common'
-]).run(function (Request, Mediator, ProfilesCollection, Notifications, PersistentModel, $filter) {
+]).run(function (
+    Request,
+    Mediator,
+    ProfilesCollection,
+    Notifications,
+    PersistentModel,
+    $filter,
+    NOTIFICATIONS_NEWS
+) {
     var
     MAX_ITEMS_COUNT = 50,
     UPDATE_PERIOD = 1000,
@@ -122,7 +130,7 @@ angular.module('feedbacks', [
             }
 
             if (title) {
-                Notifications.create('news', {
+                Notifications.create(NOTIFICATIONS_NEWS, {
                     title: title,
                     message: message,
                     image: profile.photo
