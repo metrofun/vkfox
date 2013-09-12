@@ -10,7 +10,7 @@ angular.module('feedbacks', [
     Request,
     Mediator,
     ProfilesCollection,
-    Notifications,
+    NotificationsQueue,
     PersistentModel,
     $filter,
     NOTIFICATIONS_NEWS
@@ -130,10 +130,12 @@ angular.module('feedbacks', [
             }
 
             if (title) {
-                Notifications.create(NOTIFICATIONS_NEWS, {
+                NotificationsQueue.push({
+                    type: NOTIFICATIONS_NEWS,
                     title: title,
                     message: message,
-                    image: profile.photo
+                    image: profile.photo,
+                    noVK: true
                 });
             }
         }

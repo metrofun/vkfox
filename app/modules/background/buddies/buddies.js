@@ -5,7 +5,16 @@ angular.module('buddies', [
     'persistent-set',
     'profiles-collection',
     'notifications'
-]).run(function (Users, Request, Mediator, PersistentSet, ProfilesCollection, Notifications, $filter) {
+]).run(function (
+    Users,
+    Request,
+    Mediator,
+    PersistentSet,
+    ProfilesCollection,
+    NotificationsQueue,
+    $filter,
+    NOTIFICATIONS_BUDDIES
+) {
     var readyDeferred,
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (ProfilesCollection.extend({
@@ -117,7 +126,8 @@ angular.module('buddies', [
             if (profile.isWatched && model.changed.hasOwnProperty('online')) {
                 gender = profile.sex === 1 ? 'female':'male';
 
-                Notifications.create('buddies', {
+                NotificationsQueue.push({
+                    type: NOTIFICATIONS_BUDDIES,
                     title: [
                         $filter('name')(profile),
                         $filter('i18n')(
@@ -125,7 +135,8 @@ angular.module('buddies', [
                             {GENDER: gender}
                         )
                     ].join(' '),
-                    image: model.get('photo')
+                    image: model.get('photo'),
+                    noBadge: true
                 });
             }
             Mediator.pub('buddies:data', buddiesColl.toJSON());

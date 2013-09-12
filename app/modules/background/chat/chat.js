@@ -16,7 +16,7 @@ angular.module('chat', [
     Mediator,
     Auth,
     ProfilesCollection,
-    Notifications,
+    NotificationsQueue,
     PersistentModel,
     $filter,
     NOTIFICATIONS_CHAT
@@ -79,13 +79,15 @@ angular.module('chat', [
                     // }
                     gender = profile.sex === 1 ? 'female':'male';
 
-                    Notifications.create(NOTIFICATIONS_CHAT, {
+                    NotificationsQueue.push({
+                        type: NOTIFICATIONS_CHAT,
                         title: $filter('i18n')('sent a message', {
                             NAME: $filter('name')(profile),
                             GENDER: gender
                         }),
                         message: message.body,
-                        image: profile.photo
+                        image: profile.photo,
+                        noVK: true
                     });
                 }
             });

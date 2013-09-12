@@ -1,60 +1,49 @@
-/*jshint bitwise:false */
-angular.module('notifications', ['mediator', 'persistent-model'])
+angular.module('notifications', ['mediator', 'persistent-model', 'config'])
     .constant('STANDART_SIGNAL', 'audio/standart.mp3')
     .constant('ORIGINAL_SIGNAL', 'audio/original.mp3')
     .constant('NOTIFICATIONS_CHAT', 'chat')
+    .constant('NOTIFICATIONS_BUDDIES', 'buddies')
     .constant('NOTIFICATIONS_NEWS', 'news')
-    .factory('notificationSettings', function (Mediator, PersistentModel, STANDART_SIGNAL) {
-        var notificationSettings = new PersistentModel(
-            {
-                enabled: true,
-                sound: {
-                    enabled: true,
-                    volume: 0.5,
-                    signal: STANDART_SIGNAL
-                },
-                popups: {
-                    enabled: true,
-                    showText: true
-                }
-            },
-            {name: 'notificationSettings'}
-        );
-
-        Mediator.sub('notifications:settings:get', function () {
-            Mediator.pub('notifications:settings', notificationSettings.toJSON());
-        });
-        Mediator.sub('notifications:settings:put', function (settings) {
-            notificationSettings.set(settings);
-        });
-
-        return notificationSettings;
-    })
-    .factory('notificationQueue', function (
-        notificationSettings,
+    .factory('NotificationsQueue', function (
+        NotificationsSettings,
+        Notifications,
         Mediator,
         NOTIFICATIONS_CHAT
     ) {
         var notificationQueue = new Backbone.Collection();
 
-        chrome.browserAction.setBadgeBackgroundColor({
-            color: [231, 76, 60, 255]
-        });
-        notificationSettings.on('change:enabled', function (event, enabled) {
-            var count = notificationQueue.size();
-
-            chrome.browserAction.setBadgeText({
-                text: (enabled && count && String(count)) || ''
+        /**
+         * Run a callback, only when user dosn't
+         * have vk.com opened in current ta.
+         */
+        function runIfVKIsNotCurrentTab(callback) {
+            chrome.tabs.query({active: true}, function (tabs) {
+                if (tabs.every(function (tab) {
+                    return tab.url.indexOf('vk.com') === -1;
+                })) {
+                    callback();
+                }
             });
-        });
-        notificationQueue.on('add remove reset', function () {
-            if (notificationSettings.get('enabled')) {
-                var count = notificationQueue.size();
+        }
 
-                chrome.browserAction.setBadgeText({
-                    text: count ? String(count):''
-                });
-            }
+        notificationQueue.on('add remove reset', function () {
+            Notifications.setBadge(notificationQueue.filter(function (model) {
+                return !model.get('noBadge');
+            }).length);
+        });
+
+        notificationQueue.on('add', function (model) {
+            chrome.tabs.query({active: true}, function () {
+                if (model.get('noVK')) {
+                    runIfVKIsNotCurrentTab(function () {
+                        Notifications.playSound();
+                        Notifications.createPopup(model.toJSON());
+                    });
+                } else {
+                    Notifications.playSound();
+                    Notifications.createPopup(model.toJSON());
+                }
+            });
         });
         Mediator.sub('auth:success', function () {
             notificationQueue.reset();
@@ -81,15 +70,45 @@ angular.module('notifications', ['mediator', 'persistent-model'])
 
         return notificationQueue;
     })
-    .factory('Notifications', function (
-        notificationQueue,
-        notificationSettings,
-        NOTIFICATIONS_CHAT,
-        NOTIFICATIONS_NEWS
-    ) {
-        var QUEUE_TYPES = [NOTIFICATIONS_CHAT, NOTIFICATIONS_NEWS],
-            audioInProgress = false,
-            audio = new Audio();
+    .factory('NotificationsSettings', function (Mediator, PersistentModel, STANDART_SIGNAL) {
+        var notificationsSettings = new PersistentModel(
+            {
+                enabled: true,
+                sound: {
+                    enabled: true,
+                    volume: 0.5,
+                    signal: STANDART_SIGNAL
+                },
+                popups: {
+                    enabled: true,
+                    showText: true
+                }
+            },
+            {name: 'notificationsSettings'}
+        );
+
+        Mediator.sub('notifications:settings:get', function () {
+            Mediator.pub('notifications:settings', notificationsSettings.toJSON());
+        });
+        Mediator.sub('notifications:settings:put', function (settings) {
+            notificationsSettings.set(settings);
+        });
+
+        return notificationsSettings;
+    })
+    .factory('Notifications', function (NotificationsSettings) {
+        var audioInProgress = false,
+            audio = new Audio(),
+            Notifications;
+
+        chrome.browserAction.setBadgeBackgroundColor({
+            color: [231, 76, 60, 255]
+        });
+        // Clear badge, when notifications turned off and vice versa
+        NotificationsSettings.on('change:enabled', function (event, enabled) {
+            // TODO restore
+            Notifications.setBadge(enabled ? 'zzzz':'');
+        });
 
         function getBase64FromImage(url, onSuccess, onError) {
             var xhr = new XMLHttpRequest();
@@ -119,50 +138,42 @@ angular.module('notifications', ['mediator', 'persistent-model'])
             xhr.send();
         }
 
-        return {
-            /**
-            * Show new notifications
-            *
-            * @param {Object} options
-            * @param {String} options.title
-            * @param {String} [options.photo]
-            * @param {String} [options.message='']
-            */
-            create: function (type, options) {
-                var popups = notificationSettings.get('popups'),
-                    sound = notificationSettings.get('sound');
+        Notifications = {
+            createPopup: function (options) {
+                var popups = NotificationsSettings.get('popups');
 
-                if (QUEUE_TYPES.indexOf(type) !== -1) {
-                    notificationQueue.push({type: type});
+                getBase64FromImage(options.image, function (base64) {
+                    chrome.notifications.create(_.uniqueId(), {
+                        type: 'basic',
+                        title: options.title,
+                        message: (popups.showText && options.message) || '',
+                        iconUrl: base64
+                    }, function () {});
+                });
+            },
+            playSound: function () {
+                var sound = NotificationsSettings.get('sound');
+
+                if (sound.enabled && !audioInProgress) {
+                    audioInProgress = true;
+
+                    audio.volume = sound.volume;
+                    audio.src = sound.signal;
+                    audio.play();
+
+                    audio.addEventListener('ended', function () {
+                        audioInProgress = false;
+                    });
                 }
-
-                if (notificationSettings.get('enabled')) {
-                    if (popups.enabled) {
-                        // TODO on error
-                        getBase64FromImage(options.image, function (base64) {
-                            chrome.notifications.create(_.uniqueId(), {
-                                type: 'basic',
-                                title: options.title,
-                                message: (popups.showText && options.message) || '',
-                                iconUrl: base64
-                            }, function () {});
-                        });
-                    }
-                    if (sound.enabled && !audioInProgress) {
-                        audioInProgress = true;
-
-                        audio.volume = sound.volume;
-                        audio.src = sound.signal;
-                        audio.play();
-
-                        audio.addEventListener('ended', function () {
-                            audioInProgress = false;
-                        });
-                    }
+            },
+            setBadge: function (count) {
+                if (NotificationsSettings.get('enabled')) {
+                    chrome.browserAction.setBadgeText({
+                        text: count ? String(count):''
+                    });
                 }
             }
         };
-    })
-    .run(function (notificationQueue) {
-        notificationQueue.reset();
+
+        return Notifications;
     });
