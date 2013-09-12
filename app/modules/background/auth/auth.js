@@ -1,8 +1,7 @@
-angular.module('auth', ['config'])
-    .run(function (Auth) {
-        Auth.login();
-    }).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, VK_BASE) {
-    var RETRY_INTERVAL = 10000,
+angular.module('auth', ['config']).run(function (Auth) {
+    Auth.login();
+}).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, VK_BASE) {
+    var RETRY_INTERVAL = 10000, //ms
         CREATED = 1,
         IN_PROGRESS = 1,
         READY = 2,
@@ -58,7 +57,6 @@ angular.module('auth', ['config'])
             }
         });
     }
-
     return {
         retry: _.debounce(function () {
             if (state === IN_PROGRESS) {
@@ -69,10 +67,23 @@ angular.module('auth', ['config'])
         onSuccess: function (data) {
             state = READY;
 
+            chrome.browserAction.setIcon({
+                path: {
+                    "19": "images/logo19.png",
+                    "38": "images/logo38.png"
+                }
+            });
+
             authDeferred.resolve(data);
         },
         login: function (force) {
             if (force || state === CREATED) {
+                chrome.browserAction.setIcon({
+                    path: {
+                        "19": "images/logo19_offline.png",
+                        "38": "images/logo38_offline.png"
+                    }
+                });
                 state = IN_PROGRESS;
 
                 if (authDeferred.state() === 'resolved') {
