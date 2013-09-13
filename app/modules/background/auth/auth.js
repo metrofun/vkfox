@@ -10,17 +10,17 @@ angular.module('auth', ['config']).run(function (Auth) {
         state = CREATED, authDeferred = jQuery.Deferred();
 
     Mediator.sub('auth:iframe', function (url) {
-        // close all login windows
-        chrome.tabs.query({url: AUTH_DOMAIN + '*'}, function (tabs) {
-            tabs.forEach(function (tab) {
-                console.log('remove tab', tab.id);
-                chrome.tabs.remove(tab.id);
-            });
-        });
-
         try {
             model.set('userId',  parseInt(url.match(/user_id=(\w+)(?:&|$)/i)[1], 10));
             model.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
+
+            // close all login windows
+            chrome.tabs.query({url: AUTH_DOMAIN + '*'}, function (tabs) {
+                tabs.forEach(function (tab) {
+                    console.log('remove tab', tab.id);
+                    chrome.tabs.remove(tab.id);
+                });
+            });
 
             $iframe.remove();
             // save memory

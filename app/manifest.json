@@ -18,7 +18,6 @@
             "https://*.vk.me/*",
             "https://*.vk.com/*",
             "cookies",
-            "bookmarks",
             "notifications"
         ],
         "browser_action": {

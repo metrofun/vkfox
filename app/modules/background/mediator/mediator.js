@@ -1,23 +1,27 @@
 angular.module('mediator')
     .factory('Mediator', function (MediatorDispatcher) {
         var Mediator = Object.create(MediatorDispatcher),
-            activePort;
+            activePorts = [];
 
         chrome.runtime.onConnect.addListener(function (port) {
-            activePort = port;
+            activePorts.push(port);
             port.onMessage.addListener(function (messageData) {
                 MediatorDispatcher.pub.apply(MediatorDispatcher, messageData);
             });
             port.onDisconnect.addListener(function () {
-                activePort = null;
+                activePorts = activePorts.filter(function (active) {
+                    return active !== port;
+                });
             });
         });
 
         Mediator.pub = function () {
-            MediatorDispatcher.pub.apply(MediatorDispatcher, arguments);
-            if (activePort) {
-                activePort.postMessage([].slice.call(arguments));
-            }
+            var args = arguments;
+            MediatorDispatcher.pub.apply(MediatorDispatcher, args);
+
+            activePorts.forEach(function (port) {
+                port.postMessage([].slice.call(args));
+            });
         };
 
         return Mediator;

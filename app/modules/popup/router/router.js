@@ -57,12 +57,15 @@ angular.module('router', ['mediator', 'persistent-model'])
                         $location.path(model.get('lastPath'));
                     }
                     $location.replace();
-                } else {
-                    Mediator.pub('auth:relogin');
-                    window.close();
                 }
             });
         });
-        Mediator.pub('notifications:queue:get');
+        authDeferred.then(function (state) {
+            if (state !== READY) {
+                Mediator.pub('auth:relogin');
+                window.close();
+            }
+        });
         Mediator.pub('auth:state:get');
+        Mediator.pub('notifications:queue:get');
     });
