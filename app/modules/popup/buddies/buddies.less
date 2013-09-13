@@ -2,8 +2,11 @@
     &:extend(.dropdown-menu > li > a all);
     .user-select(none)
 }
-.buddies__item:not(.buddies__item_is-fave) .media-body {
-    margin-top: 10px;
+.buddies__item:not(.buddies__item_is-fave) {
+    .item__actions,
+    .media-body {
+        margin-top: 10px;
+    }
 }
 .buddies__item-action_active.item__action {
     opacity: 1 !important;
