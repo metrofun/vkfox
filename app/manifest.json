@@ -1,8 +1,8 @@
 {
-        "name": "VKfox - клиент для \"В контакте\"",
+        "name": "VKfox - плагин для \"ВКонтакте\"",
         "version": "5",
         "manifest_version": 2,
-        "description": "__MSG_ext_description__",
+        "description": "Позволяет следить за всеми обновлениями и новостями на сайте, вести переписки, а также следить за входом-выходом друзей либо людей из закладок, при этом оставаясь оффлайн.",
         "background": {
             "page": "background.html"
         },
@@ -17,7 +17,6 @@
             "http://*.vk.com/*",
             "https://*.vk.me/*",
             "https://*.vk.com/*",
-            "cookies",
             "notifications"
         ],
         "browser_action": {

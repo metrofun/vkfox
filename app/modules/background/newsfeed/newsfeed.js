@@ -3,7 +3,7 @@ angular.module(
     ['auth', 'mediator', 'request', 'likes']
 ).run(function (Request, Mediator) {
     var MAX_ITEMS_COUNT = 50,
-        UPDATE_PERIOD = 1000,
+        UPDATE_PERIOD = 10000, //ms
 
         profilesColl = new (Backbone.Collection.extend({
             model: Backbone.Model.extend({

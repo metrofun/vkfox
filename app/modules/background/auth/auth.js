@@ -1,6 +1,6 @@
 angular.module('auth', ['config']).run(function (Auth) {
     Auth.login();
-}).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, VK_BASE) {
+}).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI) {
     var RETRY_INTERVAL = 10000, //ms
         CREATED = 1,
         IN_PROGRESS = 1,
@@ -36,7 +36,6 @@ angular.module('auth', ['config']).run(function (Auth) {
     });
 
     Mediator.sub('auth:relogin', function () {
-        resetAuthCookies();
         chrome.tabs.create({url: AUTH_URI});
     });
 
@@ -44,19 +43,6 @@ angular.module('auth', ['config']).run(function (Auth) {
         Mediator.pub('auth:success', model.toJSON());
     });
 
-    /**
-     * Removes all cookies for auth domain
-     */
-    function resetAuthCookies() {
-        chrome.cookies.getAll({domain: VK_BASE}, function (cookieArray) {
-            var i, cookie;
-            // remove each cookie
-            for (i = 0; i < cookieArray.length; ++i) {
-                cookie = cookieArray[i];
-                chrome.cookies.remove({ name: cookie.name, url: cookie.path });
-            }
-        });
-    }
     return {
         retry: _.debounce(function () {
             if (state === IN_PROGRESS) {
@@ -89,8 +75,6 @@ angular.module('auth', ['config']).run(function (Auth) {
                 if (authDeferred.state() === 'resolved') {
                     authDeferred = jQuery.Deferred();
                 }
-
-                resetAuthCookies();
 
                 if (!$iframe) {
                     $iframe = angular.element(

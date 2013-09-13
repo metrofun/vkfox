@@ -2,7 +2,7 @@ angular.module(
     'profiles-collection',
     ['request', 'mediator', 'longpoll', 'users']
 ).factory('ProfilesCollection', function (Request, Mediator, Users) {
-    var UPDATE_NON_FRIENDS_PERIOD = 1000;
+    var UPDATE_NON_FRIENDS_PERIOD = 10000;
 
     return Backbone.Collection.extend({
         initialize: function () {

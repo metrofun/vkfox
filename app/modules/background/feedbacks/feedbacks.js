@@ -17,7 +17,7 @@ angular.module('feedbacks', [
 ) {
     var
     MAX_ITEMS_COUNT = 50,
-    UPDATE_PERIOD = 1000,
+    UPDATE_PERIOD = 1000, //ms
 
     readyDeferred = jQuery.Deferred(),
     persistentModel, userId,
