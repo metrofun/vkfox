@@ -96,6 +96,11 @@ var r = "";
 r += "Нравится";
 return r;
 }
+window.i18n["ru"]["unsubscribe"] = function(d){
+var r = "";
+r += "отписаться";
+return r;
+}
 window.i18n["ru"]["more..."] = function(d){
 var r = "";
 r += "далee";

@@ -14,6 +14,20 @@ angular.module('common', ['config', 'i18n'])
             }
         };
     })
+    .filter('capitalize', function () {
+        /**
+         * Returns capitalized text
+         *
+         * @param {String} seconds
+         *
+         * @returns {String}
+         */
+        return function (str) {
+            if (str && str.length) {
+                return str[0].toUpperCase() + str.substr(1);
+            }
+        };
+    })
     .filter('where', function () {
         /**
          * Returns object from collection,

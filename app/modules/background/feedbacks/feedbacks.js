@@ -352,7 +352,7 @@ angular.module('feedbacks', [
     readyDeferred.then(function () {
         publishData();
 
-        itemsColl.on('add change', _.debounce(function () {
+        itemsColl.on('add change remove', _.debounce(function () {
             var firstModel = itemsColl.first();
 
             itemsColl.sort();
@@ -363,21 +363,34 @@ angular.module('feedbacks', [
             publishData();
         }));
         profilesColl.on('change', publishData);
+    });
 
-        Mediator.sub('likes:changed', function (params) {
-            itemsColl.some(function (model) {
-                var parent  = model.get('parent'),
-                    matches = false;
+    Mediator.sub('likes:changed', function (params) {
+        var changedItemUniqueId = [
+            params.type, params.item_id,
+            'user', params.owner_id
+        ].join(':'), changedModel = itemsColl.get(changedItemUniqueId);
 
-                matches = (parent.to_id === params.owner_id)
-                    && (params.type === parent.post_type  || params.type === model.get('type'))
-                    && (parent.id === params.item_id);
+        if (changedModel) {
+            changedModel.get('parent').likes = params.likes;
+            itemsColl.trigger('change');
+        }
+    });
 
-                if (matches) {
-                    parent.likes = params.likes;
-                    itemsColl.trigger('change');
-                }
-            });
+    Mediator.sub('feedbacks:unsubscribe', function (params) {
+        var unsubscribeFromId = [
+            params.type, params.item_id,
+            'user', params.owner_id
+        ].join(':');
+
+        Request.api({
+            code: 'return API.newsfeed.unsubscribe('
+                + JSON.stringify(params)
+                + ');'
+        }).then(function (response) {
+            if (response) {
+                itemsColl.remove(itemsColl.get(unsubscribeFromId));
+            }
         });
     });
 

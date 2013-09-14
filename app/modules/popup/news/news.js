@@ -1,4 +1,4 @@
-angular.module('news', ['mediator', 'navigation', 'rectify'])
+angular.module('news', ['mediator', 'navigation', 'rectify', 'request'])
     .controller('NewsController', function ($scope, $routeParams) {
         $scope.subtabs = [
             {
@@ -17,6 +17,15 @@ angular.module('news', ['mediator', 'navigation', 'rectify'])
         $scope.activeSubTab = $routeParams.subtab;
     })
     .controller('MyNewsController', function ($scope, Mediator) {
+        $scope.unsubscribe = function (type, ownerId, itemId) {
+            var options = {
+                type: type,
+                owner_id: ownerId,
+                item_id: itemId
+            };
+            Mediator.pub('feedbacks:unsubscribe', options);
+        };
+
         Mediator.pub('feedbacks:data:get');
         Mediator.sub('feedbacks:data', function (data) {
             $scope.$apply(function () {

@@ -1,4 +1,4 @@
-<item-list ng-controller="MyNewsController">
+<item-list ng-controller="MyNewsController" class="news_type_my">
     <item
         item-list-repeat="item in data.items track by item.id"
         owners="data.profiles | where:'id':item.parent.owner_id">
@@ -25,19 +25,22 @@
                 type="{{attachment.type}}">
             </item-attachment>
         </div>
-        <item-actions>
+        <item-actions ng-if="item.comment">
             <item-action-comment
-                ng-if="item.comment"
                 type="item.comment.type"
                 owner-id="item.comment.ownerId"
                 reply-to="item.comment.replyTo"
                 id="item.comment.id">
             </item-action-comment>
             <item-action-like
-                owner-id="item.parent.to_id || item.parent.owner_id"
-                item-id="item.parent.id"
+                type="item.comment.type"
+                owner-id="item.comment.ownerId"
+                item-id="item.comment.id"
                 likes="item.parent.likes">
             </item-action-like>
+            <i  ng-click="unsubscribe(item.comment.type, item.comment.ownerId, item.comment.id)"
+                title="{{'unsubscribe' | i18n | capitalize}}"
+                class="item__action icon-remove"></i>
         </item-actions>
         <item
             ng-repeat="feedback in item.feedbacks"
