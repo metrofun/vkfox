@@ -90,7 +90,9 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                 });
             },
             compile: function (tElement, tAttrs) {
-                tAttrs.$set('title', title);
+                if (tAttrs.title === undefined) {
+                    tAttrs.$set('title', title);
+                }
                 return function (scope, element, attrs, itemCtrl) {
                     element.bind('click', function () {
                         scope.$apply(function () {
