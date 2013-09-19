@@ -17,7 +17,6 @@ angular.module('auth', ['config']).run(function (Auth) {
             // close all login windows
             chrome.tabs.query({url: AUTH_DOMAIN + '*'}, function (tabs) {
                 tabs.forEach(function (tab) {
-                    console.log('remove tab', tab.id);
                     chrome.tabs.remove(tab.id);
                 });
             });

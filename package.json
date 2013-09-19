@@ -9,6 +9,9 @@
     "grunt-messageformat": "~0.2.0",
     "grunt-contrib-less": "~0.6.1",
     "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.2"
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-usemin": "~0.1.12",
+    "grunt-preprocess": "~3.0.1",
+    "grunt-env": "~0.4.0"
   }
 }

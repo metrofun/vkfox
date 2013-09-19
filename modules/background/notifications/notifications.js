@@ -68,6 +68,11 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
             Mediator.pub('notifications:queue', notificationQueue.toJSON());
         });
 
+        // Clear badge, when notifications turned off and vice versa
+        NotificationsSettings.on('change:enabled', function (event, enabled) {
+            Notifications.setBadge(enabled ? notificationQueue.size():'', true);
+        });
+
         return notificationQueue;
     })
     .factory('NotificationsSettings', function (Mediator, PersistentModel, STANDART_SIGNAL) {
@@ -104,11 +109,6 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
         chrome.browserAction.setBadgeBackgroundColor({
             color: [231, 76, 60, 255]
         });
-        // Clear badge, when notifications turned off and vice versa
-        NotificationsSettings.on('change:enabled', function (event, enabled) {
-            // TODO restore
-            Notifications.setBadge(enabled ? 'zzzz':'');
-        });
 
         function getBase64FromImage(url, onSuccess, onError) {
             var xhr = new XMLHttpRequest();
@@ -142,14 +142,16 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
             createPopup: function (options) {
                 var popups = NotificationsSettings.get('popups');
 
-                getBase64FromImage(options.image, function (base64) {
-                    chrome.notifications.create(_.uniqueId(), {
-                        type: 'basic',
-                        title: options.title,
-                        message: (popups.showText && options.message) || '',
-                        iconUrl: base64
-                    }, function () {});
-                });
+                if (popups.enabled) {
+                    getBase64FromImage(options.image, function (base64) {
+                        chrome.notifications.create(_.uniqueId(), {
+                            type: 'basic',
+                            title: options.title,
+                            message: (popups.showText && options.message) || '',
+                            iconUrl: base64
+                        }, function () {});
+                    });
+                }
             },
             playSound: function () {
                 var sound = NotificationsSettings.get('sound');
@@ -166,8 +168,8 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
                     });
                 }
             },
-            setBadge: function (count) {
-                if (NotificationsSettings.get('enabled')) {
+            setBadge: function (count, force) {
+                if (NotificationsSettings.get('enabled') || force) {
                     chrome.browserAction.setBadgeText({
                         text: count ? String(count):''
                     });

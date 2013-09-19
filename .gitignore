@@ -1,10 +1,4 @@
 .DS_Store
-app/vendor
-app/background.js
-app/popup.js
-app/style.css
-app/style.less
+popup.html
 components
 node_modules
-background.components.min.js
-popup.components.min.js

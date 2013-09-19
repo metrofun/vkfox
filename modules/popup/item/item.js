@@ -106,7 +106,6 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                                 } else {
                                     params.uid = scope.uid;
                                 }
-                                console.log(scope, params);
 
                                 Request.api({
                                     code: 'return API.messages.send(' + JSON.stringify(params) + ');'
@@ -210,7 +209,6 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                 function onReply(scope, message) {
                     var params = {}, method;
 
-                    console.log(scope);
                     switch (scope.type) {
                     case 'wall':
                     case 'post':

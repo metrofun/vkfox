@@ -14,7 +14,6 @@ angular.module(
 
         delete params.action;
 
-        console.log(params);
         Request.api({
             code: 'return API.likes.' + action + '(' + JSON.stringify(params) + ');'
         }).then(function (response) {
