@@ -26,8 +26,9 @@
             class="settings__input"
             ng-model="notifications.sound.signal"
             ng-disabled="!notifications.enabled || !notifications.sound.enabled">
-            <option value="audio/standart.mp3">standart</option>
-            <option value="audio/original.mp3">original</option>
+            <!-- TODO remove hardcode -->
+            <option value="modules/background/notifications/standart.mp3">standart</option>
+            <option value="modules/background/notifications/original.mp3">original</option>
         </select>
     </div>
     <div class="settings__row">

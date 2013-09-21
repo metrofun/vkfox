@@ -55,6 +55,18 @@ module.exports = function (grunt) {
         },
         clean: {
             less: ['<%= concat.less.dest %>']
+        },
+        copy: {
+            build:  {
+                expand: true,
+                src: [
+                    'modules/**/*.html',
+                    'background.html',
+                    'popup.html',
+                    'manifest.json'
+                ],
+                dest: 'build/'
+            }
         }
     });
 
@@ -71,6 +83,11 @@ module.exports = function (grunt) {
     grunt.registerTask(
         'default',
         ['env:dev', 'preprocess', 'messageformat', 'watch']
+    );
+
+    grunt.registerTask(
+        'build',
+        ['env:prod', 'preprocess', 'messageformat', 'copy:build']
     );
 
 };
