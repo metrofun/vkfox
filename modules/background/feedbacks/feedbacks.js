@@ -17,6 +17,7 @@ angular.module('feedbacks', [
 ) {
     var
     MAX_ITEMS_COUNT = 50,
+    MAX_COMMENTS_COUNT = 3,
     UPDATE_PERIOD = 1000, //ms
 
     readyDeferred = jQuery.Deferred(),
@@ -161,9 +162,7 @@ angular.module('feedbacks', [
         });
 
         autoUpdateNotificationsParams = {
-            count: MAX_ITEMS_COUNT,
-            // everything except comments
-            filters: "'wall', 'mentions', 'likes', 'reposts', 'followers', 'friends'"
+            count: MAX_ITEMS_COUNT
         },
         autoUpdateCommentsParams = {
             last_comments: 1,
@@ -189,7 +188,7 @@ angular.module('feedbacks', [
             itemModel = createItemModel(parentType, parent, true);
             itemsColl.add(itemModel, {sort: false});
         }
-        itemModel.get('feedbacks').add(item.comments.list.map(function (feedback) {
+        itemModel.get('feedbacks').add(item.comments.list.slice(- MAX_COMMENTS_COUNT).map(function (feedback) {
             feedback.owner_id = Number(feedback.from_id);
             return {
                 id: generateItemID('comment', feedback),
