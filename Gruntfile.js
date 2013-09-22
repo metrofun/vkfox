@@ -9,10 +9,20 @@ module.exports = function (grunt) {
             },
             prod : {
                 NODE_ENV : 'PRODUCTION'
+            },
+            opera: {
+                TARGET: 'OPERA'
+            },
+            chrome: {
+                TARGET: 'CHROME'
             }
         },
         preprocess : {
-            production : {
+            background: {
+                src : 'background.tmpl.html',
+                dest : 'background.html'
+            },
+            popup: {
                 src : 'popup.tmpl.html',
                 dest : 'popup.html'
             }
@@ -21,6 +31,13 @@ module.exports = function (grunt) {
             messages: {
                 files: 'modules/common/i18n/**/*.json',
                 tasks: ['messageformat'],
+                options: {
+                    interrupt: true
+                }
+            },
+            less: {
+                files: 'modules/popup/**/*.less',
+                tasks: ['less'],
                 options: {
                     interrupt: true
                 }
@@ -34,38 +51,56 @@ module.exports = function (grunt) {
                 output: 'modules/common/i18n/ru.js'
             }
         },
-        concat: {
-            less: {
-                src: [
-                    'modules/popup/*/*.less',
-                    'modules/popup/*/*/*.less'
-                ],
-                dest: 'style.less'
-            }
-        },
         less: {
-            all: {
+            dev: {
                 src: 'popup.less',
                 dest: 'popup.css',
                 options: {
-                    compile: true
-                    // compress: true
+                    compile: true,
+                    compress: process.env.NODE_ENV === 'PRODUCTION'
                 }
             }
         },
         clean: {
-            less: ['<%= concat.less.dest %>']
+            build: ['build/']
         },
         copy: {
             build:  {
                 expand: true,
                 src: [
+                    'components/font-awesome/font/fontawesome-webfont.woff',
+                    'modules/background/auth/oauth.vk.com.js',
                     'modules/**/*.html',
                     'background.html',
+                    'background.js',
                     'popup.html',
+                    'popup.js',
+                    'popup.css',
+                    'images/*',
                     'manifest.json'
                 ],
                 dest: 'build/'
+            }
+        },
+        useminPrepare: {
+            html: ['popup.html', 'background.html']
+        },
+        usemin: {
+            html: ['popup.html', 'background.html']
+        },
+        compress: {
+            main: {
+                options: {
+                    level: '9', //best compression
+                    archive: 'build.zip'
+                },
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'build/',
+                        src: ['**']
+                    }
+                ]
             }
         }
     });
@@ -79,15 +114,25 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-env');
     grunt.loadNpmTasks('grunt-preprocess');
+    grunt.loadNpmTasks('grunt-usemin');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
     grunt.registerTask(
         'default',
-        ['env:dev', 'preprocess', 'messageformat', 'watch']
+        ['env:dev', 'preprocess', 'messageformat', 'less', 'watch']
     );
 
-    grunt.registerTask(
-        'build',
-        ['env:prod', 'preprocess', 'messageformat', 'copy:build']
-    );
+    grunt.registerTask('build', [
+        'clean:build',
+        'env:prod',
+        'preprocess',
+        'messageformat',
+        'less',
+        'useminPrepare',
+        'concat',
+        'usemin',
+        'copy:build',
+        'compress'
+    ]);
 
 };

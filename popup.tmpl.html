@@ -2,15 +2,14 @@
 <html ng-app="app" ng-csp>
     <head>
         <meta charset="utf-8">
-        <title></title>
+        <title>VKfox</title>
+
+        <!-- build:css popup.css -->
         <link rel="stylesheet" href="components/emoji/lib/emoji.css" />
-        <!-- @if NODE_ENV == 'PRODUCTION' -->
         <link rel="stylesheet" href="popup.css" />
-        <!-- @endif -->
-        <!-- @if NODE_ENV == 'DEVELOPMENT' -->
-        <link rel="stylesheet/less" type="text/css" href="popup.less" />
-        <script src="components/less/dist/less-1.5.0-b3.js"></script>
-        <!-- @endif -->
+        <!-- endbuild -->
+
+        <!-- build:js popup.js -->
         <script src="components/emoji/lib/emoji.js"></script>
         <script src="components/moment/moment.js"></script>
         <script src="components/javascript-linkify/ba-linkify.js"></script>
@@ -42,6 +41,7 @@
         <script src="modules/popup/router/router.js"></script>
         <script src="modules/popup/settings/settings.js"></script>
         <script src="modules/popup/tooltip/tooltip.js"></script>
+        <!-- endbuild -->
     </head>
     <body class="app">
         <ng-view></ng-view>

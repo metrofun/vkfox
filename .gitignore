@@ -1,5 +1,10 @@
 .DS_Store
 popup.html
+background.html
+popup.css
+background.js
+popup.js
 components
 node_modules
 build
+build.zip
