@@ -144,12 +144,15 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
 
                 if (popups.enabled) {
                     getBase64FromImage(options.image, function (base64) {
-                        chrome.notifications.create(_.uniqueId(), {
-                            type: 'basic',
-                            title: options.title,
-                            message: (popups.showText && options.message) || '',
-                            iconUrl: base64
-                        }, function () {});
+                        try {
+                            chrome.notifications.create(_.uniqueId(), {
+                                type: 'basic',
+                                title: options.title,
+                                message: (popups.showText && options.message) || '',
+                                iconUrl: base64
+                            }, function () {});
+                        } catch (e) {
+                        }
                     });
                 }
             },

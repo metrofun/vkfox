@@ -2,7 +2,6 @@
         "name": "VKfox - плагин для \"ВКонтакте\"",
         "version": "5",
         "manifest_version": 2,
-         "default_locale": "ru",
         "description": "Позволяет следить за всеми обновлениями и новостями на сайте, вести переписки, а также следить за входом-выходом друзей либо людей из закладок, при этом оставаясь оффлайн.",
         "background": {
             "page": "background.html"
@@ -13,12 +12,18 @@
             "128": "images/logo128.png"
         },
         "permissions": [
-            "tabs",
-            "http://*.vk.me/*",
-            "http://*.vk.com/*",
-            "https://*.vk.me/*",
-            "https://*.vk.com/*",
-            "notifications"
+            "http://*.vk.me/*"
+            , "http://*.vk.com/*"
+            , "https://*.vk.me/*"
+            , "https://*.vk.com/*"
+            , "*://google.com/*"
+            , "*://google.com.ua/*"
+            , "*://google.ru/*"
+            , "tabs"
+            , "webRequest"
+            <!-- @if TARGET != 'OPERA' -->
+            , "notifications"
+            <!-- @endif -->
         ],
         "browser_action": {
             "default_icon": {

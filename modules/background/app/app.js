@@ -5,6 +5,7 @@ angular.module('app', [
     'chat',
     'newsfeed',
     'feedbacks',
-    'notifications'
+    'notifications',
+    'yandex'
 ]);
 // angular.module('app', ['auth', 'buddies', 'notifications']);

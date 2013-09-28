@@ -25,9 +25,20 @@ module.exports = function (grunt) {
             popup: {
                 src : 'popup.tmpl.html',
                 dest : 'popup.html'
+            },
+            manifest: {
+                src : 'manifest.tmpl.json',
+                dest : 'manifest.json'
             }
         },
         watch: {
+            manifest: {
+                files: 'manifest.tmpl.json',
+                tasks: ['preprocess:manifest'],
+                options: {
+                    interrupt: true
+                }
+            },
             messages: {
                 files: 'modules/common/i18n/**/*.json',
                 tasks: ['messageformat'],
@@ -119,7 +130,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask(
         'default',
-        ['env:dev', 'preprocess', 'messageformat', 'less', 'watch']
+        ['env:chrome', 'env:dev', 'preprocess', 'messageformat', 'less', 'watch']
     );
 
     grunt.registerTask('build', [
@@ -134,5 +145,7 @@ module.exports = function (grunt) {
         'copy:build',
         'compress'
     ]);
+    grunt.registerTask('build:opera', ['env:opera', 'build']);
+    grunt.registerTask('build:chrome', ['env:chrome', 'build']);
 
 };
