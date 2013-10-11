@@ -16,11 +16,12 @@
             , "http://*.vk.com/*"
             , "https://*.vk.me/*"
             , "https://*.vk.com/*"
-            , "*://google.com/*"
-            , "*://google.com.ua/*"
-            , "*://google.ru/*"
+            , "*://*.google.com/*"
+            , "*://*.google.com.ua/*"
+            , "*://*.google.ru/*"
             , "tabs"
             , "webRequest"
+            , "webRequestBlocking"
             <!-- @if TARGET != 'OPERA' -->
             , "notifications"
             <!-- @endif -->

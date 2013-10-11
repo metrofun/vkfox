@@ -1,5 +1,8 @@
 angular.module('settings', [])
     .controller('settingsNotificationsCtrl', function ($scope, Mediator) {
+        /**
+         * Notifications
+         */
         Mediator.sub('notifications:settings', function (settings) {
             var onSoundAdjust = _.debounce(function (newValue, oldValue) {
                 if (newValue !== oldValue) {
@@ -23,4 +26,17 @@ angular.module('settings', [])
             $scope.$watch('notifications.sound.signal', onSoundAdjust, true);
         });
         Mediator.pub('notifications:settings:get');
+        /**
+         * Yandex
+         */
+        Mediator.sub('yandex:settings', function (settings) {
+            $scope.$apply(function () {
+                $scope.yandex = settings;
+            });
+
+            $scope.$watch('yandex', function (settings) {
+                Mediator.pub('yandex:settings:put', settings);
+            }, true);
+        });
+        Mediator.pub('yandex:settings:get');
     });

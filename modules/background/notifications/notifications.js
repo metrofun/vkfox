@@ -142,7 +142,7 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
             createPopup: function (options) {
                 var popups = NotificationsSettings.get('popups');
 
-                if (popups.enabled) {
+                if (NotificationsSettings.get('enabled') && popups.enabled) {
                     getBase64FromImage(options.image, function (base64) {
                         try {
                             chrome.notifications.create(_.uniqueId(), {
@@ -152,6 +152,7 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
                                 iconUrl: base64
                             }, function () {});
                         } catch (e) {
+                            console.log(e);
                         }
                     });
                 }
@@ -159,12 +160,11 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
             playSound: function () {
                 var sound = NotificationsSettings.get('sound');
 
-                if (sound.enabled && !audioInProgress) {
+                if (NotificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
                     audioInProgress = true;
 
                     audio.volume = sound.volume;
                     audio.src = sound.signal;
-                    console.log(sound.signal);
                     audio.play();
 
                     audio.addEventListener('ended', function () {

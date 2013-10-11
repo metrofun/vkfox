@@ -1,4 +1,5 @@
 .DS_Store
+manifest.json
 popup.html
 background.html
 popup.css

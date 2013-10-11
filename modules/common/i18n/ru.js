@@ -553,4 +553,9 @@ var r = "";
 r += "показывать текст";
 return r;
 }
+window.i18n["ru"]["Yandex search"] = function(d){
+var r = "";
+r += "Яндекс поиск";
+return r;
+}
 })();
