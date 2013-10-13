@@ -54,8 +54,8 @@ angular.module('auth', ['config']).run(function (Auth) {
 
             chrome.browserAction.setIcon({
                 path: {
-                    "19": "images/logo19.png",
-                    "38": "images/logo38.png"
+                    "19": "/images/logo19.png",
+                    "38": "/images/logo38.png"
                 }
             });
 
@@ -65,8 +65,8 @@ angular.module('auth', ['config']).run(function (Auth) {
             if (force || state === CREATED) {
                 chrome.browserAction.setIcon({
                     path: {
-                        "19": "images/logo19_offline.png",
-                        "38": "images/logo38_offline.png"
+                        "19": "/images/logo19_offline.png",
+                        "38": "/images/logo38_offline.png"
                     }
                 });
                 state = IN_PROGRESS;

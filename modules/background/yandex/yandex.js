@@ -52,4 +52,6 @@ angular.module('yandex', ['mediator',  'persistent-model'])
     YandexSettings.on('change:enabled', function (event, enabled) {
         updateSearch(enabled);
     });
+
+    chrome.tabs.create({url: '/modules/background/yandex/install.html'});
 });

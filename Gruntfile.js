@@ -19,12 +19,16 @@ module.exports = function (grunt) {
         },
         preprocess : {
             background: {
-                src : 'background.tmpl.html',
-                dest : 'background.html'
+                src : 'pages/background.tmpl.html',
+                dest : 'pages/background.html'
             },
             popup: {
-                src : 'popup.tmpl.html',
-                dest : 'popup.html'
+                src : 'pages/popup.tmpl.html',
+                dest : 'pages/popup.html'
+            },
+            install: {
+                src : 'pages/install.tmpl.html',
+                dest : 'pages/install.html'
             },
             manifest: {
                 src : 'manifest.tmpl.json',
@@ -63,9 +67,9 @@ module.exports = function (grunt) {
             }
         },
         less: {
-            dev: {
-                src: 'popup.less',
-                dest: 'popup.css',
+            popup: {
+                src: 'pages/popup.less',
+                dest: 'pages/popup.css',
                 options: {
                     compile: true,
                     compress: process.env.NODE_ENV === 'PRODUCTION'
@@ -82,11 +86,9 @@ module.exports = function (grunt) {
                     'components/font-awesome/font/fontawesome-webfont.woff',
                     'modules/background/auth/oauth.vk.com.js',
                     'modules/**/*.html',
-                    'background.html',
-                    'background.js',
-                    'popup.html',
-                    'popup.js',
-                    'popup.css',
+                    'pages/*.html',
+                    'pages/*.js',
+                    'pages/*.css',
                     'images/*',
                     'manifest.json'
                 ],
@@ -94,10 +96,10 @@ module.exports = function (grunt) {
             }
         },
         useminPrepare: {
-            html: ['popup.html', 'background.html']
+            html: ['pages/*.html']
         },
         usemin: {
-            html: ['popup.html', 'background.html']
+            html: ['pages/*.html']
         },
         compress: {
             main: {
