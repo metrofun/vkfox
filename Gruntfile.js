@@ -44,18 +44,15 @@ module.exports = function (grunt) {
                 }
             },
             messages: {
-                files: 'modules/common/i18n/**/*.json',
+                files: 'modules/i18n/**/*.json',
                 tasks: ['messageformat'],
                 options: {
                     interrupt: true
                 }
             },
             less: {
-                files: 'modules/popup/**/*.less',
-                tasks: ['less'],
-                options: {
-                    interrupt: true
-                }
+                files: 'modules/**/*.less',
+                tasks: ['less']
             }
         },
         //localization
@@ -74,6 +71,14 @@ module.exports = function (grunt) {
                     compile: true,
                     compress: process.env.NODE_ENV === 'PRODUCTION'
                 }
+            },
+            install: {
+                src: 'pages/install.less',
+                dest: 'pages/install.css',
+                options: {
+                    compile: true,
+                    compress: process.env.NODE_ENV === 'PRODUCTION'
+                }
             }
         },
         clean: {
@@ -84,7 +89,7 @@ module.exports = function (grunt) {
                 expand: true,
                 src: [
                     'components/font-awesome/font/fontawesome-webfont.woff',
-                    'modules/background/auth/oauth.vk.com.js',
+                    'modules/auth/oauth.vk.com.js',
                     'modules/**/*.html',
                     'pages/*.html',
                     'pages/*.js',

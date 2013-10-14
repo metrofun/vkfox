@@ -34,7 +34,7 @@
         },
         "content_scripts": [{
             "matches" : ["http://oauth.vk.com/*", "https://oauth.vk.com/*"],
-            "js" : ["modules/background/auth/oauth.vk.com.js"],
+            "js" : ["modules/auth/oauth.vk.com.js"],
             "run_at" : "document_start",
             "all_frames" : true
         }],
