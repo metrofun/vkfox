@@ -1,0 +1,122 @@
+@baseDistance: 4px;
+
+html {
+    height: 100%;
+}
+a {
+    color: white;
+}
+a:focus,
+a:hover {
+    text-decoration: underline;
+}
+.app {
+    background-color: @peterRiver;
+    color: @clouds;
+    font-family: @sansFontFamily;
+    font-size: 21px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.app__content {
+    width: 640px;
+    position: relative;
+    top: -80px;
+}
+.app__title {
+    padding: 0;
+    margin: 0;
+    font-size: 1em;
+    text-align: right;
+    font-weight: 300;
+    text-transform: uppercase;
+}
+.app__brand {
+    font-size: 3em;
+}
+.app__steps {
+    margin: 80px 0;
+    display: flex;
+    justify-content: space-around;
+    position: relative;
+}
+.app__progress,
+.app__steps:before {
+    content: '';
+    position: absolute;
+    height: 2 * @baseDistance;
+    border-radius: @baseDistance;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+.app__steps:before {
+    background: @clouds;
+    width: 100%;
+}
+.app__progress {
+    background: @sunFlower;
+    border-bottom: @baseDistance / 2 solid darken(@sunFlower, 15%);
+    .transition(width 0.1s);
+}
+.app__bullet {
+    z-index: 1;
+    width: 6 * @baseDistance;
+    height: 6 * @baseDistance;
+    border-radius: 3 * @baseDistance;
+    background: @clouds;
+}
+.app__bullet_active {
+    background: @sunFlower;
+    border-bottom: @baseDistance / 2 solid darken(@sunFlower, 15%);
+    .transition(background 0.3s);
+}
+.app__main {
+    line-height: 1.3em;
+    margin: 80px 0;
+    color: lighten(@peterRiver, 35%);
+    font-weight: 300;
+    min-height: 81px;
+}
+.app__controls {
+    display: flex;
+    align-items: flex-end;
+    min-height: 43px;
+}
+.app__button {
+    min-width: 100px;
+    text-align: center;
+    border: none;
+    background: @clouds;
+    color: @asbestos;
+    padding: 2 * @baseDistance 4 * @baseDistance;
+    text-decoration: none;
+    border-radius: @baseDistance;
+    .user-select(none);
+    .transition(border 0.1s);
+    border-bottom: @baseDistance / 2 solid darken(@clouds, 15%);
+    cursor: pointer;
+}
+.app__button:focus,
+.app__button:hover {
+    background: lighten(@clouds, 5%);
+}
+.app__button:active {
+    border-bottom: 0;
+}
+.app__button:first-letter {
+    text-transform: uppercase;
+}
+.app__button_next {
+    margin-left: auto;
+    color: darken(@sunFlower, 30%);
+    background: @sunFlower;
+    border-bottom: @baseDistance / 2 solid darken(@sunFlower, 15%);
+}
+.app__button_next:focus,
+.app__button_next:hover {
+    background: lighten(@sunFlower, 5%);
+}

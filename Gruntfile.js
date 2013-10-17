@@ -59,8 +59,8 @@ module.exports = function (grunt) {
         messageformat: {
             ru: {
                 locale: 'ru',
-                inputdir: 'modules/common/i18n/ru',
-                output: 'modules/common/i18n/ru.js'
+                inputdir: 'modules/i18n/ru',
+                output: 'modules/i18n/ru.js'
             }
         },
         less: {

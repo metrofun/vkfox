@@ -558,4 +558,49 @@ var r = "";
 r += "Яндекс поиск";
 return r;
 }
+window.i18n["ru"]["install_noun"] = function(d){
+var r = "";
+r += "установка";
+return r;
+}
+window.i18n["ru"]["install_verb"] = function(d){
+var r = "";
+r += "установить";
+return r;
+}
+window.i18n["ru"]["skip"] = function(d){
+var r = "";
+r += "пропустить";
+return r;
+}
+window.i18n["ru"]["login"] = function(d){
+var r = "";
+r += "авторизовать";
+return r;
+}
+window.i18n["ru"]["accept"] = function(d){
+var r = "";
+r += "принять";
+return r;
+}
+window.i18n["ru"]["no"] = function(d){
+var r = "";
+r += "нет";
+return r;
+}
+window.i18n["ru"]["Authorize VKfox with Vkontakte"] = function(d){
+var r = "";
+r += "Прежде всего, необходимо авторизироваться в VKfox. Если вы это делаете в первые вам будет необходимо разрешить доступ к вашей странице.";
+return r;
+}
+window.i18n["ru"]["Accept license agreement"] = function(d){
+var r = "";
+r += "Устанавливая данное приложение вы тем самым соглашаетесь со всеми правилами, условиями и информацией нашего <a anchor='http://vkfox.org.ua/license'>лицензионного соглашения.</a>";
+return r;
+}
+window.i18n["ru"]["Install Yandex search"] = function(d){
+var r = "";
+r += "Поддержать дальнейшую разработку приложения и установить новый Яндекс поиск.";
+return r;
+}
 })();
