@@ -62,6 +62,13 @@ angular.module('feedbacks', [
             lastFeedback, notificationItem, type, parentType,
             profile, ownerId, gender, title, message, name;
 
+        console.log(this, this._previousAttributes);
+        // don't notify on first run,
+        // when there is no previous value
+        if (!this._previousAttributes.hasOwnProperty('latestFeedbackId')) {
+            return;
+        }
+
         if (itemModel.has('feedbacks')) { // notification has parent, e.g. comment to post, like to video etc
             lastFeedback = itemModel.get('feedbacks').last(),
             notificationItem = lastFeedback.get('feedback');
@@ -158,6 +165,7 @@ angular.module('feedbacks', [
             });
             persistentModel.on('change:latestFeedbackId', tryNotification);
 
+            updateLatestFeedbackId();
             publishData();
         });
 
@@ -308,6 +316,22 @@ angular.module('feedbacks', [
         }
         return itemModel;
     }
+    /**
+     * Updates "latestFeedbackId" with current last item(parentId+feedbackId)
+     * Should be called on every change
+     */
+    function updateLatestFeedbackId() {
+        var firstModel = itemsColl.first(), identifier;
+
+        if (firstModel) {
+            identifier = firstModel.get('id');
+
+            if (firstModel.has('feedbacks')) {
+                identifier += ':' + firstModel.get('feedbacks').last().get('id');
+            }
+            persistentModel.set('latestFeedbackId', identifier);
+        }
+    }
 
     function fetchFeedbacks() {
         Request.api({code: [
@@ -349,16 +373,9 @@ angular.module('feedbacks', [
     });
 
     readyDeferred.then(function () {
-        publishData();
-
         itemsColl.on('add change remove', _.debounce(function () {
-            var firstModel = itemsColl.first();
-
             itemsColl.sort();
-            persistentModel.set(
-                'latestFeedbackId',
-                (firstModel.has('feedbacks') ? firstModel.get('feedbacks').last():firstModel).get('id')
-            );
+            updateLatestFeedbackId();
             publishData();
         }));
         profilesColl.on('change', publishData);

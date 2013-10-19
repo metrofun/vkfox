@@ -12,6 +12,8 @@
             class="chat__item-content">
             <p ng-repeat="message in dialog.messages">
                 <span ng-bind-html-unsafe="message.body | rectify:message.emoji"></span>
+                <!-- line break before photos etc -->
+                <br ng-if="message.attachments"/>
                 <item-attachment
                     ng-repeat="attachment in message.attachments"
                     data="attachment[attachment.type]"

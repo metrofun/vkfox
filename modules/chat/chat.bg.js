@@ -71,12 +71,14 @@ angular.module('chat', [
                     message = messages[messages.length - 1],
                     profile, gender;
 
+                // don't notify on first run,
+                // when there is no previous value
+                if (!this._previousAttributes.hasOwnProperty('latestMessageId')) {
+                    return;
+                }
+
                 if (!message.out) {
-                    // try {
                     profile = profilesColl.get(message.uid).toJSON();
-                    // } catch (e) {
-                        // debugger;
-                    // }
                     gender = profile.sex === 1 ? 'female':'male';
 
                     NotificationsQueue.push({
@@ -91,6 +93,7 @@ angular.module('chat', [
                     });
                 }
             });
+            updateLatestMessageId();
             publishData();
         });
     }
@@ -255,6 +258,23 @@ angular.module('chat', [
             }
         });
     }
+    /**
+     * Updates "latestMessageId" with current last message
+     * Should be called on every incoming message
+     */
+    function updateLatestMessageId() {
+        var messages;
+
+        if (dialogColl.size()) {
+            messages = dialogColl.first().get('messages');
+
+            persistentModel.set(
+                'latestMessageId',
+                messages[messages.length - 1].mid
+            );
+        }
+    }
+
     function getDialogs() {
         return Request.api({
             code: 'return API.messages.getDialogs({preview_length: 0});'
@@ -278,20 +298,8 @@ angular.module('chat', [
 
         // Notify about changes
         dialogColl.on('change', function () {
-            var messages;
-
             dialogColl.sort();
-
-            // Update latest message id,
-            // required for notifications
-            if (dialogColl.size()) {
-                messages = dialogColl.first().get('messages');
-                persistentModel.set(
-                    'latestMessageId',
-                    messages[messages.length - 1].mid
-                );
-            }
-
+            updateLatestMessageId();
             publishData();
         });
         profilesColl.on('change', publishData);
