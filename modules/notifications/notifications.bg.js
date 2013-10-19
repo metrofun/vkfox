@@ -1,6 +1,6 @@
 angular.module('notifications', ['mediator', 'persistent-model', 'config'])
-    .constant('STANDART_SIGNAL', 'modules/background/notifications/standart.mp3')
-    .constant('ORIGINAL_SIGNAL', 'modules/background/notifications/original.mp3')
+    .constant('STANDART_SIGNAL', 'modules/notifications/standart.mp3')
+    .constant('ORIGINAL_SIGNAL', 'modules/notifications/original.mp3')
     .constant('NOTIFICATIONS_CHAT', 'chat')
     .constant('NOTIFICATIONS_BUDDIES', 'buddies')
     .constant('NOTIFICATIONS_NEWS', 'news')
