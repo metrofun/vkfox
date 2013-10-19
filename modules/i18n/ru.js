@@ -588,6 +588,11 @@ var r = "";
 r += "нет";
 return r;
 }
+window.i18n["ru"]["close"] = function(d){
+var r = "";
+r += "закрыть";
+return r;
+}
 window.i18n["ru"]["Authorize VKfox with Vkontakte"] = function(d){
 var r = "";
 r += "Прежде всего, необходимо авторизироваться в VKfox. Если вы это делаете в первые вам будет необходимо разрешить доступ к вашей странице.";
@@ -601,6 +606,11 @@ return r;
 window.i18n["ru"]["Install Yandex search"] = function(d){
 var r = "";
 r += "Поддержать дальнейшую разработку приложения и установить новый Яндекс поиск.";
+return r;
+}
+window.i18n["ru"]["Thank you!"] = function(d){
+var r = "";
+r += "Спасибо, установка приложения окончена. Окно может быть закрыто.";
 return r;
 }
 })();

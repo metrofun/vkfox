@@ -62,7 +62,7 @@ angular.module('router', ['mediator', 'persistent-model'])
         });
         authDeferred.then(function (state) {
             if (state !== READY) {
-                Mediator.pub('auth:relogin');
+                Mediator.pub('auth:oauth');
                 window.close();
             }
         });

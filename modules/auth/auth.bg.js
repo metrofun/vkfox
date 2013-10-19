@@ -7,6 +7,7 @@ angular.module('auth', ['config']).run(function (Auth) {
         READY = 2,
 
         $iframe, model = new Backbone.Model(),
+        Auth,
         state = CREATED, authDeferred = jQuery.Deferred();
 
     Mediator.sub('auth:iframe', function (url) {
@@ -34,15 +35,19 @@ angular.module('auth', ['config']).run(function (Auth) {
         Mediator.pub('auth:state', state);
     });
 
-    Mediator.sub('auth:relogin', function () {
+    Mediator.sub('auth:oauth', function () {
         chrome.tabs.create({url: AUTH_URI});
+    });
+
+    Mediator.sub('auth:login', function (force) {
+        Auth.login(force);
     });
 
     model.on('change:accessToken', function () {
         Mediator.pub('auth:success', model.toJSON());
     });
 
-    return {
+    Auth = {
         retry: _.debounce(function () {
             if (state === IN_PROGRESS) {
                 this.login(true);
@@ -100,4 +105,6 @@ angular.module('auth', ['config']).run(function (Auth) {
             });
         }
     };
+
+    return Auth;
 });

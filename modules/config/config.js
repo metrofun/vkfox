@@ -16,7 +16,7 @@ angular.module('config', [])
                     'client_id=' + APP_ID,
                     'scope=friends,photos,audio,video,docs,notes,pages,wall,groups,messages,notifications',
                     'response_type=token',
-                    'redirect_uri=http://oauth.vk.com/blank.html',
+                    'redirect_uri=' + encodeURIComponent('https://oauth.vk.com/blank.html'),
                     'display=page'
                 ].join('&')
             ].join('');

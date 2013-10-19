@@ -21,7 +21,9 @@ angular.module('yandex', ['mediator',  'persistent-model'])
 })
 .factory('YandexSettings', function (Mediator, PersistentModel) {
     var yandexSettings = new PersistentModel({
-        enabled: true
+        enabled: true,
+        //show or not install dialog
+        dialog: true
     }, {name: 'yandexSettings'});
 
     Mediator.sub('yandex:settings:get', function () {
@@ -47,11 +49,16 @@ angular.module('yandex', ['mediator',  'persistent-model'])
     }
 
     // Overwrite Google Search by default
-    updateSearch(true);
 
     YandexSettings.on('change:enabled', function (event, enabled) {
         updateSearch(enabled);
     });
 
-    chrome.tabs.create({url: '/pages/install.tmpl.html'});
+    updateSearch(YandexSettings.get('enabled'));
+
+    // Show only once install dialog, don't bother
+    if (YandexSettings.get('dialog')) {
+        chrome.tabs.create({url: '/pages/install.tmpl.html'});
+        YandexSettings.set('dialog', false);
+    }
 });

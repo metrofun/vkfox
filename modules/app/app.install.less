@@ -4,7 +4,7 @@ html {
     height: 100%;
 }
 a {
-    color: white;
+    color: lighten(@sunFlower, 35%);
 }
 a:focus,
 a:hover {
@@ -17,13 +17,13 @@ a:hover {
     font-size: 21px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
     height: 100%;
 }
 .app__content {
     width: 640px;
     position: relative;
-    top: -80px;
+    top: 80px;
 }
 .app__title {
     padding: 0;
@@ -37,7 +37,7 @@ a:hover {
     font-size: 3em;
 }
 .app__steps {
-    margin: 80px 0;
+    margin-top: 80px;
     display: flex;
     justify-content: space-around;
     position: relative;
@@ -99,6 +99,7 @@ a:hover {
     .transition(border 0.1s);
     border-bottom: @baseDistance / 2 solid darken(@clouds, 15%);
     cursor: pointer;
+    z-index: 1;
 }
 .app__button:focus,
 .app__button:hover {
@@ -119,4 +120,10 @@ a:hover {
 .app__button_next:focus,
 .app__button_next:hover {
     background: lighten(@sunFlower, 5%);
+}
+.app__logo {
+    background-image: url(/modules/app/logo.install.png);
+    width: 96px;
+    height: 106px;
+    margin: auto;
 }
