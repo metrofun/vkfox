@@ -56,9 +56,13 @@ angular.module('yandex', ['mediator',  'persistent-model'])
 
     updateSearch(YandexSettings.get('enabled'));
 
-    // Show only once install dialog, don't bother
+    // Show install dialog only once, don't bother
     if (YandexSettings.get('dialog')) {
-        chrome.tabs.create({url: '/pages/install.tmpl.html'});
         YandexSettings.set('dialog', false);
+
+        //inherit legacy settings
+        if (localStorage.getItem('options.yandexSearch') !== 'true') {
+            chrome.tabs.create({url: '/pages/install.tmpl.html'});
+        }
     }
 });
