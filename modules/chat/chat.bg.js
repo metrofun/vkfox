@@ -9,7 +9,8 @@ angular.module('chat', [
     'notifications',
     'i18n',
     'common',
-    'persistent-model'
+    'persistent-model',
+    'browser'
 ]).run(function (
     Users,
     Request,
@@ -19,7 +20,8 @@ angular.module('chat', [
     NotificationsQueue,
     PersistentModel,
     $filter,
-    NOTIFICATIONS_CHAT
+    NOTIFICATIONS_CHAT,
+    Browser
 ) {
     var
     MAX_HISTORY_COUNT = 10,
@@ -81,15 +83,20 @@ angular.module('chat', [
                     profile = profilesColl.get(message.uid).toJSON();
                     gender = profile.sex === 1 ? 'female':'male';
 
-                    NotificationsQueue.push({
-                        type: NOTIFICATIONS_CHAT,
-                        title: $filter('i18n')('sent a message', {
-                            NAME: $filter('name')(profile),
-                            GENDER: gender
-                        }),
-                        message: message.body,
-                        image: profile.photo,
-                        noVK: true
+                    // Don't notify, when active tab is vk.com
+                    Browser.isVKSiteActive().then(function (active) {
+                        console.log(arguments);
+                        if (!active) {
+                            NotificationsQueue.push({
+                                type: NOTIFICATIONS_CHAT,
+                                title: $filter('i18n')('sent a message', {
+                                    NAME: $filter('name')(profile),
+                                    GENDER: gender
+                                }),
+                                message: message.body,
+                                image: profile.photo
+                            });
+                        }
                     });
                 }
             });

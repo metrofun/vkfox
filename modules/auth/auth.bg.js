@@ -1,6 +1,6 @@
-angular.module('auth', ['config']).run(function (Auth) {
+angular.module('auth', ['config', 'browser']).run(function (Auth) {
     Auth.login();
-}).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI) {
+}).factory('Auth', function (Mediator, AUTH_DOMAIN, AUTH_URI, BROWSER_ICON_ONLINE, BROWSER_ICON_OFFLINE, Browser) {
     var RETRY_INTERVAL = 10000, //ms
         CREATED = 1,
         IN_PROGRESS = 1,
@@ -56,24 +56,12 @@ angular.module('auth', ['config']).run(function (Auth) {
         }, RETRY_INTERVAL),
         onSuccess: function (data) {
             state = READY;
-
-            chrome.browserAction.setIcon({
-                path: {
-                    "19": "/images/logo19.png",
-                    "38": "/images/logo38.png"
-                }
-            });
-
+            Browser.setIcon(BROWSER_ICON_ONLINE);
             authDeferred.resolve(data);
         },
         login: function (force) {
             if (force || state === CREATED) {
-                chrome.browserAction.setIcon({
-                    path: {
-                        "19": "/images/logo19_offline.png",
-                        "38": "/images/logo38_offline.png"
-                    }
-                });
+                Browser.setIcon(BROWSER_ICON_OFFLINE);
                 state = IN_PROGRESS;
 
                 if (authDeferred.state() === 'resolved') {

@@ -1,4 +1,4 @@
-angular.module('notifications', ['mediator', 'persistent-model', 'config'])
+angular.module('notifications', ['mediator', 'persistent-model', 'config', 'browser'])
     .constant('STANDART_SIGNAL', 'modules/notifications/standart.mp3')
     .constant('ORIGINAL_SIGNAL', 'modules/notifications/original.mp3')
     .constant('NOTIFICATIONS_CHAT', 'chat')
@@ -12,38 +12,19 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
     ) {
         var notificationQueue = new Backbone.Collection();
 
-        /**
-         * Run a callback, only when user dosn't
-         * have vk.com opened in current ta.
-         */
-        function runIfVKIsNotCurrentTab(callback) {
-            chrome.tabs.query({active: true}, function (tabs) {
-                if (tabs.every(function (tab) {
-                    return tab.url.indexOf('vk.com') === -1;
-                })) {
-                    callback();
-                }
-            });
-        }
-
-        notificationQueue.on('add remove reset', function () {
+        notificationQueue.on('remove reset', function () {
             Notifications.setBadge(notificationQueue.filter(function (model) {
                 return !model.get('noBadge');
             }).length);
         });
 
         notificationQueue.on('add', function (model) {
-            chrome.tabs.query({active: true}, function () {
-                if (model.get('noVK')) {
-                    runIfVKIsNotCurrentTab(function () {
-                        Notifications.playSound();
-                        Notifications.createPopup(model.toJSON());
-                    });
-                } else {
-                    Notifications.playSound();
-                    Notifications.createPopup(model.toJSON());
-                }
-            });
+            if (!model.get('noSound')) {
+                Notifications.playSound();
+            }
+            if (!model.get('noPopup')) {
+                Notifications.createPopup(model.toJSON());
+            }
         });
         Mediator.sub('auth:success', function () {
             notificationQueue.reset();
@@ -101,14 +82,10 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
 
         return notificationsSettings;
     })
-    .factory('Notifications', function (NotificationsSettings) {
+    .factory('Notifications', function (NotificationsSettings, Browser) {
         var audioInProgress = false,
             audio = new Audio(),
             Notifications;
-
-        chrome.browserAction.setBadgeBackgroundColor({
-            color: [231, 76, 60, 255]
-        });
 
         function getBase64FromImage(url, onSuccess, onError) {
             var xhr = new XMLHttpRequest();
@@ -174,9 +151,7 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config'])
             },
             setBadge: function (count, force) {
                 if (NotificationsSettings.get('enabled') || force) {
-                    chrome.browserAction.setBadgeText({
-                        text: count ? String(count):''
-                    });
+                    Browser.setBadgeText(count || '');
                 }
             }
         };

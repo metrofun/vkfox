@@ -6,6 +6,7 @@ angular.module('app', [
     'newsfeed',
     'feedbacks',
     'notifications',
+    'router',
     'yandex',
     'tracker'
 ]);

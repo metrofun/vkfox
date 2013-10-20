@@ -5,7 +5,8 @@ angular.module('feedbacks', [
     'profiles-collection',
     'persistent-model',
     'notifications',
-    'common'
+    'common',
+    'browser'
 ]).run(function (
     Request,
     Mediator,
@@ -13,7 +14,8 @@ angular.module('feedbacks', [
     NotificationsQueue,
     PersistentModel,
     $filter,
-    NOTIFICATIONS_NEWS
+    NOTIFICATIONS_NEWS,
+    Browser
 ) {
     var
     MAX_ITEMS_COUNT = 50,
@@ -138,12 +140,16 @@ angular.module('feedbacks', [
             }
 
             if (title) {
-                NotificationsQueue.push({
-                    type: NOTIFICATIONS_NEWS,
-                    title: title,
-                    message: message,
-                    image: profile.photo,
-                    noVK: true
+                // Don't notify, when active tab is vk.com
+                Browser.isVKSiteActive().then(function (active) {
+                    if (!active) {
+                        NotificationsQueue.push({
+                            type: NOTIFICATIONS_NEWS,
+                            title: title,
+                            message: message,
+                            image: profile.photo
+                        });
+                    }
                 });
             }
         }

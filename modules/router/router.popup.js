@@ -1,4 +1,4 @@
-angular.module('router', ['mediator', 'persistent-model'])
+angular.module('router', ['mediator'])
     .config(function ($routeProvider, $locationProvider, $compileProvider) {
         $locationProvider.html5Mode(true);
 
@@ -25,19 +25,17 @@ angular.module('router', ['mediator', 'persistent-model'])
                 }
             });
     })
-    .run(function ($location, $rootScope, Mediator, PersistentModel) {
+    .run(function ($location, $rootScope, Mediator) {
         // default tab is chat
-        var model = new PersistentModel(
-            {lastPath: '/chat'},
-            {name: 'router'}
-        ), notificationsDeferred = jQuery.Deferred(),
-        authDeferred = jQuery.Deferred(),
-        READY = 2; //ready status from auth module
+        var notificationsDeferred = jQuery.Deferred(),
+            authDeferred = jQuery.Deferred(),
+            lastPathDeferred = jQuery.Deferred(),
+            READY = 2; //ready status from auth module
 
         $rootScope.$on('$routeChangeSuccess', function (scope, current) {
             Mediator.pub('router:change', current.params);
             if (current.params.tab) {
-                model.set('lastPath', $location.path());
+                Mediator.pub('router:lastPath:put', $location.path());
             }
         });
         Mediator.sub('notifications:queue', function (queue) {
@@ -46,6 +44,9 @@ angular.module('router', ['mediator', 'persistent-model'])
         Mediator.sub('auth:state', function (state) {
             authDeferred.resolve(state);
         });
+        Mediator.sub('router:lastPath', function (lastPath) {
+            lastPathDeferred.resolve(lastPath);
+        });
         jQuery.when(notificationsDeferred, authDeferred).then(function (queue, state) {
             $rootScope.$apply(function () {
                 if (state === READY) {
@@ -53,10 +54,15 @@ angular.module('router', ['mediator', 'persistent-model'])
                         // queue contains updates from tabs.
                         // Property 'type' holds value
                         $location.path('/' + queue[queue.length - 1].type);
+                        $location.replace();
                     } else {
-                        $location.path(model.get('lastPath'));
+                        lastPathDeferred.then(function (lastPath) {
+                            $rootScope.$apply(function () {
+                                $location.path(lastPath);
+                                $location.replace();
+                            });
+                        });
                     }
-                    $location.replace();
                 }
             });
         });
@@ -68,4 +74,5 @@ angular.module('router', ['mediator', 'persistent-model'])
         });
         Mediator.pub('auth:state:get');
         Mediator.pub('notifications:queue:get');
+        Mediator.pub('router:lastPath:get');
     });
