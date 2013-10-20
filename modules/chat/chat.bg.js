@@ -10,6 +10,7 @@ angular.module('chat', [
     'i18n',
     'common',
     'persistent-model',
+    'router',
     'browser'
 ]).run(function (
     Users,
@@ -21,6 +22,7 @@ angular.module('chat', [
     PersistentModel,
     $filter,
     NOTIFICATIONS_CHAT,
+    Router,
     Browser
 ) {
     var
@@ -85,8 +87,9 @@ angular.module('chat', [
 
                     // Don't notify, when active tab is vk.com
                     Browser.isVKSiteActive().then(function (active) {
-                        console.log(arguments);
                         if (!active) {
+                            var chatActive = isChatTabActive();
+
                             NotificationsQueue.push({
                                 type: NOTIFICATIONS_CHAT,
                                 title: $filter('i18n')('sent a message', {
@@ -94,7 +97,9 @@ angular.module('chat', [
                                     GENDER: gender
                                 }),
                                 message: message.body,
-                                image: profile.photo
+                                image: profile.photo,
+                                noBadge: chatActive,
+                                noPopup: chatActive
                             });
                         }
                     });
@@ -104,7 +109,15 @@ angular.module('chat', [
             publishData();
         });
     }
-
+    /**
+     * Returns true if extension popup
+     * is visible and 'chat' is current tab
+     *
+     * @returns {Boolean}
+     */
+    function isChatTabActive() {
+        return Browser.isPopupOpened() && Router.isChatTabActive();
+    }
     /**
      * @param {Object} update Update object from long poll
      */

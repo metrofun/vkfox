@@ -50,7 +50,7 @@ angular.module('browser', ['mediator'])
          * @returns {Boolean}
          */
         isPopupOpened: function () {
-            return popupOpened();
+            return popupOpened;
         },
         /**
          * Says whether vk.com is currently active tab
@@ -66,6 +66,7 @@ angular.module('browser', ['mediator'])
                 })) {
                     deferred.resolve(false);
                 } else {
+                    console.log(true);
                     deferred.resolve(true);
                 }
             });

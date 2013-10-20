@@ -23,8 +23,21 @@ angular.module('router', ['mediator', 'persistent-model'])
     });
 
     return {
-        getLastPath: function () {
-            return model.get('lastPath');
+        /**
+         * Returns true if an active tab in a popup is a feedbacks tab
+         *
+         * @returns {Boolean}
+         */
+        isFeedbackTabActive: function () {
+            return model.get('lastPath').indexOf('my') !== -1;
+        },
+        /**
+         * Returns true if an active tab in a popup is a chat tab
+         *
+         * @returns {Boolean}
+         */
+        isChatTabActive: function () {
+            return model.get('lastPath').indexOf('chat') !== -1;
         }
     };
 })

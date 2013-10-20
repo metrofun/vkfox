@@ -12,7 +12,7 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config', 'brow
     ) {
         var notificationQueue = new Backbone.Collection();
 
-        notificationQueue.on('remove reset', function () {
+        notificationQueue.on('add remove reset', function () {
             Notifications.setBadge(notificationQueue.filter(function (model) {
                 return !model.get('noBadge');
             }).length);

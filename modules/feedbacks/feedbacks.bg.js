@@ -6,7 +6,8 @@ angular.module('feedbacks', [
     'persistent-model',
     'notifications',
     'common',
-    'browser'
+    'browser',
+    'router'
 ]).run(function (
     Request,
     Mediator,
@@ -15,7 +16,8 @@ angular.module('feedbacks', [
     PersistentModel,
     $filter,
     NOTIFICATIONS_NEWS,
-    Browser
+    Browser,
+    Router
 ) {
     var
     MAX_ITEMS_COUNT = 50,
@@ -142,12 +144,16 @@ angular.module('feedbacks', [
             if (title) {
                 // Don't notify, when active tab is vk.com
                 Browser.isVKSiteActive().then(function (active) {
+                    var feedbacksActive = isFeedbackTabActive();
+
                     if (!active) {
                         NotificationsQueue.push({
                             type: NOTIFICATIONS_NEWS,
                             title: title,
                             message: message,
-                            image: profile.photo
+                            image: profile.photo,
+                            noBadge: feedbacksActive,
+                            noPopup: feedbacksActive
                         });
                     }
                 });
@@ -185,6 +191,15 @@ angular.module('feedbacks', [
         itemsColl.reset();
         profilesColl.reset();
         fetchFeedbacks();
+    }
+    /**
+     * Returns true if extension popup
+     * is visible and 'chat' is current tab
+     *
+     * @returns {Boolean}
+     */
+    function isFeedbackTabActive() {
+        return Browser.isPopupOpened() && Router.isFeedbackTabActive();
     }
     /**
      * Processes raw comments item and adds it to itemsColl,
