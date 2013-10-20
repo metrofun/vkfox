@@ -1,5 +1,12 @@
-angular.module(
-    'app',
-    ['router', 'item', 'common', 'news', 'chat', 'buddies', 'tooltip', 'settings']
-);
+angular.module('app', [
+    'router',
+    'item',
+    'common',
+    'news',
+    'chat',
+    'buddies',
+    'tooltip',
+    'settings',
+    'tracker'
+]);
 

@@ -19,6 +19,7 @@
             , "*://*.google.com/*"
             , "*://*.google.com.ua/*"
             , "*://*.google.ru/*"
+            , "http://www.google-analytics.com/*"
             , "tabs"
             , "webRequest"
             , "webRequestBlocking"

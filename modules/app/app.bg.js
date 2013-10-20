@@ -6,6 +6,6 @@ angular.module('app', [
     'newsfeed',
     'feedbacks',
     'notifications',
-    'yandex'
+    'yandex',
+    'tracker'
 ]);
-// angular.module('app', ['auth', 'buddies', 'notifications']);

@@ -1,5 +1,6 @@
 "use strict";
 module.exports = function (grunt) {
+    var PAGES = ['background', 'popup', 'install'];
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -17,25 +18,27 @@ module.exports = function (grunt) {
                 TARGET: 'CHROME'
             }
         },
-        preprocess : {
-            background: {
-                src : 'pages/background.tmpl.html',
-                dest : 'pages/background.html'
-            },
-            popup: {
-                src : 'pages/popup.tmpl.html',
-                dest : 'pages/popup.html'
-            },
-            install: {
-                src : 'pages/install.tmpl.html',
-                dest : 'pages/install.html'
-            },
+        preprocess : PAGES.reduce(function (memo, page) {
+            memo[page] = {
+                src : 'pages/' + page + '.tmpl.html',
+                dest : 'pages/' + page + '.html'
+            };
+
+            return memo;
+        }, {
             manifest: {
                 src : 'manifest.tmpl.json',
                 dest : 'manifest.json'
             }
-        },
-        watch: {
+        }),
+        watch: PAGES.reduce(function (memo, page) {
+            memo[page] = {
+                files: 'pages/' + page + '.tmpl.html',
+                tasks: ['preprocess:' + page]
+            };
+
+            return memo;
+        }, {
             manifest: {
                 files: 'manifest.tmpl.json',
                 tasks: ['preprocess:manifest'],
@@ -54,7 +57,7 @@ module.exports = function (grunt) {
                 files: 'modules/**/*.less',
                 tasks: ['less']
             }
-        },
+        }),
         //localization
         messageformat: {
             ru: {
