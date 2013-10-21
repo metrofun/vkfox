@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- this page opens only once upon install -->
+<html ng-app="app" ng-csp>
+    <head>
+        <meta charset="utf-8">
+        <title>VKfox</title>
+        <base href="/" />
+
+        <link rel="stylesheet" href="/pages/install.css" />
+
+        <script src="/components/jquery/jquery.js"></script>
+        <script src="/components/angular-unstable/angular.js"></script>
+        <script src="/components/underscore/underscore.js"></script>
+        <script src="/components/backbone/backbone.js"></script>
+        <!-- build:js(.) /pages/popup.js -->
+        <script src="/modules/i18n/i18n.js"></script>
+        <script src="/modules/i18n/ru.js"></script>
+        <script src="/modules/anchor/anchor.js"></script>
+        <script src="/modules/mediator/mediator.js"></script>
+        <script src="/modules/mediator/mediator.popup.js"></script>
+        <script src="/modules/app/app.install.js"></script>
+        <!-- endbuild -->
+    </head>
+    <body class="app" ng-controller="AppCtrl">
+        <div class="app__content">
+            <h1 class="app__title">
+                {{'install_noun' | i18n}}
+                <span class="app__brand">VKfox</span>
+            </h1>
+            <div class="app__steps">
+                <div
+                    class="app__bullet"
+                    ng-repeat="index in [0, 1, 2]"
+                    ng-class="{app__bullet_active: index <= step}">
+                </div>
+                <div
+                    style="width:{{progress}}%"
+                    class="app__progress">
+                </div>
+            </div>
+            <div class="app__main app__main_step_{{step}}" ng-bind-html-unsafe="mainText | i18n">
+            </div>
+            <div class="app__controls">
+                <div
+                    ng-hide="buttonLabels.no == null"
+                    class="app__button"
+                    ng-click="onButtonClick(false)">
+                    {{buttonLabels.no | i18n}}
+                </div>
+                <div
+                    ng-hide="buttonLabels.yes == null"
+                    class="app__button app__button_next"
+                    ng-click="onButtonClick(true)">
+                    {{buttonLabels.yes | i18n}}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

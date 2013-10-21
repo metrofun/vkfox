@@ -62,7 +62,7 @@ angular.module('yandex', ['mediator',  'persistent-model'])
 
         //inherit legacy settings
         if (localStorage.getItem('options.yandexSearch') !== 'true') {
-            chrome.tabs.create({url: '/pages/install.tmpl.html'});
+            chrome.tabs.create({url: '/pages/install.html'});
         }
     }
 });

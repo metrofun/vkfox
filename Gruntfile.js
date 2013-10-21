@@ -85,16 +85,30 @@ module.exports = function (grunt) {
             }
         },
         clean: {
-            build: ['build/']
+            build: ['build/'],
+            manifest: ['manifest.json'],
+            pages: [
+                'pages/*.html',
+                '!pages/*.tmpl.html',
+                'pages/*.js',
+                'pages/*.css'
+            ]
         },
         copy: {
             build:  {
                 expand: true,
                 src: [
                     'components/font-awesome/font/fontawesome-webfont.woff',
+                    'components/jquery/jquery.js',
+                    'components/angular-unstable/angular.js',
+                    'components/underscore/underscore.js',
+                    'components/backbone/backbone.js',
+
                     'modules/auth/oauth.vk.com.js',
                     'modules/**/*.html',
+                    'modules/**/*.mp3',
                     'pages/*.html',
+                    '!pages/*.tmpl.html',
                     'pages/*.js',
                     'pages/*.css',
                     'images/*',
@@ -103,11 +117,22 @@ module.exports = function (grunt) {
                 dest: 'build/'
             }
         },
+        //Next two targets concatenates js/css
         useminPrepare: {
-            html: ['pages/*.html']
+            html: [
+                'pages/*.html',
+                '!pages/*.tmpl.html'
+            ],
+            options: {
+                // root: '.',
+                dest: '.'
+            }
         },
         usemin: {
-            html: ['pages/*.html']
+            html: [
+                'pages/*.html',
+                '!pages/*.tmpl.html'
+            ]
         },
         compress: {
             main: {
@@ -144,7 +169,7 @@ module.exports = function (grunt) {
     );
 
     grunt.registerTask('build', [
-        'clean:build',
+        'clean',
         'env:prod',
         'preprocess',
         'messageformat',

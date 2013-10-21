@@ -66,7 +66,6 @@ angular.module('feedbacks', [
             lastFeedback, notificationItem, type, parentType,
             profile, ownerId, gender, title, message, name;
 
-        console.log(this, this._previousAttributes);
         // don't notify on first run,
         // when there is no previous value
         if (!this._previousAttributes.hasOwnProperty('latestFeedbackId')) {
