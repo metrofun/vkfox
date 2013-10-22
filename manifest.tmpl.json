@@ -1,8 +1,9 @@
 {
-        "name": "VKfox - плагин для \"ВКонтакте\"",
+        "name": "__MSG_name__",
         "version": "5",
         "manifest_version": 2,
-        "description": "Позволяет следить за всеми обновлениями и новостями на сайте, вести переписки, а также следить за входом-выходом друзей либо людей из закладок, при этом оставаясь оффлайн.",
+        "default_locale": "ru",
+        "description": "__MSG_description__",
         "background": {
             "page": "pages/background.html"
         },

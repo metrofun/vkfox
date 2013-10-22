@@ -3,7 +3,7 @@ angular.module('i18n', [])
     .config(function ($filterProvider) {
         $filterProvider.register('i18n', function () {
             var DEFAULT_LANGUAGE = 'ru',
-                language = navigator.language.split('_')[0],
+                language = navigator.language.split('-')[0],
                 messages;
 
             messages = i18n[language];

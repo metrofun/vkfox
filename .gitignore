@@ -4,6 +4,8 @@ pages/*.html
 !pages/*.tmpl.html
 pages/*.js
 pages/*.css
+modules/i18n/*.js
+!modules/i18n/i18n.js
 components
 node_modules
 build

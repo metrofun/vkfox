@@ -1,6 +1,7 @@
 "use strict";
 module.exports = function (grunt) {
-    var PAGES = ['background', 'popup', 'install'];
+    var PAGES = ['background', 'popup', 'install'],
+        LOCALES = ['ru', 'en', 'uk'];
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -59,13 +60,15 @@ module.exports = function (grunt) {
             }
         }),
         //localization
-        messageformat: {
-            ru: {
-                locale: 'ru',
-                inputdir: 'modules/i18n/ru',
-                output: 'modules/i18n/ru.js'
-            }
-        },
+        messageformat: LOCALES.reduce(function (memo, locale) {
+            memo[locale] = {
+                locale: locale,
+                inputdir: 'modules/i18n/' + locale,
+                output: 'modules/i18n/' + locale + '.js'
+            };
+
+            return memo;
+        }, {}),
         less: {
             popup: {
                 src: 'pages/popup.less',
@@ -182,5 +185,4 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('build:opera', ['env:opera', 'build']);
     grunt.registerTask('build:chrome', ['env:chrome', 'build']);
-
 };

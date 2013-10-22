@@ -167,7 +167,6 @@ angular.module(
             friendItemsColl.reset(friendItemsColl.slice(0, MAX_ITEMS_COUNT));
             groupItemsColl.reset(groupItemsColl.slice(0, MAX_ITEMS_COUNT));
 
-
             // gather required profiles' ids from new friends
             required_uids = _(friendItemsColl.where({
                 type: 'friend'
