@@ -213,8 +213,11 @@ angular.module('feedbacks', [
         parent.owner_id = Number(parent.from_id || parent.source_id);
         itemID  = generateItemID(parentType, parent);
         if (!(itemModel = itemsColl.get(itemID))) {
-            itemModel = createItemModel(parentType, parent, true);
+            itemModel = createItemModel(parentType, parent);
             itemsColl.add(itemModel, {sort: false});
+        }
+        if (!itemModel.has('feedbacks')) {
+            itemModel.set('feedbacks', new FeedbacksCollection());
         }
         itemModel.get('feedbacks').add(item.comments.list.slice(- MAX_COMMENTS_COUNT).map(function (feedback) {
             feedback.owner_id = Number(feedback.from_id);
@@ -260,8 +263,11 @@ angular.module('feedbacks', [
             parent.owner_id = Number(parent.from_id || parent.owner_id);
             itemID  = generateItemID(parentType, parent);
             if (!(itemModel = itemsColl.get(itemID))) {
-                itemModel = createItemModel(parentType, parent, true);
+                itemModel = createItemModel(parentType, parent);
                 itemsColl.add(itemModel, {sort: false});
+            }
+            if (!itemModel.has('feedbacks')) {
+                itemModel.set('feedbacks', new FeedbacksCollection());
             }
             itemModel.get('feedbacks').add([].concat(feedback).map(function (feedback) {
                 var id;
@@ -291,7 +297,7 @@ angular.module('feedbacks', [
             [].concat(feedback).forEach(function (feedback) {
                 var itemModel;
                 feedback.owner_id = Number(feedback.owner_id || feedback.from_id);
-                itemModel = createItemModel(parentType, feedback, false);
+                itemModel = createItemModel(parentType, feedback);
                 itemModel.set('date', item.date);
                 itemsColl.add(itemModel, {sort: false});
             });
@@ -308,7 +314,10 @@ angular.module('feedbacks', [
     function generateItemID(type, parent) {
         if (parent.owner_id) {
             return [
-                type, parent.id || parent.pid || parent.cid || parent.post_id,
+                // replace wall with post,
+                // to make correct merging items from 'notifications.get' and 'newsfeed.getComments'
+                type === 'wall' ? 'post':type,
+                parent.id || parent.pid || parent.cid || parent.post_id,
                 'user', parent.owner_id
             ].join(':');
         } else {
@@ -324,16 +333,12 @@ angular.module('feedbacks', [
      *
      * @return {Object}
      */
-    function createItemModel(type, parent, canHaveFeedbacks) {
+    function createItemModel(type, parent) {
         var itemModel = new Backbone.Model({
             id: generateItemID(type, parent),
             parent: parent,
             type: type
         });
-        if (canHaveFeedbacks) {
-            // TODO implement sorting
-            itemModel.set('feedbacks', new FeedbacksCollection());
-        }
         return itemModel;
     }
     /**
@@ -349,6 +354,9 @@ angular.module('feedbacks', [
             if (firstModel.has('feedbacks')) {
                 identifier += ':' + firstModel.get('feedbacks').last().get('id');
             }
+            console.log('persistentModel', persistentModel.toJSON());
+            console.log('itemsColl', itemsColl.toJSON());
+            console.log('latestFeedbackId', identifier);
             persistentModel.set('latestFeedbackId', identifier);
         }
     }
@@ -379,6 +387,7 @@ angular.module('feedbacks', [
 
                 notifications.items.slice(1).forEach(addRawNotificationsItem);
                 comments.items.forEach(addRawCommentsItem);
+                itemsColl.sort();
             }
             readyDeferred.resolve();
             fetchFeedbacksDebounced();
