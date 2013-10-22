@@ -1,5 +1,5 @@
-angular.module('app', ['i18n', 'anchor', 'mediator'])
-    .controller('AppCtrl', function ($scope, Mediator) {
+angular.module('app', ['i18n', 'anchor', 'mediator', 'tracker'])
+    .controller('AppCtrl', function ($scope, Mediator, Tracker) {
         var data = {
             // authorization  step
             '0': {
@@ -9,6 +9,7 @@ angular.module('app', ['i18n', 'anchor', 'mediator'])
                     yes: 'login'
                 },
                 onButtonClick: function (makeAuth) {
+                    Tracker.trackEvent('install', 'authorize', makeAuth);
                     if (makeAuth) {
                         Mediator.once('auth:success', function () {
                             $scope.$apply(function () {
@@ -29,6 +30,7 @@ angular.module('app', ['i18n', 'anchor', 'mediator'])
                     yes: 'accept'
                 },
                 onButtonClick: function () {
+                    Tracker.trackEvent('install', 'licence agreement');
                     $scope.step++;
                 }
             },
@@ -40,6 +42,7 @@ angular.module('app', ['i18n', 'anchor', 'mediator'])
                     yes: 'install_verb'
                 },
                 onButtonClick: function (install) {
+                    Tracker.trackEvent('install', 'install yandex', install);
                     $scope.step++;
 
                     Mediator.pub('yandex:settings:put', {
@@ -55,6 +58,7 @@ angular.module('app', ['i18n', 'anchor', 'mediator'])
                     yes: 'close'
                 },
                 onButtonClick: function () {
+                    Tracker.trackEvent('install', 'close');
                     window.close();
                 }
             }

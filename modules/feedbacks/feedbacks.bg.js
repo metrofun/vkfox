@@ -354,9 +354,6 @@ angular.module('feedbacks', [
             if (firstModel.has('feedbacks')) {
                 identifier += ':' + firstModel.get('feedbacks').last().get('id');
             }
-            console.log('persistentModel', persistentModel.toJSON());
-            console.log('itemsColl', itemsColl.toJSON());
-            console.log('latestFeedbackId', identifier);
             persistentModel.set('latestFeedbackId', identifier);
         }
     }

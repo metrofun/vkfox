@@ -1,4 +1,4 @@
-angular.module('router', ['mediator'])
+angular.module('router', ['mediator', 'tracker'])
     .config(function ($routeProvider, $locationProvider, $compileProvider) {
         $locationProvider.html5Mode(true);
 
@@ -25,7 +25,7 @@ angular.module('router', ['mediator'])
                 }
             });
     })
-    .run(function ($location, $rootScope, Mediator) {
+    .run(function ($location, $rootScope, Mediator, Tracker) {
         // default tab is chat
         var notificationsDeferred = jQuery.Deferred(),
             authDeferred = jQuery.Deferred(),
@@ -35,6 +35,7 @@ angular.module('router', ['mediator'])
         $rootScope.$on('$routeChangeSuccess', function (scope, current) {
             Mediator.pub('router:change', current.params);
             if (current.params.tab) {
+                Tracker.trackPage();
                 Mediator.pub('router:lastPath:put', $location.path());
             }
         });
