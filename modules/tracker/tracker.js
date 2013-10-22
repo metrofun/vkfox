@@ -1,24 +1,46 @@
+/*jshint bitwise: false */
 /**
  * Tracking which is based on Google Analytics API
  * see https://developers.google.com/analytics/devguides/collection/protocol/v1/
  */
-angular.module('tracker', [])
+angular.module('tracker', ['persistent-model'])
     .constant('TRACKER_ID', 'UA-9568575-2')
-    .factory('Tracker', function (TRACKER_ID) {
+    .factory('Tracker', function (TRACKER_ID, PersistentModel) {
         var url = 'http://www.google-analytics.com/collect',
-            requiredParams = {
-                v: 1,               // Version.
-                tid: TRACKER_ID,    // Tracking ID / Web property / Property ID.
-                cid: 555            // Anonymous Client ID.
-            };
+            persistentModel = new PersistentModel({}, {name: 'tracker'}),
+            requiredParams;
+
+        /**
+         * Creates unique identifier if VKfox instance
+         *
+         * @see http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+         */
+        function guid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+        }
+
+        if (!persistentModel.has('guid')) {
+            persistentModel.set('guid', guid());
+        }
+
+        requiredParams = {
+            v: 1,               // Version.
+            tid: TRACKER_ID,    // Tracking ID / Web property / Property ID.
+            cid: persistentModel.get('guid'), // Anonymous Client ID.
+            ul: navigator.language, //user language
+            ap: chrome.app.getDetails().version //app version
+        };
 
         return {
             trackPage: function () {
                 jQuery.post(url, _.extend({}, requiredParams, {
                     t: 'pageview',          // Pageview hit type.
                     dh: location.hostname,  // Document hostname.
-                    dp: location.pathname,  // Page.
-                    dt: document.title      // Title.
+                    dp: location.pathname  // Page
                 }));
             },
             /**
@@ -34,7 +56,9 @@ angular.module('tracker', [])
                     ec: category, // Event Category. Required.
                     ea: action, // Event Action. Required.
                     el: label, // Event label.
-                    ev: value
+                    ev: value, // Event value.
+                    dh: location.hostname,  // Document hostname.
+                    dp: location.pathname  // Page
                 }));
             }
         };
@@ -45,8 +69,7 @@ angular.module('tracker', [])
         //error reporting
         window.onerror = function (message, filename, lineno, colno, error) {
             if (error) {
-                //category - 'errors', action - app version, label - error stack
-                Tracker.trackEvent('errors', chrome.app.getDetails().version, error.stack);
+                Tracker.trackEvent('errors', error.stack, navigator.userAgent);
             }
         };
     });
