@@ -107,6 +107,8 @@ module.exports = function (grunt) {
                     'components/underscore/underscore.js',
                     'components/backbone/backbone.js',
 
+                    '_locales/**',
+
                     'modules/auth/oauth.vk.com.js',
                     'modules/**/*.html',
                     'modules/**/*.mp3',
