@@ -7,7 +7,8 @@ angular.module('feedbacks', [
     'notifications',
     'common',
     'browser',
-    'router'
+    'router',
+    'tracker'
 ]).run(function (
     Request,
     Mediator,
@@ -17,7 +18,8 @@ angular.module('feedbacks', [
     $filter,
     NOTIFICATIONS_NEWS,
     Browser,
-    Router
+    Router,
+    Tracker
 ) {
     var
     MAX_ITEMS_COUNT = 50,
@@ -219,15 +221,19 @@ angular.module('feedbacks', [
         if (!itemModel.has('feedbacks')) {
             itemModel.set('feedbacks', new FeedbacksCollection());
         }
-        itemModel.get('feedbacks').add(item.comments.list.slice(- MAX_COMMENTS_COUNT).map(function (feedback) {
-            feedback.owner_id = Number(feedback.from_id);
-            return {
-                id: generateItemID('comment', feedback),
-                type: 'comment',
-                feedback: feedback,
-                date: feedback.date
-            };
-        }));
+        if (item.comments.list) {
+            itemModel.get('feedbacks').add(item.comments.list.slice(- MAX_COMMENTS_COUNT).map(function (feedback) {
+                feedback.owner_id = Number(feedback.from_id);
+                return {
+                    id: generateItemID('comment', feedback),
+                    type: 'comment',
+                    feedback: feedback,
+                    date: feedback.date
+                };
+            }));
+        } else {
+            Tracker.trackEvent('debug', 'item.comments.list is undefined', item);
+        }
         lastCommentDate = itemModel.get('feedbacks').last().get('date');
         if (!itemModel.has('date') || itemModel.get('date') < lastCommentDate) {
             itemModel.set('date', lastCommentDate);
