@@ -232,7 +232,11 @@ angular.module('feedbacks', [
                 };
             }));
         } else {
-            Tracker.trackEvent('debug', 'item.comments.list is undefined', item);
+            Tracker.trackEvent(
+                'debug',
+                'item.comments.list is undefined',
+                JSON.stringify(item)
+            );
         }
         lastCommentDate = itemModel.get('feedbacks').last().get('date');
         if (!itemModel.has('date') || itemModel.get('date') < lastCommentDate) {

@@ -86,7 +86,11 @@ angular.module('chat', [
                 if (!message.out) {
                     profileModel = profilesColl.get(message.uid);
                     if (!profileModel) {
-                        Tracker.trackEvent('debug', 'profilesColl.get(message.uid) is undefined', message);
+                        Tracker.trackEvent(
+                            'debug',
+                            'profilesColl.get(message.uid) is undefined',
+                            JSON.stringify(message)
+                        );
                     }
                     profile = profileModel.toJSON();
                     gender = profile.sex === 1 ? 'female':'male';
