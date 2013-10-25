@@ -3,7 +3,12 @@ angular.module('i18n', [])
     .config(function ($filterProvider, $provide) {
         $provide.factory('I18N', function () {
             var DEFAULT_LANGUAGE = 'ru',
-                language = navigator.language.split('-')[0];
+                language;
+
+            try {
+                language = navigator.language.split('-')[0].toLowerCase();
+            } catch (e) {
+            }
 
             if (!i18n[language]) {
                 language = DEFAULT_LANGUAGE;
