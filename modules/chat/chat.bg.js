@@ -89,7 +89,7 @@ angular.module('chat', [
                         Tracker.trackEvent(
                             'debug',
                             'profilesColl.get(message.uid) is undefined',
-                            JSON.stringify(message)
+                            dialogColl.first().get('id')
                         );
                     }
                     profile = profileModel.toJSON();

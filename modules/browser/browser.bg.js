@@ -66,7 +66,6 @@ angular.module('browser', ['mediator'])
                 })) {
                     deferred.resolve(false);
                 } else {
-                    console.log(true);
                     deferred.resolve(true);
                 }
             });

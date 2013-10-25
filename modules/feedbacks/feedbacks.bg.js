@@ -212,6 +212,11 @@ angular.module('feedbacks', [
         var parentType = item.type,
             parent = item, itemModel, itemID, lastCommentDate;
 
+        // do nothing if no comments
+        if (!(item.comments.list && item.comments.list.length)) {
+            return;
+        }
+
         parent.owner_id = Number(parent.from_id || parent.source_id);
         itemID  = generateItemID(parentType, parent);
         if (!(itemModel = itemsColl.get(itemID))) {
@@ -221,27 +226,21 @@ angular.module('feedbacks', [
         if (!itemModel.has('feedbacks')) {
             itemModel.set('feedbacks', new FeedbacksCollection());
         }
-        if (item.comments.list) {
-            itemModel.get('feedbacks').add(item.comments.list.slice(- MAX_COMMENTS_COUNT).map(function (feedback) {
-                feedback.owner_id = Number(feedback.from_id);
-                return {
-                    id: generateItemID('comment', feedback),
-                    type: 'comment',
-                    feedback: feedback,
-                    date: feedback.date
-                };
-            }));
-        } else {
-            Tracker.trackEvent(
-                'debug',
-                'item.comments.list is undefined',
-                JSON.stringify(item)
-            );
-        }
+        itemModel.get('feedbacks').add(item.comments.list.slice(- MAX_COMMENTS_COUNT).map(function (feedback) {
+            feedback.owner_id = Number(feedback.from_id);
+            return {
+                id: generateItemID('comment', feedback),
+                type: 'comment',
+                feedback: feedback,
+                date: feedback.date
+            };
+        }));
+
         lastCommentDate = itemModel.get('feedbacks').last().get('date');
         if (!itemModel.has('date') || itemModel.get('date') < lastCommentDate) {
             itemModel.set('date', lastCommentDate);
         }
+
         itemModel.trigger('change');
     }
     /**
