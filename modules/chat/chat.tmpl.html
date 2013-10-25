@@ -23,6 +23,11 @@
             <small class="chat__author" ng-if="dialog.author">{{dialog.author | name}}</small>
         </blockquote>
         <item-actions>
+            <!-- link to dialog -->
+            <item-action
+                anchor="{{'http://vk.com/im?sel=' + (dialog.chat_id ? 'c' + dialog.chat_id:dialog.uid)}}"
+                ng-class="'icon-external-link-sign'">
+            </item-action>
             <item-action
                 item-send-message
                 chat-id="dialog.chat_id"
