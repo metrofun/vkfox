@@ -11,7 +11,8 @@ angular.module('chat', [
     'common',
     'persistent-model',
     'router',
-    'browser'
+    'browser',
+    'tracker'
 ]).run(function (
     Users,
     Request,
@@ -23,7 +24,8 @@ angular.module('chat', [
     $filter,
     NOTIFICATIONS_CHAT,
     Router,
-    Browser
+    Browser,
+    Tracker
 ) {
     var
     MAX_HISTORY_COUNT = 10,
@@ -73,7 +75,7 @@ angular.module('chat', [
             persistentModel.on('change:latestMessageId', function () {
                 var messages = dialogColl.first().get('messages'),
                     message = messages[messages.length - 1],
-                    profile, gender;
+                    profile, profileModel, gender;
 
                 // don't notify on first run,
                 // when there is no previous value
@@ -82,7 +84,11 @@ angular.module('chat', [
                 }
 
                 if (!message.out) {
-                    profile = profilesColl.get(message.uid).toJSON();
+                    profileModel = profilesColl.get(message.uid);
+                    if (!profileModel) {
+                        Tracker.trackEvent('debug', 'profilesColl.get(message.uid) is undefined', message);
+                    }
+                    profile = profileModel.toJSON();
                     gender = profile.sex === 1 ? 'female':'male';
 
                     // Don't notify, when active tab is vk.com
