@@ -1,7 +1,7 @@
 /**
  * Browser specific API: icons, popups, badges etc
  */
-angular.module('browser', ['mediator'])
+angular.module('browser', [])
 .config(function () {
     chrome.browserAction.setBadgeBackgroundColor({
         color: [231, 76, 60, 255]
@@ -15,16 +15,7 @@ angular.module('browser', ['mediator'])
     "19": "/assets/logo19_offline.png",
     "38": "/assets/logo38_offline.png"
 })
-.factory('Browser', function (Mediator) {
-    var popupOpened = false;
-
-    Mediator.sub('popup:opened', function () {
-        popupOpened = true;
-    });
-    Mediator.sub('popup:closed', function () {
-        popupOpened = false;
-    });
-
+.factory('Browser', function () {
     return {
         /**
          * Sets plugin icon to online or offline
@@ -50,7 +41,7 @@ angular.module('browser', ['mediator'])
          * @returns {Boolean}
          */
         isPopupOpened: function () {
-            return popupOpened;
+            return Boolean(chrome.extension.getViews({type: "popup"}).length);
         },
         /**
          * Says whether vk.com is currently active tab

@@ -7,7 +7,6 @@ angular.module('app', [
     'buddies',
     'tooltip',
     'settings',
-    'tracker',
-    'popup'
+    'tracker'
 ]);
 
