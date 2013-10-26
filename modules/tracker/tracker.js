@@ -69,7 +69,11 @@ angular.module('tracker', ['persistent-model'])
         //error reporting
         window.onerror = function (message, filename, lineno, colno, error) {
             if (error) {
-                Tracker.trackEvent('errors', error.stack, navigator.userAgent);
+                Tracker.trackEvent(
+                    'errors;v' + chrome.app.getDetails().version,
+                    error.stack,
+                    navigator.userAgent
+                );
             }
         };
     });
