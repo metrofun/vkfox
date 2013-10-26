@@ -1,11 +1,17 @@
-angular.module('buddies', ['i18n', 'item-list', 'mediator'])
-    .controller('buddiesCtrl', function ($scope, $element, Mediator) {
-        $scope.filters = {
+angular.module('buddies', ['i18n', 'item-list', 'mediator', 'persistent-model'])
+    .controller('buddiesCtrl', function ($scope, $element, Mediator, PersistentModel) {
+        var filtersModel = new PersistentModel({
             male: true,
             female: true,
             offline: false,
             faves: true
-        };
+        }, {name: 'buddiesFilters'});
+
+        $scope.filters = filtersModel.toJSON();
+        $scope.$watch('filters', function (filters) {
+            filtersModel.set(filters);
+        }, true);
+
         $element.find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {
@@ -46,11 +52,13 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator'])
          *
          * @returns [Array]
          */
-        return function (input, filters, count, searchClue) {
+        return function (input, filters, searchClue) {
             if (Array.isArray(input)) {
                 return input.filter(function (profile) {
                     if (!searchClue) {
                         return (filters.offline || profile.online) && (
+                            // if "male" is checked, then proceed,
+                            // otherwise the profile should be a male
                             (filters.male || profile.sex !== 2)
                             && (filters.female || profile.sex !== 1)
                         ) && (filters.faves || !profile.isFave);

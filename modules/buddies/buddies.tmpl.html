@@ -48,7 +48,7 @@
     </div>
     <item-list>
         <item
-            item-list-repeat="friend in data | buddiesFilter:filters:25:searchClue track by friend.uid"
+            item-list-repeat="friend in data | buddiesFilter:filters:searchClue track by friend.uid"
             class="buddies__item {{friend.isFave && 'buddies__item_is-fave'}}"
             owners="friend">
             <span ng-if="friend.isFave">{{'Bookmarked' | i18n}}</span>

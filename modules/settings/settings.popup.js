@@ -14,8 +14,7 @@ angular.module('settings', [])
                 }, true);
             });
             Mediator.pub(moduleName + ':settings:get');
-            console.log(moduleName + ':settings:get');
-        })
+        });
         /**
          * Notifications
          */
