@@ -1,6 +1,22 @@
 angular.module('settings', [])
     .controller('settingsNotificationsCtrl', function ($scope, Mediator) {
         /**
+         * Similar interface for simple modules
+         */
+        ['forceOnline', 'yandex'].forEach(function (moduleName) {
+            Mediator.sub(moduleName + ':settings', function (settings) {
+                $scope.$apply(function () {
+                    $scope[moduleName] = settings;
+                });
+
+                $scope.$watch(moduleName, function (settings) {
+                    Mediator.pub(moduleName + ':settings:put', settings);
+                }, true);
+            });
+            Mediator.pub(moduleName + ':settings:get');
+            console.log(moduleName + ':settings:get');
+        })
+        /**
          * Notifications
          */
         Mediator.sub('notifications:settings', function (settings) {

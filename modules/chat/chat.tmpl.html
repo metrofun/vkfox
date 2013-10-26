@@ -4,6 +4,7 @@
         class="{{dialog.author && 'chat__item_out'}}"
         item-list-repeat="dialog in data track by dialog.id"
         owners="dialog.owners">
+        <!-- overwrite title from item-send-message directive -->
         <blockquote
             item-send-message
             title=""

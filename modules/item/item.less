@@ -43,13 +43,13 @@
        max-width: 70%;
        display: inline-block;
    }
-   &__head.is-online:after {
+   &__head.is-online .item__author:after {
        &:extend([class^="icon-"]);
        content: @ok-sign;
        display: inline-block;
        margin-left: 6px;
        color: @nephritis;
-       vertical-align: top;
+       vertical-align: baseline;
    }
    &__actions {
        position: absolute;

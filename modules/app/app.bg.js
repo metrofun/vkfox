@@ -8,5 +8,6 @@ angular.module('app', [
     'notifications',
     'router',
     'yandex',
-    'tracker'
+    'tracker',
+    'force-online'
 ]);

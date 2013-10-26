@@ -4,6 +4,14 @@
     ng-hide="!notifications"
     class="settings">
     <div class="settings__row">
+        <i class="icon-eye-open settings__icon"></i>
+        <label class="settings__label">{{'force online' | i18n}}</label>
+        <input
+            class="settings__input settings__checkbox"
+            ng-model="forceOnline.enabled"
+            type="checkbox" />
+    </div>
+    <div class="settings__row settings__separator">
         <i class="icon-bullhorn settings__icon"></i>
         <label class="settings__label">{{'notifications' | i18n}}</label>
         <input

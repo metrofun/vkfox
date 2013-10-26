@@ -19,11 +19,13 @@
         </div>
         <div ng-if="['post', 'comment', 'wall'].indexOf(item.type) !== -1">
             <p ng-if="item.parent.text" ng-bind-html-unsafe="item.parent.text | rectify"></p>
-            <item-attachment
-                ng-repeat="attachment in item.parent.attachments"
-                data="attachment[attachment.type]"
-                type="{{attachment.type}}">
-            </item-attachment>
+            <div>
+                <item-attachment
+                    ng-repeat="attachment in item.parent.attachments"
+                    data="attachment[attachment.type]"
+                    type="{{attachment.type}}">
+                </item-attachment>
+            </div>
         </div>
         <item-actions ng-if="item.comment">
             <item-action-comment
@@ -51,11 +53,13 @@
                -->
             <div ng-if="['comment', 'comments', 'reply'].indexOf(feedback.type) !== -1">
                 <span ng-bind-html-unsafe="feedback.feedback.text | rectify"></span>
-                <item-attachment
-                    ng-repeat="attachment in feedback.feedback.attachments"
-                    data="attachment[attachment.type]"
-                    type="{{attachment.type}}">
-                </item-attachment>
+                <div>
+                    <item-attachment
+                        ng-repeat="attachment in feedback.feedback.attachments"
+                        data="attachment[attachment.type]"
+                        type="{{attachment.type}}">
+                    </item-attachment>
+                </div>
             </div>
             <span ng-if="feedback.type == 'like'">
                 {{'Liked' | i18n}} <i class="icon-heart"></i>

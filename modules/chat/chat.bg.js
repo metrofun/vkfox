@@ -75,7 +75,7 @@ angular.module('chat', [
             persistentModel.on('change:latestMessageId', function () {
                 var messages = dialogColl.first().get('messages'),
                     message = messages[messages.length - 1],
-                    profile, profileModel, gender;
+                    profile, gender;
 
                 // don't notify on first run,
                 // when there is no previous value
@@ -84,15 +84,7 @@ angular.module('chat', [
                 }
 
                 if (!message.out) {
-                    profileModel = profilesColl.get(message.uid);
-                    if (!profileModel) {
-                        Tracker.trackEvent(
-                            'debug',
-                            'profilesColl.get(message.uid) is undefined',
-                            dialogColl.first().get('id')
-                        );
-                    }
-                    profile = profileModel.toJSON();
+                    profile = profilesColl.get(message.uid).toJSON();
                     gender = profile.sex === 1 ? 'female':'male';
 
                     // Don't notify, when active tab is vk.com
@@ -165,9 +157,6 @@ angular.module('chat', [
             if (dialog) {
                 dialog.get('messages').push(message);
                 removeReadMessages(dialog);
-                dialog.trigger('change');
-
-                return message;
             } else {
                 // TODO add parse function and move this code into dialogColl
                 dialogColl.add({
@@ -177,11 +166,12 @@ angular.module('chat', [
                     chat_active: message.chat_active,
                     messages: [message]
                 });
-
-                return fetchProfiles().then(function () {
-                    return message;
-                });
             }
+
+            return fetchProfiles().then(function () {
+                dialog.trigger('change');
+                return message;
+            });
         });
     }
     function fetchProfiles() {

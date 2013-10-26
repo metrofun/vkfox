@@ -8,12 +8,12 @@ angular.module('browser', ['mediator'])
     });
 })
 .constant('BROWSER_ICON_ONLINE', {
-    "19": "/images/logo19.png",
-    "38": "/images/logo38.png"
+    "19": "/assets/logo19.png",
+    "38": "/assets/logo38.png"
 })
 .constant('BROWSER_ICON_OFFLINE', {
-    "19": "/images/logo19_offline.png",
-    "38": "/images/logo38_offline.png"
+    "19": "/assets/logo19_offline.png",
+    "38": "/assets/logo38_offline.png"
 })
 .factory('Browser', function (Mediator) {
     var popupOpened = false;

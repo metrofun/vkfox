@@ -38,6 +38,7 @@
     "shared your photo": "shared your photo",
     "shared your video": "shared your video",
     "notifications": "notifications",
+    "force online": "Be always online",
     "sound": "sound",
     "signal": "signal",
     "volume": "volume",
@@ -53,6 +54,6 @@
     "close": "close",
     "Authorize VKfox with Vkontakte": "First you need to authorize VKfox to connect with VK.COM™. If you are doing this for the first time you will be asked to grant access to your account.",
     "Accept license agreement": "By installing this application you agree to all terms, conditions, and information of the <a anchor='http://vkfox.org.ua/license'>license agreement.</a>",
-    "Install Yandex search": "Please consider the supporting future development of VKfox by installing Yandex search.",
+    "Install Yandex search": "Please consider supporting future development of VKfox by installing Yandex search.",
     "Thank you!": "Thank you, installation is complete! Now this window can be closed."
 }

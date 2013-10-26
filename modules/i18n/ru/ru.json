@@ -38,6 +38,7 @@
     "shared your photo": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим фото",
     "shared your video": "{GENDER, select, male{поделился} female{поделилась} other{поделился}} вашим видео",
     "notifications": "уведомления",
+    "force online": "быть всегда он-лайн",
     "sound": "звук",
     "signal": "сигнал",
     "volume": "громкость",

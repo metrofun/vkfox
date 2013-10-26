@@ -101,7 +101,7 @@ module.exports = function (grunt) {
             build:  {
                 expand: true,
                 src: [
-                    'components/font-awesome/font/fontawesome-webfont.woff',
+                    'components/font-awesome/font/fontawesome-webfont.ttf',
                     'components/jquery/jquery.js',
                     'components/angular-unstable/angular.js',
                     'components/underscore/underscore.js',
@@ -116,7 +116,7 @@ module.exports = function (grunt) {
                     '!pages/*.tmpl.html',
                     'pages/*.js',
                     'pages/*.css',
-                    'images/*',
+                    'assets/**',
                     'manifest.json'
                 ],
                 dest: 'build/'
