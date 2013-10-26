@@ -19,7 +19,7 @@
             ng-model="notifications.enabled"
             type="checkbox" />
     </div>
-    <div class="settings__row settings__separator">
+    <div class="settings__row settings__row_sub">
         <i class="icon-volume-up settings__icon"></i>
         <label class="settings__label">{{'sound' | i18n}}</label>
         <input
@@ -28,7 +28,7 @@
             ng-disabled="!notifications.enabled"
             type="checkbox" />
     </div>
-    <div class="settings__row">
+    <div class="settings__row settings__row_sub">
         <label class="settings__label">{{'signal' | i18n}}</label>
         <select
             class="settings__input"
@@ -39,7 +39,7 @@
             <option value="modules/notifications/original.mp3">original</option>
         </select>
     </div>
-    <div class="settings__row">
+    <div class="settings__row settings__row_sub">
         <label class="settings__label">{{'volume' | i18n}}</label>
         <input
             class="settings__input"
@@ -50,7 +50,7 @@
             max="1"
             type="range"/>
     </div>
-    <div class="settings__row settings__separator">
+    <div class="settings__row settings__row_sub">
         <i class="settings__icon icon-bell-alt"></i>
         <label class="settings__label">{{'popups' | i18n}}</label>
         <input
@@ -59,7 +59,7 @@
             ng-disabled="!notifications.enabled"
             type="checkbox"/>
     </div>
-    <div class="settings__row">
+    <div class="settings__row settings__row_sub">
         <label class="settings__label">{{'show text' | i18n}}</label>
         <input
             class="settings__input settings__checkbox"
