@@ -38,7 +38,7 @@
             <item-action
                 ng-class="'chat__item-action_mark-read icon-bookmark'"
                 ng-if="dialog.isUnread"
-                ng-click="dialog.unreadHandler(dialog.messages)"
+                ng-click="dialog.unreadHandler(dialog.messages, $event)"
                 title="{{dialog.unreadTooltip}}">
             </item-action>
         </item-actions>

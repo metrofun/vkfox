@@ -6,7 +6,9 @@ angular.module('tooltip', []).run(function () {
             setTimeout(function () {
                 var $tooltip = jQuery(tooltip),
                     $inner = jQuery('.tooltip-inner', tooltip),
-                    offset = jQuery(window).width() - $tooltip.offset().left - $tooltip.width();
+                    //if no item, then will return outerWidth of root
+                    offset = $tooltip.parents('.item').add(window).outerWidth()
+                        - $tooltip.offset().left - $tooltip.width();
 
                 if (offset < 0) {
                     $inner.css({

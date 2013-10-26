@@ -8,8 +8,8 @@ angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
                 + _.pluck(messages, 'mid') + ']});'});
         }
 
-        function showTooltip() {
-            jQuery(this).data('tooltip').$tip.remove();
+        function showTooltip(messages, event) {
+            jQuery(event.currentTarget).data('tooltip').toggle();
         }
 
         Mediator.pub('chat:data:get');
