@@ -165,11 +165,13 @@ angular.module('chat', [
                     chat_id: message.chat_id,
                     chat_active: message.chat_active,
                     messages: [message]
-                });
+                }, {silent: true});
             }
 
             return fetchProfiles().then(function () {
-                dialog.trigger('change');
+                // important to trogger change, when profiles are available
+                // because will cause an error, when creating notifications
+                dialogColl.trigger('change');
                 return message;
             });
         });
