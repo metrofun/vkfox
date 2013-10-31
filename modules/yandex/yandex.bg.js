@@ -1,5 +1,5 @@
 angular.module('yandex', ['mediator',  'persistent-model'])
-.constant('YANDEX_QUERY_URL', 'http://beta.yandex.ru/yandsearch?clid=149180&text=')
+.constant('YANDEX_QUERY_URL', 'http://yandex.ru/yandsearch?clid=149180&text=')
 .constant('GOOGLE_URLS_OVERWRITE', [
     '*://*.google.com/*sourceid=chrome*',
     '*://*.google.ru/*sourceid=chrome*',
