@@ -1,30 +1,24 @@
-@itemIconSize: 35px;
+@itemIconSize: 30px;
+@itemPadding: 10px;
 .item {
-   @itemPadding: 10px;
-
    background: @white;
-   padding: @itemPadding;
    margin: 0;
    position: relative;
+   top: 0;
+   left: 0;
+   box-sizing: border-box;
+   padding: @itemPadding;
+   padding-top: @itemIconSize + 2 * @itemPadding;
+   border-top: 1px solid @clouds;
 
    .item {
-       padding-left: 0;
-       padding-right: 0;
-       width: 100%;
-
-       & + .item {
-           border: none;
-       }
-   }
-
-   & + .item {
-       border-top: 1px solid @clouds;
+       margin: 0 -@itemPadding;
+       border-top: none;
    }
 
    &__img {
         width: @itemIconSize;
         height: @itemIconSize;
-        /* .background-size(cover); */
         background-position: center;
         position: relative;
         opacity: 0.9;
@@ -35,15 +29,17 @@
             opacity: 1;
         }
    }
-   &__head {
+   &__title {
+       width: 60%;
+       padding-left: @itemPadding;
        display: block;
    }
    &__author {
        .text-overflow();
-       max-width: 70%;
+       max-width: 100%;
        display: inline-block;
    }
-   &__head.is-online .item__author:after {
+   &__title.is-online .item__author:after {
        &:extend([class^="icon-"]);
        content: @ok-sign;
        display: inline-block;
@@ -53,8 +49,12 @@
    }
    &__actions {
        position: absolute;
-       right: @itemPadding;
-       top: @itemPadding;
+       height: @itemIconSize + 2 * @itemPadding;
+       padding-right: @itemPadding;
+       display: flex;
+       align-items: center;
+       top: 0;
+       right: 0;
        font-size: 14px;
    }
    &:hover .item__action {
@@ -74,7 +74,7 @@
    &__reply {
        background-color: #f5f5f5;
        padding: @itemPadding;
-       margin: @itemPadding -@itemPadding -@itemPadding;
+       margin: @itemPadding  -@itemPadding -@itemPadding;
        border-top: 1px solid #ddd;
        .box-shadow(inset 0 1px 0 @white);
        position: relative;
@@ -110,6 +110,19 @@
             margin: 0;
         }
     }
+}
+.item__header {
+    height: @itemIconSize + 2 * @itemPadding;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin: 0 @itemPadding;
+    position: absolute;
+    display: flex;
+    align-items: center;
+}
+.item__body {
+    padding-left: @itemIconSize + @itemPadding;
 }
 .item__action-active {
     opacity: 1;

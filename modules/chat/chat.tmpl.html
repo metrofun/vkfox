@@ -1,46 +1,62 @@
 <navigation></navigation>
 <item-list class="chat" ng-controller="ChatCtrl">
-    <item
-        class="{{dialog.author && 'chat__item_out'}}"
-        item-list-repeat="dialog in data track by dialog.id"
-        owners="dialog.owners">
-        <!-- overwrite title from item-send-message directive -->
-        <blockquote
-            item-send-message
-            title=""
-            chat-id="dialog.chat_id"
-            uid="dialog.uid"
-            class="chat__item-content">
-            <p ng-repeat="message in dialog.messages">
-                <span ng-bind-html-unsafe="message.body | rectify:message.emoji"></span>
-                <!-- line break before photos etc -->
-                <br ng-if="message.attachments"/>
-                <item-attachment
-                    ng-repeat="attachment in message.attachments"
-                    data="attachment[attachment.type]"
-                    type="{{attachment.type}}">
-                </item-attachment>
-            </p>
-            <small class="chat__author" ng-if="dialog.author">{{dialog.author | name}}</small>
-        </blockquote>
-        <item-actions>
-            <!-- link to dialog -->
-            <item-action
-                anchor="{{'http://vk.com/im?sel=' + (dialog.chat_id ? 'c' + dialog.chat_id:dialog.uid)}}"
-                ng-class="'icon-external-link-sign'">
-            </item-action>
-            <item-action
+    <div
+        item-list-repeat="dialog in dialogs track by dialog.id"
+        ng-controller="ChatItemCtrl">
+        <item owners="owners">
+            <!-- overwrite title from item-send-message directive -->
+            <blockquote
+                ng-repeat="messages in foldedMessages"
                 item-send-message
+                title=""
                 chat-id="dialog.chat_id"
                 uid="dialog.uid"
-                ng-class="'icon-envelope'">
-            </item-action>
-            <item-action
-                ng-class="'chat__item-action_mark-read icon-bookmark'"
-                ng-if="dialog.isUnread"
-                ng-click="dialog.unreadHandler(dialog.messages, $event)"
-                title="{{dialog.unreadTooltip}}">
-            </item-action>
-        </item-actions>
-    </item>
+                class="chat__item-content">
+                <div ng-class="{chat__messages_out: messages.out}">
+                    <p ng-repeat="message in messages.items">
+                        <span ng-bind-html-unsafe="message.body | rectify:message.emoji"></span>
+                        <!-- line break before photos etc -->
+                        <br ng-if="message.attachments && message.body"/>
+                        <item-attachment
+                            ng-repeat="attachment in message.attachments"
+                            data="attachment[attachment.type]"
+                            type="{{attachment.type}}">
+                        </item-attachment>
+                    </p>
+                    <!-- {{messages.author | json}} -->
+                    <small
+                        class="chat__author"
+                        ng-if="messages.author !== owners">{{messages.author | name}}</small>
+                </div>
+            </blockquote>
+            <!-- TODO item-actions and ChatActionsCtrl on single node -->
+            <div ng-controller=ChatActionsCtrl>
+                <item-actions>
+                    <item-action
+                        ng-click="showHistory(dialog)"
+                        title="{{'Show history' | i18n}}"
+                        ng-class="'icon-time'">
+                    </item-action>
+                    <!-- link to dialog -->
+                    <item-action
+                        anchor="{{'http://vk.com/im?sel=' + (dialog.chat_id ? 'c' + dialog.chat_id:dialog.uid)}}"
+                        title="{{'Open in New Tab' | i18n}}"
+                        ng-class="'icon-external-link-sign'">
+                    </item-action>
+                    <item-action
+                        item-send-message
+                        chat-id="dialog.chat_id"
+                        uid="dialog.uid"
+                        ng-class="'icon-envelope'">
+                    </item-action>
+                    <item-action
+                        ng-class="'chat__item-action_mark-read icon-bookmark'"
+                        ng-if="unread"
+                        ng-click="unreadHandler($event)"
+                        title="{{out ? 'Your message wasn\'t read':'Mark as read' | i18n}}">
+                    </item-action>
+                </item-actions>
+            </div>
+        </item>
+    </div>
 </item-list>

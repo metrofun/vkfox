@@ -1,9 +1,5 @@
-<!--
-   - If user alreadt liked, than 'can_like' is '0'.
-   - In posts on own wall there is no 'can_like' property
-   -->
 <i
     ng-class="{'item__action-like_liked': likes.user_likes}"
-    ng-if="likes.can_like || likes.user_likes || (likes && likes.can_like === undefined)"
+    ng-show="likes.can_like || likes.user_likes || (likes && likes.can_like === undefined)"
     class="item__action icon-heart">
 </i>

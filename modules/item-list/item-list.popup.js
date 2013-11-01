@@ -1,4 +1,42 @@
 angular.module('item-list', [])
+    /**
+     * Adds an effect of sticky header for items,
+     * when scrolling (aka Instagram effect)
+     */
+    .directive('itemListFixedHeader', function () {
+        var HEADER_HEIGHT = 50;
+        return {
+            link: function (scope, element, attrs) {
+                var listTop = element.offset().top,
+                lastTopVisibleElement;
+
+                jQuery(element).bind('scroll', _.debounce(function () {
+                    var topVisibleElement = document.elementFromPoint(0, listTop),
+                    element = jQuery(topVisibleElement),
+                    itemBottom;
+
+                    if (!element.hasClass('item')) {
+                        return;
+                    }
+                    itemBottom = element.offset().top + element.outerHeight();
+
+                    if (topVisibleElement !== lastTopVisibleElement) {
+                        if (lastTopVisibleElement) {
+                            lastTopVisibleElement.className = 'item';
+                        }
+                        lastTopVisibleElement = topVisibleElement;
+                    }
+                    if (itemBottom - listTop > HEADER_HEIGHT) {
+                        topVisibleElement.className = 'item item_fixed_window';
+                    } else if (itemBottom - listTop > 0) {
+                        topVisibleElement.className = 'item item_fixed_bottom';
+                    } else {
+                        topVisibleElement.className = 'item';
+                    }
+                }, 10));
+            }
+        };
+    })
     .directive('itemList', function () {
         return {
             templateUrl: '/modules/item-list/item-list.tmpl.html',
@@ -96,7 +134,7 @@ angular.module('item-list', [])
                                 + itemListElement.height() + itemListElement.scrollTop();
 
                         if (cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
-                            itemListElement.one('scroll', $scope.$apply.bind($scope, function () {
+                            itemListElement.one('scroll.itemListRepeat', $scope.$apply.bind($scope, function () {
                                 updateScrolledBlocks(
                                     collection,
                                     cursor,
@@ -175,7 +213,7 @@ angular.module('item-list', [])
                         if (!collection) {
                             collection = [];
                         }
-                        itemListElement.unbind('scroll');
+                        itemListElement.unbind('scroll.itemListRepeat');
 
                         // locate existing items
                         length = nextBlockOrder.length = collection.length;

@@ -2,4 +2,39 @@
     height: 400px;
     overflow-y: scroll;
     overflow-x: hidden;
+    position: relative;
+}
+
+.item_fixed_window .item__header,
+.item_fixed_window .item__actions {
+    position: fixed;
+    z-index: 999;
+    top: 82px;
+    background: white;
+
+    .chat & {
+        top: 41px;
+    }
+}
+.item_fixed_window .item .item__header,
+.item_fixed_window .item .item__actions {
+    position: absolute;
+    top: 0;
+    z-index: 0;
+    background: transparent;
+}
+
+.item_fixed_bottom .item__header,
+.item_fixed_bottom .item__actions {
+    bottom: 0;
+    top: auto;
+    z-index: 999;
+    background: white;
+}
+.item_fixed_bottom .item .item__header,
+.item_fixed_bottom .item .item__actions {
+    bottom: auto;
+    top: 0;
+    z-index: 0;
+    background: transparent;
 }

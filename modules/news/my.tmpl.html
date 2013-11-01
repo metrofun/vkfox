@@ -1,4 +1,7 @@
-<item-list ng-controller="MyNewsController" class="news_type_my">
+<item-list
+    item-list-fixed-header
+    ng-controller="MyNewsController"
+    class="news_type_my">
     <item
         item-list-repeat="item in data.items track by item.id"
         owners="data.profiles | where:'id':item.parent.owner_id">

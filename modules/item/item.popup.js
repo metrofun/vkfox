@@ -166,6 +166,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
         return {
             templateUrl: '/modules/item/action-like.tmpl.html',
             restrict: 'E',
+            replace: true,
             scope: {
                 // Default type is 'post'
                 type: '=?',
@@ -196,6 +197,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             require: '^item',
             template: '<i class="item__action icon-comment"></i>',
             restrict: 'E',
+            replace: true,
             scope: {
                 type: '=?',
                 ownerId: '=?',
@@ -221,20 +223,20 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
                         }
                         break;
                     case 'topic':
-                        params.gid = Math.abs(scope.ownerId),
-                        params.tid = scope.id,
+                        params.gid = Math.abs(scope.ownerId);
+                        params.tid = scope.id;
                         params.text = message;
                         method = 'board.addComment';
                         break;
                     case 'photo':
-                        params.oid = scope.ownerId,
-                        params.pid = scope.id,
+                        params.oid = scope.ownerId;
+                        params.pid = scope.id;
                         params.message = message;
                         method = 'photos.createComment';
                         break;
                     case 'video':
-                        params.owner_id = scope.ownerId,
-                        params.video_id = scope.id,
+                        params.owner_id = scope.ownerId;
+                        params.video_id = scope.id;
                         params.message = message;
                         method = 'video.createComment';
                         break;

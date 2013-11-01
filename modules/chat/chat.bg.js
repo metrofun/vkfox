@@ -181,9 +181,11 @@ angular.module('chat', [
             dialog.get('messages').map(function (message) {
                 var chatActive = message.chat_active;
                 if (chatActive) {
+                    // unfortunately chatActive sometimes
+                    // don't contain actual sender
                     uids = uids.concat(chatActive.map(function (uid) {
                         return Number(uid);
-                    })).concat(userId);
+                    })).concat(userId, message.uid);
                 } else {
                     uids = uids.concat([message.uid, dialog.get('uid')]);
                 }
