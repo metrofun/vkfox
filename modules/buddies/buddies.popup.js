@@ -1,5 +1,5 @@
-angular.module('buddies', ['i18n', 'item-list', 'mediator', 'persistent-model'])
-    .controller('buddiesCtrl', function ($scope, $element, Mediator, PersistentModel) {
+angular.module('buddies', ['i18n', 'item-list', 'mediator', 'persistent-model', 'common'])
+    .controller('buddiesCtrl', function ($scope, $element, Mediator, PersistentModel, $filter) {
         var filtersModel = new PersistentModel({
             male: true,
             female: true,
@@ -22,6 +22,16 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator', 'persistent-model'])
         Mediator.pub('buddies:data:get');
         Mediator.sub('buddies:data', function (data) {
             $scope.$apply(function () {
+                data.filter(function (buddie) {
+                    return buddie.lastActivityTime;
+                }).forEach(function (buddie) {
+                    var gender = buddie.sex === 1 ? 'female':'male';
+
+                    buddie.description = $filter('i18n')(
+                        buddie.online ? 'is_online_short':'went_offline_short',
+                        gender
+                    ) + ' ' + $filter('timeago')(buddie.lastActivityTime);
+                });
                 $scope.data = data;
             });
         }.bind(this));
@@ -56,12 +66,13 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator', 'persistent-model'])
             if (Array.isArray(input)) {
                 return input.filter(function (profile) {
                     if (!searchClue) {
-                        return (filters.offline || profile.online) && (
+                        return profile.isWatched || (
+                            (filters.offline || profile.online)
                             // if "male" is checked, then proceed,
                             // otherwise the profile should be a male
-                            (filters.male || profile.sex !== 2)
-                            && (filters.female || profile.sex !== 1)
-                        ) && (filters.faves || !profile.isFave);
+                            && ((filters.male || profile.sex !== 2) && (filters.female || profile.sex !== 1))
+                            && (filters.faves || !profile.isFave)
+                        );
                     } else {
                         return matchProfile(profile, searchClue);
                     }

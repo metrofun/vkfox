@@ -12,11 +12,12 @@
                     <i class="icon-user"></i>{{owners.length}}
                 </div>
             </div>
-            <strong
+            <span
                 ng-class="{'is-online': owners.online}"
                 class="item__title">
                 <span class="item__author">{{owners | name}}</span>
-            </strong>
+                <span ng-if="description" class="item__description">{{description}}</span>
+            </span>
         </div>
         <div class="item__body clearfix" ng-transclude>
         </div>

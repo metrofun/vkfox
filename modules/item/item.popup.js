@@ -38,6 +38,7 @@ angular.module('item', ['common', 'ui.keypress', 'request', 'anchor', 'mediator'
             restrict: 'E',
             scope: {
                 owners: '=',
+                description: '@?',
                 reply: '=?',
                 'class': '@'
             }

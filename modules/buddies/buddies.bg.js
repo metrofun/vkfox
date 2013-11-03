@@ -19,18 +19,47 @@ angular.module('buddies', [
         watchedBuddiesSet = new PersistentSet('watchedBuddies'),
         buddiesColl = new (ProfilesCollection.extend({
             model: Backbone.Model.extend({
-                idAttribute: 'uid'
+                idAttribute: 'uid',
+                // Automatically set last activity time
+                // for all watched items
+                initialize: function () {
+                    this.on('change:isWatched', function (model) {
+                        if (model.get('isWatched')) {
+                            Request.api({
+                                code: 'return API.messages.getLastActivity({user_id: '
+                                    + model.get('uid') + '})'
+                            }).then(function (response) {
+                                model
+                                    .set('online', response.online)
+                                    .set('lastActivityTime', response.time * 1000);
+
+                                buddiesColl.sort();
+                            });
+                        } else {
+                            model.unset('lastActivityTime');
+                        }
+                        buddiesColl.sort();
+                    });
+                }
             }),
             comparator: function (buddie) {
                 if (buddie.get('isWatched')) {
-                    return -2;
+                    if (buddie.get('lastActivityTime')) {
+                        return -buddie.get('lastActivityTime');
+                    } else {
+                        return -2;
+                    }
                 } else if (buddie.get('isFave')) {
                     return -1;
                 } else {
                     return buddie.get('originalIndex') || 0;
                 }
             }
-        }))();
+        }))(),
+        publishData = _.debounce(function () {
+            Mediator.pub('buddies:data', buddiesColl.toJSON());
+        }, 0);
+
 
     /**
      * Initialize all state
@@ -42,9 +71,7 @@ angular.module('buddies', [
             }
             readyDeferred = jQuery.Deferred();
         }
-        readyDeferred.then(function () {
-            Mediator.pub('buddies:data', buddiesColl.toJSON());
-        });
+        readyDeferred.then(publishData);
     }
     initialize();
 
@@ -86,6 +113,19 @@ angular.module('buddies', [
         });
     }
 
+    /**
+     * Extends buddiesColl with information
+     * about watched persons
+     */
+    function setWatchedBuddies() {
+        watchedBuddiesSet.toArray().forEach(function (uid) {
+            var model = buddiesColl.get(uid);
+            if (model) {
+                model.set('isWatched', true);
+            }
+        });
+    }
+
     // entry point
     Mediator.sub('auth:success', function () {
         initialize();
@@ -97,35 +137,27 @@ angular.module('buddies', [
             buddiesColl.reset([].concat(favourites, friends));
 
             saveOriginalBuddiesOrder();
+            setWatchedBuddies();
 
-            watchedBuddiesSet.toArray().forEach(function (uid) {
-                var model = buddiesColl.get(uid);
-                if (model) {
-                    model.set('isWatched', true);
-                }
-            });
-            // resort if any profile was changed
-            if (watchedBuddiesSet.size()) {
-                buddiesColl.sort();
-            }
             readyDeferred.resolve();
         });
     });
 
     Mediator.sub('buddies:data:get', function () {
-        readyDeferred.then(function () {
-            Mediator.pub('buddies:data', buddiesColl.toJSON());
-        });
+        readyDeferred.then(publishData);
     });
 
     readyDeferred.then(function () {
         buddiesColl.on('change', function (model) {
             var profile = model.toJSON(), gender;
 
-            // Notify about watched buddies
             if (profile.isWatched && model.changed.hasOwnProperty('online')) {
+                model.set({
+                    'lastActivityTime': Date.now()
+                }, {silent: true});
                 gender = profile.sex === 1 ? 'female':'male';
 
+                // Notify about watched buddies
                 NotificationsQueue.push({
                     type: NOTIFICATIONS_BUDDIES,
                     title: [
@@ -138,8 +170,10 @@ angular.module('buddies', [
                     image: model.get('photo'),
                     noBadge: true
                 });
+
+                buddiesColl.sort();
             }
-            Mediator.pub('buddies:data', buddiesColl.toJSON());
+            publishData();
         });
     });
 
@@ -150,10 +184,6 @@ angular.module('buddies', [
         } else {
             watchedBuddiesSet.add(uid);
             buddiesColl.get(uid).set('isWatched', true);
-        }
-        if (buddiesColl.get(uid).hasChanged()) {
-            buddiesColl.sort();
-            Mediator.pub('buddies:data', buddiesColl.toJSON());
         }
     });
 });

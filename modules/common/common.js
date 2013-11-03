@@ -14,6 +14,13 @@ angular.module('common', ['config', 'i18n'])
             }
         };
     })
+    .filter('timeago', function () {
+        return function (timestamp) {
+            if (timestamp) {
+                return moment(timestamp).fromNow();
+            }
+        };
+    })
     .filter('capitalize', function () {
         /**
          * Returns capitalized text
