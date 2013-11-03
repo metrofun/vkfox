@@ -8,9 +8,16 @@ angular.module('item-list', [])
         return {
             link: function (scope, element, attrs) {
                 var listTop = element.offset().top,
-                lastTopVisibleElement;
+                    lastTopVisibleElement,
+                    contentElement = jQuery('.item-list__content', element),
+                    SCROLLBAR_WIDTH = contentElement.width()
+                        - contentElement.find('.item-list__scroll').width();
 
-                jQuery(element).bind('scroll', _.debounce(function () {
+                jQuery('<style>.item_fixed_window .item__header,'
+                    + ' .item_fixed_window .item__actions { right: '
+                    + SCROLLBAR_WIDTH + 'px;}</style>').appendTo('head');
+
+                contentElement.bind('scroll', _.debounce(function () {
                     var topVisibleElement = document.elementFromPoint(0, listTop),
                     element = jQuery(topVisibleElement),
                     itemBottom;
