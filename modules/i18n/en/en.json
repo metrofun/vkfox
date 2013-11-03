@@ -48,6 +48,8 @@
     "volume": "volume",
     "popups": "popups",
     "show text": "show message text",
+    "show all": "show all",
+    "hide": "show less",
     "Yandex search": "Yandex search",
     "install_noun": "install",
     "install_verb": "install",

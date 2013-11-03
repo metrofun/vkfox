@@ -47,8 +47,14 @@
                 likes="item.parent.likes">
             </item-action-like>
         </item-actions>
+        <span
+            ng-if="item.feedbacks.length > 3"
+            class="btn news__show-all"
+            ng-click="item.showAllFeedbacks = !item.showAllFeedbacks">
+            {{item.showAllFeedbacks ? 'hide':'show all' | i18n}}
+        </span>
         <item
-            ng-repeat="feedback in item.feedbacks"
+            ng-repeat="feedback in item.feedbacks|slice:item.showAllFeedbacks ? 0:-3"
             owners="data.profiles | where:'id':feedback.feedback.owner_id">
             <!--
                - 'mention_commentS' type in notifications
