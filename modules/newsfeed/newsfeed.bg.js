@@ -172,7 +172,7 @@ angular.module(
                 type: 'friend'
             }).map(function (model) {
                 // first element contains quantity
-                return model.get('friends').slice(1);
+                return (model.get('friends') || []).slice(1);
             })).chain().flatten().pluck('uid').value();
 
             // gather required profiles from source_ids
