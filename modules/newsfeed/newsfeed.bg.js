@@ -1,7 +1,7 @@
 angular.module(
     'newsfeed',
-    ['auth', 'mediator', 'request', 'likes']
-).run(function (Request, Mediator) {
+    ['auth', 'mediator', 'request', 'likes', 'tracker']
+).run(function (Request, Mediator, Tracker) {
     var MAX_ITEMS_COUNT = 50,
         UPDATE_PERIOD = 10000, //ms
 
@@ -102,10 +102,17 @@ angular.module(
                 // type "photo" item has "photos" property; note - notes etc
                 propertyName = typeToPropertyMap[collisionItem.type];
 
-                collection.add(item[propertyName].slice(1), {parse: true});
-                collection.add(collisionItem[propertyName].slice(1), {parse: true});
+                try {
+                    collection.add(item[propertyName].slice(1), {parse: true});
+                    collection.add(collisionItem[propertyName].slice(1), {parse: true});
 
-                item[propertyName] = [collection.size()].concat(collection.toJSON());
+                    item[propertyName] = [collection.size()].concat(collection.toJSON());
+                } catch (event) {
+                    Tracker.trackEvent(
+                        'debug;v' + chrome.app.getDetails().version,
+                        JSON.stringify([collisionItem, item, event.stack])
+                    );
+                }
             }
         }
 
