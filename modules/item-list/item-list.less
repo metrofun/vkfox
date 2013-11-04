@@ -9,15 +9,19 @@
 
 .item_fixed_window,
 .item_fixed_bottom {
+    &  .item__header {
+        #gradient > .vertical(white, fade(white, 70%));
+    }
     &  .item__header,
     &  .item__actions {
         z-index: 999;
-        background: white;
+    }
+    & .item .item__actions {
+        background: transparent;
     }
     & .item .item__header,
     & .item .item__actions {
         z-index: auto;
-        background: transparent;
     }
 }
 .item_fixed_window {
