@@ -26,7 +26,7 @@
                     <!-- {{messages.author | json}} -->
                     <small
                         class="chat__author"
-                        ng-if="messages.author !== owners">{{messages.author | name}}</small>
+                        ng-if="messages.author.uid !== owners.uid">{{messages.author | name}}</small>
                 </div>
             </blockquote>
             <!-- TODO item-actions and ChatActionsCtrl on single node -->
