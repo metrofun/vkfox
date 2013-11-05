@@ -3,7 +3,10 @@
     <div
         item-list-repeat="dialog in dialogs track by dialog.id"
         ng-controller="ChatItemCtrl">
-        <item owners="owners">
+        <!-- show time of last (most recent) message -->
+        <item
+            description="{{(dialog.messages | slice:-1)[0].date * 1000 | timeago}}"
+            owners="owners">
             <!-- overwrite title from item-send-message directive -->
             <blockquote
                 ng-repeat="messages in foldedMessages"
