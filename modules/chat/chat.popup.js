@@ -96,7 +96,7 @@ angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
                 $scope.$apply(function () {
                     //remove first item, which contains count
                     messages.shift();
-                    [].unshift.apply(dialog.messages, messages);
+                    [].unshift.apply(dialog.messages, messages.reverse());
                 });
             });
         };
