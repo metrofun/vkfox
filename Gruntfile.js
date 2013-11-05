@@ -102,6 +102,8 @@ module.exports = function (grunt) {
                 expand: true,
                 src: [
                     'components/font-awesome/font/fontawesome-webfont.ttf',
+                    'components/emoji/lib/emoji.png',
+                    'components/emoji/lib/emoji.css',
                     'components/jquery/jquery.js',
                     'components/angular-unstable/angular.js',
                     'components/underscore/underscore.js',
