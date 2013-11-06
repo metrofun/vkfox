@@ -1,5 +1,5 @@
-angular.module('news', ['mediator', 'navigation', 'rectify', 'request'])
-    .factory('News', function (Mediator) {
+angular.module('news', ['mediator', 'navigation', 'rectify', 'request', 'config'])
+    .factory('News', function (Mediator, VK_BASE) {
         return {
             unsubscribe: function (type, ownerId, itemId) {
                 var options = {
@@ -9,15 +9,50 @@ angular.module('news', ['mediator', 'navigation', 'rectify', 'request'])
                 };
                 Mediator.pub('feedbacks:unsubscribe', options);
             },
+            /**
+             * Returns link to the original item on vk.com
+             *
+             * @param {Object} item
+             * @returns {String}
+             */
+            getSourceLink: function (item) {
+                var parent = item.parent;
+
+                switch (item.type) {
+                    case 'wall':
+                    case 'post':
+                    // case 'mention':
+                        return VK_BASE + 'wall'
+                            + (parent.to_id || parent.source_id) + '_'
+                            + (parent.post_id || parent.id);
+                    case 'comment':
+                        // generate link to parent item
+                        return ['post', 'topic', 'photo', 'video']
+                            .filter(Object.hasOwnProperty, parent)
+                            .map(function (type) {
+                                return this.getSourceLink({type: type, parent: parent[type]});
+                            }, this)[0];
+                    case 'topic':
+                        return VK_BASE + 'topic' + parent.owner_id
+                            + '_' + (parent.id || parent.post_id || parent.tid)
+                            + '?offset=last&scroll=1';
+                    case 'photo':
+                        return VK_BASE + 'photo' + parent.owner_id
+                            + '_' + (parent.id || parent.pid);
+                    case 'video':
+                        return VK_BASE + 'video' + parent.owner_id
+                            + '_' + (parent.id || parent.vid);
+                }
+            },
             getCommentsData: function (item) {
-                var comment, parent = item.parent, type;
+                var parent = item.parent;
 
                 switch (item.type) {
                     case 'wall':
                     case 'post':
                     case 'mention':
                         if (parent.comments.can_post) {
-                            comment = {
+                            return {
                                 ownerId: parent.owner_id,
                                 id: parent.id || parent.post_id,
                                 type: 'post'
@@ -26,56 +61,41 @@ angular.module('news', ['mediator', 'navigation', 'rectify', 'request'])
                         break;
                     case 'comment':
                         if (parent.post && parent.post.comments.can_post) {
-                            comment = {
+                            return {
                                 ownerId: parent.post.from_id,
                                 id: parent.post.id,
                                 replyTo: item.parent.id,
                                 type: 'post'
                             };
                         } else if (parent.topic && !parent.topic.is_closed) {
-                            comment = {
-                                ownerId: parent.topic.owner_id,
-                                id: parent.topic.tid,
-                                type: 'topic'
-                            };
+                            return this.getCommentsData({type: 'topic', parent: parent.topic});
                         } else {
-                            if (parent.photo) {
-                                type = 'photo';
-                            } else if (parent.video) {
-                                type = 'video';
-                            }
-                            if (type) {
-                                comment = {
-                                    ownerId: parent[type].owner_id,
-                                    id: parent[type].id,
-                                    type: type
-                                };
-                            }
+                            return ['photo', 'video']
+                                .filter(Object.hasOwnProperty, parent)
+                                .map(function (type) {
+                                    return this.getSourceLink({type: type, parent: parent[type]});
+                                }, this)[0];
                         }
                         break;
                     case 'topic':
-                        comment = {
+                        return {
                             ownerId: parent.owner_id,
-                            id: parent.id || parent.post_id,
+                            id: parent.id || parent.tid || parent.post_id,
                             type: 'topic'
                         };
-                        break;
                     case 'photo':
-                        comment = {
+                        return {
                             ownerId: parent.owner_id,
-                            id: parent.pid,
+                            id: parent.id || parent.pid,
                             type: 'photo'
                         };
-                        break;
                     case 'video':
-                        comment = {
+                        return {
                             ownerId: parent.owner_id,
                             id: parent.id || parent.vid,
                             type: 'video'
                         };
-                        break;
                 }
-                return comment;
             }
         };
     })
@@ -96,20 +116,18 @@ angular.module('news', ['mediator', 'navigation', 'rectify', 'request'])
         ];
         $scope.activeSubTab = $routeParams.subtab;
     })
-    .controller('MyNewsController', function ($scope, Mediator, News) {
-        $scope.unsubscribe = News.unsubscribe;
+    .controller('MyNewsController', function ($scope, Mediator) {
         Mediator.pub('feedbacks:data:get');
         Mediator.sub('feedbacks:data', function (data) {
             $scope.$apply(function () {
-                if (data.items && data.items.length) {
-                    data.items.forEach(function (item) {
-                        item.comment = News.getCommentsData(item);
-                    });
-
-                    $scope.data = data;
-                }
+                $scope.data = data;
             });
         });
+    })
+    .controller('MyNewsActionsCtrl', function ($scope, News) {
+        $scope.unsubscribe = News.unsubscribe;
+        $scope.comment = News.getCommentsData($scope.item);
+        $scope.open = News.getSourceLink($scope.item);
     })
     .controller('FriendNewsController', function ($scope, Mediator) {
         Mediator.pub('newsfeed:friends:get');

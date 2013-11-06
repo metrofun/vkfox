@@ -30,23 +30,33 @@
                 </item-attachment>
             </div>
         </div>
-        <item-actions ng-if="item.comment">
-            <i  ng-click="unsubscribe(item.comment.type, item.comment.ownerId, item.comment.id)"
-                title="{{'unsubscribe' | i18n | capitalize}}"
-                class="item__action icon-ban-circle"></i>
-            <item-action-comment
-                type="item.comment.type"
-                owner-id="item.comment.ownerId"
-                reply-to="item.comment.replyTo"
-                id="item.comment.id">
-            </item-action-comment>
-            <item-action-like
-                type="item.comment.type"
-                owner-id="item.comment.ownerId"
-                item-id="item.comment.id"
-                likes="item.parent.likes">
-            </item-action-like>
-        </item-actions>
+        <div ng-controller="MyNewsActionsCtrl">
+            <item-actions>
+                <i  ng-click="unsubscribe(comment.type, comment.ownerId, comment.id)"
+                    title="{{'unsubscribe' | i18n | capitalize}}"
+                    class="item__action icon-ban-circle"></i>
+                <item-action
+                    ng-if="open"
+                    anchor="{{open}}"
+                    title="{{'Open in New Tab' | i18n}}"
+                    ng-class="'icon-external-link-sign'">
+                </item-action>
+                <item-action-comment
+                    ng-if="comment"
+                    type="comment.type"
+                    owner-id="comment.ownerId"
+                    reply-to="comment.replyTo"
+                    id="comment.id">
+                </item-action-comment>
+                <item-action-like
+                    ng-if="comment"
+                    type="comment.type"
+                    owner-id="comment.ownerId"
+                    item-id="comment.id"
+                    likes="parent.likes">
+                </item-action-like>
+            </item-actions>
+        </div>
         <span
             ng-if="item.feedbacks.length > 3"
             class="btn news__show-all"

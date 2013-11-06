@@ -1,7 +1,7 @@
 {
     // Settings
-    "passfail"      : true,  // Stop on first error.
-    "maxerr"        : 1,    // Maximum errors before stopping.
+    "passfail"      : false,  // Stop on first error.
+    "maxerr"        : 0,    // Maximum errors before stopping.
     "unused"        : true,
 
 
