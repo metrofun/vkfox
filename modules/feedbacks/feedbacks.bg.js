@@ -7,8 +7,7 @@ angular.module('feedbacks', [
     'notifications',
     'common',
     'browser',
-    'router',
-    'tracker'
+    'router'
 ]).run(function (
     Request,
     Mediator,
@@ -18,8 +17,7 @@ angular.module('feedbacks', [
     $filter,
     NOTIFICATIONS_NEWS,
     Browser,
-    Router,
-    Tracker
+    Router
 ) {
     var
     MAX_ITEMS_COUNT = 50,
@@ -75,7 +73,7 @@ angular.module('feedbacks', [
         }
 
         if (itemModel.has('feedbacks')) { // notification has parent, e.g. comment to post, like to video etc
-            lastFeedback = itemModel.get('feedbacks').last(),
+            lastFeedback = itemModel.get('feedbacks').last();
             notificationItem = lastFeedback.get('feedback');
             type = lastFeedback.get('type');
             parentType = itemModel.get('type');
@@ -89,8 +87,8 @@ angular.module('feedbacks', [
         // Don't show self messages
         if (ownerId !== userId) {
             try {
-                profile = profilesColl.get(ownerId).toJSON(),
-                name = $filter('name')(profile),
+                profile = profilesColl.get(ownerId).toJSON();
+                name = $filter('name')(profile);
                 gender = profile.sex === 1 ? 'female':'male';
             } catch (e) {
                 console.log(ownerId, profile, name);
@@ -184,11 +182,11 @@ angular.module('feedbacks', [
 
         autoUpdateNotificationsParams = {
             count: MAX_ITEMS_COUNT
-        },
+        };
         autoUpdateCommentsParams = {
             last_comments: 1,
             count: MAX_ITEMS_COUNT
-        },
+        };
         itemsColl.reset();
         profilesColl.reset();
         fetchFeedbacks();
@@ -244,6 +242,17 @@ angular.module('feedbacks', [
         itemModel.trigger('change');
     }
     /**
+     * Returns true for supported feedback types
+     * @param {String} type
+     *
+     * @returns {Boolean}
+     */
+    function isSupportedType(type) {
+        var forbidden = ['mention_comments'];
+
+        return forbidden.indexOf(type) === -1;
+    }
+    /**
      * Handles news' item.
      * If parent is already in collection,
      * then adds feedback to parent's feedbacks collection.
@@ -256,6 +265,10 @@ angular.module('feedbacks', [
             feedbackType, feedback = item.feedback,
             itemID, itemModel, typeTokens;
 
+        if (!isSupportedType(item.type)) {
+            return;
+        }
+
         if (item.type === 'friend_accepted') {
             parentType = item.type;
             parent = item.feedback;
@@ -266,7 +279,6 @@ angular.module('feedbacks', [
         } else {
             parentType = item.type;
         }
-
 
         if (feedbackType) {
             parent.owner_id = Number(parent.from_id || parent.owner_id);
