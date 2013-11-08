@@ -10,16 +10,12 @@ angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
              *
              * @returns {Array}
              */
-            foldMessagesByAuthor: function (messages, profiles) {
-                var selfProfile = _(profiles).findWhere({
-                    isSelf: true
-                });
+            foldMessagesByAuthor: function (messages, profilesColl) {
+                var selfProfile = profilesColl.findWhere({isSelf: true}).toJSON();
 
                 return messages.reduce(function (memo, message) {
                     var lastItem = memo[memo.length - 1],
-                        author = message.out
-                            ? selfProfile
-                            :_(profiles).findWhere({uid: message.uid});
+                        author = message.out ? selfProfile : profilesColl.get(message.uid).toJSON();
 
                     if (lastItem && (author.uid === lastItem.author.uid)) {
                         lastItem.items.push(message);
@@ -57,21 +53,34 @@ angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
         Mediator.pub('chat:data:get');
         Mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
-                $scope.profiles = data.profiles;
+                $scope.profilesColl = new Backbone.Collection(data.profiles, {
+                    model: Backbone.Model.extend({
+                        idAttribute: 'uid'
+                    })
+                });
                 $scope.dialogs = data.dialogs;
             });
         });
     })
     .controller('ChatItemCtrl', function ($scope, Chat) {
         var dialog = $scope.dialog,
-            profiles = $scope.profiles;
+            profilesColl = $scope.profilesColl,
+            online;
 
         if (dialog.chat_id) {
             $scope.owners = dialog.chat_active.map(function (uid) {
-                return _(profiles).findWhere({uid: uid});
+                return profilesColl.get(uid).toJSON();
             });
         } else {
-            $scope.owners = _(profiles).findWhere({uid: dialog.uid});
+            $scope.owners = profilesColl.get(dialog.uid).toJSON();
+
+            $scope.$watch(function ($scope) {
+                online = $scope.profilesColl.get(dialog.uid).get('online');
+
+                return online;
+            }, function () {
+                $scope.owners.online = online;
+            });
         }
 
         $scope.$watch(function ($scope) {
@@ -82,10 +91,9 @@ angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
                 message.read_state
             ].join();
         }, function () {
-            var dialog = $scope.dialog,
-                profiles = $scope.profiles;
+            var dialog = $scope.dialog;
 
-            $scope.foldedMessages = Chat.foldMessagesByAuthor(dialog.messages, profiles);
+            $scope.foldedMessages = Chat.foldMessagesByAuthor(dialog.messages, $scope.profilesColl);
             $scope.out = _($scope.foldedMessages).last().author.isSelf;
             $scope.unread = _(dialog.messages).last().read_state === 0;
         });
