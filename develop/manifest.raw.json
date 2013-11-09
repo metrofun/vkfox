@@ -6,7 +6,12 @@
         "default_locale": "ru",
         "description": "__MSG_description__",
         "background": {
-            "page": "pages/background.html"
+            <!-- @if TARGET='CHROME' -->
+            "page": "chrome/pages/background.html"
+            <!-- @endif -->
+            <!-- @if TARGET='OPERA' -->
+            "page": "opera/pages/background.html"
+            <!-- @endif -->
         },
         "icons": {
             "16": "assets/logo16.png",
@@ -33,7 +38,13 @@
                 "38": "assets/logo38_offline.png"
             },
             "default_title": "VKfox",
-            "default_popup": "pages/popup.html"
+            <!-- @if TARGET='CHROME' -->
+            "default_popup": "chrome/pages/popup.html"
+            <!-- @endif -->
+            <!-- @if TARGET='OPERA' -->
+            "default_popup": "opera/pages/popup.html"
+            <!-- @endif -->
+
         },
         "content_scripts": [{
             "matches" : ["http://oauth.vk.com/*", "https://oauth.vk.com/*"],

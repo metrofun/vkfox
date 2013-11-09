@@ -1,47 +1,66 @@
 "use strict";
 module.exports = function (grunt) {
-    var PAGES = ['background', 'popup', 'install'],
+    var BROWSERS = ['chrome'],
+        SRC_DIR = 'develop/',
+        PRODUCTION = 'production',
+        DEVELOP = 'develop',
         LOCALES = ['ru', 'en', 'uk'];
+
+    grunt.loadNpmTasks('grunt-messageformat');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-env');
+    grunt.loadNpmTasks('grunt-preprocess');
+    grunt.loadNpmTasks('grunt-usemin');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         env : {
-            dev: {
-                NODE_ENV : 'DEVELOPMENT'
-            },
-            prod : {
-                NODE_ENV : 'PRODUCTION'
-            },
             opera: {
                 TARGET: 'OPERA'
             },
             chrome: {
                 TARGET: 'CHROME'
+            },
+            production: {
+                NODE_ENV : PRODUCTION
+            },
+            develop: {
+                NODE_ENV : DEVELOP
             }
         },
-        preprocess : PAGES.reduce(function (memo, page) {
-            memo[page] = {
-                src : 'pages/' + page + '.tmpl.html',
-                dest : 'pages/' + page + '.html'
+        preprocess : BROWSERS.reduce(function (preprocess, browser) {
+            preprocess[browser] = {
+                expand: true,
+                cwd: browser + '/pages/',
+                dest: browser + '/pages/',
+                src: ['*.raw.html'],
+                ext: '.html'
             };
 
-            return memo;
+            return preprocess;
         }, {
             manifest: {
-                src : 'manifest.tmpl.json',
+                src : 'manifest.raw.json',
                 dest : 'manifest.json'
             }
         }),
-        watch: PAGES.reduce(function (memo, page) {
-            memo[page] = {
-                files: 'pages/' + page + '.tmpl.html',
-                tasks: ['preprocess:' + page]
+        // optimize, preprocess only single file
+        watch: BROWSERS.reduce(function (watch, browser) {
+            watch[browser] = {
+                files: browser + '/pages/*.raw.html',
+                tasks: ['preprocess:' + browser]
             };
 
-            return memo;
+            return watch;
         }, {
             manifest: {
-                files: 'manifest.tmpl.json',
+                files: 'manifest.raw.json',
                 tasks: ['preprocess:manifest'],
                 options: {
                     interrupt: true
@@ -69,38 +88,40 @@ module.exports = function (grunt) {
 
             return memo;
         }, {}),
-        less: {
-            popup: {
-                src: 'pages/popup.less',
-                dest: 'pages/popup.css',
+        less: BROWSERS.reduce(function (less, browser) {
+            less[browser] = {
+                expand: true,
+                cwd: browser + '/pages/',
+                dest: browser + '/pages/',
+                src: ['*.less'],
+                ext: '.css',
                 options: {
                     compile: true,
-                    compress: process.env.NODE_ENV === 'PRODUCTION'
+                    compress: process.env.NODE_ENV === PRODUCTION
                 }
-            },
-            install: {
-                src: 'pages/install.less',
-                dest: 'pages/install.css',
-                options: {
-                    compile: true,
-                    compress: process.env.NODE_ENV === 'PRODUCTION'
-                }
-            }
-        },
+            };
+            return less;
+        }, {}),
         clean: {
-            build: ['build/'],
+            // Warning: Cannot delete files outside the current working directory.
+            options: {force: true},
+            build: ['../build'],
             manifest: ['manifest.json'],
             pages: [
                 'pages/*.html',
-                '!pages/*.tmpl.html',
+                '!pages/*.raw.html',
                 'pages/*.js',
                 'pages/*.css'
             ]
         },
-        copy: {
-            build:  {
+        copy: BROWSERS.reduce(function (copy, browser) {
+            copy[browser] = {
                 expand: true,
                 src: [
+                    '_locales/**',
+                    'assets/**',
+                    'manifest.json',
+
                     'components/font-awesome/font/fontawesome-webfont.ttf',
                     'components/emoji/lib/emoji.png',
                     'components/emoji/lib/emoji.css',
@@ -109,84 +130,82 @@ module.exports = function (grunt) {
                     'components/underscore/underscore.js',
                     'components/backbone/backbone.js',
 
-                    '_locales/**',
-
                     'modules/auth/oauth.vk.com.js',
                     'modules/**/*.html',
                     'modules/**/*.mp3',
-                    'pages/*.html',
-                    '!pages/*.tmpl.html',
-                    'pages/*.js',
-                    'pages/*.css',
-                    'assets/**',
-                    'manifest.json'
+                    browser + '/pages/*.html',
+                    '!' + browser + '/pages/*.raw.html',
+                    browser + '/pages/*.js',
+                    browser + '/pages/*.css',
                 ],
-                dest: 'build/'
-            }
-        },
+                dest: '../build/' + browser
+            };
+
+            return copy;
+        }, {}),
         //Next two targets concatenates js/css
         useminPrepare: {
-            html: [
-                'pages/*.html',
-                '!pages/*.tmpl.html'
-            ],
+            html: BROWSERS.reduce(function (html, browser) {
+                return html.concat([
+                    browser + '/pages/*.html',
+                    '!' + browser + '/pages/*.raw.html'
+                ]);
+            }, []),
             options: {
-                // root: '.',
                 dest: '.'
             }
         },
         usemin: {
-            html: [
-                'pages/*.html',
-                '!pages/*.tmpl.html'
-            ]
+            html: BROWSERS.reduce(function (html, browser) {
+                return html.concat([
+                    browser + '/pages/*.html',
+                    '!' + browser + '/pages/*.raw.html'
+                ]);
+            }, [])
         },
-        compress: {
-            main: {
+        compress: BROWSERS.reduce(function (compress, browser) {
+            compress[browser] = {
                 options: {
                     level: '9', //best compression
-                    archive: 'build.zip'
+                    archive: '../build/' + browser + '.zip'
                 },
                 files: [
                     {
                         expand: true,
-                        cwd: 'build/',
+                        cwd: '../build/' + browser + '/',
                         src: ['**']
                     }
                 ]
-            }
-        }
+            };
+            return compress;
+        }, {})
     });
 
-    grunt.loadNpmTasks('grunt-messageformat');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-env');
-    grunt.loadNpmTasks('grunt-preprocess');
-    grunt.loadNpmTasks('grunt-usemin');
-    grunt.loadNpmTasks('grunt-contrib-compress');
 
-    grunt.registerTask(
-        'default',
-        ['env:chrome', 'env:dev', 'preprocess', 'messageformat', 'less', 'watch']
-    );
+    grunt.file.setBase(SRC_DIR);
 
-    grunt.registerTask('build', [
-        'clean',
-        'env:prod',
-        'preprocess',
-        'messageformat',
-        'less',
-        'useminPrepare',
-        'concat',
-        'usemin',
-        'copy:build',
-        'compress'
-    ]);
-    grunt.registerTask('build:opera', ['env:opera', 'build']);
-    grunt.registerTask('build:chrome', ['env:chrome', 'build']);
+
+    BROWSERS.forEach(function (browser) {
+        grunt.registerTask(browser, [
+            'env:' + browser,
+            'preprocess',
+            'messageformat',
+            'less',
+            'watch'
+        ]);
+
+        grunt.registerTask('build:' + browser, [
+            'clean',
+            'env:production',
+            'env:' + browser,
+            'preprocess',
+            'messageformat',
+            'less',
+            'useminPrepare',
+            'concat',
+            'usemin',
+            'copy:' + browser,
+            'compress:' + browser
+        ]);
+    });
 };
