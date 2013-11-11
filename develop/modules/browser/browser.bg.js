@@ -1,7 +1,7 @@
 /**
  * Browser specific API: icons, popups, badges etc
  */
-angular.module('browser', [])
+angular.module('browser')
 .config(function () {
     chrome.browserAction.setBadgeBackgroundColor({
         color: [231, 76, 60, 255]

@@ -5,7 +5,6 @@
         "underscore": "~1.4.4",
         "backbone": "https://github.com/jashkenas/backbone.git#~1.0.0",
         "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.3",
-        "angular-unstable": "~1.1.5",
         "angular-ui-utils": "~0.0.2",
         "moment": "~2.3.0",
         "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git",

@@ -23,9 +23,11 @@
             , "http://*.vk.com/*"
             , "https://*.vk.me/*"
             , "https://*.vk.com/*"
+            <!-- @if TARGET='CHROME' -->
             , "*://*.google.com/*"
             , "*://*.google.com.ua/*"
             , "*://*.google.ru/*"
+            <!-- @endif -->
             , "http://www.google-analytics.com/*"
             , "tabs"
             , "webRequest"

@@ -3,8 +3,7 @@
  * Tracking which is based on Google Analytics API
  * see https://developers.google.com/analytics/devguides/collection/protocol/v1/
  */
-angular.module('tracker', ['persistent-model'])
-    .constant('TRACKER_ID', 'UA-9568575-2')
+angular.module('tracker')
     .factory('Tracker', function (TRACKER_ID, PersistentModel) {
         var url = 'http://www.google-analytics.com/collect',
             persistentModel = new PersistentModel({}, {name: 'tracker'}),

@@ -1,7 +1,7 @@
 .DS_Store
 develop/manifest.json
 develop/*/pages/*.html
-!develop/*/pages/*.tmpl.html
+!develop/*/pages/*.raw.html
 develop/*/pages/*.js
 develop/*/pages/*.css
 develop/modules/i18n/*.js

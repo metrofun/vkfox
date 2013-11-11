@@ -28,15 +28,13 @@
             ng-disabled="!notifications.enabled"
             type="checkbox" />
     </div>
-    <div class="settings__row settings__row_sub">
+    <div class="settings__row settings__row_sub" ng-controller="settingsSignalCtrl">
         <label class="settings__label">{{'signal' | i18n}}</label>
         <select
             class="settings__input"
             ng-model="notifications.sound.signal"
+            ng-options="signal for signal in signals"
             ng-disabled="!notifications.enabled || !notifications.sound.enabled">
-            <!-- TODO remove hardcode -->
-            <option value="modules/notifications/standart.mp3">standart</option>
-            <option value="modules/notifications/original.mp3">original</option>
         </select>
     </div>
     <div class="settings__row settings__row_sub">
@@ -67,7 +65,7 @@
             ng-disabled="!notifications.enabled || !notifications.popups.enabled"
             type="checkbox"/>
     </div>
-    <div class="settings__row settings__separator">
+    <div ng-if="yandex" class="settings__row settings__separator">
         <i class="settings__icon icon-search"></i>
         <label class="settings__label">{{'Yandex search' | i18n}}</label>
         <input

@@ -5,10 +5,15 @@
         <title></title>
         <base href="/" />
         <script src="/components/jquery/jquery.js"></script>
-        <script src="/components/angular-unstable/angular.js"></script>
+        <script src="/components/angular/angular.js"></script>
         <script src="/components/underscore/underscore.js"></script>
         <script src="/components/backbone/backbone.js"></script>
+        <!-- @if TARGET='CHROME' -->
         <!-- build:js(./) /chrome/pages/background.js -->
+        <!-- @endif -->
+        <!-- @if TARGET='OPERA' -->
+        <!-- build:js(./) /opera/pages/background.js -->
+        <!-- @endif -->
         <script src="/modules/common/common.js"></script>
         <script src="/modules/config/config.js"></script>
         <script src="/modules/i18n/i18n.js"></script>
@@ -27,16 +32,26 @@
         <script src="/modules/longpoll/longpoll.bg.js"></script>
         <script src="/modules/mediator/mediator.bg.js"></script>
         <script src="/modules/newsfeed/newsfeed.bg.js"></script>
+        <!-- @if TARGET='CHROME' -->
+        <script src="/chrome/modules/browser/browser.js"></script>
+        <script src="/chrome/modules/yandex/yandex.bg.js"></script>
+        <script src="/chrome/modules/tracker/tracker.js"></script>
+        <!-- @endif -->
+        <!-- @if TARGET='OPERA' -->
+        <script src="/opera/modules/browser/browser.js"></script>
+        <script src="/opera/modules/yandex/yandex.bg.js"></script>
+        <script src="/opera/modules/tracker/tracker.js"></script>
+        <!-- @endif -->
         <script src="/modules/browser/browser.bg.js"></script>
+        <script src="/modules/tracker/tracker.js"></script>
         <script src="/modules/notifications/notifications.bg.js"></script>
+        <script src="/modules/notifications/notifications.js"></script>
         <script src="/modules/persistent-set/persistent-set.bg.js"></script>
         <script src="/modules/profiles-collection/profiles-collection.bg.js"></script>
         <script src="/modules/request/request.bg.js"></script>
         <script src="/modules/users/users.bg.js"></script>
         <script src="/modules/router/router.bg.js"></script>
-        <script src="/chrome/modules/yandex/yandex.bg.js"></script>
         <script src="/modules/force-online/force-online.bg.js"></script>
-        <script src="/modules/tracker/tracker.js"></script>
         <!-- endbuild -->
     </head>
     <body></body>

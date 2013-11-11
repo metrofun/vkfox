@@ -1,6 +1,4 @@
 angular.module('notifications', ['mediator', 'persistent-model', 'config', 'browser'])
-    .constant('STANDART_SIGNAL', 'modules/notifications/standart.mp3')
-    .constant('ORIGINAL_SIGNAL', 'modules/notifications/original.mp3')
     .constant('NOTIFICATIONS_CHAT', 'chat')
     .constant('NOTIFICATIONS_BUDDIES', 'buddies')
     .constant('NOTIFICATIONS_NEWS', 'news')
@@ -56,14 +54,14 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config', 'brow
 
         return notificationQueue;
     })
-    .factory('NotificationsSettings', function (Mediator, PersistentModel, STANDART_SIGNAL) {
+    .factory('NotificationsSettings', function (Mediator, PersistentModel, NOTIFICATIONS_SOUNDS) {
         var notificationsSettings = new PersistentModel(
             {
                 enabled: true,
                 sound: {
                     enabled: true,
                     volume: 0.5,
-                    signal: STANDART_SIGNAL
+                    signal: NOTIFICATIONS_SOUNDS.standart
                 },
                 popups: {
                     enabled: true,
@@ -71,7 +69,7 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config', 'brow
                 }
             },
             {name: 'notificationsSettings'}
-        );
+        ), sound;
 
         Mediator.sub('notifications:settings:get', function () {
             Mediator.pub('notifications:settings', notificationsSettings.toJSON());
@@ -80,9 +78,19 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config', 'brow
             notificationsSettings.set(settings);
         });
 
+        // TODO remove in v5.0.7
+        // support legacy signal values (i.g. standart.mp3)
+        sound = notificationsSettings.get('sound');
+        ['standart', 'original'].some(function (type) {
+            if (sound.signal.indexOf(type) > 0) {
+                sound.signal = type;
+                return true;
+            }
+        });
+
         return notificationsSettings;
     })
-    .factory('Notifications', function (NotificationsSettings, Browser) {
+    .factory('Notifications', function (NotificationsSettings, Browser, NOTIFICATIONS_SOUNDS) {
         var audioInProgress = false,
             audio = new Audio(),
             Notifications;
@@ -141,7 +149,7 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config', 'brow
                     audioInProgress = true;
 
                     audio.volume = sound.volume;
-                    audio.src = sound.signal;
+                    audio.src = NOTIFICATIONS_SOUNDS[sound.signal];
                     audio.play();
 
                     audio.addEventListener('ended', function () {

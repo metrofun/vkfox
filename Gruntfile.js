@@ -1,6 +1,6 @@
 "use strict";
 module.exports = function (grunt) {
-    var BROWSERS = ['chrome'],
+    var BROWSERS = ['chrome', 'opera'],
         SRC_DIR = 'develop/',
         PRODUCTION = 'production',
         DEVELOP = 'develop',
@@ -126,7 +126,7 @@ module.exports = function (grunt) {
                     'components/emoji/lib/emoji.png',
                     'components/emoji/lib/emoji.css',
                     'components/jquery/jquery.js',
-                    'components/angular-unstable/angular.js',
+                    'components/angular/angular.js',
                     'components/underscore/underscore.js',
                     'components/backbone/backbone.js',
 
@@ -188,9 +188,10 @@ module.exports = function (grunt) {
     BROWSERS.forEach(function (browser) {
         grunt.registerTask(browser, [
             'env:' + browser,
-            'preprocess',
+            'preprocess:manifest',
+            'preprocess:' + browser,
             'messageformat',
-            'less',
+            'less:' + browser,
             'watch'
         ]);
 
@@ -198,9 +199,10 @@ module.exports = function (grunt) {
             'clean',
             'env:production',
             'env:' + browser,
-            'preprocess',
+            'preprocess:manifest',
+            'preprocess:' + browser,
             'messageformat',
-            'less',
+            'less:' + browser,
             'useminPrepare',
             'concat',
             'usemin',
