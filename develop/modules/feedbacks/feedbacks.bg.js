@@ -248,7 +248,13 @@ angular.module('feedbacks', [
      * @returns {Boolean}
      */
     function isSupportedType(type) {
-        var forbidden = ['mention_comments'];
+        var forbidden = [
+            'mention_comments',
+            'reply_comment',
+            'reply_comment_photo',
+            'reply_comment_video',
+            'reply_topic'
+        ];
 
         return forbidden.indexOf(type) === -1;
     }
