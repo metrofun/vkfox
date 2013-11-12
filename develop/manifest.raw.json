@@ -24,14 +24,14 @@
             , "https://*.vk.me/*"
             , "https://*.vk.com/*"
             <!-- @if TARGET='CHROME' -->
+            , "webRequest"
+            , "webRequestBlocking"
             , "*://*.google.com/*"
             , "*://*.google.com.ua/*"
             , "*://*.google.ru/*"
             <!-- @endif -->
             , "http://www.google-analytics.com/*"
             , "tabs"
-            , "webRequest"
-            , "webRequestBlocking"
             , "notifications"
         ],
         "browser_action": {
