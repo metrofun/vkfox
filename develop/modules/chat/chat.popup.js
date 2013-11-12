@@ -61,6 +61,9 @@ angular.module('chat', ['item', 'mediator', 'request', 'rectify'])
                 $scope.dialogs = data.dialogs;
             });
         });
+        $scope.$on('$destroy', function () {
+            Mediator.unsub('chat:data');
+        });
     })
     .controller('ChatItemCtrl', function ($scope, Chat) {
         var dialog = $scope.dialog,

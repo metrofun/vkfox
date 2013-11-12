@@ -29,7 +29,7 @@ angular.module('users', ['request', 'mediator']).factory('Users', function (Requ
             inProgress = true;
             Request.api({
                 // TODO limit for uids.length
-                code: 'return API.users.get({uids: "' + newUids.join() + '", fields : "online, photo,sex,nickname,lists"})'
+                code: 'return API.users.get({uids: "' + newUids.join() + '", fields: "online,photo,sex,nickname,lists"})'
             }).then(function (response) {
                 if (response && response.length) {
                     usersColl.add(response);

@@ -35,6 +35,9 @@ angular.module('buddies', ['i18n', 'item-list', 'mediator', 'persistent-model', 
                 $scope.data = data;
             });
         }.bind(this));
+        $scope.$on('$destroy', function () {
+            Mediator.unsub('buddies:data');
+        });
     })
     .filter('buddiesFilter', function ($filter) {
         /**

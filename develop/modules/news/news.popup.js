@@ -123,6 +123,9 @@ angular.module('news', ['mediator', 'navigation', 'rectify', 'request', 'config'
                 $scope.data = data;
             });
         });
+        $scope.$on('$destroy', function () {
+            Mediator.unsub('feedbacks:data');
+        });
     })
     .controller('MyNewsActionsCtrl', function ($scope, News) {
         $scope.unsubscribe = News.unsubscribe;
@@ -136,6 +139,9 @@ angular.module('news', ['mediator', 'navigation', 'rectify', 'request', 'config'
                 $scope.data = data;
             });
         });
+        $scope.$on('$destroy', function () {
+            Mediator.unsub('newsfeed:friends');
+        });
     })
     .controller('GroupNewsController', function ($scope, Mediator) {
         Mediator.pub('newsfeed:groups:get');
@@ -143,5 +149,8 @@ angular.module('news', ['mediator', 'navigation', 'rectify', 'request', 'config'
             $scope.$apply(function () {
                 $scope.data = data;
             });
+        });
+        $scope.$on('$destroy', function () {
+            Mediator.unsub('newsfeed:groups');
         });
     });

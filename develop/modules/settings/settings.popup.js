@@ -19,6 +19,9 @@ angular.module('settings', ['browser', 'notifications'])
                             Mediator.pub(moduleName + ':settings:put', settings);
                         }, true);
                     });
+                    $scope.$on('$destroy', function () {
+                        Mediator.unsub(moduleName + ':settings');
+                    });
                     Mediator.pub(moduleName + ':settings:get');
                 });
             /**

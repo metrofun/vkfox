@@ -51,7 +51,6 @@ angular.module('router', ['mediator', 'tracker'])
         jQuery.when(notificationsDeferred, authDeferred).then(function (queue, state) {
             $rootScope.$apply(function () {
                 if (state === READY) {
-                    console.log(queue);
                     if (queue.length) {
                         // queue contains updates from tabs.
                         // Property 'type' holds value
