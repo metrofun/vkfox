@@ -7,6 +7,7 @@ develop/*/pages/*.css
 develop/modules/i18n/*.js
 !develop/modules/i18n/i18n.js
 develop/components
+develop/tmp
 node_modules
 build
 build.zip

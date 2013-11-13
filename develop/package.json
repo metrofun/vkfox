@@ -1,0 +1,12 @@
+{
+  "name": "vkfox",
+  "fullName": "vkfox",
+  "id": "jid1-cI3MbXpMMpDxuQ",
+  "description": "a basic add-on",
+  "author": "",
+  "license": "MPL 2.0",
+  "version": "0.1",
+  "lib": ".",
+  "dependencies": ["toolbarwidget"],
+  "main": "firefox/modules/app/app.main"
+}

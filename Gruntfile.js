@@ -17,6 +17,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-preprocess');
     grunt.loadNpmTasks('grunt-usemin');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -32,6 +33,22 @@ module.exports = function (grunt) {
             },
             develop: {
                 NODE_ENV : DEVELOP
+            }
+        },
+        "mozilla-addon-sdk": {
+            '1_14': {
+                options: {
+                    revision: "1.14"
+                }
+            }
+        },
+        "mozilla-cfx": {
+            run: {
+                options: {
+                    "mozilla-addon-sdk": "1_14",
+                    extension_dir: ".",
+                    command: "run"
+                }
             }
         },
         preprocess : BROWSERS.reduce(function (preprocess, browser) {
