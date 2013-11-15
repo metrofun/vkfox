@@ -1,7 +1,7 @@
 angular.module('users', ['request', 'mediator']).factory('Users', function (Request, Mediator) {
     var
-    DROP_PROFILES_INTERVAL = 500,
-    USERS_GET_DEBOUNCE = 400,
+    DROP_PROFILES_INTERVAL = 5000,
+    USERS_GET_DEBOUNCE = 2000,
 
     inProgress, usersGetQueue, friendsProfilesDefer,
     usersColl = new (Backbone.Collection.extend({

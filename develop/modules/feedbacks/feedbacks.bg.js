@@ -22,7 +22,7 @@ angular.module('feedbacks', [
     var
     MAX_ITEMS_COUNT = 50,
     MAX_COMMENTS_COUNT = 3,
-    UPDATE_PERIOD = 1000, //ms
+    UPDATE_PERIOD = 2000, //ms
 
     readyDeferred = jQuery.Deferred(),
     persistentModel, userId,
