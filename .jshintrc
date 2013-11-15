@@ -13,16 +13,13 @@
     "couch"         : false,
     "wsh"           : false,   // Windows Scripting Host.
 
-    "jquery"        : true,
     "prototypejs"   : false,
     "mootools"      : false,
     "dojo"          : false,
 
     "predef"        : [  // Extra globals.
         "moment",
-        "_",
         "LocalStorage",
-        "Backbone",
         "angular",
         "module",
         "require",
@@ -71,7 +68,7 @@
     // Persone styling prefrences.
 "onecase"       : true,
     "newcap"        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
-    "noempty"       : true,   // Prohibit use of empty blocks.
+    "noempty"       : false,   // Prohibit use of empty blocks.
     "nonew"         : true,   // Prohibit use of constructors for side-effects.
     "nomen"         : false,   // Prohibit use of initial or trailing underbars in names.
     "onevar"        : true,  // Allow only one `var` statement per function.

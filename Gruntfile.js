@@ -1,6 +1,6 @@
 "use strict";
 module.exports = function (grunt) {
-    var BROWSERS = ['chrome', 'opera'],
+    var BROWSERS = ['chrome', 'opera', 'firefox'],
         SRC_DIR = 'develop/',
         PRODUCTION = 'production',
         DEVELOP = 'develop',
@@ -27,6 +27,9 @@ module.exports = function (grunt) {
             },
             chrome: {
                 TARGET: 'CHROME'
+            },
+            firefox: {
+                TARGET: 'FIREFOX'
             },
             production: {
                 NODE_ENV : PRODUCTION

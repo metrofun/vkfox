@@ -1,19 +1,19 @@
-angular.module('mediator', [])
-    .factory('MediatorDispatcher', function () {
-        var dispatcher = _.clone(Backbone.Events);
+var _ = require('underscore')._,
+    Backbone = require('backbone'),
+    dispatcher = _.clone(Backbone.Events);
 
-        return {
-            pub: function () {
-                dispatcher.trigger.apply(dispatcher, arguments);
-            },
-            sub: function () {
-                dispatcher.on.apply(dispatcher, arguments);
-            },
-            once: function () {
-                dispatcher.once.apply(dispatcher, arguments);
-            },
-            unsub: function () {
-                dispatcher.off.apply(dispatcher, arguments);
-            }
-        };
-    });
+module.exports = {
+    pub: function () {
+        dispatcher.trigger.apply(dispatcher, arguments);
+    },
+    sub: function () {
+        dispatcher.on.apply(dispatcher, arguments);
+    },
+    once: function () {
+        dispatcher.once.apply(dispatcher, arguments);
+    },
+    unsub: function () {
+        dispatcher.off.apply(dispatcher, arguments);
+    }
+};
+
