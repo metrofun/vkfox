@@ -3,17 +3,17 @@ API_QUERIES_PER_REQUEST = 15,
 API_DOMAIN = 'https://api.vk.com/',
 API_REQUESTS_DEBOUNCE = 400,
 API_VERSION = 4.99,
-XHR_TIMEOUT = 30000,
+// XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
 _ = require('underscore')._,
 Browser = require('modules/browser/browser.js'),
 Auth = require('modules/auth/auth.js'),
 
-Request, apiQueriesQueue = [];
+sdkRequest, apiQueriesQueue = [];
 
 if (Browser.firefox) {
-    Request = require("sdk/request").Request;
+    sdkRequest = require("sdk/request").Request;
 }
 
 function HttpError(message) {
@@ -30,34 +30,38 @@ function AccessTokenError(message) {
 });
 
 
-function request(type, url, data, dataType) {
+function request(type, url, data) {
     return Auth.getAccessToken().then(function (accessToken) {
         var usedAccessToken = accessToken,
             ajaxPromise = Vow.promise();
 
         if (Browser.firefox) {
             // TODO implement timeout
-            new Request({url: url, onComplete: function (response) {
-                if (response.statusText === 'OK') {
-                    Auth.getAccessToken().then(function (accessToken) {
-                        if (accessToken === usedAccessToken) {
-                            ajaxPromise.fulfill(
-                                dataType === 'json' ? response.json:response.text
-                            );
-                        } else {
-                            ajaxPromise.reject(new AccessTokenError(response));
-                        }
-                    });
-                } else {
-                    ajaxPromise.reject(new HttpError(response));
+            sdkRequest({
+                url: url,
+                content: data === 'string' ? encodeURIComponent(data):data,
+                onComplete: function (response) {
+                    if (response.statusText === 'OK') {
+                        Auth.getAccessToken().then(function (accessToken) {
+                            if (accessToken === usedAccessToken) {
+                                ajaxPromise.fulfill(
+                                    response.json || response.text
+                                );
+                            } else {
+                                ajaxPromise.reject(new AccessTokenError(response));
+                            }
+                        });
+                    } else {
+                        ajaxPromise.reject(new HttpError(response));
+                    }
                 }
-            }})[type]();
+            })[type]();
         } else {
             throw "Not implemented";
         }
 
         return ajaxPromise;
-    });
+    }).done();
 }
 
 module.exports = {
@@ -100,6 +104,7 @@ module.exports = {
             executeCode = 'return [' + executeCodeTokens + '];';
 
             Auth.getAccessToken().then(function (accessToken) {
+                console.log('self.post', self);
                 self.post([API_DOMAIN, 'method/', method].join(''), {
                     method: 'execute',
                     code: executeCode,
@@ -123,8 +128,8 @@ module.exports = {
                 }, function () {
                     // force relogin on API error
                     Auth.login(true);
-                });
-            });
+                }).done();
+            }).done();
         }
     }, API_REQUESTS_DEBOUNCE)
 };

@@ -50,7 +50,8 @@ module.exports = function (grunt) {
                 options: {
                     "mozilla-addon-sdk": "1_14",
                     extension_dir: ".",
-                    command: "run"
+                    command: "run",
+                    arguments: "-p tmp/ff"
                 }
             }
         },

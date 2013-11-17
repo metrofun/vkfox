@@ -17,6 +17,7 @@ buddiesColl = new (ProfilesCollection.extend({
         // Automatically set last activity time
         // for all watched items
         initialize: function () {
+            console.log('initialize');
             this.on('change:isWatched', function (model) {
                 if (model.get('isWatched')) {
                     Request.api({

@@ -17,7 +17,8 @@ var _ = require('underscore')._,
 
 function closeAuthTabs() {
     if (Browser.firefox) {
-        throw "Not implemented";
+        // TODO
+        // throw "Not implemented";
     } else {
         chrome.tabs.query({url: Config.AUTH_DOMAIN + '*'}, function (tabs) {
             tabs.forEach(function (tab) {
@@ -94,11 +95,12 @@ model.on('change:accessToken', function () {
     Mediator.pub('auth:success', model.toJSON());
 });
 
-module.exports = {
+
+module.exports = Auth = {
     retry: _.debounce(function () {
         if (state === IN_PROGRESS) {
-            this.login(true);
-            this.retry();
+            Auth.login(true);
+            Auth.retry();
         }
     }, RETRY_INTERVAL),
     login: function (force) {
@@ -111,7 +113,7 @@ module.exports = {
             }
 
             tryLogin();
-            this.retry();
+            Auth.retry();
 
             Mediator.unsub('auth:success', onSuccess);
             Mediator.once('auth:success', onSuccess);
@@ -119,15 +121,15 @@ module.exports = {
         return authPromise;
     },
     getAccessToken: function () {
-        return exports.login().then(function () {
+        return Auth.login().then(function () {
             return model.get('accessToken');
         });
     },
     getUserId: function () {
-        return exports.login().then(function () {
+        return Auth.login().then(function () {
             return model.get('userId');
         });
     }
 };
 
-module.exports.login();
+Auth.login();

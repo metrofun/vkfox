@@ -1,5 +1,7 @@
-var constructor = function (name) {
-    var item = localStorage.getItem(name);
+var
+storage = require('modules/storage/storage.js'),
+constructor = function (name) {
+    var item = storage.getItem(name);
 
     if (item) {
         this._set = JSON.parse(item);
@@ -10,7 +12,7 @@ var constructor = function (name) {
 };
 constructor.prototype = {
     _save: function () {
-        localStorage.setItem(
+        storage.setItem(
             this._name,
             JSON.stringify(this._set)
         );
@@ -39,4 +41,4 @@ constructor.prototype = {
     }
 };
 
-exports = constructor;
+module.exports = constructor;
