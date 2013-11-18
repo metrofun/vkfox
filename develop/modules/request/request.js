@@ -10,10 +10,10 @@ _ = require('underscore')._,
 Browser = require('modules/browser/browser.js'),
 Auth = require('modules/auth/auth.js'),
 
-sdkRequest, apiQueriesQueue = [];
+apiQueriesQueue = [];
 
 if (Browser.firefox) {
-    sdkRequest = require("sdk/request").Request;
+    var sdkRequest = require("sdk/request").Request;
 }
 
 function HttpError(message) {
@@ -30,7 +30,7 @@ function AccessTokenError(message) {
 });
 
 
-function request(type, url, data) {
+function xhr(type, url, data) {
     return Auth.getAccessToken().then(function (accessToken) {
         var usedAccessToken = accessToken,
             ajaxPromise = Vow.promise();
@@ -61,15 +61,15 @@ function request(type, url, data) {
         }
 
         return ajaxPromise;
-    }).done();
+    });
 }
 
-module.exports = {
+var Request = module.exports = {
     get: function (url, data, dataType) {
-        return request('get', url, data, dataType);
+        return xhr('get', url, data, dataType);
     },
     post: function (url, data, dataType) {
-        return request('post', url, data, dataType);
+        return xhr('post', url, data, dataType);
     },
     api: function (params) {
         var promise = Vow.promise();
@@ -77,13 +77,13 @@ module.exports = {
             params: params,
             promise: promise
         });
-        this.processApiQueries();
+        Request.processApiQueries();
         return promise;
     },
     processApiQueries: _.debounce(function () {
         if (apiQueriesQueue.length) {
-            var self = this, queriesToProcess = apiQueriesQueue.splice(0, API_QUERIES_PER_REQUEST),
-            executeCodeTokens = [], executeCode,  i, method, params;
+            var queriesToProcess = apiQueriesQueue.splice(0, API_QUERIES_PER_REQUEST),
+                executeCodeTokens = [], executeCode,  i, method, params;
 
             for (i = 0; i < queriesToProcess.length; i++) {
                 params = queriesToProcess[i].params;
@@ -104,8 +104,7 @@ module.exports = {
             executeCode = 'return [' + executeCodeTokens + '];';
 
             Auth.getAccessToken().then(function (accessToken) {
-                console.log('self.post', self);
-                self.post([API_DOMAIN, 'method/', method].join(''), {
+                Request.post([API_DOMAIN, 'method/', method].join(''), {
                     method: 'execute',
                     code: executeCode,
                     access_token: accessToken,
@@ -117,9 +116,9 @@ module.exports = {
                     var response = data.response, i;
                     if (Array.isArray(response)) {
                         for (i = 0; i < response.length; i++) {
-                            queriesToProcess[i].deferred.resolve(response[i]);
+                            queriesToProcess[i].promise.fulfill(response[i]);
                         }
-                        self.processApiQueries();
+                        Request.processApiQueries();
                     } else {
                         console.warn(data);
                         // force relogin on API error
@@ -133,4 +132,3 @@ module.exports = {
         }
     }, API_REQUESTS_DEBOUNCE)
 };
-

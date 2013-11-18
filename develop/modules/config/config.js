@@ -1,4 +1,13 @@
-exports.APP_ID =  3807372;
+var Browser = require('modules/browser/browser.js');
+
+exports.APP_ID = 3807372;
+if (Browser.firefox) {
+    exports.TRACKER_ID = 'UA-9568575-4';
+} else if (Browser.chrome) {
+    exports.TRACKER_ID = 'UA-9568575-2';
+} else {
+    exports.TRACKER_ID = 'UA-9568575-3';
+}
 exports.VK_PROTOCOL = 'https://';
 exports.VK_BASE = exports.VK_PROTOCOL + 'vk.com/';
 exports.AUTH_DOMAIN = exports.VK_PROTOCOL + 'oauth.vk.com/';

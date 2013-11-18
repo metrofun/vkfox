@@ -5,6 +5,7 @@ Backbone = require('backbone'),
 Request = require('modules/request/request.js'),
 Mediator = require('modules/mediator/mediator.js'),
 Users = require('modules/users/users.js'),
+I18N = require('modules/i18n/i18n.js'),
 Notifications = require('modules/notifications/notifications.js'),
 PersistentSet = require('modules/persistent-set/persistent-set.js'),
 ProfilesCollection = require('modules/profiles-collection/profiles-collection.js'),
@@ -17,7 +18,7 @@ buddiesColl = new (ProfilesCollection.extend({
         // Automatically set last activity time
         // for all watched items
         initialize: function () {
-            console.log('initialize');
+            ProfilesCollection.prototype.initialize.apply(this, arguments);
             this.on('change:isWatched', function (model) {
                 if (model.get('isWatched')) {
                     Request.api({
@@ -157,11 +158,10 @@ readyPromise.then(function () {
             Notifications.notify({
                 type: Notifications.BUDDIES,
                 title: [
-                    // $filter('name')(profile),
-                    // $filter('i18n')(
-                        // profile.online ? 'is online':'went offline',
-                        // {GENDER: gender}
-                    // )
+                    Users.getName(profile),
+                    I18N.get(profile.online ? 'is online':'went offline', {
+                        GENDER: gender
+                    })
                 ].join(' '),
                 image: model.get('photo'),
                 noBadge: true

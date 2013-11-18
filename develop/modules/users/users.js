@@ -84,7 +84,7 @@ Mediator.sub('auth:success', function () {
 
 dropOldNonFriendsProfiles();
 
-module.exports = {
+module.exports = _.extend({
     getFriendsProfiles: function () {
         if (!friendsProfilesDefer) {
             friendsProfilesDefer = Request.api({
@@ -120,5 +120,4 @@ module.exports = {
             return promise;
         });
     }
-};
-
+}, require('modules/users/name.js'));

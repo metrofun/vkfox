@@ -16,7 +16,7 @@ NotificationsSettings = PersistentModel.extend({
     initialize: function () {
         var sound, self = this;
 
-        NotificationsSettings.__super__.initialize.apply(this, arguments);
+        PersistentModel.prototype.initialize.apply(this, arguments);
 
         Mediator.sub('notifications:settings:get', function () {
             Mediator.pub('notifications:settings', self.toJSON());

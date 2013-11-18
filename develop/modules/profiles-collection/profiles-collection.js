@@ -9,9 +9,13 @@ module.exports = Backbone.Collection.extend({
     initialize: function () {
         Mediator.sub('longpoll:updates', this._onFriendUpdates.bind(this));
 
+        this._updateNonFriends = _.debounce(
+            this._updateNonFriends.bind(this),
+            UPDATE_NON_FRIENDS_PERIOD
+        );
         this._updateNonFriends();
     },
-    _updateNonFriends: _.debounce(function () {
+    _updateNonFriends: function () {
         var
         self = this,
         uids = this.where({
@@ -32,10 +36,11 @@ module.exports = Backbone.Collection.extend({
                 });
             }).always(this._updateNonFriends.bind(this));
         } else {
+            console.log('else', this);
             this._updateNonFriends();
         }
 
-    }, UPDATE_NON_FRIENDS_PERIOD),
+    },
     /**
      * @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
      *
