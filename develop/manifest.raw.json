@@ -1,7 +1,7 @@
 {
         "name": "__MSG_name__",
         "short_name": "VKfox",
-        "version": "5.0.7",
+        "version": "5.0.8",
         "manifest_version": 2,
         "default_locale": "ru",
         "description": "__MSG_description__",
@@ -49,7 +49,7 @@
 
         },
         "content_scripts": [{
-            "matches" : ["http://oauth.vk.com/*", "https://oauth.vk.com/*"],
+            "matches" : ["http://oauth.vk.com/blank.html*", "https://oauth.vk.com/blank.html*"],
             "js" : ["modules/auth/oauth.vk.com.js"],
             "run_at" : "document_start",
             "all_frames" : true
