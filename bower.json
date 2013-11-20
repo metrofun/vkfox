@@ -13,7 +13,7 @@
     "font-awesome": "~3.2.1"
   },
   "resolutions": {
-    "jquery": "~1.9.1"
+    "jquery": "~1.9.1",
     "less": "~1.5.0-b3",
     "toolbarwidget-jplib": "https://github.com/Rob--W/toolbarwidget-jplib.git#~1.3.0",
     "browser-action-jplib": "https://github.com/Rob--W/browser-action-jplib.git#~0.2.2",
