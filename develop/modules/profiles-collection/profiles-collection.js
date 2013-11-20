@@ -36,7 +36,6 @@ module.exports = Backbone.Collection.extend({
                 });
             }).always(this._updateNonFriends.bind(this));
         } else {
-            console.log('else', this);
             this._updateNonFriends();
         }
 

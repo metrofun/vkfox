@@ -18,7 +18,6 @@
     "dojo"          : false,
 
     "predef"        : [  // Extra globals.
-        "i18n",
         "moment",
         "LocalStorage",
         "angular",

@@ -34,7 +34,7 @@ requiredParams = {
     ap: chrome.app.getDetails().version //app version
 };
 
-return {
+module.exports = {
     trackPage: function () {
         Request.post(url, _.extend({}, requiredParams, {
             t: 'pageview',          // Pageview hit type.
@@ -61,4 +61,3 @@ return {
         }));
     }
 };
-

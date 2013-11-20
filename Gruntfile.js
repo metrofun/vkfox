@@ -102,6 +102,7 @@ module.exports = function (grunt) {
         //localization
         messageformat: LOCALES.reduce(function (memo, locale) {
             memo[locale] = {
+                namespace: 'module.exports',
                 locale: locale,
                 inputdir: 'modules/i18n/' + locale,
                 output: 'modules/i18n/' + locale + '.js'
