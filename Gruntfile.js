@@ -18,6 +18,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-usemin');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
+    grunt.loadNpmTasks('grunt-browserify');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -36,6 +37,13 @@ module.exports = function (grunt) {
             },
             develop: {
                 NODE_ENV : DEVELOP
+            }
+        },
+        browserify: {
+            popup: {
+                files: {
+                    'firefox/popup.js': ['modules/app/app.pu.js'],
+                }
             }
         },
         "mozilla-addon-sdk": {
@@ -232,4 +240,11 @@ module.exports = function (grunt) {
             'compress:' + browser
         ]);
     });
+
+    grunt.registerTask('mozilla', [
+        'mozilla-addon-sdk',
+        'browserify',
+        'mozilla-cfx'
+    ]);
+
 };

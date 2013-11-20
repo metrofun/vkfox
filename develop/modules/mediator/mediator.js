@@ -16,4 +16,3 @@ module.exports = {
         dispatcher.off.apply(dispatcher, arguments);
     }
 };
-

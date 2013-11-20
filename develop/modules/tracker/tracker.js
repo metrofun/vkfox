@@ -1,9 +1,10 @@
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,
-PersistentModel = require('modules/persistent-model/persistent-model.js'),
-Request = require('modules/request/request.js'),
-Config = require('modules/config/config.js'),
+PersistentModel = require('persistent-model/persistent-model.bg.js'),
+I18n = require('i18n/i18n.js'),
+Request = require('request/request.bg.js'),
+Config = require('config/config.bg.js'),
 
 url = 'http://www.google-analytics.com/collect',
 persistentModel = new PersistentModel({}, {name: 'tracker'}),
@@ -30,8 +31,9 @@ requiredParams = {
     v: 1,               // Version.
     tid: Config.TRACKER_ID,    // Tracking ID / Web property / Property ID.
     cid: persistentModel.get('guid'), // Anonymous Client ID.
-    ul: navigator.language, //user language
-    ap: chrome.app.getDetails().version //app version
+    ul: I18n.getLang(), //user language
+    // TODO
+    // ap: chrome.app.getDetails().version //app version
 };
 
 module.exports = {
