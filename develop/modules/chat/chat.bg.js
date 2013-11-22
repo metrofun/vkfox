@@ -178,17 +178,18 @@ angular.module('chat', [
     }
     function fetchProfiles() {
         var uids = dialogColl.reduce(function (uids, dialog) {
-            dialog.get('messages').map(function (message) {
+            dialog.get('messages').forEach(function (message) {
                 var chatActive = message.chat_active;
                 if (chatActive) {
                     // unfortunately chatActive sometimes
                     // don't contain actual sender
                     uids = uids.concat(chatActive.map(function (uid) {
                         return Number(uid);
-                    })).concat(userId, message.uid);
+                    }), dialog.get('chat_active'));
                 } else {
-                    uids = uids.concat([message.uid, dialog.get('uid')]);
+                    uids.push(dialog.get('uid'));
                 }
+                uids.push(message.uid);
             });
             return uids;
         }, []);
