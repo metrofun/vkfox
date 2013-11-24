@@ -19,10 +19,13 @@
     "grunt-env": "~0.4.0",
     "grunt-contrib-compress": "~0.5.2",
     "grunt-mozilla-addon-sdk": "~0.3.1",
-    "angular": "~1.1.5",
+    "angular": "git+ssh://git@github.com:bclinkinbeard/angular.git#7dbf7d9",
     "browserify": "~2.35.4",
     "grunt-browserify": "~1.2.11",
-    "underscore": "git+ssh://git@github.com:metrofun/underscore.git#1.5.3"
+    "underscore": "git+ssh://git@github.com:metrofun/underscore.git#1.5.3",
+    "vow": "git+ssh://git@github.com:metrofun/vow.git#0.3.13",
+    "backbone": "~1.1.0",
+    "grunt-watchify": "~0.1.0"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.5.3",

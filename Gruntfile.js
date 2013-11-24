@@ -42,7 +42,30 @@ module.exports = function (grunt) {
         browserify: {
             popup: {
                 files: {
-                    'firefox/popup.js': ['modules/app/app.pu.js'],
+                    'pages/popup.js': ['modules/app/app.pu.js'],
+                },
+                options: {
+                    ignore: [
+                        'timer',
+                        './request.bg.js',
+                        'sdk/simple-storage'
+                    ]
+                }
+            },
+            background: {
+                files: {
+                    'pages/background.js': ['modules/app/app.bg.js'],
+                },
+                options: {
+                    ignore: [
+                        'sdk/self',
+                        'sdk/page-worker',
+                        'browserAction',
+                        './request.pu.js',
+                        'sdk/request',
+                        'timer',
+                        'sdk/simple-storage'
+                    ]
                 }
             }
         },
@@ -215,36 +238,42 @@ module.exports = function (grunt) {
     grunt.file.setBase(SRC_DIR);
 
 
-    BROWSERS.forEach(function (browser) {
-        grunt.registerTask(browser, [
-            'env:' + browser,
-            'preprocess:manifest',
-            'preprocess:' + browser,
-            'messageformat',
-            'less:' + browser,
-            'watch'
-        ]);
+    // BROWSERS.forEach(function (browser) {
+        // grunt.registerTask(browser, [
+            // 'env:' + browser,
+            // 'preprocess:manifest',
+            // 'preprocess:' + browser,
+            // 'messageformat',
+            // 'less:' + browser,
+            // 'watch'
+        // ]);
 
-        grunt.registerTask('build:' + browser, [
-            'clean',
-            'env:production',
-            'env:' + browser,
-            'preprocess:manifest',
-            'preprocess:' + browser,
-            'messageformat',
-            'less:' + browser,
-            'useminPrepare',
-            'concat',
-            'usemin',
-            'copy:' + browser,
-            'compress:' + browser
-        ]);
-    });
+        // grunt.registerTask('build:' + browser, [
+            // 'clean',
+            // 'env:production',
+            // 'env:' + browser,
+            // 'preprocess:manifest',
+            // 'preprocess:' + browser,
+            // 'messageformat',
+            // 'less:' + browser,
+            // 'useminPrepare',
+            // 'concat',
+            // 'usemin',
+            // 'copy:' + browser,
+            // 'compress:' + browser
+        // ]);
+    // });
 
     grunt.registerTask('mozilla', [
         'mozilla-addon-sdk',
         'browserify',
         'mozilla-cfx'
     ]);
+    grunt.registerTask('chrome', [
+        'env:chrome',
+        'preprocess:manifest',
+        'browserify'
+    ]);
+
 
 };

@@ -1,10 +1,10 @@
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,
-PersistentModel = require('persistent-model/persistent-model.bg.js'),
+PersistentModel = require('persistent-model/persistent-model.js'),
 I18n = require('i18n/i18n.js'),
-Request = require('request/request.bg.js'),
-Config = require('config/config.bg.js'),
+Request = require('request/request.js'),
+Config = require('config/config.js'),
 
 url = 'http://www.google-analytics.com/collect',
 persistentModel = new PersistentModel({}, {name: 'tracker'}),
