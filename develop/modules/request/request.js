@@ -1,12 +1,5 @@
-/*jshint bitwise: false*/
-var Browser = require('browser/detect.js');
-
-if (Browser.firefox) {
-    if (location && ~location.href.indexOf('popup')) {
-        return require('./request.pu.js');
-    } else {
-        return require('./request.bg.js');
-    }
-} else {
-    throw 'not implemented';
-}
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+return require(require('env/env.js') ? './request.pu.js':'./request.bg.js');

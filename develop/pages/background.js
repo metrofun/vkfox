@@ -61,7 +61,7 @@ var _ = require('underscore')._,
     Vow = require('vow'),
 
     model = new Backbone.Model(),
-    Auth, page,
+    Auth, page, iframe,
     state = CREATED, authPromise = Vow.promise();
 
 function closeAuthTabs() {
@@ -88,23 +88,20 @@ function tryLogin() {
             }
         });
     } else {
-        throw "Not implemented";
-        // if (!$iframe) {
-            // $iframe = angular.element(
-                // '<iframe/>',
-                // {name : 'vkfox-login-iframe'}
-            // ).appendTo('body');
-        // }
-        // $iframe.attr('src', Config.AUTH_URI);
+        if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.setAttribute('name', 'vkfox-login-iframe');
+            iframe.setAttribute('src', Config.AUTH_URI);
+            document.body.appendChild(iframe);
+        }
     }
 }
 function freeLogin() {
     if (Browser.firefox) {
         page.destroy();
     } else {
-        throw "Not implemented";
-        // $iframe.remove();
-        // $iframe = null;
+        document.body.removeChild(iframe);
+        iframe = null;
     }
     page = null;
 }
@@ -217,7 +214,7 @@ if (Browser.firefox) {
         Mediator.pub.apply(Mediator, arguments);
     };
 } else {
-    browserAction = chrome.browserAction.bind(chrome);
+    browserAction = chrome.browserAction;
 }
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
@@ -288,7 +285,8 @@ module.exports = _.extend({}, Browser, {
 
 },{"browser/detect.js":5,"browserAction":29,"mediator/mediator.js":15,"sdk/self":29,"underscore":31,"vow":32}],5:[function(require,module,exports){
 module.exports = {
-    firefox:  true
+    chrome: true
+    // firefox:  true
 };
 
 },{}],6:[function(require,module,exports){
@@ -3885,19 +3883,17 @@ var Request = module.exports = {
 
 },{"auth/auth.bg.js":3,"browser/detect.js":5,"mediator/mediator.js":15,"sdk/request":29,"underscore":31,"vow":32}],22:[function(require,module,exports){
 /*jshint bitwise: false*/
-var Browser = require('browser/detect.js');
-
-if (Browser.firefox) {
-    if (location && ~location.href.indexOf('popup')) {
-        return require('./request.pu.js');
-    } else {
-        return require('./request.bg.js');
-    }
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+if (location && ~location.href.indexOf('popup')) {
+    return require('./request.pu.js');
 } else {
-    throw 'not implemented';
+    return require('./request.bg.js');
 }
 
-},{"./request.bg.js":21,"./request.pu.js":29,"browser/detect.js":5}],23:[function(require,module,exports){
+},{"./request.bg.js":21,"./request.pu.js":29}],23:[function(require,module,exports){
 var
 Mediator = require('mediator/mediator.js'),
 PersistentModel = require('persistent-model/persistent-model.js'),

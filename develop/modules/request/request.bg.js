@@ -8,12 +8,12 @@ API_VERSION = 4.99,
 Vow = require('vow'),
 _ = require('underscore')._,
 Auth = require('auth/auth.bg.js'),
-Browser = require('browser/detect.js'),
+Eng = require('env/env.js'),
 Mediator = require('mediator/mediator.js'),
 
 apiQueriesQueue = [];
 
-if (Browser.firefox) {
+if (Eng.firefox) {
     var sdkRequest = require("sdk/request").Request;
 }
 
@@ -36,7 +36,7 @@ function xhr(type, url, data) {
         var usedAccessToken = accessToken,
             ajaxPromise = Vow.promise();
 
-        if (Browser.firefox) {
+        if (Eng.firefox) {
             // TODO implement timeout
             sdkRequest({
                 url: url,

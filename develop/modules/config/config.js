@@ -1,9 +1,9 @@
-var Browser = require('browser/detect.js');
+var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
-if (Browser.firefox) {
+if (Env.firefox) {
     exports.TRACKER_ID = 'UA-9568575-4';
-} else if (Browser.chrome) {
+} else if (Env.chrome) {
     exports.TRACKER_ID = 'UA-9568575-2';
 } else {
     exports.TRACKER_ID = 'UA-9568575-3';

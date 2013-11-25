@@ -29,7 +29,8 @@ if (Browser.firefox) {
 
 },{"browser/detect.js":3,"mediator/mediator.js":9,"underscore":21}],3:[function(require,module,exports){
 module.exports = {
-    firefox:  true
+    chrome: true
+    // firefox:  true
 };
 
 },{}],4:[function(require,module,exports){
@@ -1905,19 +1906,17 @@ module.exports = Backbone.Model.extend({
 
 },{"backbone":18,"storage/storage.js":14}],11:[function(require,module,exports){
 /*jshint bitwise: false*/
-var Browser = require('browser/detect.js');
-
-if (Browser.firefox) {
-    if (location && ~location.href.indexOf('popup')) {
-        return require('./request.pu.js');
-    } else {
-        return require('./request.bg.js');
-    }
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+if (location && ~location.href.indexOf('popup')) {
+    return require('./request.pu.js');
 } else {
-    throw 'not implemented';
+    return require('./request.bg.js');
 }
 
-},{"./request.bg.js":19,"./request.pu.js":12,"browser/detect.js":3}],12:[function(require,module,exports){
+},{"./request.bg.js":19,"./request.pu.js":12}],12:[function(require,module,exports){
 var Vow = require('vow'),
     _ = require('underscore')._,
     Mediator = require('mediator/mediator.js');

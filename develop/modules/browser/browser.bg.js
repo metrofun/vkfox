@@ -9,14 +9,12 @@ var BADGE_COLOR = [231, 76, 60, 255],
     },
 
     Vow = require('vow'),
-    _ = require('underscore')._,
-    Browser = require('browser/detect.js'),
-    Mediator = require('mediator/mediator.js'),
+    Env = require('env/env.js'),
 
     browserAction;
 
 // Set up popup and popup comminication
-if (Browser.firefox) {
+if (Env.firefox) {
     var data = require('sdk/self').data;
 
     browserAction = require('browserAction').BrowserAction({
@@ -24,19 +22,13 @@ if (Browser.firefox) {
         default_title: 'VKfox',
         default_popup: data.url('pages/popup.html')
     });
-    Mediator.sub('all', function () {
-        browserAction.sendMessage([].slice.call(arguments));
-    });
-    browserAction.onMessage = function () {
-        Mediator.pub.apply(Mediator, arguments);
-    };
 } else {
-    browserAction = chrome.browserAction.bind(chrome);
+    browserAction = chrome.browserAction;
 }
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = _.extend({}, Browser, {
+module.exports = {
     getBrowserAction: function () {
         return browserAction;
     },
@@ -66,7 +58,7 @@ module.exports = _.extend({}, Browser, {
      * @returns {Boolean}
      */
     isPopupOpened: function () {
-        if (Browser.firefox) {
+        if (Env.firefox) {
             // TODO fix stub
             return false;
         } else {
@@ -81,7 +73,7 @@ module.exports = _.extend({}, Browser, {
     isVKSiteActive: function () {
         var promise = Vow.promise();
 
-        if (Browser.firefox) {
+        if (Env.firefox) {
             // TODO fix stub
             promise.fulfill(false);
         } else {
@@ -98,4 +90,4 @@ module.exports = _.extend({}, Browser, {
 
         return promise;
     }
-});
+};

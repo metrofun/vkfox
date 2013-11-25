@@ -1,18 +1,5 @@
-var _ = require('underscore')._,
-    Backbone = require('backbone'),
-    dispatcher = _.clone(Backbone.Events);
-
-module.exports = {
-    pub: function () {
-        dispatcher.trigger.apply(dispatcher, arguments);
-    },
-    sub: function () {
-        dispatcher.on.apply(dispatcher, arguments);
-    },
-    once: function () {
-        dispatcher.once.apply(dispatcher, arguments);
-    },
-    unsub: function () {
-        dispatcher.off.apply(dispatcher, arguments);
-    }
-};
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+return require(require('env/env.js') ? './mediator.pu.js':'./mediator.bg.js');

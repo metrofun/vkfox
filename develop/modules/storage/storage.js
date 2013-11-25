@@ -1,6 +1,6 @@
-var Browser = require('browser/detect.js');
+var Env = require('env/env.js');
 
-if (Browser.firefox) {
+if (Env.firefox) {
     var storage = require("sdk/simple-storage");
 
     module.exports = {

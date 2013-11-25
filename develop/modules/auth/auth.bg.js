@@ -12,7 +12,7 @@ var _ = require('underscore')._,
     Vow = require('vow'),
 
     model = new Backbone.Model(),
-    Auth, page,
+    Auth, page, iframe,
     state = CREATED, authPromise = Vow.promise();
 
 function closeAuthTabs() {
@@ -39,23 +39,20 @@ function tryLogin() {
             }
         });
     } else {
-        throw "Not implemented";
-        // if (!$iframe) {
-            // $iframe = angular.element(
-                // '<iframe/>',
-                // {name : 'vkfox-login-iframe'}
-            // ).appendTo('body');
-        // }
-        // $iframe.attr('src', Config.AUTH_URI);
+        if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.setAttribute('name', 'vkfox-login-iframe');
+            iframe.setAttribute('src', Config.AUTH_URI);
+            document.body.appendChild(iframe);
+        }
     }
 }
 function freeLogin() {
     if (Browser.firefox) {
         page.destroy();
     } else {
-        throw "Not implemented";
-        // $iframe.remove();
-        // $iframe = null;
+        document.body.removeChild(iframe);
+        iframe = null;
     }
     page = null;
 }
