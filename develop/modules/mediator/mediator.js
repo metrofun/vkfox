@@ -2,4 +2,8 @@
  * Returns a correct implementation
  * for background or popup page
  */
-return require(require('env/env.js') ? './mediator.pu.js':'./mediator.bg.js');
+if (require('env/env.js').popup) {
+    module.exports = require('./mediator.pu.js');
+} else {
+    module.exports = require('./mediator.bg.js');
+}

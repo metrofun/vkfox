@@ -1,2 +1,3 @@
-require('browser/browser.pu.js');
+require('angular').module('app', []);
 require('router/router.pu.js');
+

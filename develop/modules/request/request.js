@@ -2,4 +2,8 @@
  * Returns a correct implementation
  * for background or popup page
  */
-return require(require('env/env.js') ? './request.pu.js':'./request.bg.js');
+if (require('env/env.js').popup) {
+    module.exports = require('./request.pu.js');
+} else {
+    module.exports = require('./request.bg.js');
+}

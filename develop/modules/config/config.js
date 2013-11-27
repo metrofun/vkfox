@@ -22,4 +22,3 @@ exports.AUTH_URI = [
         'display=page'
     ].join('&')
 ].join('');
-console.log(exports.AUTH_URI);

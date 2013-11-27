@@ -63,7 +63,7 @@ function initialize() {
     dialogColl.reset();
     profilesColl.reset();
 
-    if (!readyPromise || readyPromise.isFulfilled() === 'resolved') {
+    if (!readyPromise || readyPromise.isFulfilled()) {
         if (readyPromise) {
             readyPromise.reject();
         }
@@ -134,6 +134,7 @@ function fetchProfiles() {
     uids = _.uniq(uids);
 
     return Users.getProfilesById(uids).then(function (data) {
+        console.log(data);
         profilesColl.reset(data);
         // mark self profile
         profilesColl.get(userId).set('isSelf', true);

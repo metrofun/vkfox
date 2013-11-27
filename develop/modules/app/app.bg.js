@@ -10,3 +10,4 @@ require('router/router.bg.js');
 // require('yandex/yandex.bg.js');
 // require('tracker/tracker.bg.js');
 require('force-online/force-online.bg.js');
+require('longpoll/longpoll.bg.js');

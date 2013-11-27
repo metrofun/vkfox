@@ -11,8 +11,9 @@ require('router/router.bg.js');
 // require('yandex/yandex.bg.js');
 // require('tracker/tracker.bg.js');
 require('force-online/force-online.bg.js');
+require('longpoll/longpoll.bg.js');
 
-},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":6,"chat/chat.bg.js":7,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"newsfeed/newsfeed.bg.js":16,"router/router.bg.js":23}],2:[function(require,module,exports){
+},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"longpoll/longpoll.bg.js":15,"newsfeed/newsfeed.bg.js":19,"router/router.bg.js":26}],2:[function(require,module,exports){
 var
 CHECK_AUTH_PERIOD = 3000, //ms
 
@@ -46,7 +47,7 @@ Mediator.sub('auth:success', function (data) {
     monitorAuthChanges();
 });
 
-},{"auth/auth.bg.js":3,"config/config.js":8,"mediator/mediator.js":15,"request/request.bg.js":21,"underscore":31}],3:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"config/config.js":7,"mediator/mediator.js":18,"request/request.bg.js":24,"underscore":34}],3:[function(require,module,exports){
 var RETRY_INTERVAL = 10000, //ms
     CREATED = 1,
     IN_PROGRESS = 1,
@@ -83,14 +84,14 @@ function tryLogin() {
             contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
             contentURL: Config.AUTH_URI,
             onMessage: function (url) {
-                console.log('url', url);
                 Mediator.pub('auth:iframe', url);
             }
         });
     } else {
         if (!iframe) {
             iframe = document.createElement("iframe");
-            iframe.setAttribute('name', 'vkfox-login-iframe');
+            iframe.name = 'vkfox-login-iframe';
+            // iframe.setAttribute('name', '');
             iframe.setAttribute('src', Config.AUTH_URI);
             document.body.appendChild(iframe);
         }
@@ -121,7 +122,9 @@ Mediator.sub('auth:iframe', function (url) {
         freeLogin();
     } catch (e) {
         // TODO control console.log
-        console.log(e);
+        setTimeout(function () {
+            throw e;
+        });
     }
 }.bind(this));
 
@@ -180,7 +183,7 @@ module.exports = Auth = {
 
 Auth.login();
 
-},{"backbone":28,"browser/browser.bg.js":4,"config/config.js":8,"mediator/mediator.js":15,"sdk/page-worker":29,"underscore":31,"vow":32}],4:[function(require,module,exports){
+},{"backbone":31,"browser/browser.bg.js":4,"config/config.js":7,"mediator/mediator.js":18,"sdk/page-worker":32,"underscore":34,"vow":35}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
         "19": "/assets/logo19.png",
@@ -192,14 +195,12 @@ var BADGE_COLOR = [231, 76, 60, 255],
     },
 
     Vow = require('vow'),
-    _ = require('underscore')._,
-    Browser = require('browser/detect.js'),
-    Mediator = require('mediator/mediator.js'),
+    Env = require('env/env.js'),
 
     browserAction;
 
 // Set up popup and popup comminication
-if (Browser.firefox) {
+if (Env.firefox) {
     var data = require('sdk/self').data;
 
     browserAction = require('browserAction').BrowserAction({
@@ -207,19 +208,13 @@ if (Browser.firefox) {
         default_title: 'VKfox',
         default_popup: data.url('pages/popup.html')
     });
-    Mediator.sub('all', function () {
-        browserAction.sendMessage([].slice.call(arguments));
-    });
-    browserAction.onMessage = function () {
-        Mediator.pub.apply(Mediator, arguments);
-    };
 } else {
     browserAction = chrome.browserAction;
 }
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = _.extend({}, Browser, {
+module.exports = {
     getBrowserAction: function () {
         return browserAction;
     },
@@ -249,7 +244,7 @@ module.exports = _.extend({}, Browser, {
      * @returns {Boolean}
      */
     isPopupOpened: function () {
-        if (Browser.firefox) {
+        if (Env.firefox) {
             // TODO fix stub
             return false;
         } else {
@@ -264,7 +259,7 @@ module.exports = _.extend({}, Browser, {
     isVKSiteActive: function () {
         var promise = Vow.promise();
 
-        if (Browser.firefox) {
+        if (Env.firefox) {
             // TODO fix stub
             promise.fulfill(false);
         } else {
@@ -281,15 +276,9 @@ module.exports = _.extend({}, Browser, {
 
         return promise;
     }
-});
-
-},{"browser/detect.js":5,"browserAction":29,"mediator/mediator.js":15,"sdk/self":29,"underscore":31,"vow":32}],5:[function(require,module,exports){
-module.exports = {
-    chrome: true
-    // firefox:  true
 };
 
-},{}],6:[function(require,module,exports){
+},{"browserAction":32,"env/env.js":8,"sdk/self":32,"vow":35}],5:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Vow = require('vow'),
@@ -475,7 +464,7 @@ Mediator.sub('buddies:watch:toggle', function (uid) {
     }
 });
 
-},{"backbone":28,"i18n/i18n.js":12,"mediator/mediator.js":15,"notifications/notifications.bg.js":17,"persistent-set/persistent-set.bg.js":19,"profiles-collection/profiles-collection.bg.js":20,"request/request.bg.js":21,"underscore":31,"users/users.bg.js":27,"vow":32}],7:[function(require,module,exports){
+},{"backbone":31,"i18n/i18n.js":12,"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-set/persistent-set.bg.js":22,"profiles-collection/profiles-collection.bg.js":23,"request/request.bg.js":24,"underscore":34,"users/users.bg.js":30,"vow":35}],6:[function(require,module,exports){
 /*jshint bitwise:false */
 var
 MAX_HISTORY_COUNT = 10,
@@ -541,7 +530,7 @@ function initialize() {
     dialogColl.reset();
     profilesColl.reset();
 
-    if (!readyPromise || readyPromise.isFulfilled() === 'resolved') {
+    if (!readyPromise || readyPromise.isFulfilled()) {
         if (readyPromise) {
             readyPromise.reject();
         }
@@ -612,6 +601,7 @@ function fetchProfiles() {
     uids = _.uniq(uids);
 
     return Users.getProfilesById(uids).then(function (data) {
+        console.log(data);
         profilesColl.reset(data);
         // mark self profile
         profilesColl.get(userId).set('isSelf', true);
@@ -798,13 +788,13 @@ Mediator.sub('chat:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":28,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":15,"notifications/notifications.bg.js":17,"persistent-model/persistent-model.js":18,"profiles-collection/profiles-collection.bg.js":20,"request/request.bg.js":21,"router/router.bg.js":23,"underscore":31,"users/users.bg.js":27,"vow":32}],8:[function(require,module,exports){
-var Browser = require('browser/detect.js');
+},{"backbone":31,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":21,"profiles-collection/profiles-collection.bg.js":23,"request/request.bg.js":24,"router/router.bg.js":26,"underscore":34,"users/users.bg.js":30,"vow":35}],7:[function(require,module,exports){
+var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
-if (Browser.firefox) {
+if (Env.firefox) {
     exports.TRACKER_ID = 'UA-9568575-4';
-} else if (Browser.chrome) {
+} else if (Env.chrome) {
     exports.TRACKER_ID = 'UA-9568575-2';
 } else {
     exports.TRACKER_ID = 'UA-9568575-3';
@@ -823,9 +813,21 @@ exports.AUTH_URI = [
         'display=page'
     ].join('&')
 ].join('');
-console.log(exports.AUTH_URI);
 
-},{"browser/detect.js":5}],9:[function(require,module,exports){
+},{"env/env.js":8}],8:[function(require,module,exports){
+/*jshint bitwise: false*/
+var isPopup = location && ~location.href.indexOf('popup');
+
+module.exports = {
+    // popup/background environment
+    popup: isPopup,
+    background: !isPopup,
+    // browser environment
+    chrome: true
+    // firefox:  true
+};
+
+},{}],9:[function(require,module,exports){
 var
 MAX_ITEMS_COUNT = 50,
 MAX_COMMENTS_COUNT = 3,
@@ -1279,7 +1281,7 @@ Mediator.sub('feedbacks:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":28,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":15,"notifications/notifications.bg.js":17,"persistent-model/persistent-model.js":18,"profiles-collection/profiles-collection.bg.js":20,"request/request.bg.js":21,"router/router.bg.js":23,"underscore":31,"users/users.bg.js":27,"vow":32}],10:[function(require,module,exports){
+},{"backbone":31,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":21,"profiles-collection/profiles-collection.bg.js":23,"request/request.bg.js":24,"router/router.bg.js":26,"underscore":34,"users/users.bg.js":30,"vow":35}],10:[function(require,module,exports){
 var MARK_PERIOD = 5 * 60 * 1000, //5 min
 
     Mediator = require('mediator/mediator.js'),
@@ -1315,7 +1317,7 @@ settings.on('change:enabled', function (event, enabled) {
     }
 });
 
-},{"mediator/mediator.js":15,"persistent-model/persistent-model.js":18,"request/request.bg.js":21}],11:[function(require,module,exports){
+},{"mediator/mediator.js":18,"persistent-model/persistent-model.js":21,"request/request.bg.js":24}],11:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -1698,7 +1700,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":11,"./ru.js":13,"./uk.js":14,"underscore":31}],13:[function(require,module,exports){
+},{"./en.js":11,"./ru.js":13,"./uk.js":14,"underscore":34}],13:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -3107,6 +3109,44 @@ return r;
 })();
 
 },{}],15:[function(require,module,exports){
+var LONG_POLL_WAIT = 20,
+    FETCH_DEBOUNCE = 1000,
+    fetchUpdates,
+
+    _ = require('underscore')._,
+    Request = require('request/request.bg.js'),
+    Mediator = require('mediator/mediator.js');
+
+function enableLongPollUpdates() {
+    Request.api({
+        code: 'return API.messages.getLongPollServer();'
+    }).then(fetchUpdates);
+}
+fetchUpdates = _.debounce(function (params) {
+    Request.get('http://' + params.server, {
+        act: 'a_check',
+        key:  params.key,
+        ts: params.ts,
+        wait: LONG_POLL_WAIT,
+        mode: 2
+    }, 'json').then(function (response) {
+        if (!response.updates) {
+            enableLongPollUpdates();
+            return;
+        } else if (response.updates.length) {
+            Mediator.pub('longpoll:updates', response.updates);
+        }
+
+        params.ts = response.ts;
+        fetchUpdates(params);
+    }, enableLongPollUpdates);
+}, FETCH_DEBOUNCE);
+
+Mediator.sub('auth:success', function () {
+    enableLongPollUpdates();
+});
+
+},{"mediator/mediator.js":18,"request/request.bg.js":24,"underscore":34}],16:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -3126,7 +3166,59 @@ module.exports = {
     }
 };
 
-},{"backbone":28,"underscore":31}],16:[function(require,module,exports){
+},{"backbone":31,"underscore":34}],17:[function(require,module,exports){
+var Dispatcher = require('./dispatcher.js'),
+    Mediator = Object.create(Dispatcher),
+    Env = require('env/env.js');
+
+if (Env.firefox) {
+    throw "not implemented";
+    // Mediator.sub('all', function () {
+        // browserAction.sendMessage([].slice.call(arguments));
+    // });
+    // browserAction.onMessage = function () {
+        // Mediator.pub.apply(Mediator, arguments);
+    // };
+} else {
+    var activePorts = [];
+
+    chrome.runtime.onConnect.addListener(function (port) {
+        activePorts.push(port);
+        port.onMessage.addListener(function (messageData) {
+            Dispatcher.pub.apply(Dispatcher, messageData);
+        });
+        port.onDisconnect.addListener(function () {
+            activePorts = activePorts.filter(function (active) {
+                return active !== port;
+            });
+        });
+    });
+
+    Mediator.pub = function () {
+        var args = arguments;
+
+        Dispatcher.pub.apply(Mediator, arguments);
+
+        activePorts.forEach(function (port) {
+            port.postMessage([].slice.call(args));
+        });
+    };
+}
+
+module.exports = Mediator;
+
+},{"./dispatcher.js":16,"env/env.js":8}],18:[function(require,module,exports){
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+if (require('env/env.js').popup) {
+    module.exports = require('./mediator.pu.js');
+} else {
+    module.exports = require('./mediator.bg.js');
+}
+
+},{"./mediator.bg.js":17,"./mediator.pu.js":32,"env/env.js":8}],19:[function(require,module,exports){
 var
 MAX_ITEMS_COUNT = 50,
 UPDATE_PERIOD = 10000, //ms
@@ -3311,8 +3403,8 @@ function fetchNewsfeed() {
         autoUpdateParams.start_time = response.time;
 
         profilesColl
-        .add(newsfeed.profiles, {parse: true})
-        .add(newsfeed.groups, {parse: true});
+            .add(newsfeed.profiles, {parse: true})
+            .add(newsfeed.groups, {parse: true});
 
         discardOddWallPhotos(newsfeed.items).forEach(processRawItem);
 
@@ -3412,7 +3504,7 @@ readyPromise.then(function () {
     }), 0);
 }).done();
 
-},{"backbone":28,"mediator/mediator.js":15,"request/request.bg.js":21,"tracker/tracker.js":25,"underscore":31,"vow":32}],17:[function(require,module,exports){
+},{"backbone":31,"mediator/mediator.js":18,"request/request.bg.js":24,"tracker/tracker.js":28,"underscore":34,"vow":35}],20:[function(require,module,exports){
 var
 NOTIFICATIONS_SOUNDS = {
     standart: 'notifications/standart.ogg',
@@ -3464,7 +3556,7 @@ notificationsSettings = new NotificationsSettings({
     }
 }, {name: 'notificationsSettings'}),
 
-notificationQueue = new Backbone.Collection.extend({
+notificationQueue = new (Backbone.Collection.extend({
     initialize: function () {
         this
             .on('add remove reset', function () {
@@ -3509,7 +3601,7 @@ notificationQueue = new Backbone.Collection.extend({
         });
 
     }
-});
+}))();
 
 function getBase64FromImage(url, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
@@ -3544,9 +3636,9 @@ module.exports = Notifications = {
     BUDDIES: 'buddies',
     NEWS: 'news',
     createPopup: function (options) {
-        var popups = NotificationsSettings.get('popups');
+        var popups = notificationsSettings.get('popups');
 
-        if (NotificationsSettings.get('enabled') && popups.enabled) {
+        if (notificationsSettings.get('enabled') && popups.enabled) {
             getBase64FromImage(options.image, function (base64) {
                 try {
                     chrome.notifications.create(_.uniqueId(), {
@@ -3562,10 +3654,10 @@ module.exports = Notifications = {
         }
     },
     playSound: function () {
-        var sound = NotificationsSettings.get('sound'),
+        var sound = notificationsSettings.get('sound'),
             audio = new Audio();
 
-        if (NotificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
+        if (notificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
             audioInProgress = true;
 
             audio.volume = sound.volume;
@@ -3578,13 +3670,13 @@ module.exports = Notifications = {
         }
     },
     setBadge: function (count, force) {
-        if (NotificationsSettings.get('enabled') || force) {
+        if (notificationsSettings.get('enabled') || force) {
             Browser.setBadgeText(count || '');
         }
     }
 };
 
-},{"backbone":28,"browser/browser.bg.js":4,"mediator/mediator.js":15,"persistent-model/persistent-model.js":18,"underscore":31}],18:[function(require,module,exports){
+},{"backbone":31,"browser/browser.bg.js":4,"mediator/mediator.js":18,"persistent-model/persistent-model.js":21,"underscore":34}],21:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -3617,7 +3709,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":28,"storage/storage.js":24}],19:[function(require,module,exports){
+},{"backbone":31,"storage/storage.js":27}],22:[function(require,module,exports){
 var
 storage = require('storage/storage.js'),
 constructor = function (name) {
@@ -3663,7 +3755,7 @@ constructor.prototype = {
 
 module.exports = constructor;
 
-},{"storage/storage.js":24}],20:[function(require,module,exports){
+},{"storage/storage.js":27}],23:[function(require,module,exports){
 var UPDATE_NON_FRIENDS_PERIOD = 10000,
 
     Users = require('users/users.bg.js'),
@@ -3730,26 +3822,27 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"backbone":28,"mediator/mediator.js":15,"underscore":31,"users/users.bg.js":27}],21:[function(require,module,exports){
+},{"backbone":31,"mediator/mediator.js":18,"underscore":34,"users/users.bg.js":30}],24:[function(require,module,exports){
 var
 API_QUERIES_PER_REQUEST = 15,
 API_DOMAIN = 'https://api.vk.com/',
 API_REQUESTS_DEBOUNCE = 400,
 API_VERSION = 4.99,
-// XHR_TIMEOUT = 30000,
+XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
 _ = require('underscore')._,
 Auth = require('auth/auth.bg.js'),
-Browser = require('browser/detect.js'),
+Env = require('env/env.js'),
 Mediator = require('mediator/mediator.js'),
 
 apiQueriesQueue = [];
 
-if (Browser.firefox) {
+if (Env.firefox) {
     var sdkRequest = require("sdk/request").Request;
 }
 
+// Custom errors
 function HttpError(message) {
     this.name = 'HttpError';
     this.message = message;
@@ -3763,35 +3856,98 @@ function AccessTokenError(message) {
     constructor.prototype.constructor = constructor;
 });
 
+/**
+ * Convert an object into a query params string
+ *
+ * @param {Object} params
+ *
+ * @returns {String}
+ */
+function querystring(params) {
+    var query = [],
+        i, key;
 
-function xhr(type, url, data) {
+    for (key in params) {
+        if (params[key] === undefined || params[key] === null)  {
+            continue;
+        }
+        if (Array.isArray(params[key])) {
+            for (i = 0; i < params[key].length; ++i) {
+                if (params[key][i] === undefined || params[key][i] === null) {
+                    continue;
+                }
+                query.push(encodeURIComponent(key) + '[]=' + encodeURIComponent(params[key][i]));
+            }
+        } else {
+            query.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
+        }
+    }
+    return query.join('&');
+}
+
+/**
+ * XMLHttpRequest onload handler.
+ * Checks for an expired accessToken (e.g. a request that completed after relogin)
+ *
+ * @param {Vow.promise} ajaxPromise Will be resolved or rejected
+ * @param {String} usedAccessToken
+ * @param {String} responseText
+ * @param {String} dataType Is ignored currently
+ */
+function onLoad(ajaxPromise, usedAccessToken, responseText) {
+    Auth.getAccessToken().then(function (accessToken) {
+        if (accessToken === usedAccessToken) {
+            try {
+                ajaxPromise.fulfill(JSON.parse(responseText));
+            } catch (e) {
+                ajaxPromise.fulfill(responseText);
+            }
+        } else {
+            ajaxPromise.reject(new AccessTokenError());
+        }
+    });
+}
+
+/**
+ * Make HTTP Request
+ *
+ * @param {String} type Post or get
+ * @param {String} url
+ * @param {Object|String} data to send
+ * @param {String} dataType If "json" than reponseText will be parsed and returned as object
+ */
+function xhr(type, url, data, dataType) {
     return Auth.getAccessToken().then(function (accessToken) {
-        var usedAccessToken = accessToken,
-            ajaxPromise = Vow.promise();
+        var ajaxPromise = Vow.promise(), xhr;
 
-        if (Browser.firefox) {
+        if (Env.firefox) {
             // TODO implement timeout
             sdkRequest({
                 url: url,
                 content: data === 'string' ? encodeURIComponent(data):data,
                 onComplete: function (response) {
                     if (response.statusText === 'OK') {
-                        Auth.getAccessToken().then(function (accessToken) {
-                            if (accessToken === usedAccessToken) {
-                                ajaxPromise.fulfill(
-                                    response.bg.json || response.text
-                                );
-                            } else {
-                                ajaxPromise.reject(new AccessTokenError(response));
-                            }
-                        });
+                        onLoad(ajaxPromise, accessToken, response.text, dataType);
                     } else {
-                        ajaxPromise.reject(new HttpError(response));
+                        ajaxPromise.reject(new HttpError(response.status));
                     }
                 }
             })[type]();
         } else {
-            throw "Not implemented";
+            xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                onLoad(ajaxPromise, accessToken, xhr.responseText);
+            };
+            xhr.timeout = XHR_TIMEOUT;
+            xhr.onerror = xhr.ontimeout = function (e) {
+                ajaxPromise.reject(new HttpError(e));
+            };
+            type = type.toUpperCase();
+            xhr.open(type, url, true);
+            if (type === 'POST') {
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            }
+            xhr.send(typeof data === 'string' ? data:querystring(data));
         }
 
         return ajaxPromise;
@@ -3872,28 +4028,29 @@ var Request = module.exports = {
                         // force relogin on API error
                         Auth.login(true);
                     }
-                }, function () {
+                }, function (e) {
                     // force relogin on API error
                     Auth.login(true);
+                    console.log(e);
                 }).done();
             }).done();
         }
     }, API_REQUESTS_DEBOUNCE)
 };
 
-},{"auth/auth.bg.js":3,"browser/detect.js":5,"mediator/mediator.js":15,"sdk/request":29,"underscore":31,"vow":32}],22:[function(require,module,exports){
-/*jshint bitwise: false*/
+},{"auth/auth.bg.js":3,"env/env.js":8,"mediator/mediator.js":18,"sdk/request":32,"underscore":34,"vow":35}],25:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
  */
-if (location && ~location.href.indexOf('popup')) {
-    return require('./request.pu.js');
+if (require('env/env.js').popup) {
+    module.exports = require('./request.pu.js');
 } else {
-    return require('./request.bg.js');
+    module.exports = require('./request.bg.js');
 }
 
-},{"./request.bg.js":21,"./request.pu.js":29}],23:[function(require,module,exports){
+},{"./request.bg.js":24,"./request.pu.js":32,"env/env.js":8}],26:[function(require,module,exports){
+require('notifications/notifications.bg.js');
 var
 Mediator = require('mediator/mediator.js'),
 PersistentModel = require('persistent-model/persistent-model.js'),
@@ -3929,10 +4086,10 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":15,"persistent-model/persistent-model.js":18}],24:[function(require,module,exports){
-var Browser = require('browser/detect.js');
+},{"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":21}],27:[function(require,module,exports){
+var Env = require('env/env.js');
 
-if (Browser.firefox) {
+if (Env.firefox) {
     var storage = require("sdk/simple-storage");
 
     module.exports = {
@@ -3949,7 +4106,7 @@ if (Browser.firefox) {
 
 
 
-},{"browser/detect.js":5,"sdk/simple-storage":29}],25:[function(require,module,exports){
+},{"env/env.js":8,"sdk/simple-storage":32}],28:[function(require,module,exports){
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,
@@ -4016,7 +4173,7 @@ module.exports = {
     }
 };
 
-},{"config/config.js":8,"i18n/i18n.js":12,"persistent-model/persistent-model.js":18,"request/request.js":22,"underscore":31}],26:[function(require,module,exports){
+},{"config/config.js":7,"i18n/i18n.js":12,"persistent-model/persistent-model.js":21,"request/request.js":25,"underscore":34}],29:[function(require,module,exports){
 /**
  * Returns user's name
  *
@@ -4036,7 +4193,7 @@ exports.getName = function (input) {
     }).join(', ');
 };
 
-},{}],27:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var
 DROP_PROFILES_INTERVAL = 500,
 USERS_GET_DEBOUNCE = 400,
@@ -4079,7 +4236,7 @@ publishUids = function (queue) {
             return getProfileById(uid).toJSON();
         });
 
-        queueItem.promise.resolve(data);
+        queueItem.promise.fulfill(data);
     }
 },
 processGetUsersQueue = _.debounce(function () {
@@ -4161,11 +4318,10 @@ module.exports = _.extend({
     }
 }, require('users/name.js'));
 
-},{"backbone":28,"mediator/mediator.js":15,"request/request.bg.js":21,"underscore":31,"users/name.js":26,"vow":32}],28:[function(require,module,exports){
-//     Backbone.js 1.1.0
+},{"backbone":31,"mediator/mediator.js":18,"request/request.bg.js":24,"underscore":34,"users/name.js":29,"vow":35}],31:[function(require,module,exports){
+//     Backbone.js 1.0.0
 
-//     (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
-//     (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
@@ -4199,7 +4355,7 @@ module.exports = _.extend({
   }
 
   // Current version of the library. Keep in sync with `package.json`.
-  Backbone.VERSION = '1.1.0';
+  Backbone.VERSION = '1.0.0';
 
   // Require Underscore, if we're on the server, and it's not already present.
   var _ = root._;
@@ -4217,7 +4373,7 @@ module.exports = _.extend({
   };
 
   // Turn on `emulateHTTP` to support legacy HTTP servers. Setting this option
-  // will fake `"PATCH"`, `"PUT"` and `"DELETE"` requests via the `_method` parameter and
+  // will fake `"PUT"` and `"DELETE"` requests via the `_method` parameter and
   // set a `X-Http-Method-Override` header.
   Backbone.emulateHTTP = false;
 
@@ -4276,6 +4432,7 @@ module.exports = _.extend({
         this._events = {};
         return this;
       }
+
       names = name ? [name] : _.keys(this._events);
       for (i = 0, l = names.length; i < l; i++) {
         name = names[i];
@@ -4315,15 +4472,14 @@ module.exports = _.extend({
     // Tell this object to stop listening to either specific events ... or
     // to every object it's currently listening to.
     stopListening: function(obj, name, callback) {
-      var listeningTo = this._listeningTo;
-      if (!listeningTo) return this;
-      var remove = !name && !callback;
-      if (!callback && typeof name === 'object') callback = this;
-      if (obj) (listeningTo = {})[obj._listenId] = obj;
-      for (var id in listeningTo) {
-        obj = listeningTo[id];
-        obj.off(name, callback, this);
-        if (remove || _.isEmpty(obj._events)) delete this._listeningTo[id];
+      var listeners = this._listeners;
+      if (!listeners) return this;
+      var deleteListener = !name && !callback;
+      if (typeof name === 'object') callback = this;
+      if (obj) (listeners = {})[obj._listenerId] = obj;
+      for (var id in listeners) {
+        listeners[id].off(name, callback, this);
+        if (deleteListener) delete this._listeners[id];
       }
       return this;
     }
@@ -4380,10 +4536,10 @@ module.exports = _.extend({
   // listening to.
   _.each(listenMethods, function(implementation, method) {
     Events[method] = function(obj, name, callback) {
-      var listeningTo = this._listeningTo || (this._listeningTo = {});
-      var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
-      listeningTo[id] = obj;
-      if (!callback && typeof name === 'object') callback = this;
+      var listeners = this._listeners || (this._listeners = {});
+      var id = obj._listenerId || (obj._listenerId = _.uniqueId('l'));
+      listeners[id] = obj;
+      if (typeof name === 'object') callback = this;
       obj[implementation](name, callback, this);
       return this;
     };
@@ -4408,17 +4564,23 @@ module.exports = _.extend({
   // Create a new model with the specified attributes. A client id (`cid`)
   // is automatically generated and assigned for you.
   var Model = Backbone.Model = function(attributes, options) {
+    var defaults;
     var attrs = attributes || {};
     options || (options = {});
     this.cid = _.uniqueId('c');
     this.attributes = {};
-    if (options.collection) this.collection = options.collection;
+    _.extend(this, _.pick(options, modelOptions));
     if (options.parse) attrs = this.parse(attrs, options) || {};
-    attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
+    if (defaults = _.result(this, 'defaults')) {
+      attrs = _.defaults({}, attrs, defaults);
+    }
     this.set(attrs, options);
     this.changed = {};
     this.initialize.apply(this, arguments);
   };
+
+  // A list of options to be attached directly to the model, if provided.
+  var modelOptions = ['url', 'urlRoot', 'collection'];
 
   // Attach all inheritable methods to the Model prototype.
   _.extend(Model.prototype, Events, {
@@ -4615,16 +4777,13 @@ module.exports = _.extend({
         (attrs = {})[key] = val;
       }
 
+      // If we're not waiting and attributes exist, save acts as `set(attr).save(null, opts)`.
+      if (attrs && (!options || !options.wait) && !this.set(attrs, options)) return false;
+
       options = _.extend({validate: true}, options);
 
-      // If we're not waiting and attributes exist, save acts as
-      // `set(attr).save(null, opts)` with validation. Otherwise, check if
-      // the model will be valid when the attributes, if any, are set.
-      if (attrs && !options.wait) {
-        if (!this.set(attrs, options)) return false;
-      } else {
-        if (!this._validate(attrs, options)) return false;
-      }
+      // Do not persist invalid models.
+      if (!this._validate(attrs, options)) return false;
 
       // Set temporary attributes if `{wait: true}`.
       if (attrs && options.wait) {
@@ -4725,7 +4884,7 @@ module.exports = _.extend({
       attrs = _.extend({}, this.attributes, attrs);
       var error = this.validationError = this.validate(attrs, options) || null;
       if (!error) return true;
-      this.trigger('invalid', this, error, _.extend(options, {validationError: error}));
+      this.trigger('invalid', this, error, _.extend(options || {}, {validationError: error}));
       return false;
     }
 
@@ -4758,6 +4917,7 @@ module.exports = _.extend({
   // its models in sort order, as they're added and removed.
   var Collection = Backbone.Collection = function(models, options) {
     options || (options = {});
+    if (options.url) this.url = options.url;
     if (options.model) this.model = options.model;
     if (options.comparator !== void 0) this.comparator = options.comparator;
     this._reset();
@@ -4767,7 +4927,7 @@ module.exports = _.extend({
 
   // Default options for `Collection#set`.
   var setOptions = {add: true, remove: true, merge: true};
-  var addOptions = {add: true, remove: false};
+  var addOptions = {add: true, merge: false, remove: false};
 
   // Define the Collection's inheritable methods.
   _.extend(Collection.prototype, Events, {
@@ -4793,17 +4953,16 @@ module.exports = _.extend({
 
     // Add a model, or list of models to the set.
     add: function(models, options) {
-      return this.set(models, _.extend({merge: false}, options, addOptions));
+      return this.set(models, _.defaults(options || {}, addOptions));
     },
 
     // Remove a model, or a list of models from the set.
     remove: function(models, options) {
-      var singular = !_.isArray(models);
-      models = singular ? [models] : _.clone(models);
+      models = _.isArray(models) ? models.slice() : [models];
       options || (options = {});
       var i, l, index, model;
       for (i = 0, l = models.length; i < l; i++) {
-        model = models[i] = this.get(models[i]);
+        model = this.get(models[i]);
         if (!model) continue;
         delete this._byId[model.id];
         delete this._byId[model.cid];
@@ -4816,7 +4975,7 @@ module.exports = _.extend({
         }
         this._removeReference(model);
       }
-      return singular ? models[0] : models;
+      return this;
     },
 
     // Update a collection by `set`-ing a new list of models, adding new ones,
@@ -4824,45 +4983,31 @@ module.exports = _.extend({
     // already exist in the collection, as necessary. Similar to **Model#set**,
     // the core operation for updating the data contained by the collection.
     set: function(models, options) {
-      options = _.defaults({}, options, setOptions);
+      options = _.defaults(options || {}, setOptions);
       if (options.parse) models = this.parse(models, options);
-      var singular = !_.isArray(models);
-      models = singular ? (models ? [models] : []) : _.clone(models);
-      var i, l, id, model, attrs, existing, sort;
+      if (!_.isArray(models)) models = models ? [models] : [];
+      var i, l, model, attrs, existing, sort;
       var at = options.at;
-      var targetModel = this.model;
       var sortable = this.comparator && (at == null) && options.sort !== false;
       var sortAttr = _.isString(this.comparator) ? this.comparator : null;
       var toAdd = [], toRemove = [], modelMap = {};
-      var add = options.add, merge = options.merge, remove = options.remove;
-      var order = !sortable && add && remove ? [] : false;
 
       // Turn bare objects into model references, and prevent invalid models
       // from being added.
       for (i = 0, l = models.length; i < l; i++) {
-        attrs = models[i];
-        if (attrs instanceof Model) {
-          id = model = attrs;
-        } else {
-          id = attrs[targetModel.prototype.idAttribute];
-        }
+        if (!(model = this._prepareModel(models[i], options))) continue;
 
         // If a duplicate is found, prevent it from being added and
         // optionally merge it into the existing model.
-        if (existing = this.get(id)) {
-          if (remove) modelMap[existing.cid] = true;
-          if (merge) {
-            attrs = attrs === model ? model.attributes : attrs;
-            if (options.parse) attrs = existing.parse(attrs, options);
-            existing.set(attrs, options);
+        if (existing = this.get(model)) {
+          if (options.remove) modelMap[existing.cid] = true;
+          if (options.merge) {
+            existing.set(model.attributes, options);
             if (sortable && !sort && existing.hasChanged(sortAttr)) sort = true;
           }
-          models[i] = existing;
 
-        // If this is a new, valid model, push it to the `toAdd` list.
-        } else if (add) {
-          model = models[i] = this._prepareModel(attrs, options);
-          if (!model) continue;
+        // This is a new model, push it to the `toAdd` list.
+        } else if (options.add) {
           toAdd.push(model);
 
           // Listen to added models' events, and index models for lookup by
@@ -4871,11 +5016,10 @@ module.exports = _.extend({
           this._byId[model.cid] = model;
           if (model.id != null) this._byId[model.id] = model;
         }
-        if (order) order.push(existing || model);
       }
 
       // Remove nonexistent models if appropriate.
-      if (remove) {
+      if (options.remove) {
         for (i = 0, l = this.length; i < l; ++i) {
           if (!modelMap[(model = this.models[i]).cid]) toRemove.push(model);
         }
@@ -4883,35 +5027,29 @@ module.exports = _.extend({
       }
 
       // See if sorting is needed, update `length` and splice in new models.
-      if (toAdd.length || (order && order.length)) {
+      if (toAdd.length) {
         if (sortable) sort = true;
         this.length += toAdd.length;
         if (at != null) {
-          for (i = 0, l = toAdd.length; i < l; i++) {
-            this.models.splice(at + i, 0, toAdd[i]);
-          }
+          splice.apply(this.models, [at, 0].concat(toAdd));
         } else {
-          if (order) this.models.length = 0;
-          var orderedModels = order || toAdd;
-          for (i = 0, l = orderedModels.length; i < l; i++) {
-            this.models.push(orderedModels[i]);
-          }
+          push.apply(this.models, toAdd);
         }
       }
 
       // Silently sort the collection if appropriate.
       if (sort) this.sort({silent: true});
 
-      // Unless silenced, it's time to fire all appropriate add/sort events.
-      if (!options.silent) {
-        for (i = 0, l = toAdd.length; i < l; i++) {
-          (model = toAdd[i]).trigger('add', model, this, options);
-        }
-        if (sort || (order && order.length)) this.trigger('sort', this, options);
+      if (options.silent) return this;
+
+      // Trigger `add` events.
+      for (i = 0, l = toAdd.length; i < l; i++) {
+        (model = toAdd[i]).trigger('add', model, this, options);
       }
-      
-      // Return the added (or merged) model (or models).
-      return singular ? models[0] : models;
+
+      // Trigger `sort` if the collection was sorted.
+      if (sort) this.trigger('sort', this, options);
+      return this;
     },
 
     // When you have more items than you want to add or remove individually,
@@ -4925,14 +5063,16 @@ module.exports = _.extend({
       }
       options.previousModels = this.models;
       this._reset();
-      models = this.add(models, _.extend({silent: true}, options));
+      this.add(models, _.extend({silent: true}, options));
       if (!options.silent) this.trigger('reset', this, options);
-      return models;
+      return this;
     },
 
     // Add a model to the end of the collection.
     push: function(model, options) {
-      return this.add(model, _.extend({at: this.length}, options));
+      model = this._prepareModel(model, options);
+      this.add(model, _.extend({at: this.length}, options));
+      return model;
     },
 
     // Remove a model from the end of the collection.
@@ -4944,7 +5084,9 @@ module.exports = _.extend({
 
     // Add a model to the beginning of the collection.
     unshift: function(model, options) {
-      return this.add(model, _.extend({at: 0}, options));
+      model = this._prepareModel(model, options);
+      this.add(model, _.extend({at: 0}, options));
+      return model;
     },
 
     // Remove a model from the beginning of the collection.
@@ -4955,14 +5097,14 @@ module.exports = _.extend({
     },
 
     // Slice out a sub-array of models from the collection.
-    slice: function() {
-      return slice.apply(this.models, arguments);
+    slice: function(begin, end) {
+      return this.models.slice(begin, end);
     },
 
     // Get a model from the set by id.
     get: function(obj) {
       if (obj == null) return void 0;
-      return this._byId[obj.id] || this._byId[obj.cid] || this._byId[obj];
+      return this._byId[obj.id != null ? obj.id : obj.cid || obj];
     },
 
     // Get the model at the given index.
@@ -5006,6 +5148,16 @@ module.exports = _.extend({
       return this;
     },
 
+    // Figure out the smallest index at which a model should be inserted so as
+    // to maintain order.
+    sortedIndex: function(model, value, context) {
+      value || (value = this.comparator);
+      var iterator = _.isFunction(value) ? value : function(model) {
+        return model.get(value);
+      };
+      return _.sortedIndex(this.models, model, iterator, context);
+    },
+
     // Pluck an attribute from each model in the collection.
     pluck: function(attr) {
       return _.invoke(this.models, 'get', attr);
@@ -5038,7 +5190,7 @@ module.exports = _.extend({
       if (!options.wait) this.add(model, options);
       var collection = this;
       var success = options.success;
-      options.success = function(model, resp, options) {
+      options.success = function(resp) {
         if (options.wait) collection.add(model, options);
         if (success) success(model, resp, options);
       };
@@ -5072,12 +5224,14 @@ module.exports = _.extend({
         if (!attrs.collection) attrs.collection = this;
         return attrs;
       }
-      options = options ? _.clone(options) : {};
+      options || (options = {});
       options.collection = this;
       var model = new this.model(attrs, options);
-      if (!model.validationError) return model;
-      this.trigger('invalid', this, model.validationError, options);
-      return false;
+      if (!model._validate(attrs, options)) {
+        this.trigger('invalid', this, attrs, options);
+        return false;
+      }
+      return model;
     },
 
     // Internal method to sever a model's ties to a collection.
@@ -5109,8 +5263,8 @@ module.exports = _.extend({
     'inject', 'reduceRight', 'foldr', 'find', 'detect', 'filter', 'select',
     'reject', 'every', 'all', 'some', 'any', 'include', 'contains', 'invoke',
     'max', 'min', 'toArray', 'size', 'first', 'head', 'take', 'initial', 'rest',
-    'tail', 'drop', 'last', 'without', 'difference', 'indexOf', 'shuffle',
-    'lastIndexOf', 'isEmpty', 'chain'];
+    'tail', 'drop', 'last', 'without', 'indexOf', 'shuffle', 'lastIndexOf',
+    'isEmpty', 'chain'];
 
   // Mix in each Underscore method as a proxy to `Collection#models`.
   _.each(methods, function(method) {
@@ -5149,8 +5303,7 @@ module.exports = _.extend({
   // if an existing element is not provided...
   var View = Backbone.View = function(options) {
     this.cid = _.uniqueId('view');
-    options || (options = {});
-    _.extend(this, _.pick(options, viewOptions));
+    this._configure(options || {});
     this._ensureElement();
     this.initialize.apply(this, arguments);
     this.delegateEvents();
@@ -5169,7 +5322,7 @@ module.exports = _.extend({
     tagName: 'div',
 
     // jQuery delegate for element lookup, scoped to DOM elements within the
-    // current view. This should be preferred to global lookups where possible.
+    // current view. This should be prefered to global lookups where possible.
     $: function(selector) {
       return this.$el.find(selector);
     },
@@ -5209,7 +5362,7 @@ module.exports = _.extend({
     //
     //     {
     //       'mousedown .title':  'edit',
-    //       'click .button':     'save',
+    //       'click .button':     'save'
     //       'click .open':       function(e) { ... }
     //     }
     //
@@ -5245,6 +5398,16 @@ module.exports = _.extend({
     undelegateEvents: function() {
       this.$el.off('.delegateEvents' + this.cid);
       return this;
+    },
+
+    // Performs the initial configuration of a View with a set of options.
+    // Keys with special meaning *(e.g. model, collection, id, className)* are
+    // attached directly to the view.  See `viewOptions` for an exhaustive
+    // list.
+    _configure: function(options) {
+      if (this.options) options = _.extend({}, _.result(this, 'options'), options);
+      _.extend(this, _.pick(options, viewOptions));
+      this.options = options;
     },
 
     // Ensure that the View has a DOM element to render into.
@@ -5332,7 +5495,8 @@ module.exports = _.extend({
     // If we're sending a `PATCH` request, and we're in an old Internet Explorer
     // that still has ActiveX enabled by default, override jQuery to use that
     // for XHR instead. Remove this line when jQuery supports `PATCH` on IE8.
-    if (params.type === 'PATCH' && noXhrPatch) {
+    if (params.type === 'PATCH' && window.ActiveXObject &&
+          !(window.external && window.external.msActiveXFilteringEnabled)) {
       params.xhr = function() {
         return new ActiveXObject("Microsoft.XMLHTTP");
       };
@@ -5343,8 +5507,6 @@ module.exports = _.extend({
     model.trigger('request', model, xhr, options);
     return xhr;
   };
-
-  var noXhrPatch = typeof window !== 'undefined' && !!window.ActiveXObject && !(window.XMLHttpRequest && (new XMLHttpRequest).dispatchEvent);
 
   // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
   var methodMap = {
@@ -5434,7 +5596,7 @@ module.exports = _.extend({
     _routeToRegExp: function(route) {
       route = route.replace(escapeRegExp, '\\$&')
                    .replace(optionalParam, '(?:$1)?')
-                   .replace(namedParam, function(match, optional) {
+                   .replace(namedParam, function(match, optional){
                      return optional ? match : '([^\/]+)';
                    })
                    .replace(splatParam, '(.*?)');
@@ -5484,9 +5646,6 @@ module.exports = _.extend({
   // Cached regex for removing a trailing slash.
   var trailingSlash = /\/$/;
 
-  // Cached regex for stripping urls of hash and query.
-  var pathStripper = /[?#].*$/;
-
   // Has the history handling already been started?
   History.started = false;
 
@@ -5511,7 +5670,7 @@ module.exports = _.extend({
         if (this._hasPushState || !this._wantsHashChange || forcePushState) {
           fragment = this.location.pathname;
           var root = this.root.replace(trailingSlash, '');
-          if (!fragment.indexOf(root)) fragment = fragment.slice(root.length);
+          if (!fragment.indexOf(root)) fragment = fragment.substr(root.length);
         } else {
           fragment = this.getHash();
         }
@@ -5527,7 +5686,7 @@ module.exports = _.extend({
 
       // Figure out the initial configuration. Do we need an iframe?
       // Is pushState desired ... is it available?
-      this.options          = _.extend({root: '/'}, this.options, options);
+      this.options          = _.extend({}, {root: '/'}, this.options, options);
       this.root             = this.options.root;
       this._wantsHashChange = this.options.hashChange !== false;
       this._wantsPushState  = !!this.options.pushState;
@@ -5560,25 +5719,19 @@ module.exports = _.extend({
       var loc = this.location;
       var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
 
-      // Transition from hashChange to pushState or vice versa if both are
-      // requested.
-      if (this._wantsHashChange && this._wantsPushState) {
+      // If we've started off with a route from a `pushState`-enabled browser,
+      // but we're currently in a browser that doesn't support it...
+      if (this._wantsHashChange && this._wantsPushState && !this._hasPushState && !atRoot) {
+        this.fragment = this.getFragment(null, true);
+        this.location.replace(this.root + this.location.search + '#' + this.fragment);
+        // Return immediately as browser will do redirect to new url
+        return true;
 
-        // If we've started off with a route from a `pushState`-enabled
-        // browser, but we're currently in a browser that doesn't support it...
-        if (!this._hasPushState && !atRoot) {
-          this.fragment = this.getFragment(null, true);
-          this.location.replace(this.root + this.location.search + '#' + this.fragment);
-          // Return immediately as browser will do redirect to new url
-          return true;
-
-        // Or if we've started out with a hash-based route, but we're currently
-        // in a browser where it could be `pushState`-based instead...
-        } else if (this._hasPushState && atRoot && loc.hash) {
-          this.fragment = this.getHash().replace(routeStripper, '');
-          this.history.replaceState({}, document.title, this.root + this.fragment + loc.search);
-        }
-
+      // Or if we've started out with a hash-based route, but we're currently
+      // in a browser where it could be `pushState`-based instead...
+      } else if (this._wantsPushState && this._hasPushState && atRoot && loc.hash) {
+        this.fragment = this.getHash().replace(routeStripper, '');
+        this.history.replaceState({}, document.title, this.root + this.fragment + loc.search);
       }
 
       if (!this.options.silent) return this.loadUrl();
@@ -5607,20 +5760,21 @@ module.exports = _.extend({
       }
       if (current === this.fragment) return false;
       if (this.iframe) this.navigate(current);
-      this.loadUrl();
+      this.loadUrl() || this.loadUrl(this.getHash());
     },
 
     // Attempt to load the current URL fragment. If a route succeeds with a
     // match, returns `true`. If no defined routes matches the fragment,
     // returns `false`.
-    loadUrl: function(fragment) {
-      fragment = this.fragment = this.getFragment(fragment);
-      return _.any(this.handlers, function(handler) {
+    loadUrl: function(fragmentOverride) {
+      var fragment = this.fragment = this.getFragment(fragmentOverride);
+      var matched = _.any(this.handlers, function(handler) {
         if (handler.route.test(fragment)) {
           handler.callback(fragment);
           return true;
         }
       });
+      return matched;
     },
 
     // Save a fragment into the hash history, or replace the URL state if the
@@ -5632,18 +5786,11 @@ module.exports = _.extend({
     // you wish to modify the current URL without adding an entry to the history.
     navigate: function(fragment, options) {
       if (!History.started) return false;
-      if (!options || options === true) options = {trigger: !!options};
-
-      var url = this.root + (fragment = this.getFragment(fragment || ''));
-
-      // Strip the fragment of the query and hash for matching.
-      fragment = fragment.replace(pathStripper, '');
-
+      if (!options || options === true) options = {trigger: options};
+      fragment = this.getFragment(fragment || '');
       if (this.fragment === fragment) return;
       this.fragment = fragment;
-
-      // Don't include a trailing slash on the root.
-      if (fragment === '' && url !== '/') url = url.slice(0, -1);
+      var url = this.root + fragment;
 
       // If pushState is available, we use it to set the fragment as a real URL.
       if (this._hasPushState) {
@@ -5666,7 +5813,7 @@ module.exports = _.extend({
       } else {
         return this.location.assign(url);
       }
-      if (options.trigger) return this.loadUrl(fragment);
+      if (options.trigger) this.loadUrl(fragment);
     },
 
     // Update the hash location, either replacing the current entry, or adding
@@ -5734,7 +5881,7 @@ module.exports = _.extend({
   };
 
   // Wrap an optional error callback with a fallback error event.
-  var wrapError = function(model, options) {
+  var wrapError = function (model, options) {
     var error = options.error;
     options.error = function(resp) {
       if (error) error(model, resp, options);
@@ -5744,9 +5891,9 @@ module.exports = _.extend({
 
 }).call(this);
 
-},{"underscore":31}],29:[function(require,module,exports){
+},{"underscore":34}],32:[function(require,module,exports){
 
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5800,7 +5947,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -7113,7 +7260,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":29}],32:[function(require,module,exports){
+},{"timer":32}],35:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -7707,5 +7854,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":30,"timer":29}]},{},[1])
+},{"__browserify_process":33,"timer":32}]},{},[1])
 ;

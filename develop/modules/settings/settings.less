@@ -1,0 +1,106 @@
+.settings {
+    padding: 10px;
+    height: 441px;
+    box-sizing: border-box;
+}
+.settings__separator {
+    border-top: 1px solid @clouds;
+    padding-top: 10px;
+}
+.settings__row {
+    font-size: 16px;
+    overflow: hidden;
+    position: relative;
+    padding-left: 20px;
+    line-height: 25px;
+
+    .settings__icon {
+        position: absolute;
+        left: 0;
+        vertical-align: middle;
+        line-height: inherit;
+    }
+
+    & + .settings__row {
+        margin-top: 10px;
+    }
+}
+
+.settings__row_sub {
+    margin-left: 20px;
+}
+
+.settings__label {
+    margin: 0;
+    float: left;
+    vertical-align: middle;
+    line-height: inherit;
+}
+.settings__label:first-letter {
+    text-transform: capitalize;
+}
+.settings__input {
+    float: right;
+}
+.settings__input:focus {
+    outline: none;
+}
+
+.settings__checkbox {
+    font-weight: bold;
+    display: inline-block;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 80px !important;
+    position: relative;
+    height: 25px;
+    z-index: 1;
+    text-align: center;
+    line-height: 15px !important;
+    font-size: 14px;
+}
+.settings__checkbox:before,
+.settings__checkbox:after {
+    .icon-FontAwesome();
+    position: absolute;
+    display: block;
+    width: 40px;
+    border: 5px solid @clouds;
+    height: 100%;
+    box-sizing: border-box;
+}
+.settings__checkbox:hover::before,
+.settings__checkbox:checked:hover::after {
+    background: darken(@clouds, 5%);
+}
+.settings__checkbox:checked::before {
+    color: white;
+    background: @peterRiver;
+}
+.settings__checkbox:after {
+    content: @remove;
+    background: @peterRiver;
+    color: white;
+    right: 0;
+    top: 0;
+}
+.settings__checkbox:checked::after {
+    color: @asbestos;
+    background: @clouds;
+}
+.settings__checkbox:after {
+    .border-right-radius(3px);
+}
+.settings__checkbox:before {
+    .border-left-radius(3px);
+    content: @ok;
+    background: @clouds;
+    color: @asbestos;
+    left: 0;
+    top: 0;
+}
+.settings__checkbox[disabled]:before,
+.settings__checkbox[disabled]:after {
+    background: @clouds !important;
+    color: darken(@clouds, 5%) !important;
+}

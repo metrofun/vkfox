@@ -40,7 +40,7 @@ publishUids = function (queue) {
             return getProfileById(uid).toJSON();
         });
 
-        queueItem.promise.resolve(data);
+        queueItem.promise.fulfill(data);
     }
 },
 processGetUsersQueue = _.debounce(function () {

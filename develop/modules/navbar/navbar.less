@@ -1,0 +1,41 @@
+.navbar .navbar-inner {
+    background: @clouds;
+    border-color: darken(@clouds, 15%);
+    box-shadow: none;
+    padding: 0 10px;
+
+    & .nav > li > a {
+        text-shadow: none;
+        outline: none;
+        color: @asbestos;
+    }
+    & .nav > li > a:hover {
+        background: darken(@clouds, 5%);
+    }
+
+
+    & .nav .active > a:hover,
+    & .nav .active > a {
+        box-shadow: none;
+        color: darken(@asbestos, 15%);
+        background: darken(@clouds, 10%);
+    }
+}
+.navbar-inverse .navbar-inner {
+    background: @peterRiver;
+    border-color: darken(@peterRiver, 15%);
+
+    & .nav > li > a {
+        outline: none;
+        color: white;
+    }
+    & .nav > li > a:hover {
+        background: darken(@peterRiver, 5%);
+    }
+
+    & .nav .active > a:hover,
+    & .nav .active > a {
+        background: darken(@peterRiver, 10%);
+        color: white;
+    }
+}

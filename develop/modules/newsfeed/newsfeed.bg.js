@@ -182,8 +182,8 @@ function fetchNewsfeed() {
         autoUpdateParams.start_time = response.time;
 
         profilesColl
-        .add(newsfeed.profiles, {parse: true})
-        .add(newsfeed.groups, {parse: true});
+            .add(newsfeed.profiles, {parse: true})
+            .add(newsfeed.groups, {parse: true});
 
         discardOddWallPhotos(newsfeed.items).forEach(processRawItem);
 

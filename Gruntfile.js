@@ -45,9 +45,28 @@ module.exports = function (grunt) {
                     'pages/popup.js': ['modules/app/app.pu.js'],
                 },
                 options: {
+                    shim: {
+                        'angular': {
+                            path: '../bower_components/angular-unstable/angular.js',
+                            exports: 'angular'
+                        },
+                        'javascript-linkify': {
+                            path: '../bower_components/javascript-linkify/ba-linkify.js',
+                            exports: 'linkify',
+                        },
+                        'zepto': {
+                            path: '../bower_components/zepto-bootstrap/zepto.js',
+                            exports: '$'
+                        },
+                        'jEmoji': {
+                            path: '../bower_components/emoji/lib/emoji.js',
+                            exports: 'jEmoji'
+                        }
+                    },
                     ignore: [
                         'timer',
                         './request.bg.js',
+                        './mediator.bg.js',
                         'sdk/simple-storage'
                     ]
                 }
@@ -62,6 +81,7 @@ module.exports = function (grunt) {
                         'sdk/page-worker',
                         'browserAction',
                         './request.pu.js',
+                        './mediator.pu.js',
                         'sdk/request',
                         'timer',
                         'sdk/simple-storage'
@@ -104,10 +124,10 @@ module.exports = function (grunt) {
         }),
         // optimize, preprocess only single file
         watch: BROWSERS.reduce(function (watch, browser) {
-            watch[browser] = {
-                files: browser + '/pages/*.raw.html',
-                tasks: ['preprocess:' + browser]
-            };
+            // watch[browser] = {
+                // files: browser + '/pages/*.raw.html',
+                // tasks: ['preprocess:' + browser]
+            // };
 
             return watch;
         }, {
@@ -128,6 +148,10 @@ module.exports = function (grunt) {
             less: {
                 files: 'modules/**/*.less',
                 tasks: ['less']
+            },
+            js: {
+                files: 'modules/**/*.js',
+                tasks: ['browserify']
             }
         }),
         //localization
@@ -141,20 +165,33 @@ module.exports = function (grunt) {
 
             return memo;
         }, {}),
-        less: BROWSERS.reduce(function (less, browser) {
-            less[browser] = {
+        less: {
+            all: {
                 expand: true,
-                cwd: browser + '/pages/',
-                dest: browser + '/pages/',
+                cwd: 'pages/',
+                dest: 'pages/',
                 src: ['*.less'],
                 ext: '.css',
                 options: {
                     compile: true,
                     compress: process.env.NODE_ENV === PRODUCTION
                 }
-            };
-            return less;
-        }, {}),
+            }
+        },
+        // less: BROWSERS.reduce(function (less, browser) {
+            // less[browser] = {
+                // expand: true,
+                // cwd: browser + '/pages/',
+                // dest: browser + '/pages/',
+                // src: ['*.less'],
+                // ext: '.css',
+                // options: {
+                    // compile: true,
+                    // compress: process.env.NODE_ENV === PRODUCTION
+                // }
+            // };
+            // return less;
+        // }, {}),
         clean: {
             // Warning: Cannot delete files outside the current working directory.
             options: {force: true},
@@ -271,8 +308,10 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('chrome', [
         'env:chrome',
+        'less',
         'preprocess:manifest',
-        'browserify'
+        'browserify',
+        'watch'
     ]);
 
 

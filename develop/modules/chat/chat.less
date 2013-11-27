@@ -1,0 +1,30 @@
+.chat .item-list__content {
+    height: 441px;
+}
+.chat__author  {
+    color: @asbestos;
+}
+.chat__item-content {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    cursor: pointer;
+
+    p {
+        font-size: @baseFontSize;
+        line-height: @baseLineHeight;
+        font-weight: normal;
+    }
+}
+.chat__item-content + .chat__item-content {
+    margin-top: 1.3em;
+}
+.chat__messages_out {
+    text-align: right;
+}
+.item__action.chat__item-action_mark-read
+{
+    opacity: 1;
+    .color-with-hover(@alizarin);
+}
+

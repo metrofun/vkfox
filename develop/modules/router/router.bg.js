@@ -1,3 +1,4 @@
+require('notifications/notifications.bg.js');
 var
 Mediator = require('mediator/mediator.js'),
 PersistentModel = require('persistent-model/persistent-model.js'),

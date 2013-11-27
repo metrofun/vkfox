@@ -1,4 +1,5 @@
-var Dispatcher = require('dispatcher/dispatcher.js'),
+var Dispatcher = require('./dispatcher.js'),
+    Mediator = Object.create(Dispatcher),
     Env = require('env/env.js');
 
 if (Env.firefox) {
@@ -15,9 +16,11 @@ if (Env.firefox) {
         Dispatcher.pub.apply(Dispatcher, messageData);
     });
 
-    Dispatcher.sub('all', function () {
+    Mediator.pub = function () {
+        Dispatcher.pub.apply(Dispatcher, arguments);
+
         activePort.postMessage([].slice.call(arguments));
-    });
+    };
 }
 
-return Dispatcher;
+module.exports = Mediator;

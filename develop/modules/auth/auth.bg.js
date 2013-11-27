@@ -34,14 +34,14 @@ function tryLogin() {
             contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
             contentURL: Config.AUTH_URI,
             onMessage: function (url) {
-                console.log('url', url);
                 Mediator.pub('auth:iframe', url);
             }
         });
     } else {
         if (!iframe) {
             iframe = document.createElement("iframe");
-            iframe.setAttribute('name', 'vkfox-login-iframe');
+            iframe.name = 'vkfox-login-iframe';
+            // iframe.setAttribute('name', '');
             iframe.setAttribute('src', Config.AUTH_URI);
             document.body.appendChild(iframe);
         }
@@ -72,7 +72,9 @@ Mediator.sub('auth:iframe', function (url) {
         freeLogin();
     } catch (e) {
         // TODO control console.log
-        console.log(e);
+        setTimeout(function () {
+            throw e;
+        });
     }
 }.bind(this));
 

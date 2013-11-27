@@ -19,9 +19,7 @@
 
     "predef"        : [  // Extra globals.
         "extension",
-        "moment",
         "LocalStorage",
-        "angular",
         "module",
         "require",
         "define",

@@ -1,0 +1,110 @@
+.buddies .dropdown-menu label {
+    &:extend(.dropdown-menu > li > a all);
+    .user-select(none)
+}
+.buddies__item:not(.buddies__item_is-fave) {
+    padding-bottom: 0;
+
+    .item__reply {
+        margin-bottom: 0;
+    }
+}
+.buddies__item-action_active.item__action {
+    opacity: 1 !important;
+    .color-with-hover(@sunFlower);
+}
+.buddies .checkbox {
+    overflow: hidden;
+}
+.buddies__checkbox
+{
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-size: 14px;
+    margin-left: -60px !important;
+}
+.buddies__checkbox:before
+{
+    top: -5px;
+    position: relative;
+    .icon-FontAwesome();
+    display: inline-block;
+    margin-left: 40px;
+    content: @check-empty;
+}
+.buddies__checkbox:checked:before
+{
+    content: @check;
+}
+label:hover .buddies__checkbox:before
+{
+    color: white;
+}
+.buddies__search {
+    margin: 0;
+    line-height: 40px;
+    display: inline-block;
+
+    input {
+        margin: 0;
+        border: none;
+        padding: 10px;
+        vertical-align: middle;
+        background: #ecf0f1;
+        box-shadow: none;
+        text-shadow: none;
+        border-radius: 100px;
+
+        &:focus {
+            background: white;
+            box-shadow: 0 0 20px 5px #ecf0f1 inset;
+            transition: none;
+        }
+    }
+}
+.buddies__filter {
+    line-height: 40px;
+    cursor: pointer;
+
+    &.open .dropdown-toggle {
+        opacity: 0.6;
+    }
+
+    .dropdown-menu {
+        border-radius: 0;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), 0 4px 15px -4px rgba(0, 0, 0, 0.5);
+        border: 0;
+
+        &:before {
+            position: absolute;
+            top: -7px;
+            right: 1px;
+            display: inline-block;
+            border-right: 7px solid transparent;
+            border-bottom: 7px solid rgba(0, 0, 0, 0.07);
+            border-left: 7px solid transparent;
+            content: '';
+        }
+        &:after {
+            position: absolute;
+            top: -6px;
+            right: 2px;
+            display: inline-block;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #ffffff;
+            border-left: 6px solid transparent;
+            content: '';
+        }
+
+        label {
+            padding: 3px 10px 3px 30px;
+        }
+
+        label:hover {
+            background: #3498db;
+            box-shadow: none;
+        }
+    }
+}

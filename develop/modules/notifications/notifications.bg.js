@@ -49,7 +49,7 @@ notificationsSettings = new NotificationsSettings({
     }
 }, {name: 'notificationsSettings'}),
 
-notificationQueue = new Backbone.Collection.extend({
+notificationQueue = new (Backbone.Collection.extend({
     initialize: function () {
         this
             .on('add remove reset', function () {
@@ -94,7 +94,7 @@ notificationQueue = new Backbone.Collection.extend({
         });
 
     }
-});
+}))();
 
 function getBase64FromImage(url, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
@@ -129,9 +129,9 @@ module.exports = Notifications = {
     BUDDIES: 'buddies',
     NEWS: 'news',
     createPopup: function (options) {
-        var popups = NotificationsSettings.get('popups');
+        var popups = notificationsSettings.get('popups');
 
-        if (NotificationsSettings.get('enabled') && popups.enabled) {
+        if (notificationsSettings.get('enabled') && popups.enabled) {
             getBase64FromImage(options.image, function (base64) {
                 try {
                     chrome.notifications.create(_.uniqueId(), {
@@ -147,10 +147,10 @@ module.exports = Notifications = {
         }
     },
     playSound: function () {
-        var sound = NotificationsSettings.get('sound'),
+        var sound = notificationsSettings.get('sound'),
             audio = new Audio();
 
-        if (NotificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
+        if (notificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
             audioInProgress = true;
 
             audio.volume = sound.volume;
@@ -163,7 +163,7 @@ module.exports = Notifications = {
         }
     },
     setBadge: function (count, force) {
-        if (NotificationsSettings.get('enabled') || force) {
+        if (notificationsSettings.get('enabled') || force) {
             Browser.setBadgeText(count || '');
         }
     }
