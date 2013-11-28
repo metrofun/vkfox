@@ -16885,6 +16885,8 @@ angular.element(document).find('head').append('<style type="text/css">@charset "
 
 },{"zepto":"uKiMw7"}],"angular":[function(require,module,exports){
 module.exports=require('QdUR+k');
+},{}],"bootstrapDropdown":[function(require,module,exports){
+module.exports=require('87mv8W');
 },{}],"87mv8W":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -17064,9 +17066,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"uKiMw7"}],"bootstrapDropdown":[function(require,module,exports){
-module.exports=require('87mv8W');
-},{}],"1CGTFl":[function(require,module,exports){
+},{"zepto":"uKiMw7"}],"1CGTFl":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*global exports */
 /*!
@@ -18189,8 +18189,6 @@ window.linkify = (function(){
 
 },{}],"javascript-linkify":[function(require,module,exports){
 module.exports=require('VKK8MK');
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('uKiMw7');
 },{}],"uKiMw7":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
@@ -19473,12 +19471,24 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('uKiMw7');
 },{}],11:[function(require,module,exports){
 require('angular').module('app', []);
+require('anchor/anchor.pu.js');
 require('router/router.pu.js');
 
 
-},{"angular":"QdUR+k","router/router.pu.js":33}],12:[function(require,module,exports){
+},{"anchor/anchor.pu.js":12,"angular":"QdUR+k","router/router.pu.js":34}],12:[function(require,module,exports){
+var $ = require('zepto');
+
+$(document).on('click', '[anchor]', function (e) {
+    var jTarget = $(e.currentTarget);
+
+    chrome.tabs.create({url: jTarget.attr('anchor')});
+});
+
+},{"zepto":"uKiMw7"}],13:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
     I18N = require('i18n/i18n.js'),
@@ -19576,7 +19586,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","bootstrapDropdown":"87mv8W","filters/filters.pu.js":16,"i18n/i18n.js":18,"item-list/item-list.pu.js":22,"item/item.pu.js":23,"mediator/mediator.js":25,"navigation/navigation.pu.js":27,"persistent-model/persistent-model.js":29,"zepto":"uKiMw7"}],13:[function(require,module,exports){
+},{"angular":"QdUR+k","bootstrapDropdown":"87mv8W","filters/filters.pu.js":17,"i18n/i18n.js":19,"item-list/item-list.pu.js":23,"item/item.pu.js":24,"mediator/mediator.js":26,"navigation/navigation.pu.js":28,"persistent-model/persistent-model.js":30,"zepto":"uKiMw7"}],14:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
@@ -19712,7 +19722,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","backbone":35,"filters/filters.pu.js":16,"item-list/item-list.pu.js":22,"item/item.pu.js":23,"mediator/mediator.js":25,"navigation/navigation.pu.js":27,"request/request.js":31,"underscore":39,"zepto":"uKiMw7"}],14:[function(require,module,exports){
+},{"angular":"QdUR+k","backbone":36,"filters/filters.pu.js":17,"item-list/item-list.pu.js":23,"item/item.pu.js":24,"mediator/mediator.js":26,"navigation/navigation.pu.js":28,"request/request.js":32,"underscore":40,"zepto":"uKiMw7"}],15:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -19738,7 +19748,7 @@ exports.AUTH_URI = [
     ].join('&')
 ].join('');
 
-},{"env/env.js":15}],15:[function(require,module,exports){
+},{"env/env.js":16}],16:[function(require,module,exports){
 /*jshint bitwise: false*/
 var isPopup = location && ~location.href.indexOf('popup');
 
@@ -19751,7 +19761,7 @@ module.exports = {
     // firefox:  true
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var _ = require('underscore')._,
     Config = require('config/config.js'),
     moment = require('moment'),
@@ -19867,7 +19877,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","config/config.js":14,"i18n/i18n.pu.js":19,"moment":38,"rectify/rectify.pu.js":30,"underscore":39}],17:[function(require,module,exports){
+},{"angular":"QdUR+k","config/config.js":15,"i18n/i18n.pu.js":20,"moment":39,"rectify/rectify.pu.js":31,"underscore":40}],18:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -20203,7 +20213,7 @@ return r;
 }
 })();
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var DEFAULT_LANGUAGE = 'ru',
 
     _ = require('underscore')._,
@@ -20250,7 +20260,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":17,"./ru.js":20,"./uk.js":21,"underscore":39}],19:[function(require,module,exports){
+},{"./en.js":18,"./ru.js":21,"./uk.js":22,"underscore":40}],20:[function(require,module,exports){
 // Set correct language for "moment" library
 var I18N = require('./i18n.js');
 
@@ -20258,7 +20268,7 @@ require('moment').lang(I18N.getLang());
 
 module.exports = I18N;
 
-},{"./i18n.js":18,"moment":38}],20:[function(require,module,exports){
+},{"./i18n.js":19,"moment":39}],21:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -20962,7 +20972,7 @@ return r;
 }
 })();
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.uk = function (n) {
@@ -21666,7 +21676,7 @@ return r;
 }
 })();
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var _ = require('underscore')._,
     $ = require('zepto');
 
@@ -21933,7 +21943,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","underscore":39,"zepto":"uKiMw7"}],23:[function(require,module,exports){
+},{"angular":"QdUR+k","underscore":40,"zepto":"uKiMw7"}],24:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
     I18N = require('i18n/i18n.pu.js');
@@ -22203,7 +22213,7 @@ angular.module('app')
         };
     });
 
-},{"filters/filters.pu.js":16,"i18n/i18n.pu.js":19,"mediator/mediator.js":25,"request/request.js":31}],24:[function(require,module,exports){
+},{"filters/filters.pu.js":17,"i18n/i18n.pu.js":20,"mediator/mediator.js":26,"request/request.js":32}],25:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -22223,7 +22233,7 @@ module.exports = {
     }
 };
 
-},{"backbone":35,"underscore":39}],25:[function(require,module,exports){
+},{"backbone":36,"underscore":40}],26:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -22234,7 +22244,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":36,"./mediator.pu.js":26,"env/env.js":15}],26:[function(require,module,exports){
+},{"./mediator.bg.js":37,"./mediator.pu.js":27,"env/env.js":16}],27:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Env = require('env/env.js');
@@ -22262,7 +22272,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":24,"env/env.js":15}],27:[function(require,module,exports){
+},{"./dispatcher.js":25,"env/env.js":16}],28:[function(require,module,exports){
 require('angular').module('app')
     .directive('navigation', function ($routeParams) {
         return {
@@ -22289,7 +22299,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k"}],28:[function(require,module,exports){
+},{"angular":"QdUR+k"}],29:[function(require,module,exports){
 var Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js');
 
@@ -22452,7 +22462,7 @@ require('angular').module('app')
         });
     });
 
-},{"angular":"QdUR+k","config/config.js":14,"filters/filters.pu.js":16,"mediator/mediator.js":25,"navigation/navigation.pu.js":27}],29:[function(require,module,exports){
+},{"angular":"QdUR+k","config/config.js":15,"filters/filters.pu.js":17,"mediator/mediator.js":26,"navigation/navigation.pu.js":28}],30:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -22485,7 +22495,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":35,"storage/storage.js":34}],30:[function(require,module,exports){
+},{"backbone":36,"storage/storage.js":35}],31:[function(require,module,exports){
 var I18N = require('i18n/i18n.pu.js'),
     linkify = require('javascript-linkify'),
     jEmoji = require('jEmoji'),
@@ -22580,7 +22590,7 @@ angular.module('app')
         };
     });
 
-},{"i18n/i18n.pu.js":19,"jEmoji":"1CGTFl","javascript-linkify":"VKK8MK","zepto":"uKiMw7"}],31:[function(require,module,exports){
+},{"i18n/i18n.pu.js":20,"jEmoji":"1CGTFl","javascript-linkify":"VKK8MK","zepto":"uKiMw7"}],32:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -22591,7 +22601,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./request.bg.js');
 }
 
-},{"./request.bg.js":36,"./request.pu.js":32,"env/env.js":15}],32:[function(require,module,exports){
+},{"./request.bg.js":37,"./request.pu.js":33,"env/env.js":16}],33:[function(require,module,exports){
 var Vow = require('vow'),
     _ = require('underscore')._,
     Mediator = require('mediator/mediator.js');
@@ -22615,7 +22625,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":25,"underscore":39,"vow":40}],33:[function(require,module,exports){
+},{"mediator/mediator.js":26,"underscore":40,"vow":41}],34:[function(require,module,exports){
 var Vow = require('vow'),
     Mediator = require('mediator/mediator.js');
     // TODO
@@ -22704,7 +22714,7 @@ require('angular').module('app')
         Mediator.pub('router:lastPath:get');
     });
 
-},{"angular":"QdUR+k","buddies/buddies.pu.js":12,"chat/chat.pu.js":13,"mediator/mediator.js":25,"news/news.pu.js":28,"vow":40}],34:[function(require,module,exports){
+},{"angular":"QdUR+k","buddies/buddies.pu.js":13,"chat/chat.pu.js":14,"mediator/mediator.js":26,"news/news.pu.js":29,"vow":41}],35:[function(require,module,exports){
 var Env = require('env/env.js');
 
 if (Env.firefox) {
@@ -22724,7 +22734,7 @@ if (Env.firefox) {
 
 
 
-},{"env/env.js":15,"sdk/simple-storage":36}],35:[function(require,module,exports){
+},{"env/env.js":16,"sdk/simple-storage":37}],36:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -24297,9 +24307,9 @@ if (Env.firefox) {
 
 }).call(this);
 
-},{"underscore":39}],36:[function(require,module,exports){
+},{"underscore":40}],37:[function(require,module,exports){
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -24353,7 +24363,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 //! moment.js
 //! version : 2.4.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -26669,7 +26679,7 @@ process.chdir = function (dir) {
     }
 }).call(this);
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -27982,7 +27992,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":36}],40:[function(require,module,exports){
+},{"timer":37}],41:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -28576,5 +28586,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":37,"timer":36}]},{},[11])
+},{"__browserify_process":38,"timer":37}]},{},[11])
 ;

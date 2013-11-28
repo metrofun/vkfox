@@ -47,25 +47,25 @@ module.exports = function (grunt) {
                 options: {
                     shim: {
                         'bootstrapDropdown': {
-                            path: '../bower_components/bootstrap/js/bootstrap-dropdown.js',
+                            path: 'bower_components/bootstrap/js/bootstrap-dropdown.js',
                             exports: 'bootstrapDropdown',
                             depends: {zepto: 'jQuery'}
                         },
                         'angular': {
-                            path: '../bower_components/angular-unstable/angular.js',
+                            path: 'bower_components/angular-unstable/angular.js',
                             exports: 'angular',
                             depends: {zepto: 'jQuery'}
                         },
                         'javascript-linkify': {
-                            path: '../bower_components/javascript-linkify/ba-linkify.js',
+                            path: 'bower_components/javascript-linkify/ba-linkify.js',
                             exports: 'linkify',
                         },
                         'zepto': {
-                            path: '../bower_components/zepto-bootstrap/zepto.js',
+                            path: 'bower_components/zepto-bootstrap/zepto.js',
                             exports: '$'
                         },
                         'jEmoji': {
-                            path: '../bower_components/emoji/lib/emoji.js',
+                            path: 'bower_components/emoji/lib/emoji.js',
                             exports: 'jEmoji'
                         }
                     },
