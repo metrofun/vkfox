@@ -39,10 +39,11 @@ function tryLogin() {
         });
     } else {
         if (!iframe) {
+            console.log('tryLogin');
             iframe = document.createElement("iframe");
             iframe.name = 'vkfox-login-iframe';
             // iframe.setAttribute('name', '');
-            iframe.setAttribute('src', Config.AUTH_URI);
+            iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
             document.body.appendChild(iframe);
         }
     }
@@ -53,6 +54,7 @@ function freeLogin() {
     } else {
         document.body.removeChild(iframe);
         iframe = null;
+        console.log('freeLogin success');
     }
     page = null;
 }

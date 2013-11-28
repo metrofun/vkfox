@@ -1,11 +1,13 @@
 var Mediator = require('mediator/mediator.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
-    I18N = require('i18n/i18n.js');
+    I18N = require('i18n/i18n.js'),
+    $ = require('zepto');
 
 require('navigation/navigation.pu.js');
 require('item-list/item-list.pu.js');
 require('item/item.pu.js');
 require('filters/filters.pu.js');
+require('bootstrapDropdown');
 require('angular').module('app')
     .controller('buddiesCtrl', function ($scope, $element) {
         var filtersModel = new PersistentModel({
@@ -20,7 +22,8 @@ require('angular').module('app')
             filtersModel.set(filters);
         }, true);
 
-        $element.find('.dropdown-toggle').dropdown();
+        console.log($.fn);
+        $($element).find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {
             profile.isWatched = !profile.isWatched;

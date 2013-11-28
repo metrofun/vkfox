@@ -367,7 +367,7 @@ function tryNotification() {
                         noPopup: feedbacksActive
                     });
                 }
-            });
+            }).done();
         }
     }
 }

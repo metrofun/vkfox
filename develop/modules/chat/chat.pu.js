@@ -62,7 +62,6 @@ require('angular').module('app')
     .controller('ChatCtrl', function ($scope) {
         Mediator.pub('chat:data:get');
         Mediator.sub('chat:data', function (data) {
-            console.log(data);
             $scope.$apply(function () {
                 $scope.profilesColl = new Backbone.Collection(data.profiles, {
                     model: Backbone.Model.extend({

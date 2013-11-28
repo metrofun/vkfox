@@ -1,7 +1,7 @@
 var _ = require('underscore')._,
-    $ = require('jquery-browserify');
+    $ = require('zepto');
 
-angular.module('app')
+require('angular').module('app')
     /**
      * Adds an effect of sticky header for items,
      * when scrolling (aka Instagram effect)
@@ -28,7 +28,7 @@ angular.module('app')
                     if (!element.hasClass('item')) {
                         return;
                     }
-                    itemBottom = element.offset().top + element.outerHeight();
+                    itemBottom = element.offset().top + element.height();
 
                     if (topVisibleElement !== lastTopVisibleElement) {
                         if (lastTopVisibleElement) {
@@ -112,7 +112,7 @@ angular.module('app')
                         hashFnLocals = {},
                         lastBlockMap = {},
                         // wrap with zepto, to make available some additional methods
-                        itemListElement = $(itemListController.getElement());
+                        itemListElement = itemListController.getElement().find('.item-list__content');
 
                     if (!match) {
                         throw new Error("Expected itemListRepeat in form of '_item_ in _collection_[ track by _id_]' but got '" +
@@ -172,11 +172,11 @@ angular.module('app')
 
                                 if (block.element[0] === nextCursor) {
                                     // do nothing
-                                    cursor = $(block.element);
+                                    cursor = block.element;
                                 } else {
                                     // existing item which got moved
                                     animate.move(block.element, null, cursor);
-                                    cursor = $(block.element);
+                                    cursor = block.element;
                                 }
                             } else {
                                 // new item which we don't know about
@@ -192,7 +192,7 @@ angular.module('app')
                             if (!block.element) {
                                 linker(childScope, function (clone) {
                                     animate.enter(clone, null, cursor);
-                                    cursor = $(clone);
+                                    cursor = clone;
                                     block.scope = childScope;
                                     block.element = clone;
                                     nextBlockMap[block.id] = block;
@@ -255,7 +255,7 @@ angular.module('app')
                             }
                         }
 
-                        updateScrolledBlocks(collection, $($element), nextBlockOrder, nextBlockMap);
+                        updateScrolledBlocks(collection, $element, nextBlockOrder, nextBlockMap);
 
                         lastBlockMap = nextBlockMap;
                     });

@@ -138,7 +138,7 @@ function fetchProfiles() {
         profilesColl.reset(data);
         // mark self profile
         profilesColl.get(userId).set('isSelf', true);
-    }).done();
+    });
 }
 /*
  * Removes read messages from dialog,

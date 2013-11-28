@@ -46,9 +46,15 @@ module.exports = function (grunt) {
                 },
                 options: {
                     shim: {
+                        'bootstrapDropdown': {
+                            path: '../bower_components/bootstrap/js/bootstrap-dropdown.js',
+                            exports: 'bootstrapDropdown',
+                            depends: {zepto: 'jQuery'}
+                        },
                         'angular': {
                             path: '../bower_components/angular-unstable/angular.js',
-                            exports: 'angular'
+                            exports: 'angular',
+                            depends: {zepto: 'jQuery'}
                         },
                         'javascript-linkify': {
                             path: '../bower_components/javascript-linkify/ba-linkify.js',

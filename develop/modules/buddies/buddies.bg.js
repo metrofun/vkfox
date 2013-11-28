@@ -18,7 +18,6 @@ buddiesColl = new (ProfilesCollection.extend({
         // Automatically set last activity time
         // for all watched items
         initialize: function () {
-            ProfilesCollection.prototype.initialize.apply(this, arguments);
             this.on('change:isWatched', function (model) {
                 if (model.get('isWatched')) {
                     Request.api({
@@ -30,7 +29,7 @@ buddiesColl = new (ProfilesCollection.extend({
                             .set('lastActivityTime', response.time * 1000);
 
                         buddiesColl.sort();
-                    });
+                    }).done();
                 } else {
                     model.unset('lastActivityTime');
                 }
@@ -56,7 +55,6 @@ publishData = _.debounce(function () {
     Mediator.pub('buddies:data', buddiesColl.toJSON());
 }, 0);
 
-
 /**
 * Initialize all state
 */
@@ -67,7 +65,7 @@ function initialize() {
         }
         readyPromise = Vow.promise();
     }
-    readyPromise.then(publishData);
+    readyPromise.then(publishData).done();
 }
 initialize();
 
@@ -136,11 +134,11 @@ Mediator.sub('auth:success', function () {
         setWatchedBuddies();
 
         readyPromise.fulfill();
-    });
+    }).done();
 });
 
 Mediator.sub('buddies:data:get', function () {
-    readyPromise.then(publishData);
+    readyPromise.then(publishData).done();
 });
 
 readyPromise.then(function () {
@@ -171,7 +169,7 @@ readyPromise.then(function () {
         }
         publishData();
     });
-});
+}).done();
 
 Mediator.sub('buddies:watch:toggle', function (uid) {
     if (watchedBuddiesSet.contains(uid)) {
