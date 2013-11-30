@@ -1,4 +1,130 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"QdUR+k":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"OP3XyP":[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
+
+; global.angular = require("angular");
+angular.module('ui.keypress',[]).
+factory('keypressHelper', ['$parse', function keypress($parse){
+  var keysByCode = {
+    8: 'backspace',
+    9: 'tab',
+    13: 'enter',
+    27: 'esc',
+    32: 'space',
+    33: 'pageup',
+    34: 'pagedown',
+    35: 'end',
+    36: 'home',
+    37: 'left',
+    38: 'up',
+    39: 'right',
+    40: 'down',
+    45: 'insert',
+    46: 'delete'
+  };
+
+  var capitaliseFirstLetter = function (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  return function(mode, scope, elm, attrs) {
+    var params, combinations = [];
+    params = scope.$eval(attrs['ui'+capitaliseFirstLetter(mode)]);
+
+    // Prepare combinations for simple checking
+    angular.forEach(params, function (v, k) {
+      var combination, expression;
+      expression = $parse(v);
+
+      angular.forEach(k.split(' '), function(variation) {
+        combination = {
+          expression: expression,
+          keys: {}
+        };
+        angular.forEach(variation.split('-'), function (value) {
+          combination.keys[value] = true;
+        });
+        combinations.push(combination);
+      });
+    });
+
+    // Check only matching of pressed keys one of the conditions
+    elm.bind(mode, function (event) {
+      // No need to do that inside the cycle
+      var metaPressed = !!(event.metaKey && !event.ctrlKey);
+      var altPressed = !!event.altKey;
+      var ctrlPressed = !!event.ctrlKey;
+      var shiftPressed = !!event.shiftKey;
+      var keyCode = event.keyCode;
+
+      // normalize keycodes
+      if (mode === 'keypress' && !shiftPressed && keyCode >= 97 && keyCode <= 122) {
+        keyCode = keyCode - 32;
+      }
+
+      // Iterate over prepared combinations
+      angular.forEach(combinations, function (combination) {
+
+        var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()];
+
+        var metaRequired = !!combination.keys.meta;
+        var altRequired = !!combination.keys.alt;
+        var ctrlRequired = !!combination.keys.ctrl;
+        var shiftRequired = !!combination.keys.shift;
+
+        if (
+          mainKeyPressed &&
+          ( metaRequired === metaPressed ) &&
+          ( altRequired === altPressed ) &&
+          ( ctrlRequired === ctrlPressed ) &&
+          ( shiftRequired === shiftPressed )
+        ) {
+          // Run the function
+          scope.$apply(function () {
+            combination.expression(scope, { '$event': event });
+          });
+        }
+      });
+    });
+  };
+}]);
+
+/**
+ * Bind one or more handlers to particular keys or their combination
+ * @param hash {mixed} keyBindings Can be an object or string where keybinding expression of keys or keys combinations and AngularJS Exspressions are set. Object syntax: "{ keys1: expression1 [, keys2: expression2 [ , ... ]]}". String syntax: ""expression1 on keys1 [ and expression2 on keys2 [ and ... ]]"". Expression is an AngularJS Expression, and key(s) are dash-separated combinations of keys and modifiers (one or many, if any. Order does not matter). Supported modifiers are 'ctrl', 'shift', 'alt' and key can be used either via its keyCode (13 for Return) or name. Named keys are 'backspace', 'tab', 'enter', 'esc', 'space', 'pageup', 'pagedown', 'end', 'home', 'left', 'up', 'right', 'down', 'insert', 'delete'.
+ * @example <input ui-keypress="{enter:'x = 1', 'ctrl-shift-space':'foo()', 'shift-13':'bar()'}" /> <input ui-keypress="foo = 2 on ctrl-13 and bar('hello') on shift-esc" />
+ **/
+angular.module('ui.keypress').directive('uiKeydown', ['keypressHelper', function(keypressHelper){
+  return {
+    link: function (scope, elm, attrs) {
+      keypressHelper('keydown', scope, elm, attrs);
+    }
+  };
+}]);
+
+angular.module('ui.keypress').directive('uiKeypress', ['keypressHelper', function(keypressHelper){
+  return {
+    link: function (scope, elm, attrs) {
+      keypressHelper('keypress', scope, elm, attrs);
+    }
+  };
+}]);
+
+angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(keypressHelper){
+  return {
+    link: function (scope, elm, attrs) {
+      keypressHelper('keyup', scope, elm, attrs);
+    }
+  };
+}]);
+; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
+
+}).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
+
+},{"angular":"7Lkch9"}],"angularKeypress":[function(require,module,exports){
+module.exports=require('OP3XyP');
+},{}],"angular":[function(require,module,exports){
+module.exports=require('7Lkch9');
+},{}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.jQuery = require("zepto");
@@ -16878,16 +17004,13 @@ var styleDirective = valueFn({
 
 })(window, document);
 angular.element(document).find('head').append('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak{display:none;}ng\\:form{display:block;}</style>');
-
 ; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"uKiMw7"}],"angular":[function(require,module,exports){
-module.exports=require('QdUR+k');
-},{}],"bootstrapDropdown":[function(require,module,exports){
-module.exports=require('87mv8W');
-},{}],"87mv8W":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
+module.exports=require('uRsKAo');
+},{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.jQuery = require("zepto");
@@ -17037,7 +17160,6 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
       if (typeof option == 'string') data[option].call($this)
     })
   }
-  console.log($);
 
   $.fn.dropdown.Constructor = Dropdown
 
@@ -17062,11 +17184,11 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }(window.jQuery);
 
-; browserify_shim__define__module__export__(typeof bootstrapDropdown != "undefined" ? bootstrapDropdown : window.bootstrapDropdown);
+; browserify_shim__define__module__export__(typeof jQuery != "undefined" ? jQuery : window.jQuery);
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"uKiMw7"}],"1CGTFl":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"3GhwsM":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*global exports */
 /*!
@@ -17966,8 +18088,8 @@ return jEmoji;
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 },{}],"jEmoji":[function(require,module,exports){
-module.exports=require('1CGTFl');
-},{}],"VKK8MK":[function(require,module,exports){
+module.exports=require('3GhwsM');
+},{}],"+vibbn":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
  * JavaScript Linkify - v0.3 - 6/27/2009
@@ -18188,8 +18310,10 @@ window.linkify = (function(){
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 },{}],"javascript-linkify":[function(require,module,exports){
-module.exports=require('VKK8MK');
-},{}],"uKiMw7":[function(require,module,exports){
+module.exports=require('+vibbn');
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('naz2eD');
+},{}],"naz2eD":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
 
@@ -19471,15 +19595,13 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('uKiMw7');
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 require('angular').module('app', []);
 require('anchor/anchor.pu.js');
 require('router/router.pu.js');
 
 
-},{"anchor/anchor.pu.js":12,"angular":"QdUR+k","router/router.pu.js":34}],12:[function(require,module,exports){
+},{"anchor/anchor.pu.js":14,"angular":"7Lkch9","router/router.pu.js":36}],14:[function(require,module,exports){
 var $ = require('zepto');
 
 $(document).on('click', '[anchor]', function (e) {
@@ -19488,7 +19610,7 @@ $(document).on('click', '[anchor]', function (e) {
     chrome.tabs.create({url: jTarget.attr('anchor')});
 });
 
-},{"zepto":"uKiMw7"}],13:[function(require,module,exports){
+},{"zepto":"naz2eD"}],15:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
     I18N = require('i18n/i18n.js'),
@@ -19586,7 +19708,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","bootstrapDropdown":"87mv8W","filters/filters.pu.js":17,"i18n/i18n.js":19,"item-list/item-list.pu.js":23,"item/item.pu.js":24,"mediator/mediator.js":26,"navigation/navigation.pu.js":28,"persistent-model/persistent-model.js":30,"zepto":"uKiMw7"}],14:[function(require,module,exports){
+},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","filters/filters.pu.js":19,"i18n/i18n.js":21,"item-list/item-list.pu.js":25,"item/item.pu.js":26,"mediator/mediator.js":28,"navigation/navigation.pu.js":30,"persistent-model/persistent-model.js":32,"zepto":"naz2eD"}],16:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
@@ -19722,7 +19844,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","backbone":36,"filters/filters.pu.js":17,"item-list/item-list.pu.js":23,"item/item.pu.js":24,"mediator/mediator.js":26,"navigation/navigation.pu.js":28,"request/request.js":32,"underscore":40,"zepto":"uKiMw7"}],15:[function(require,module,exports){
+},{"angular":"7Lkch9","backbone":38,"filters/filters.pu.js":19,"item-list/item-list.pu.js":25,"item/item.pu.js":26,"mediator/mediator.js":28,"navigation/navigation.pu.js":30,"request/request.js":34,"underscore":42,"zepto":"naz2eD"}],17:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -19748,7 +19870,7 @@ exports.AUTH_URI = [
     ].join('&')
 ].join('');
 
-},{"env/env.js":16}],16:[function(require,module,exports){
+},{"env/env.js":18}],18:[function(require,module,exports){
 /*jshint bitwise: false*/
 var isPopup = location && ~location.href.indexOf('popup');
 
@@ -19761,7 +19883,7 @@ module.exports = {
     // firefox:  true
 };
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var _ = require('underscore')._,
     Config = require('config/config.js'),
     moment = require('moment'),
@@ -19877,7 +19999,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","config/config.js":15,"i18n/i18n.pu.js":20,"moment":39,"rectify/rectify.pu.js":31,"underscore":40}],18:[function(require,module,exports){
+},{"angular":"7Lkch9","config/config.js":17,"i18n/i18n.pu.js":22,"moment":41,"rectify/rectify.pu.js":33,"underscore":42}],20:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -20213,7 +20335,7 @@ return r;
 }
 })();
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var DEFAULT_LANGUAGE = 'ru',
 
     _ = require('underscore')._,
@@ -20260,7 +20382,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":18,"./ru.js":21,"./uk.js":22,"underscore":40}],20:[function(require,module,exports){
+},{"./en.js":20,"./ru.js":23,"./uk.js":24,"underscore":42}],22:[function(require,module,exports){
 // Set correct language for "moment" library
 var I18N = require('./i18n.js');
 
@@ -20268,7 +20390,7 @@ require('moment').lang(I18N.getLang());
 
 module.exports = I18N;
 
-},{"./i18n.js":19,"moment":39}],21:[function(require,module,exports){
+},{"./i18n.js":21,"moment":41}],23:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -20972,7 +21094,7 @@ return r;
 }
 })();
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.uk = function (n) {
@@ -21676,7 +21798,7 @@ return r;
 }
 })();
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var _ = require('underscore')._,
     $ = require('zepto');
 
@@ -21943,14 +22065,14 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k","underscore":40,"zepto":"uKiMw7"}],24:[function(require,module,exports){
+},{"angular":"7Lkch9","underscore":42,"zepto":"naz2eD"}],26:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
     I18N = require('i18n/i18n.pu.js');
 
+require('angularKeypress');
 require('filters/filters.pu.js');
-// anchor ui.keypress
-angular.module('app')
+require('angular').module('app')
     .directive('item', function () {
         return {
             controller: function ($scope) {
@@ -22213,7 +22335,7 @@ angular.module('app')
         };
     });
 
-},{"filters/filters.pu.js":17,"i18n/i18n.pu.js":20,"mediator/mediator.js":26,"request/request.js":32}],25:[function(require,module,exports){
+},{"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":19,"i18n/i18n.pu.js":22,"mediator/mediator.js":28,"request/request.js":34}],27:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -22233,7 +22355,7 @@ module.exports = {
     }
 };
 
-},{"backbone":36,"underscore":40}],26:[function(require,module,exports){
+},{"backbone":38,"underscore":42}],28:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -22244,7 +22366,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":37,"./mediator.pu.js":27,"env/env.js":16}],27:[function(require,module,exports){
+},{"./mediator.bg.js":39,"./mediator.pu.js":29,"env/env.js":18}],29:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Env = require('env/env.js');
@@ -22272,7 +22394,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":25,"env/env.js":16}],28:[function(require,module,exports){
+},{"./dispatcher.js":27,"env/env.js":18}],30:[function(require,module,exports){
 require('angular').module('app')
     .directive('navigation', function ($routeParams) {
         return {
@@ -22299,7 +22421,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"QdUR+k"}],29:[function(require,module,exports){
+},{"angular":"7Lkch9"}],31:[function(require,module,exports){
 var Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js');
 
@@ -22462,7 +22584,7 @@ require('angular').module('app')
         });
     });
 
-},{"angular":"QdUR+k","config/config.js":15,"filters/filters.pu.js":17,"mediator/mediator.js":26,"navigation/navigation.pu.js":28}],30:[function(require,module,exports){
+},{"angular":"7Lkch9","config/config.js":17,"filters/filters.pu.js":19,"mediator/mediator.js":28,"navigation/navigation.pu.js":30}],32:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -22495,7 +22617,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":36,"storage/storage.js":35}],31:[function(require,module,exports){
+},{"backbone":38,"storage/storage.js":37}],33:[function(require,module,exports){
 var I18N = require('i18n/i18n.pu.js'),
     linkify = require('javascript-linkify'),
     jEmoji = require('jEmoji'),
@@ -22590,7 +22712,7 @@ angular.module('app')
         };
     });
 
-},{"i18n/i18n.pu.js":20,"jEmoji":"1CGTFl","javascript-linkify":"VKK8MK","zepto":"uKiMw7"}],32:[function(require,module,exports){
+},{"i18n/i18n.pu.js":22,"jEmoji":"3GhwsM","javascript-linkify":"+vibbn","zepto":"naz2eD"}],34:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -22601,7 +22723,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./request.bg.js');
 }
 
-},{"./request.bg.js":37,"./request.pu.js":33,"env/env.js":16}],33:[function(require,module,exports){
+},{"./request.bg.js":39,"./request.pu.js":35,"env/env.js":18}],35:[function(require,module,exports){
 var Vow = require('vow'),
     _ = require('underscore')._,
     Mediator = require('mediator/mediator.js');
@@ -22625,12 +22747,16 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":26,"underscore":40,"vow":41}],34:[function(require,module,exports){
+},{"mediator/mediator.js":28,"underscore":42,"vow":43}],36:[function(require,module,exports){
 var Vow = require('vow'),
     Mediator = require('mediator/mediator.js');
     // TODO
     // Tracker = require('tracker/tracker.js');
 
+// Polyfill jQuery proprietary method for Zepto
+window.Event.prototype.isDefaultPrevented = function () {
+    return this.defaultPrevented;
+};
 require('buddies/buddies.pu.js');
 require('news/news.pu.js');
 require('chat/chat.pu.js');
@@ -22714,7 +22840,7 @@ require('angular').module('app')
         Mediator.pub('router:lastPath:get');
     });
 
-},{"angular":"QdUR+k","buddies/buddies.pu.js":13,"chat/chat.pu.js":14,"mediator/mediator.js":26,"news/news.pu.js":29,"vow":41}],35:[function(require,module,exports){
+},{"angular":"7Lkch9","buddies/buddies.pu.js":15,"chat/chat.pu.js":16,"mediator/mediator.js":28,"news/news.pu.js":31,"vow":43}],37:[function(require,module,exports){
 var Env = require('env/env.js');
 
 if (Env.firefox) {
@@ -22734,7 +22860,7 @@ if (Env.firefox) {
 
 
 
-},{"env/env.js":16,"sdk/simple-storage":37}],36:[function(require,module,exports){
+},{"env/env.js":18,"sdk/simple-storage":39}],38:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -24307,9 +24433,9 @@ if (Env.firefox) {
 
 }).call(this);
 
-},{"underscore":40}],37:[function(require,module,exports){
+},{"underscore":42}],39:[function(require,module,exports){
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -24363,7 +24489,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 //! moment.js
 //! version : 2.4.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -26679,7 +26805,7 @@ process.chdir = function (dir) {
     }
 }).call(this);
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -27992,7 +28118,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":37}],41:[function(require,module,exports){
+},{"timer":39}],43:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -28586,5 +28712,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":38,"timer":37}]},{},[11])
+},{"__browserify_process":40,"timer":39}]},{},[13])
 ;

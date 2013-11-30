@@ -3,6 +3,10 @@ var Vow = require('vow'),
     // TODO
     // Tracker = require('tracker/tracker.js');
 
+// Polyfill jQuery proprietary method for Zepto
+window.Event.prototype.isDefaultPrevented = function () {
+    return this.defaultPrevented;
+};
 require('buddies/buddies.pu.js');
 require('news/news.pu.js');
 require('chat/chat.pu.js');

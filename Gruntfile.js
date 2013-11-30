@@ -46,9 +46,14 @@ module.exports = function (grunt) {
                 },
                 options: {
                     shim: {
+                        'angularKeypress': {
+                            path: 'bower_components/angular-ui-utils/modules/keypress/keypress.js',
+                            exports: 'angular',
+                            depends: {angular: 'angular'}
+                        },
                         'bootstrapDropdown': {
                             path: 'bower_components/bootstrap/js/bootstrap-dropdown.js',
-                            exports: 'bootstrapDropdown',
+                            exports: 'jQuery',
                             depends: {zepto: 'jQuery'}
                         },
                         'angular': {
