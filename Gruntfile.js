@@ -56,6 +56,11 @@ module.exports = function (grunt) {
                             exports: 'jQuery',
                             depends: {zepto: 'jQuery'}
                         },
+                        'bootstrapTooltip': {
+                            path: 'bower_components/bootstrap/js/bootstrap-tooltip.js',
+                            exports: 'jQuery',
+                            depends: {zepto: 'jQuery'}
+                        },
                         'angular': {
                             path: 'bower_components/angular-unstable/angular.js',
                             exports: 'angular',
