@@ -6,18 +6,18 @@ angular.module('item-list', [])
     .directive('itemListFixedHeader', function () {
         var HEADER_HEIGHT = 50;
         return {
-            link: function (scope, element, attrs) {
+            link: function (scope, element) {
                 var listTop = element.offset().top,
                     lastTopVisibleElement,
-                    contentElement = jQuery('.item-list__content', element),
-                    SCROLLBAR_WIDTH = contentElement.width()
-                        - contentElement.find('.item-list__scroll').width();
+                    scrollElement = jQuery('.item-list__content', element),
+                    SCROLLBAR_WIDTH = scrollElement.width()
+                        - scrollElement.find('.item-list__scroll').width();
 
                 jQuery('<style>.item_fixed_window .item__header,'
                     + ' .item_fixed_window .item__actions { right: '
                     + SCROLLBAR_WIDTH + 'px;}</style>').appendTo('head');
 
-                contentElement.bind('scroll', _.debounce(function () {
+                scrollElement.bind('scroll', _.debounce(function () {
                     var topVisibleElement = document.elementFromPoint(0, listTop),
                     element = jQuery(topVisibleElement),
                     itemBottom;
@@ -108,7 +108,7 @@ angular.module('item-list', [])
                         trackByExp, trackByIdFn, trackByExpGetter,
                         hashFnLocals = {},
                         lastBlockMap = {},
-                        itemListElement = itemListController.getElement();
+                        itemListElement = itemListController.getElement().find('.item-list__content');
 
                     itemListElement = itemListElement;
                     if (!match) {
