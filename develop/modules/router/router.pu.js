@@ -8,6 +8,7 @@ window.Event.prototype.isDefaultPrevented = function () {
     return this.defaultPrevented;
 };
 require('buddies/buddies.pu.js');
+require('settings/settings.pu.js');
 require('news/news.pu.js');
 require('chat/chat.pu.js');
 require('angular').module('app')

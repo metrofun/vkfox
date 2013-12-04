@@ -11,8 +11,8 @@ var MARK_PERIOD = 5 * 60 * 1000, //5 min
 Mediator.sub('forceOnline:settings:get', function () {
     Mediator.pub('forceOnline:settings', settings.toJSON());
 });
-Mediator.sub('forceOnline:settings:put', function (settings) {
-    settings.set(settings);
+Mediator.sub('forceOnline:settings:put', function (data) {
+    settings.set(data);
 });
 
 function markAsOnline() {

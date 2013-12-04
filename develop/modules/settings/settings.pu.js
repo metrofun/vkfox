@@ -1,14 +1,20 @@
-angular.module('settings', ['browser', 'notifications'])
-    .controller('settingsSignalCtrl', function ($scope, NOTIFICATIONS_SOUNDS) {
-        $scope.signals = Object.keys(NOTIFICATIONS_SOUNDS);
+var _ = require('underscore')._,
+    Env = require('env/env.js'),
+    NotificationsSettings = require('notifications/settings.js'),
+    Mediator = require('mediator/mediator.js');
+
+require('angular')
+    .module('app')
+    .controller('settingsSignalCtrl', function ($scope) {
+        $scope.signals = Object.keys(NotificationsSettings);
     })
     .controller(
         'settingsNotificationsCtrl',
-        function ($scope, Mediator, BROWSER_IS_OPERA, NOTIFICATIONS_SOUNDS) {
+        function ($scope) {
             /**
              * Similar interface for simple modules
              */
-            ['forceOnline', !BROWSER_IS_OPERA && 'yandex', 'notifications']
+            ['forceOnline', !Env.opera && 'yandex', 'notifications']
                 .filter(Boolean).forEach(function (moduleName) {
                     Mediator.sub(moduleName + ':settings', function (settings) {
                         $scope.$apply(function () {
@@ -34,7 +40,7 @@ angular.module('settings', ['browser', 'notifications'])
                             sound = $scope.notifications.sound;
 
                         audio.volume = sound.volume;
-                        audio.src = NOTIFICATIONS_SOUNDS[sound.signal];
+                        audio.src = NotificationsSettings[sound.signal];
                         audio.play();
                     }
                 }, 300);

@@ -1,13 +1,9 @@
 var
-NOTIFICATIONS_SOUNDS = {
-    standart: 'notifications/standart.ogg',
-    original: 'notifications/original.ogg'
-},
-
 _ = require('underscore')._,
 Backbone = require('backbone'),
 Browser = require('browser/browser.bg.js'),
 Mediator = require('mediator/mediator.js'),
+Settings = require('notifications/settings.js'),
 PersistentModel = require('persistent-model/persistent-model.js'),
 
 audioInProgress = false, Notifications,
@@ -41,7 +37,7 @@ notificationsSettings = new NotificationsSettings({
     sound: {
         enabled: true,
         volume: 0.5,
-        signal: NOTIFICATIONS_SOUNDS.standart
+        signal: Settings.standart
     },
     popups: {
         enabled: true,
@@ -154,7 +150,7 @@ module.exports = Notifications = {
             audioInProgress = true;
 
             audio.volume = sound.volume;
-            audio.src = NOTIFICATIONS_SOUNDS[sound.signal];
+            audio.src = Settings[sound.signal];
             audio.play();
 
             audio.addEventListener('ended', function () {

@@ -1,4 +1,6 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"OP3XyP":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"angularKeypress":[function(require,module,exports){
+module.exports=require('OP3XyP');
+},{}],"OP3XyP":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.angular = require("angular");
@@ -120,9 +122,7 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"angular":"7Lkch9"}],"angularKeypress":[function(require,module,exports){
-module.exports=require('OP3XyP');
-},{}],"angular":[function(require,module,exports){
+},{"angular":"7Lkch9"}],"angular":[function(require,module,exports){
 module.exports=require('7Lkch9');
 },{}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -4494,10 +4494,13 @@ function $CompileProvider($provide) {
         }
 
 
+        console.log('writeAttr', writeAttr, writeAttr !== false, 'value', value);
         if (writeAttr !== false) {
           if (value === null || value === undefined) {
+            console.log('removeAttr', attrName);
             this.$$element.removeAttr(attrName);
           } else {
+              console.log('attr', attrName);
             this.$$element.attr(attrName, value);
           }
         }
@@ -17004,11 +17007,14 @@ var styleDirective = valueFn({
 
 })(window, document);
 angular.element(document).find('head').append('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak{display:none;}ng\\:form{display:block;}</style>');
+
 ; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"uRsKAo":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
+module.exports=require('uRsKAo');
+},{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.jQuery = require("zepto");
@@ -17186,9 +17192,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
-module.exports=require('uRsKAo');
-},{}],"bootstrapTooltip":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"bootstrapTooltip":[function(require,module,exports){
 module.exports=require('7sF/R2');
 },{}],"7sF/R2":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -18461,6 +18465,8 @@ return jEmoji;
 
 },{}],"jEmoji":[function(require,module,exports){
 module.exports=require('3GhwsM');
+},{}],"javascript-linkify":[function(require,module,exports){
+module.exports=require('+vibbn');
 },{}],"+vibbn":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
@@ -18681,8 +18687,8 @@ window.linkify = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"javascript-linkify":[function(require,module,exports){
-module.exports=require('+vibbn');
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('naz2eD');
 },{}],"naz2eD":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
@@ -19965,15 +19971,13 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('naz2eD');
 },{}],15:[function(require,module,exports){
 require('angular').module('app', []);
 require('anchor/anchor.pu.js');
 require('tooltip/tooltip.pu.js');
 require('router/router.pu.js');
 
-},{"anchor/anchor.pu.js":16,"angular":"7Lkch9","router/router.pu.js":38,"tooltip/tooltip.pu.js":40}],16:[function(require,module,exports){
+},{"anchor/anchor.pu.js":16,"angular":"7Lkch9","router/router.pu.js":39,"tooltip/tooltip.pu.js":42}],16:[function(require,module,exports){
 var $ = require('zepto');
 
 $(document).on('click', '[anchor]', function (e) {
@@ -20080,7 +20084,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","filters/filters.pu.js":21,"i18n/i18n.js":23,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"persistent-model/persistent-model.js":34,"zepto":"naz2eD"}],18:[function(require,module,exports){
+},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","filters/filters.pu.js":21,"i18n/i18n.js":23,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"persistent-model/persistent-model.js":35,"zepto":"naz2eD"}],18:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
@@ -20216,7 +20220,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","backbone":41,"filters/filters.pu.js":21,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"request/request.js":36,"underscore":45,"zepto":"naz2eD"}],19:[function(require,module,exports){
+},{"angular":"7Lkch9","backbone":43,"filters/filters.pu.js":21,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"request/request.js":37,"underscore":47,"zepto":"naz2eD"}],19:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -20371,7 +20375,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","config/config.js":19,"i18n/i18n.pu.js":24,"moment":44,"rectify/rectify.pu.js":35,"underscore":45}],22:[function(require,module,exports){
+},{"angular":"7Lkch9","config/config.js":19,"i18n/i18n.pu.js":24,"moment":46,"rectify/rectify.pu.js":36,"underscore":47}],22:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -20754,7 +20758,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":22,"./ru.js":25,"./uk.js":26,"underscore":45}],24:[function(require,module,exports){
+},{"./en.js":22,"./ru.js":25,"./uk.js":26,"underscore":47}],24:[function(require,module,exports){
 // Set correct language for "moment" library
 var I18N = require('./i18n.js');
 
@@ -20762,7 +20766,7 @@ require('moment').lang(I18N.getLang());
 
 module.exports = I18N;
 
-},{"./i18n.js":23,"moment":44}],25:[function(require,module,exports){
+},{"./i18n.js":23,"moment":46}],25:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -22437,7 +22441,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","underscore":45,"zepto":"naz2eD"}],28:[function(require,module,exports){
+},{"angular":"7Lkch9","underscore":47,"zepto":"naz2eD"}],28:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
     I18N = require('i18n/i18n.pu.js');
@@ -22707,7 +22711,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":21,"i18n/i18n.pu.js":24,"mediator/mediator.js":30,"request/request.js":36}],29:[function(require,module,exports){
+},{"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":21,"i18n/i18n.pu.js":24,"mediator/mediator.js":30,"request/request.js":37}],29:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -22727,7 +22731,7 @@ module.exports = {
     }
 };
 
-},{"backbone":41,"underscore":45}],30:[function(require,module,exports){
+},{"backbone":43,"underscore":47}],30:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -22738,7 +22742,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":42,"./mediator.pu.js":31,"env/env.js":20}],31:[function(require,module,exports){
+},{"./mediator.bg.js":44,"./mediator.pu.js":31,"env/env.js":20}],31:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Env = require('env/env.js');
@@ -22957,6 +22961,12 @@ require('angular').module('app')
     });
 
 },{"angular":"7Lkch9","config/config.js":19,"filters/filters.pu.js":21,"mediator/mediator.js":30,"navigation/navigation.pu.js":32}],34:[function(require,module,exports){
+module.exports = {
+    standart: 'notifications/standart.ogg',
+    original: 'notifications/original.ogg'
+};
+
+},{}],35:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -22989,7 +22999,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":41,"storage/storage.js":39}],35:[function(require,module,exports){
+},{"backbone":43,"storage/storage.js":41}],36:[function(require,module,exports){
 var I18N = require('i18n/i18n.pu.js'),
     linkify = require('javascript-linkify'),
     jEmoji = require('jEmoji'),
@@ -23084,7 +23094,7 @@ angular.module('app')
         };
     });
 
-},{"i18n/i18n.pu.js":24,"jEmoji":"3GhwsM","javascript-linkify":"+vibbn","zepto":"naz2eD"}],36:[function(require,module,exports){
+},{"i18n/i18n.pu.js":24,"jEmoji":"3GhwsM","javascript-linkify":"+vibbn","zepto":"naz2eD"}],37:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -23095,7 +23105,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./request.bg.js');
 }
 
-},{"./request.bg.js":42,"./request.pu.js":37,"env/env.js":20}],37:[function(require,module,exports){
+},{"./request.bg.js":44,"./request.pu.js":38,"env/env.js":20}],38:[function(require,module,exports){
 var Vow = require('vow'),
     _ = require('underscore')._,
     Mediator = require('mediator/mediator.js');
@@ -23119,7 +23129,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":30,"underscore":45,"vow":46}],38:[function(require,module,exports){
+},{"mediator/mediator.js":30,"underscore":47,"vow":48}],39:[function(require,module,exports){
 var Vow = require('vow'),
     Mediator = require('mediator/mediator.js');
     // TODO
@@ -23130,6 +23140,7 @@ window.Event.prototype.isDefaultPrevented = function () {
     return this.defaultPrevented;
 };
 require('buddies/buddies.pu.js');
+require('settings/settings.pu.js');
 require('news/news.pu.js');
 require('chat/chat.pu.js');
 require('angular').module('app')
@@ -23212,7 +23223,62 @@ require('angular').module('app')
         Mediator.pub('router:lastPath:get');
     });
 
-},{"angular":"7Lkch9","buddies/buddies.pu.js":17,"chat/chat.pu.js":18,"mediator/mediator.js":30,"news/news.pu.js":33,"vow":46}],39:[function(require,module,exports){
+},{"angular":"7Lkch9","buddies/buddies.pu.js":17,"chat/chat.pu.js":18,"mediator/mediator.js":30,"news/news.pu.js":33,"settings/settings.pu.js":40,"vow":48}],40:[function(require,module,exports){
+var _ = require('underscore')._,
+    Env = require('env/env.js'),
+    NotificationsSettings = require('notifications/settings.js'),
+    Mediator = require('mediator/mediator.js');
+
+require('angular')
+    .module('app')
+    .controller('settingsSignalCtrl', function ($scope) {
+        $scope.signals = Object.keys(NotificationsSettings);
+    })
+    .controller(
+        'settingsNotificationsCtrl',
+        function ($scope) {
+            /**
+             * Similar interface for simple modules
+             */
+            ['forceOnline', !Env.opera && 'yandex', 'notifications']
+                .filter(Boolean).forEach(function (moduleName) {
+                    Mediator.sub(moduleName + ':settings', function (settings) {
+                        $scope.$apply(function () {
+                            $scope[moduleName] = settings;
+                        });
+
+                        $scope.$watch(moduleName, function (settings) {
+                            Mediator.pub(moduleName + ':settings:put', settings);
+                        }, true);
+                    });
+                    $scope.$on('$destroy', function () {
+                        Mediator.unsub(moduleName + ':settings');
+                    });
+                    Mediator.pub(moduleName + ':settings:get');
+                });
+            /**
+             * Notifications
+             */
+            Mediator.sub('notifications:settings', function () {
+                var onSoundAdjust = _.debounce(function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        var audio = new Audio(),
+                            sound = $scope.notifications.sound;
+
+                        audio.volume = sound.volume;
+                        audio.src = NotificationsSettings[sound.signal];
+                        audio.play();
+                    }
+                }, 300);
+
+                $scope.$watch('notifications.sound.volume', onSoundAdjust, true);
+                $scope.$watch('notifications.sound.signal', onSoundAdjust, true);
+            });
+            Mediator.pub('notifications:settings:get');
+        }
+    );
+
+},{"angular":"7Lkch9","env/env.js":20,"mediator/mediator.js":30,"notifications/settings.js":34,"underscore":47}],41:[function(require,module,exports){
 var Env = require('env/env.js');
 
 if (Env.firefox) {
@@ -23232,7 +23298,7 @@ if (Env.firefox) {
 
 
 
-},{"env/env.js":20,"sdk/simple-storage":42}],40:[function(require,module,exports){
+},{"env/env.js":20,"sdk/simple-storage":44}],42:[function(require,module,exports){
 var $ = require('zepto');
 
 require('bootstrapTooltip');
@@ -23266,7 +23332,7 @@ $(document).on('show', '[title]', function (e) {
     });
 });
 
-},{"bootstrapTooltip":"7sF/R2","zepto":"naz2eD"}],41:[function(require,module,exports){
+},{"bootstrapTooltip":"7sF/R2","zepto":"naz2eD"}],43:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -24839,9 +24905,9 @@ $(document).on('show', '[title]', function (e) {
 
 }).call(this);
 
-},{"underscore":45}],42:[function(require,module,exports){
+},{"underscore":47}],44:[function(require,module,exports){
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -24895,7 +24961,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 //! moment.js
 //! version : 2.4.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -27211,7 +27277,7 @@ process.chdir = function (dir) {
     }
 }).call(this);
 
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -28524,7 +28590,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":42}],46:[function(require,module,exports){
+},{"timer":44}],48:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -29118,5 +29184,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":43,"timer":42}]},{},[15])
+},{"__browserify_process":45,"timer":44}]},{},[15])
 ;
