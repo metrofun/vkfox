@@ -7,7 +7,6 @@ var _ = require('underscore')._,
 require('navigation/navigation.pu.js');
 require('item-list/item-list.pu.js');
 require('item/item.pu.js');
-require('filters/filters.pu.js');
 require('angular').module('app')
     .factory('Chat', function () {
         return {

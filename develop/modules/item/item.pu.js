@@ -2,8 +2,6 @@ var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
     I18N = require('i18n/i18n.pu.js');
 
-require('angularKeypress');
-require('filters/filters.pu.js');
 require('angular').module('app')
     .directive('item', function () {
         return {

@@ -118,6 +118,7 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
     }
   };
 }]);
+
 ; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
@@ -18681,8 +18682,6 @@ window.linkify = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('naz2eD');
 },{}],"naz2eD":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
@@ -19965,13 +19964,17 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('naz2eD');
 },{}],15:[function(require,module,exports){
-require('angular').module('app', []);
+require('angularKeypress');
+require('angular').module('app', ['ui.keypress']);
+require('filters/filters.pu.js');
 require('anchor/anchor.pu.js');
 require('tooltip/tooltip.pu.js');
 require('router/router.pu.js');
 
-},{"anchor/anchor.pu.js":16,"angular":"7Lkch9","router/router.pu.js":39,"tooltip/tooltip.pu.js":42}],16:[function(require,module,exports){
+},{"anchor/anchor.pu.js":16,"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":21,"router/router.pu.js":39,"tooltip/tooltip.pu.js":42}],16:[function(require,module,exports){
 var $ = require('zepto');
 
 $(document).on('click', '[anchor]', function (e) {
@@ -19989,7 +19992,6 @@ var Mediator = require('mediator/mediator.js'),
 require('navigation/navigation.pu.js');
 require('item-list/item-list.pu.js');
 require('item/item.pu.js');
-require('filters/filters.pu.js');
 require('bootstrapDropdown');
 require('angular').module('app')
     .controller('buddiesCtrl', function ($scope, $element) {
@@ -20078,7 +20080,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","filters/filters.pu.js":21,"i18n/i18n.js":23,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"persistent-model/persistent-model.js":35,"zepto":"naz2eD"}],18:[function(require,module,exports){
+},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","i18n/i18n.js":23,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"persistent-model/persistent-model.js":35,"zepto":"naz2eD"}],18:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
@@ -20088,7 +20090,6 @@ var _ = require('underscore')._,
 require('navigation/navigation.pu.js');
 require('item-list/item-list.pu.js');
 require('item/item.pu.js');
-require('filters/filters.pu.js');
 require('angular').module('app')
     .factory('Chat', function () {
         return {
@@ -20214,7 +20215,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","backbone":43,"filters/filters.pu.js":21,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"request/request.js":37,"underscore":47,"zepto":"naz2eD"}],19:[function(require,module,exports){
+},{"angular":"7Lkch9","backbone":43,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"request/request.js":37,"underscore":47,"zepto":"naz2eD"}],19:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -22442,8 +22443,6 @@ var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
     I18N = require('i18n/i18n.pu.js');
 
-require('angularKeypress');
-require('filters/filters.pu.js');
 require('angular').module('app')
     .directive('item', function () {
         return {
@@ -22707,7 +22706,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":21,"i18n/i18n.pu.js":24,"mediator/mediator.js":30,"request/request.js":37}],29:[function(require,module,exports){
+},{"angular":"7Lkch9","i18n/i18n.pu.js":24,"mediator/mediator.js":30,"request/request.js":37}],29:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -22798,7 +22797,6 @@ var Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js');
 
 require('navigation/navigation.pu.js');
-require('filters/filters.pu.js');
 require('angular').module('app')
     .factory('News', function () {
         return {
@@ -22956,7 +22954,7 @@ require('angular').module('app')
         });
     });
 
-},{"angular":"7Lkch9","config/config.js":19,"filters/filters.pu.js":21,"mediator/mediator.js":30,"navigation/navigation.pu.js":32}],34:[function(require,module,exports){
+},{"angular":"7Lkch9","config/config.js":19,"mediator/mediator.js":30,"navigation/navigation.pu.js":32}],34:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'

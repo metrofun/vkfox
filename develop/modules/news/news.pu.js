@@ -2,7 +2,6 @@ var Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js');
 
 require('navigation/navigation.pu.js');
-require('filters/filters.pu.js');
 require('angular').module('app')
     .factory('News', function () {
         return {
