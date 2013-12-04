@@ -126,8 +126,6 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
 module.exports=require('7Lkch9');
 },{}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
-
-; global.jQuery = require("zepto");
 /**
  * @license AngularJS v1.1.5
  * (c) 2010-2012 Google, Inc. http://angularjs.org
@@ -4494,13 +4492,10 @@ function $CompileProvider($provide) {
         }
 
 
-        console.log('writeAttr', writeAttr, writeAttr !== false, 'value', value);
         if (writeAttr !== false) {
           if (value === null || value === undefined) {
-            console.log('removeAttr', attrName);
             this.$$element.removeAttr(attrName);
           } else {
-              console.log('attr', attrName);
             this.$$element.attr(attrName, value);
           }
         }
@@ -17007,12 +17002,11 @@ var styleDirective = valueFn({
 
 })(window, document);
 angular.element(document).find('head').append('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak{display:none;}ng\\:form{display:block;}</style>');
-
 ; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
+},{}],"bootstrapDropdown":[function(require,module,exports){
 module.exports=require('uRsKAo');
 },{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -22187,25 +22181,26 @@ require('angular').module('app')
         var HEADER_HEIGHT = 50;
         return {
             link: function (scope, element) {
-                var listTop = $(element).offset().top,
+                var element$ = $(element[0]),
+                    listTop = element$.offset().top,
                     lastTopVisibleElement,
-                    contentElement = $('.item-list__content', element),
-                    SCROLLBAR_WIDTH = contentElement.width()
-                        - contentElement.find('.item-list__scroll').width();
+                    contentElement$ = element$.find('.item-list__content'),
+                    SCROLLBAR_WIDTH = contentElement$.width()
+                        - contentElement$.find('.item-list__scroll').width();
 
                 $('<style>.item_fixed_window .item__header,'
                     + ' .item_fixed_window .item__actions { right: '
                     + SCROLLBAR_WIDTH + 'px;}</style>').appendTo('head');
 
-                contentElement.bind('scroll', _.debounce(function () {
+                contentElement$.bind('scroll', _.debounce(function () {
                     var topVisibleElement = document.elementFromPoint(0, listTop),
-                        element = $(topVisibleElement),
+                        topVisibleElement$ = $(topVisibleElement),
                         itemBottom;
 
-                    if (!element.hasClass('item')) {
+                    if (!topVisibleElement$.hasClass('item')) {
                         return;
                     }
-                    itemBottom = element.offset().top + element.height();
+                    itemBottom = topVisibleElement$.offset().top + topVisibleElement$.height();
 
                     if (topVisibleElement !== lastTopVisibleElement) {
                         if (lastTopVisibleElement) {
@@ -22289,7 +22284,7 @@ require('angular').module('app')
                         hashFnLocals = {},
                         lastBlockMap = {},
                         // wrap with zepto, to make available some additional methods
-                        itemListElement = itemListController.getElement().find('.item-list__content');
+                        scrollElement$ = $('.item-list__content', itemListController.getElement()[0]);
 
                     if (!match) {
                         throw new Error("Expected itemListRepeat in form of '_item_ in _collection_[ track by _id_]' but got '" +
@@ -22315,13 +22310,14 @@ require('angular').module('app')
 
                     function updateScrolledBlocks(collection, cursor, nextBlockOrder, nextBlockMap, offset) {
                         var index = offset || 0,
+                            cursor$ = $(cursor[0]),
                             length = Math.min(index + BLOCKS_PER_LOOP, collection.length),
                             block, childScope, nextCursor,
-                            scrollAreaBottom = itemListElement.offset().top
-                                + itemListElement.height() + itemListElement.scrollTop();
+                            scrollAreaBottom = scrollElement$.offset().top
+                                + scrollElement$.height() + scrollElement$.scrollTop();
 
-                        if (cursor[0].getBoundingClientRect && cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
-                            itemListElement.one('scroll.itemListRepeat', $scope.$apply.bind($scope, function () {
+                        if (cursor[0].getBoundingClientRect && cursor$.offset().top > scrollAreaBottom + RENDER_PADDING) {
+                            scrollElement$.one('scroll.itemListRepeat', $scope.$apply.bind($scope, function () {
                                 updateScrolledBlocks(
                                     collection,
                                     cursor,
@@ -22400,7 +22396,7 @@ require('angular').module('app')
                         if (!collection) {
                             collection = [];
                         }
-                        itemListElement.unbind('scroll.itemListRepeat');
+                        scrollElement$.unbind('scroll.itemListRepeat');
 
                         // locate existing items
                         length = nextBlockOrder.length = collection.length;
@@ -23135,10 +23131,6 @@ var Vow = require('vow'),
     // TODO
     // Tracker = require('tracker/tracker.js');
 
-// Polyfill jQuery proprietary method for Zepto
-window.Event.prototype.isDefaultPrevented = function () {
-    return this.defaultPrevented;
-};
 require('buddies/buddies.pu.js');
 require('settings/settings.pu.js');
 require('news/news.pu.js');

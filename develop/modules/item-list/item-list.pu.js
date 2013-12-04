@@ -10,25 +10,26 @@ require('angular').module('app')
         var HEADER_HEIGHT = 50;
         return {
             link: function (scope, element) {
-                var listTop = $(element).offset().top,
+                var element$ = $(element[0]),
+                    listTop = element$.offset().top,
                     lastTopVisibleElement,
-                    contentElement = $('.item-list__content', element),
-                    SCROLLBAR_WIDTH = contentElement.width()
-                        - contentElement.find('.item-list__scroll').width();
+                    contentElement$ = element$.find('.item-list__content'),
+                    SCROLLBAR_WIDTH = contentElement$.width()
+                        - contentElement$.find('.item-list__scroll').width();
 
                 $('<style>.item_fixed_window .item__header,'
                     + ' .item_fixed_window .item__actions { right: '
                     + SCROLLBAR_WIDTH + 'px;}</style>').appendTo('head');
 
-                contentElement.bind('scroll', _.debounce(function () {
+                contentElement$.bind('scroll', _.debounce(function () {
                     var topVisibleElement = document.elementFromPoint(0, listTop),
-                        element = $(topVisibleElement),
+                        topVisibleElement$ = $(topVisibleElement),
                         itemBottom;
 
-                    if (!element.hasClass('item')) {
+                    if (!topVisibleElement$.hasClass('item')) {
                         return;
                     }
-                    itemBottom = element.offset().top + element.height();
+                    itemBottom = topVisibleElement$.offset().top + topVisibleElement$.height();
 
                     if (topVisibleElement !== lastTopVisibleElement) {
                         if (lastTopVisibleElement) {
@@ -112,7 +113,7 @@ require('angular').module('app')
                         hashFnLocals = {},
                         lastBlockMap = {},
                         // wrap with zepto, to make available some additional methods
-                        itemListElement = itemListController.getElement().find('.item-list__content');
+                        scrollElement$ = $('.item-list__content', itemListController.getElement()[0]);
 
                     if (!match) {
                         throw new Error("Expected itemListRepeat in form of '_item_ in _collection_[ track by _id_]' but got '" +
@@ -138,13 +139,14 @@ require('angular').module('app')
 
                     function updateScrolledBlocks(collection, cursor, nextBlockOrder, nextBlockMap, offset) {
                         var index = offset || 0,
+                            cursor$ = $(cursor[0]),
                             length = Math.min(index + BLOCKS_PER_LOOP, collection.length),
                             block, childScope, nextCursor,
-                            scrollAreaBottom = itemListElement.offset().top
-                                + itemListElement.height() + itemListElement.scrollTop();
+                            scrollAreaBottom = scrollElement$.offset().top
+                                + scrollElement$.height() + scrollElement$.scrollTop();
 
-                        if (cursor[0].getBoundingClientRect && cursor.offset().top > scrollAreaBottom + RENDER_PADDING) {
-                            itemListElement.one('scroll.itemListRepeat', $scope.$apply.bind($scope, function () {
+                        if (cursor[0].getBoundingClientRect && cursor$.offset().top > scrollAreaBottom + RENDER_PADDING) {
+                            scrollElement$.one('scroll.itemListRepeat', $scope.$apply.bind($scope, function () {
                                 updateScrolledBlocks(
                                     collection,
                                     cursor,
@@ -223,7 +225,7 @@ require('angular').module('app')
                         if (!collection) {
                             collection = [];
                         }
-                        itemListElement.unbind('scroll.itemListRepeat');
+                        scrollElement$.unbind('scroll.itemListRepeat');
 
                         // locate existing items
                         length = nextBlockOrder.length = collection.length;

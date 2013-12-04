@@ -63,8 +63,7 @@ module.exports = function (grunt) {
                         },
                         'angular': {
                             path: 'bower_components/angular-unstable/angular.js',
-                            exports: 'angular',
-                            depends: {zepto: 'jQuery'}
+                            exports: 'angular'
                         },
                         'javascript-linkify': {
                             path: 'bower_components/javascript-linkify/ba-linkify.js',
