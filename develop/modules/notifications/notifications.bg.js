@@ -124,6 +124,20 @@ module.exports = Notifications = {
     CHAT: 'chat',
     BUDDIES: 'buddies',
     NEWS: 'news',
+    /**
+     * Create notifications. Usually you will need only this method
+     *
+     * @param {Object} data
+     * @param {String} data.type
+     * @param {String} data.title
+     * @param {String} data.message
+     * @param {String} data.image
+     * @param {Boolean} [data.noBadge]
+     * @param {Boolean} [data.noPopup]
+     */
+    notify: function (data) {
+        notificationQueue.push(data);
+    },
     createPopup: function (options) {
         var popups = notificationsSettings.get('popups');
 

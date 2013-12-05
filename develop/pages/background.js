@@ -78,6 +78,7 @@ function closeAuthTabs() {
     }
 }
 
+// TODO run if one time
 function tryLogin() {
     if (Browser.firefox) {
         page = require("sdk/page-worker").Page({
@@ -89,13 +90,11 @@ function tryLogin() {
         });
     } else {
         if (!iframe) {
-            console.log('tryLogin');
             iframe = document.createElement("iframe");
             iframe.name = 'vkfox-login-iframe';
-            // iframe.setAttribute('name', '');
-            iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
             document.body.appendChild(iframe);
         }
+        iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
     }
 }
 function freeLogin() {
@@ -104,7 +103,6 @@ function freeLogin() {
     } else {
         document.body.removeChild(iframe);
         iframe = null;
-        console.log('freeLogin success');
     }
     page = null;
 }
@@ -601,7 +599,6 @@ function fetchProfiles() {
     uids = _.uniq(uids);
 
     return Users.getProfilesById(uids).then(function (data) {
-        console.log(data);
         profilesColl.reset(data);
         // mark self profile
         profilesColl.get(userId).set('isSelf', true);
@@ -713,6 +710,7 @@ function getUnreadMessages() {
 }
 function onUpdates(updates) {
     updates.forEach(function (update) {
+        console.log(update);
         var messageId, mask, readState;
 
         // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
@@ -3130,6 +3128,7 @@ fetchUpdates = _.debounce(function (params) {
         wait: LONG_POLL_WAIT,
         mode: 2
     }, 'json').then(function (response) {
+        console.log(response);
         if (!response.updates) {
             enableLongPollUpdates();
             return;
@@ -3139,7 +3138,7 @@ fetchUpdates = _.debounce(function (params) {
 
         params.ts = response.ts;
         fetchUpdates(params);
-    }, enableLongPollUpdates);
+    }, enableLongPollUpdates).done();
 }, FETCH_DEBOUNCE);
 
 Mediator.sub('auth:success', function () {
@@ -3631,6 +3630,20 @@ module.exports = Notifications = {
     CHAT: 'chat',
     BUDDIES: 'buddies',
     NEWS: 'news',
+    /**
+     * Create notifications. Usually you will need only this method
+     *
+     * @param {Object} data
+     * @param {String} data.type
+     * @param {String} data.title
+     * @param {String} data.message
+     * @param {String} data.image
+     * @param {Boolean} [data.noBadge]
+     * @param {Boolean} [data.noPopup]
+     */
+    notify: function (data) {
+        notificationQueue.push(data);
+    },
     createPopup: function (options) {
         var popups = notificationsSettings.get('popups');
 
@@ -3920,7 +3933,8 @@ function onLoad(ajaxPromise, usedAccessToken, responseText) {
  */
 function xhr(type, url, data, dataType) {
     return Auth.getAccessToken().then(function (accessToken) {
-        var ajaxPromise = Vow.promise(), xhr;
+        var ajaxPromise = Vow.promise(), xhr,
+            encodedData = typeof data === 'string' ? data:querystring(data);
 
         if (Env.firefox) {
             // TODO implement timeout
@@ -3945,11 +3959,14 @@ function xhr(type, url, data, dataType) {
                 ajaxPromise.reject(new HttpError(e));
             };
             type = type.toUpperCase();
-            xhr.open(type, url, true);
             if (type === 'POST') {
+                xhr.open(type, url, true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                xhr.send(encodedData);
+            } else {
+                xhr.open(type, url + '?' + encodedData, true);
+                xhr.send();
             }
-            xhr.send(typeof data === 'string' ? data:querystring(data));
         }
 
         return ajaxPromise;

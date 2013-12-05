@@ -93,7 +93,8 @@ function onLoad(ajaxPromise, usedAccessToken, responseText) {
  */
 function xhr(type, url, data, dataType) {
     return Auth.getAccessToken().then(function (accessToken) {
-        var ajaxPromise = Vow.promise(), xhr;
+        var ajaxPromise = Vow.promise(), xhr,
+            encodedData = typeof data === 'string' ? data:querystring(data);
 
         if (Env.firefox) {
             // TODO implement timeout
@@ -118,11 +119,14 @@ function xhr(type, url, data, dataType) {
                 ajaxPromise.reject(new HttpError(e));
             };
             type = type.toUpperCase();
-            xhr.open(type, url, true);
             if (type === 'POST') {
+                xhr.open(type, url, true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                xhr.send(encodedData);
+            } else {
+                xhr.open(type, url + '?' + encodedData, true);
+                xhr.send();
             }
-            xhr.send(typeof data === 'string' ? data:querystring(data));
         }
 
         return ajaxPromise;

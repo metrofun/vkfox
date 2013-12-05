@@ -28,6 +28,7 @@ function closeAuthTabs() {
     }
 }
 
+// TODO run if one time
 function tryLogin() {
     if (Browser.firefox) {
         page = require("sdk/page-worker").Page({
@@ -39,13 +40,11 @@ function tryLogin() {
         });
     } else {
         if (!iframe) {
-            console.log('tryLogin');
             iframe = document.createElement("iframe");
             iframe.name = 'vkfox-login-iframe';
-            // iframe.setAttribute('name', '');
-            iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
             document.body.appendChild(iframe);
         }
+        iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
     }
 }
 function freeLogin() {
@@ -54,7 +53,6 @@ function freeLogin() {
     } else {
         document.body.removeChild(iframe);
         iframe = null;
-        console.log('freeLogin success');
     }
     page = null;
 }

@@ -134,7 +134,6 @@ function fetchProfiles() {
     uids = _.uniq(uids);
 
     return Users.getProfilesById(uids).then(function (data) {
-        console.log(data);
         profilesColl.reset(data);
         // mark self profile
         profilesColl.get(userId).set('isSelf', true);
@@ -246,6 +245,7 @@ function getUnreadMessages() {
 }
 function onUpdates(updates) {
     updates.forEach(function (update) {
+        console.log(update);
         var messageId, mask, readState;
 
         // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
