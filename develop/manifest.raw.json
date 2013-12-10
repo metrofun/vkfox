@@ -44,5 +44,5 @@
             "run_at" : "document_start",
             "all_frames" : true
         }],
-        "minimum_chrome_version" : "28"
+        "minimum_chrome_version" : "29"
 }

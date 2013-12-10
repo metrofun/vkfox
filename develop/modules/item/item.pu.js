@@ -36,7 +36,7 @@ require('angular').module('app')
                     }
                 };
             },
-            templateUrl: '/modules/item/item.tmpl.html',
+            templateUrl: 'modules/item/item.tmpl.html',
             replace: true,
             transclude: true,
             restrict: 'E',
@@ -50,7 +50,7 @@ require('angular').module('app')
     })
     .directive('itemAttachment', function () {
         return {
-            templateUrl: '/modules/item/attachment.tmpl.html',
+            templateUrl: 'modules/item/attachment.tmpl.html',
             replace: true,
             restrict: 'E',
             scope: {
@@ -169,7 +169,7 @@ require('angular').module('app')
         var title =  I18N.get('Like');
 
         return {
-            templateUrl: '/modules/item/action-like.tmpl.html',
+            templateUrl: 'modules/item/action-like.tmpl.html',
             restrict: 'E',
             replace: true,
             scope: {

@@ -21,7 +21,6 @@ require('angular').module('app')
             filtersModel.set(filters);
         }, true);
 
-        console.log($.fn);
         $($element).find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {

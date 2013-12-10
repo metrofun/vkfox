@@ -19,7 +19,6 @@ fetchUpdates = _.debounce(function (params) {
         wait: LONG_POLL_WAIT,
         mode: 2
     }, 'json').then(function (response) {
-        console.log(response);
         if (!response.updates) {
             enableLongPollUpdates();
             return;

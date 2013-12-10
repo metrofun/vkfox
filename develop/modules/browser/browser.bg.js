@@ -10,8 +10,9 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
+    _ = require('underscore'),
 
-    browserAction;
+    Browser, browserAction;
 
 // Set up popup and popup comminication
 if (Env.firefox) {
@@ -22,13 +23,20 @@ if (Env.firefox) {
         default_title: 'VKfox',
         default_popup: data.url('pages/popup.html')
     });
+
+    // circular dependencies
+    _.defer(function () {
+        require('mediator/mediator.js').sub('browser:createTab', function (url) {
+            Browser.createTab(url);
+        });
+    });
 } else {
     browserAction = chrome.browserAction;
 }
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = {
+module.exports = Browser = {
     getBrowserAction: function () {
         return browserAction;
     },
@@ -89,5 +97,19 @@ module.exports = {
         }
 
         return promise;
+    },
+    createTab: function () {
+        if (Env.firefox) {
+            var tabs = require('sdk/tabs');
+
+            this.createTab = function (url) {
+                tabs.open(url);
+            };
+        } else {
+            this.createTab = function (url) {
+                chrome.tabs.create({url: url});
+            };
+        }
+        this.createTab.apply(this, arguments);
     }
 };

@@ -5,6 +5,7 @@ var RETRY_INTERVAL = 10000, //ms
 
     Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js'),
+    Env = require('env/env.js'),
     Browser = require('browser/browser.bg.js');
 
 var _ = require('underscore')._,
@@ -16,7 +17,7 @@ var _ = require('underscore')._,
     state = CREATED, authPromise = Vow.promise();
 
 function closeAuthTabs() {
-    if (Browser.firefox) {
+    if (Env.firefox) {
         // TODO
         // throw "Not implemented";
     } else {
@@ -30,7 +31,7 @@ function closeAuthTabs() {
 
 // TODO run if one time
 function tryLogin() {
-    if (Browser.firefox) {
+    if (Env.firefox) {
         page = require("sdk/page-worker").Page({
             contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
             contentURL: Config.AUTH_URI,
@@ -48,7 +49,7 @@ function tryLogin() {
     }
 }
 function freeLogin() {
-    if (Browser.firefox) {
+    if (Env.firefox) {
         page.destroy();
     } else {
         document.body.removeChild(iframe);
@@ -72,9 +73,7 @@ Mediator.sub('auth:iframe', function (url) {
         freeLogin();
     } catch (e) {
         // TODO control console.log
-        setTimeout(function () {
-            throw e;
-        });
+        console.log(e);
     }
 }.bind(this));
 
@@ -83,7 +82,7 @@ Mediator.sub('auth:state:get', function () {
 });
 
 Mediator.sub('auth:oauth', function () {
-    chrome.tabs.create({url: Config.AUTH_URI});
+    Browser.createTab(Config.AUTH_URI);
 });
 
 Mediator.sub('auth:login', function (force) {

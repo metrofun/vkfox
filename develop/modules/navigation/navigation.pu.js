@@ -18,7 +18,7 @@ require('angular').module('app')
                 ];
                 $scope.activeTab = $routeParams.tab;
             },
-            templateUrl: '/modules/navigation/navigation.tmpl.html',
+            templateUrl: 'modules/navigation/navigation.tmpl.html',
             replace: true,
             restrict: 'E'
         };

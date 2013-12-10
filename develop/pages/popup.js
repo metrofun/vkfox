@@ -17003,12 +17003,11 @@ var styleDirective = valueFn({
 
 })(window, document);
 angular.element(document).find('head').append('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak{display:none;}ng\\:form{display:block;}</style>');
+
 ; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"bootstrapDropdown":[function(require,module,exports){
-module.exports=require('uRsKAo');
 },{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -17187,7 +17186,9 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"bootstrapTooltip":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
+module.exports=require('uRsKAo');
+},{}],"bootstrapTooltip":[function(require,module,exports){
 module.exports=require('7sF/R2');
 },{}],"7sF/R2":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -17559,7 +17560,9 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"3GhwsM":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"jEmoji":[function(require,module,exports){
+module.exports=require('3GhwsM');
+},{}],"3GhwsM":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*global exports */
 /*!
@@ -18458,8 +18461,6 @@ return jEmoji;
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"jEmoji":[function(require,module,exports){
-module.exports=require('3GhwsM');
 },{}],"javascript-linkify":[function(require,module,exports){
 module.exports=require('+vibbn');
 },{}],"+vibbn":[function(require,module,exports){
@@ -19973,17 +19974,43 @@ require('filters/filters.pu.js');
 require('anchor/anchor.pu.js');
 require('tooltip/tooltip.pu.js');
 require('router/router.pu.js');
+//debug
+window.onerror = function () {
+    require('mediator/mediator.js').pub(arguments);
+};
+console.log = function () {
+    extension.sendMessage(arguments);
+};
 
-},{"anchor/anchor.pu.js":16,"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":21,"router/router.pu.js":39,"tooltip/tooltip.pu.js":42}],16:[function(require,module,exports){
-var $ = require('zepto');
+},{"anchor/anchor.pu.js":16,"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":22,"mediator/mediator.js":31,"router/router.pu.js":40,"tooltip/tooltip.pu.js":43}],16:[function(require,module,exports){
+var $ = require('zepto'),
+    Browser = require('browser/browser.pu.js');
 
 $(document).on('click', '[anchor]', function (e) {
     var jTarget = $(e.currentTarget);
 
-    chrome.tabs.create({url: jTarget.attr('anchor')});
+    Browser.createTab(jTarget.attr('anchor'));
 });
 
-},{"zepto":"naz2eD"}],17:[function(require,module,exports){
+},{"browser/browser.pu.js":17,"zepto":"naz2eD"}],17:[function(require,module,exports){
+var Env = require('env/env.js'),
+    Mediator = require('mediator/mediator.js');
+
+exports.createTab = function () {
+    if (Env.firefox) {
+        this.createTab = function (url) {
+            Mediator.pub('browser:createTab', url);
+        };
+    } else {
+        this.createTab = function (url) {
+            chrome.tabs.create({url: url});
+        };
+    }
+    this.createTab.apply(this, arguments);
+};
+
+
+},{"env/env.js":21,"mediator/mediator.js":31}],18:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
     I18N = require('i18n/i18n.js'),
@@ -20007,7 +20034,6 @@ require('angular').module('app')
             filtersModel.set(filters);
         }, true);
 
-        console.log($.fn);
         $($element).find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {
@@ -20080,7 +20106,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","i18n/i18n.js":23,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"persistent-model/persistent-model.js":35,"zepto":"naz2eD"}],18:[function(require,module,exports){
+},{"angular":"7Lkch9","bootstrapDropdown":"uRsKAo","i18n/i18n.js":24,"item-list/item-list.pu.js":28,"item/item.pu.js":29,"mediator/mediator.js":31,"navigation/navigation.pu.js":33,"persistent-model/persistent-model.js":36,"zepto":"naz2eD"}],19:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
@@ -20215,7 +20241,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","backbone":43,"item-list/item-list.pu.js":27,"item/item.pu.js":28,"mediator/mediator.js":30,"navigation/navigation.pu.js":32,"request/request.js":37,"underscore":47,"zepto":"naz2eD"}],19:[function(require,module,exports){
+},{"angular":"7Lkch9","backbone":44,"item-list/item-list.pu.js":28,"item/item.pu.js":29,"mediator/mediator.js":31,"navigation/navigation.pu.js":33,"request/request.js":38,"underscore":48,"zepto":"naz2eD"}],20:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -20241,20 +20267,20 @@ exports.AUTH_URI = [
     ].join('&')
 ].join('');
 
-},{"env/env.js":20}],20:[function(require,module,exports){
+},{"env/env.js":21}],21:[function(require,module,exports){
 /*jshint bitwise: false*/
-var isPopup = location && ~location.href.indexOf('popup');
+var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup');
 
 module.exports = {
     // popup/background environment
     popup: isPopup,
     background: !isPopup,
     // browser environment
-    chrome: true
-    // firefox:  true
+    // chrome: true
+    firefox:  true
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var _ = require('underscore')._,
     Config = require('config/config.js'),
     moment = require('moment'),
@@ -20370,7 +20396,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","config/config.js":19,"i18n/i18n.pu.js":24,"moment":46,"rectify/rectify.pu.js":36,"underscore":47}],22:[function(require,module,exports){
+},{"angular":"7Lkch9","config/config.js":20,"i18n/i18n.pu.js":25,"moment":47,"rectify/rectify.pu.js":37,"underscore":48}],23:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -20706,7 +20732,7 @@ return r;
 }
 })();
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var DEFAULT_LANGUAGE = 'ru',
 
     _ = require('underscore')._,
@@ -20753,7 +20779,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":22,"./ru.js":25,"./uk.js":26,"underscore":47}],24:[function(require,module,exports){
+},{"./en.js":23,"./ru.js":26,"./uk.js":27,"underscore":48}],25:[function(require,module,exports){
 // Set correct language for "moment" library
 var I18N = require('./i18n.js');
 
@@ -20761,7 +20787,7 @@ require('moment').lang(I18N.getLang());
 
 module.exports = I18N;
 
-},{"./i18n.js":23,"moment":46}],25:[function(require,module,exports){
+},{"./i18n.js":24,"moment":47}],26:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -21465,7 +21491,7 @@ return r;
 }
 })();
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.uk = function (n) {
@@ -22169,7 +22195,7 @@ return r;
 }
 })();
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var _ = require('underscore')._,
     $ = require('zepto');
 
@@ -22222,7 +22248,7 @@ require('angular').module('app')
     })
     .directive('itemList', function () {
         return {
-            templateUrl: '/modules/item-list/item-list.tmpl.html',
+            templateUrl: 'modules/item-list/item-list.tmpl.html',
             replace: true,
             transclude: true,
             restrict: 'E',
@@ -22438,7 +22464,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","underscore":47,"zepto":"naz2eD"}],28:[function(require,module,exports){
+},{"angular":"7Lkch9","underscore":48,"zepto":"naz2eD"}],29:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
     I18N = require('i18n/i18n.pu.js');
@@ -22477,7 +22503,7 @@ require('angular').module('app')
                     }
                 };
             },
-            templateUrl: '/modules/item/item.tmpl.html',
+            templateUrl: 'modules/item/item.tmpl.html',
             replace: true,
             transclude: true,
             restrict: 'E',
@@ -22491,7 +22517,7 @@ require('angular').module('app')
     })
     .directive('itemAttachment', function () {
         return {
-            templateUrl: '/modules/item/attachment.tmpl.html',
+            templateUrl: 'modules/item/attachment.tmpl.html',
             replace: true,
             restrict: 'E',
             scope: {
@@ -22610,7 +22636,7 @@ require('angular').module('app')
         var title =  I18N.get('Like');
 
         return {
-            templateUrl: '/modules/item/action-like.tmpl.html',
+            templateUrl: 'modules/item/action-like.tmpl.html',
             restrict: 'E',
             replace: true,
             scope: {
@@ -22706,7 +22732,7 @@ require('angular').module('app')
         };
     });
 
-},{"angular":"7Lkch9","i18n/i18n.pu.js":24,"mediator/mediator.js":30,"request/request.js":37}],29:[function(require,module,exports){
+},{"angular":"7Lkch9","i18n/i18n.pu.js":25,"mediator/mediator.js":31,"request/request.js":38}],30:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -22726,7 +22752,7 @@ module.exports = {
     }
 };
 
-},{"backbone":43,"underscore":47}],30:[function(require,module,exports){
+},{"backbone":44,"underscore":48}],31:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -22737,18 +22763,20 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":44,"./mediator.pu.js":31,"env/env.js":20}],31:[function(require,module,exports){
+},{"./mediator.bg.js":45,"./mediator.pu.js":32,"env/env.js":21}],32:[function(require,module,exports){
+/* global self */
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Env = require('env/env.js');
 
 if (Env.firefox) {
-    Dispatcher.sub('all', function () {
-        extension.sendMessage([].slice.call(arguments));
-    });
-    extension.onMessage = function () {
+    Mediator.pub = function () {
         Dispatcher.pub.apply(Dispatcher, arguments);
+        extension.sendMessage([].slice.call(arguments));
     };
+    extension.onMessage.addListener(function (messageData) {
+        Dispatcher.pub.apply(Mediator, messageData);
+    });
 } else {
     var activePort = chrome.runtime.connect();
 
@@ -22758,14 +22786,13 @@ if (Env.firefox) {
 
     Mediator.pub = function () {
         Dispatcher.pub.apply(Dispatcher, arguments);
-
         activePort.postMessage([].slice.call(arguments));
     };
 }
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":29,"env/env.js":20}],32:[function(require,module,exports){
+},{"./dispatcher.js":30,"env/env.js":21}],33:[function(require,module,exports){
 require('angular').module('app')
     .directive('navigation', function ($routeParams) {
         return {
@@ -22786,13 +22813,13 @@ require('angular').module('app')
                 ];
                 $scope.activeTab = $routeParams.tab;
             },
-            templateUrl: '/modules/navigation/navigation.tmpl.html',
+            templateUrl: 'modules/navigation/navigation.tmpl.html',
             replace: true,
             restrict: 'E'
         };
     });
 
-},{"angular":"7Lkch9"}],33:[function(require,module,exports){
+},{"angular":"7Lkch9"}],34:[function(require,module,exports){
 var Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js');
 
@@ -22954,13 +22981,13 @@ require('angular').module('app')
         });
     });
 
-},{"angular":"7Lkch9","config/config.js":19,"mediator/mediator.js":30,"navigation/navigation.pu.js":32}],34:[function(require,module,exports){
+},{"angular":"7Lkch9","config/config.js":20,"mediator/mediator.js":31,"navigation/navigation.pu.js":33}],35:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -22993,7 +23020,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":43,"storage/storage.js":41}],36:[function(require,module,exports){
+},{"backbone":44,"storage/storage.js":42}],37:[function(require,module,exports){
 var I18N = require('i18n/i18n.pu.js'),
     linkify = require('javascript-linkify'),
     jEmoji = require('jEmoji'),
@@ -23088,7 +23115,7 @@ angular.module('app')
         };
     });
 
-},{"i18n/i18n.pu.js":24,"jEmoji":"3GhwsM","javascript-linkify":"+vibbn","zepto":"naz2eD"}],37:[function(require,module,exports){
+},{"i18n/i18n.pu.js":25,"jEmoji":"3GhwsM","javascript-linkify":"+vibbn","zepto":"naz2eD"}],38:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -23099,7 +23126,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./request.bg.js');
 }
 
-},{"./request.bg.js":44,"./request.pu.js":38,"env/env.js":20}],38:[function(require,module,exports){
+},{"./request.bg.js":45,"./request.pu.js":39,"env/env.js":21}],39:[function(require,module,exports){
 var Vow = require('vow'),
     _ = require('underscore')._,
     Mediator = require('mediator/mediator.js');
@@ -23123,7 +23150,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":30,"underscore":47,"vow":48}],39:[function(require,module,exports){
+},{"mediator/mediator.js":31,"underscore":48,"vow":49}],40:[function(require,module,exports){
 var Vow = require('vow'),
     Mediator = require('mediator/mediator.js');
     // TODO
@@ -23134,10 +23161,15 @@ require('settings/settings.pu.js');
 require('news/news.pu.js');
 require('chat/chat.pu.js');
 require('angular').module('app')
-    .config(function ($routeProvider, $locationProvider, $compileProvider) {
-        $locationProvider.html5Mode(true);
+    .config(function ($routeProvider, $locationProvider, $compileProvider, $provide) {
+        // Make Addon SDK compatible
+        $provide.decorator('$sniffer', function ($delegate) {
+            $delegate.history = false;
+            return $delegate;
+        });
+        $locationProvider.html5Mode(false);
 
-        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension):/);
+        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension|resource):/);
 
         $routeProvider
             .when('/news', {
@@ -23146,7 +23178,7 @@ require('angular').module('app')
             .when('/:tab', {
                 templateUrl: function (params) {
                     return [
-                        '/modules/', params.tab,
+                        'modules/', params.tab,
                         '/', params.tab, '.tmpl.html'
                     ].join('');
                 }
@@ -23154,7 +23186,7 @@ require('angular').module('app')
             .when('/:tab/:subtab', {
                 templateUrl: function (params) {
                     return [
-                        '/modules/', params.tab,
+                        'modules/', params.tab,
                         '/', params.tab, '.tmpl.html'
                     ].join('');
                 }
@@ -23213,7 +23245,7 @@ require('angular').module('app')
         Mediator.pub('router:lastPath:get');
     });
 
-},{"angular":"7Lkch9","buddies/buddies.pu.js":17,"chat/chat.pu.js":18,"mediator/mediator.js":30,"news/news.pu.js":33,"settings/settings.pu.js":40,"vow":48}],40:[function(require,module,exports){
+},{"angular":"7Lkch9","buddies/buddies.pu.js":18,"chat/chat.pu.js":19,"mediator/mediator.js":31,"news/news.pu.js":34,"settings/settings.pu.js":41,"vow":49}],41:[function(require,module,exports){
 var _ = require('underscore')._,
     Env = require('env/env.js'),
     NotificationsSettings = require('notifications/settings.js'),
@@ -23268,7 +23300,7 @@ require('angular')
         }
     );
 
-},{"angular":"7Lkch9","env/env.js":20,"mediator/mediator.js":30,"notifications/settings.js":34,"underscore":47}],41:[function(require,module,exports){
+},{"angular":"7Lkch9","env/env.js":21,"mediator/mediator.js":31,"notifications/settings.js":35,"underscore":48}],42:[function(require,module,exports){
 var Env = require('env/env.js');
 
 if (Env.firefox) {
@@ -23288,7 +23320,7 @@ if (Env.firefox) {
 
 
 
-},{"env/env.js":20,"sdk/simple-storage":44}],42:[function(require,module,exports){
+},{"env/env.js":21,"sdk/simple-storage":45}],43:[function(require,module,exports){
 var $ = require('zepto');
 
 require('bootstrapTooltip');
@@ -23322,7 +23354,7 @@ $(document).on('show', '[title]', function (e) {
     });
 });
 
-},{"bootstrapTooltip":"7sF/R2","zepto":"naz2eD"}],43:[function(require,module,exports){
+},{"bootstrapTooltip":"7sF/R2","zepto":"naz2eD"}],44:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -24895,9 +24927,9 @@ $(document).on('show', '[title]', function (e) {
 
 }).call(this);
 
-},{"underscore":47}],44:[function(require,module,exports){
+},{"underscore":48}],45:[function(require,module,exports){
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -24951,7 +24983,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 //! moment.js
 //! version : 2.4.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -27267,7 +27299,7 @@ process.chdir = function (dir) {
     }
 }).call(this);
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -27275,15 +27307,14 @@ process.chdir = function (dir) {
 
 (function() {
     // Support ADDON SDK environment
-    if (!setTimeout) {
-        var timer = require('timer');
-
-        setImmediate = timer.setImmediate;
-        clearImmediate = timer.clearImmediate;
-        setTimeout = setTimeout;
-        setInterval = setInterval;
-        clearTimeout = clearTimeout;
-        clearInterval = clearInterval;
+    if (typeof setTimeout === 'undefined') {
+        var timer = require('timer'),
+            setImmediate = timer.setImmediate;
+            clearImmediate = timer.clearImmediate;
+            setTimeout = timer.setTimeout;
+            setInterval = timer.setInterval;
+            clearTimeout = timer.clearTimeout;
+            clearInterval = timer.clearInterval;
     }
 
   // Baseline setup
@@ -28580,7 +28611,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":44}],48:[function(require,module,exports){
+},{"timer":45}],49:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -28606,15 +28637,15 @@ var Promise = function(val) {
 };
 
 // Support ADDON SDK environment
-if (!setTimeout) {
-    var timer = require('timer');
+if (!global.setTimeout) {
+    var timer = require('timer'),
 
     setImmediate = timer.setImmediate;
     clearImmediate = timer.clearImmediate;
-    setTimeout = setTimeout;
-    setInterval = setInterval;
-    clearTimeout = clearTimeout;
-    clearInterval = clearInterval;
+    setTimeout = timer.setTimeout;
+    setInterval = timer.setInterval;
+    clearTimeout = timer.clearTimeout;
+    clearInterval = timer.clearInterval;
 }
 
 Promise.prototype = {
@@ -29174,5 +29205,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":45,"timer":44}]},{},[15])
+},{"__browserify_process":46,"timer":45}]},{},[15])
 ;

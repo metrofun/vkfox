@@ -39,8 +39,10 @@ module.exports = function (grunt) {
                 NODE_ENV : DEVELOP
             }
         },
-        browserify: {
-            popup: {
+        browserify: BROWSERS.reduce(function (memo, browser) {
+            var isFirefox = browser === 'firefox';
+
+            memo[browser + 'Popup'] = {
                 files: {
                     'pages/popup.js': ['modules/app/app.pu.js'],
                 },
@@ -79,31 +81,35 @@ module.exports = function (grunt) {
                         }
                     },
                     ignore: [
-                        'timer',
                         './request.bg.js',
                         './mediator.bg.js',
+                        'timer',
+                        'sdk/tabs',
                         'sdk/simple-storage'
-                    ]
+                    ].filter(Boolean)
                 }
-            },
-            background: {
+            };
+            memo[browser + 'Background'] = {
                 files: {
                     'pages/background.js': ['modules/app/app.bg.js'],
                 },
                 options: {
                     ignore: [
-                        'sdk/self',
-                        'sdk/page-worker',
-                        'browserAction',
                         './request.pu.js',
                         './mediator.pu.js',
-                        'sdk/request',
                         'timer',
+                        'browserAction',
+                        'sdk/tabs',
+                        'sdk/request',
+                        'sdk/self',
+                        'sdk/page-worker',
                         'sdk/simple-storage'
-                    ]
+                    ].filter(Boolean)
                 }
-            }
-        },
+            };
+
+            return memo;
+        }, {}),
         "mozilla-addon-sdk": {
             '1_14': {
                 options: {
@@ -317,15 +323,18 @@ module.exports = function (grunt) {
     // });
 
     grunt.registerTask('mozilla', [
+        'env:firefox',
+        'less',
+        'browserify:firefoxPopup',
         'mozilla-addon-sdk',
-        'browserify',
         'mozilla-cfx'
     ]);
     grunt.registerTask('chrome', [
         'env:chrome',
         'less',
         'preprocess:manifest',
-        'browserify',
+        'browserify:chromePopup',
+        'browserify:chromeBackground',
         'watch'
     ]);
 

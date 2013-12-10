@@ -1,22 +1,27 @@
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
+    Browser = require('browser/browser.bg.js'),
     Env = require('env/env.js');
 
 if (Env.firefox) {
-    throw "not implemented";
-    // Mediator.sub('all', function () {
-        // browserAction.sendMessage([].slice.call(arguments));
-    // });
-    // browserAction.onMessage = function () {
-        // Mediator.pub.apply(Mediator, arguments);
-    // };
+    var browserAction = Browser.getBrowserAction();
+
+    Object.defineProperty(Mediator, 'pub', { value: function () {
+        Dispatcher.pub.apply(Mediator, arguments);
+        browserAction.sendMessage([].slice.call(arguments));
+    }, writable: true, enumerable: true});
+
+    browserAction.onMessage.addListener(function (messageData) {
+        console.log('recieve', messageData);
+        Dispatcher.pub.apply(Mediator, messageData);
+    });
 } else {
     var activePorts = [];
 
     chrome.runtime.onConnect.addListener(function (port) {
         activePorts.push(port);
         port.onMessage.addListener(function (messageData) {
-            Dispatcher.pub.apply(Dispatcher, messageData);
+            Dispatcher.pub.apply(Mediator, messageData);
         });
         port.onDisconnect.addListener(function () {
             activePorts = activePorts.filter(function (active) {
@@ -26,12 +31,10 @@ if (Env.firefox) {
     });
 
     Mediator.pub = function () {
-        var args = arguments;
-
         Dispatcher.pub.apply(Mediator, arguments);
 
         activePorts.forEach(function (port) {
-            port.postMessage([].slice.call(args));
+            port.postMessage([].slice.call(arguments));
         });
     };
 }

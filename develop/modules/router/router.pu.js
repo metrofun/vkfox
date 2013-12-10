@@ -8,10 +8,15 @@ require('settings/settings.pu.js');
 require('news/news.pu.js');
 require('chat/chat.pu.js');
 require('angular').module('app')
-    .config(function ($routeProvider, $locationProvider, $compileProvider) {
-        $locationProvider.html5Mode(true);
+    .config(function ($routeProvider, $locationProvider, $compileProvider, $provide) {
+        // Make Addon SDK compatible
+        $provide.decorator('$sniffer', function ($delegate) {
+            $delegate.history = false;
+            return $delegate;
+        });
+        $locationProvider.html5Mode(false);
 
-        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension):/);
+        $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|chrome-extension|resource):/);
 
         $routeProvider
             .when('/news', {
@@ -20,7 +25,7 @@ require('angular').module('app')
             .when('/:tab', {
                 templateUrl: function (params) {
                     return [
-                        '/modules/', params.tab,
+                        'modules/', params.tab,
                         '/', params.tab, '.tmpl.html'
                     ].join('');
                 }
@@ -28,7 +33,7 @@ require('angular').module('app')
             .when('/:tab/:subtab', {
                 templateUrl: function (params) {
                     return [
-                        '/modules/', params.tab,
+                        'modules/', params.tab,
                         '/', params.tab, '.tmpl.html'
                     ].join('');
                 }

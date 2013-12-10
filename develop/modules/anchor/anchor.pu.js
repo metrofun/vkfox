@@ -1,7 +1,8 @@
-var $ = require('zepto');
+var $ = require('zepto'),
+    Browser = require('browser/browser.pu.js');
 
 $(document).on('click', '[anchor]', function (e) {
     var jTarget = $(e.currentTarget);
 
-    chrome.tabs.create({url: jTarget.attr('anchor')});
+    Browser.createTab(jTarget.attr('anchor'));
 });

@@ -9,7 +9,7 @@
                         ng-repeat="tab in subtabs"
                         ng-class="{active: tab.href === activeTab}">
                         <a
-                            href="/{{tab.href}}">
+                            href="pages/popup.html#/{{tab.href}}">
                             {{tab.text | i18n}}
                         </a>
                     </li>
@@ -17,5 +17,5 @@
             </div>
         </div>
     </div>
-    <ng-include src="'/modules/news/' + activeSubTab + '.tmpl.html'"></ng-include>
+    <ng-include src="'modules/news/' + activeSubTab + '.tmpl.html'"></ng-include>
 </div>

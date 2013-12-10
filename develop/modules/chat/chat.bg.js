@@ -245,7 +245,6 @@ function getUnreadMessages() {
 }
 function onUpdates(updates) {
     updates.forEach(function (update) {
-        console.log(update);
         var messageId, mask, readState;
 
         // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server

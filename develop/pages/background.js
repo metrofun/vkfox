@@ -55,6 +55,7 @@ var RETRY_INTERVAL = 10000, //ms
 
     Config = require('config/config.js'),
     Mediator = require('mediator/mediator.js'),
+    Env = require('env/env.js'),
     Browser = require('browser/browser.bg.js');
 
 var _ = require('underscore')._,
@@ -66,7 +67,7 @@ var _ = require('underscore')._,
     state = CREATED, authPromise = Vow.promise();
 
 function closeAuthTabs() {
-    if (Browser.firefox) {
+    if (Env.firefox) {
         // TODO
         // throw "Not implemented";
     } else {
@@ -80,7 +81,7 @@ function closeAuthTabs() {
 
 // TODO run if one time
 function tryLogin() {
-    if (Browser.firefox) {
+    if (Env.firefox) {
         page = require("sdk/page-worker").Page({
             contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
             contentURL: Config.AUTH_URI,
@@ -98,7 +99,7 @@ function tryLogin() {
     }
 }
 function freeLogin() {
-    if (Browser.firefox) {
+    if (Env.firefox) {
         page.destroy();
     } else {
         document.body.removeChild(iframe);
@@ -122,9 +123,7 @@ Mediator.sub('auth:iframe', function (url) {
         freeLogin();
     } catch (e) {
         // TODO control console.log
-        setTimeout(function () {
-            throw e;
-        });
+        console.log(e);
     }
 }.bind(this));
 
@@ -183,7 +182,7 @@ module.exports = Auth = {
 
 Auth.login();
 
-},{"backbone":32,"browser/browser.bg.js":4,"config/config.js":7,"mediator/mediator.js":18,"sdk/page-worker":33,"underscore":35,"vow":36}],4:[function(require,module,exports){
+},{"backbone":32,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":18,"sdk/page-worker":33,"underscore":35,"vow":36}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
         "19": "/assets/logo19.png",
@@ -710,7 +709,6 @@ function getUnreadMessages() {
 }
 function onUpdates(updates) {
     updates.forEach(function (update) {
-        console.log(update);
         var messageId, mask, readState;
 
         // @see http://vk.com/developers.php?oid=-17680044&p=Connecting_to_the_LongPoll_Server
@@ -814,15 +812,15 @@ exports.AUTH_URI = [
 
 },{"env/env.js":8}],8:[function(require,module,exports){
 /*jshint bitwise: false*/
-var isPopup = location && ~location.href.indexOf('popup');
+var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup');
 
 module.exports = {
     // popup/background environment
     popup: isPopup,
     background: !isPopup,
     // browser environment
-    chrome: true
-    // firefox:  true
+    // chrome: true
+    firefox:  true
 };
 
 },{}],9:[function(require,module,exports){
@@ -3128,7 +3126,6 @@ fetchUpdates = _.debounce(function (params) {
         wait: LONG_POLL_WAIT,
         mode: 2
     }, 'json').then(function (response) {
-        console.log(response);
         if (!response.updates) {
             enableLongPollUpdates();
             return;
@@ -3168,16 +3165,19 @@ module.exports = {
 },{"backbone":32,"underscore":35}],17:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
+    Browser = require('browser/browser.bg.js'),
     Env = require('env/env.js');
 
 if (Env.firefox) {
-    throw "not implemented";
-    // Mediator.sub('all', function () {
-        // browserAction.sendMessage([].slice.call(arguments));
-    // });
-    // browserAction.onMessage = function () {
-        // Mediator.pub.apply(Mediator, arguments);
-    // };
+    var browserAction = Browser.getBrowserAction();
+
+    Mediator.pub = function () {
+        Dispatcher.pub.apply(Mediator, arguments);
+        browserAction.sendMessage([].slice.call(arguments));
+    };
+    browserAction.onMessage = function () {
+        Mediator.pub.apply(Mediator, arguments);
+    };
 } else {
     var activePorts = [];
 
@@ -3206,7 +3206,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":16,"env/env.js":8}],18:[function(require,module,exports){
+},{"./dispatcher.js":16,"browser/browser.bg.js":4,"env/env.js":8}],18:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -5974,15 +5974,14 @@ process.chdir = function (dir) {
 
 (function() {
     // Support ADDON SDK environment
-    if (!setTimeout) {
-        var timer = require('timer');
-
-        setImmediate = timer.setImmediate;
-        clearImmediate = timer.clearImmediate;
-        setTimeout = setTimeout;
-        setInterval = setInterval;
-        clearTimeout = clearTimeout;
-        clearInterval = clearInterval;
+    if (typeof setTimeout === 'undefined') {
+        var timer = require('timer'),
+            setImmediate = timer.setImmediate;
+            clearImmediate = timer.clearImmediate;
+            setTimeout = timer.setTimeout;
+            setInterval = timer.setInterval;
+            clearTimeout = timer.clearTimeout;
+            clearInterval = timer.clearInterval;
     }
 
   // Baseline setup
@@ -7305,15 +7304,15 @@ var Promise = function(val) {
 };
 
 // Support ADDON SDK environment
-if (!setTimeout) {
-    var timer = require('timer');
+if (!global.setTimeout) {
+    var timer = require('timer'),
 
     setImmediate = timer.setImmediate;
     clearImmediate = timer.clearImmediate;
-    setTimeout = setTimeout;
-    setInterval = setInterval;
-    clearTimeout = clearTimeout;
-    clearInterval = clearInterval;
+    setTimeout = timer.setTimeout;
+    setInterval = timer.setInterval;
+    clearTimeout = timer.clearTimeout;
+    clearInterval = timer.clearInterval;
 }
 
 Promise.prototype = {

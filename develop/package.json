@@ -6,7 +6,7 @@
   "author": "",
   "license": "MPL 2.0",
   "version": "0.1",
-  "lib": "modules",
+  "lib": "data/modules",
   "dependencies": ["browser-action"],
-  "main": "app/app.bg"
+  "main": "app/app.bg.js"
 }
