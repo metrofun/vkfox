@@ -123,9 +123,7 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"angular":"7Lkch9"}],"angular":[function(require,module,exports){
-module.exports=require('7Lkch9');
-},{}],"7Lkch9":[function(require,module,exports){
+},{"angular":"7Lkch9"}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /**
  * @license AngularJS v1.1.5
@@ -17008,6 +17006,8 @@ angular.element(document).find('head').append('<style type="text/css">@charset "
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
+},{}],"angular":[function(require,module,exports){
+module.exports=require('7Lkch9');
 },{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -17188,8 +17188,6 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 },{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
 module.exports=require('uRsKAo');
-},{}],"bootstrapTooltip":[function(require,module,exports){
-module.exports=require('7sF/R2');
 },{}],"7sF/R2":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -17288,6 +17286,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
       if (!self.options.delay || !self.options.delay.show) return self.show()
 
+      console.log('clearTimeout', clearTimeout, window.clearTimeout);
       clearTimeout(this.timeout)
       self.hoverState = 'in'
       this.timeout = setTimeout(function() {
@@ -17560,8 +17559,8 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"jEmoji":[function(require,module,exports){
-module.exports=require('3GhwsM');
+},{"zepto":"naz2eD"}],"bootstrapTooltip":[function(require,module,exports){
+module.exports=require('7sF/R2');
 },{}],"3GhwsM":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*global exports */
@@ -18461,8 +18460,8 @@ return jEmoji;
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"javascript-linkify":[function(require,module,exports){
-module.exports=require('+vibbn');
+},{}],"jEmoji":[function(require,module,exports){
+module.exports=require('3GhwsM');
 },{}],"+vibbn":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
@@ -18683,6 +18682,10 @@ window.linkify = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
+},{}],"javascript-linkify":[function(require,module,exports){
+module.exports=require('+vibbn');
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('naz2eD');
 },{}],"naz2eD":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
@@ -19965,8 +19968,6 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('naz2eD');
 },{}],15:[function(require,module,exports){
 require('angularKeypress');
 require('angular').module('app', ['ui.keypress']);

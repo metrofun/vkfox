@@ -132,7 +132,7 @@ Mediator.sub('auth:state:get', function () {
 });
 
 Mediator.sub('auth:oauth', function () {
-    chrome.tabs.create({url: Config.AUTH_URI});
+    Browser.createTab(Config.AUTH_URI);
 });
 
 Mediator.sub('auth:login', function (force) {
@@ -195,8 +195,9 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
+    _ = require('underscore'),
 
-    browserAction;
+    Browser, browserAction;
 
 // Set up popup and popup comminication
 if (Env.firefox) {
@@ -207,13 +208,20 @@ if (Env.firefox) {
         default_title: 'VKfox',
         default_popup: data.url('pages/popup.html')
     });
+
+    // circular dependencies
+    _.defer(function () {
+        require('mediator/mediator.js').sub('browser:createTab', function (url) {
+            Browser.createTab(url);
+        });
+    });
 } else {
     browserAction = chrome.browserAction;
 }
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = {
+module.exports = Browser = {
     getBrowserAction: function () {
         return browserAction;
     },
@@ -274,10 +282,24 @@ module.exports = {
         }
 
         return promise;
+    },
+    createTab: function () {
+        if (Env.firefox) {
+            var tabs = require('sdk/tabs');
+
+            this.createTab = function (url) {
+                tabs.open(url);
+            };
+        } else {
+            this.createTab = function (url) {
+                chrome.tabs.create({url: url});
+            };
+        }
+        this.createTab.apply(this, arguments);
     }
 };
 
-},{"browserAction":33,"env/env.js":8,"sdk/self":33,"vow":36}],5:[function(require,module,exports){
+},{"browserAction":33,"env/env.js":8,"mediator/mediator.js":18,"sdk/self":33,"sdk/tabs":33,"underscore":35,"vow":36}],5:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Vow = require('vow'),
@@ -3171,20 +3193,22 @@ var Dispatcher = require('./dispatcher.js'),
 if (Env.firefox) {
     var browserAction = Browser.getBrowserAction();
 
-    Mediator.pub = function () {
+    Object.defineProperty(Mediator, 'pub', { value: function () {
         Dispatcher.pub.apply(Mediator, arguments);
         browserAction.sendMessage([].slice.call(arguments));
-    };
-    browserAction.onMessage = function () {
-        Mediator.pub.apply(Mediator, arguments);
-    };
+    }, writable: true, enumerable: true});
+
+    browserAction.onMessage.addListener(function (messageData) {
+        console.log('recieve', messageData);
+        Dispatcher.pub.apply(Mediator, messageData);
+    });
 } else {
     var activePorts = [];
 
     chrome.runtime.onConnect.addListener(function (port) {
         activePorts.push(port);
         port.onMessage.addListener(function (messageData) {
-            Dispatcher.pub.apply(Dispatcher, messageData);
+            Dispatcher.pub.apply(Mediator, messageData);
         });
         port.onDisconnect.addListener(function () {
             activePorts = activePorts.filter(function (active) {
@@ -3194,12 +3218,10 @@ if (Env.firefox) {
     });
 
     Mediator.pub = function () {
-        var args = arguments;
-
         Dispatcher.pub.apply(Mediator, arguments);
 
         activePorts.forEach(function (port) {
-            port.postMessage([].slice.call(args));
+            port.postMessage([].slice.call(arguments));
         });
     };
 }
