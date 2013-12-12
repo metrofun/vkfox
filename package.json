@@ -22,7 +22,7 @@
     "browserify": "~2.35.4",
     "grunt-browserify": "~1.2.11",
     "underscore": "git+ssh://git@github.com:metrofun/underscore.git#1.5.3",
-    "vow": "git+ssh://git@github.com:metrofun/vow.git#0.3.13",
+    "vow": "git+ssh://git@github.com:metrofun/vow.git#0.3.14",
     "backbone": "~1.0.0",
     "moment": "~2.4.0"
   },

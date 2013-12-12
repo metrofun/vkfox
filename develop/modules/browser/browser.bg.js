@@ -1,11 +1,11 @@
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
-        "19": "/assets/logo19.png",
-        "38": "/assets/logo38.png"
+        "19": "assets/logo19.png",
+        "38": "assets/logo38.png"
     },
     ICON_OFFLINE = {
-        "19": "/assets/logo19_offline.png",
-        "38": "/assets/logo38_offline.png"
+        "19": "assets/logo19_offline.png",
+        "38": "assets/logo38_offline.png"
     },
 
     Vow = require('vow'),
@@ -98,18 +98,17 @@ module.exports = Browser = {
 
         return promise;
     },
-    createTab: function () {
+    createTab: (function () {
         if (Env.firefox) {
             var tabs = require('sdk/tabs');
 
-            this.createTab = function (url) {
+            return function (url) {
                 tabs.open(url);
             };
         } else {
-            this.createTab = function (url) {
+            return function (url) {
                 chrome.tabs.create({url: url});
             };
         }
-        this.createTab.apply(this, arguments);
-    }
+    })()
 };

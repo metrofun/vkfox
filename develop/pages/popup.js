@@ -123,7 +123,9 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"angular":"7Lkch9"}],"7Lkch9":[function(require,module,exports){
+},{"angular":"7Lkch9"}],"angular":[function(require,module,exports){
+module.exports=require('7Lkch9');
+},{}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /**
  * @license AngularJS v1.1.5
@@ -17006,8 +17008,8 @@ angular.element(document).find('head').append('<style type="text/css">@charset "
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"angular":[function(require,module,exports){
-module.exports=require('7Lkch9');
+},{}],"bootstrapDropdown":[function(require,module,exports){
+module.exports=require('uRsKAo');
 },{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -17186,9 +17188,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
-module.exports=require('uRsKAo');
-},{}],"7sF/R2":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"7sF/R2":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.jQuery = require("zepto");
@@ -18462,6 +18462,8 @@ return jEmoji;
 
 },{}],"jEmoji":[function(require,module,exports){
 module.exports=require('3GhwsM');
+},{}],"javascript-linkify":[function(require,module,exports){
+module.exports=require('+vibbn');
 },{}],"+vibbn":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
@@ -18682,8 +18684,6 @@ window.linkify = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"javascript-linkify":[function(require,module,exports){
-module.exports=require('+vibbn');
 },{}],"zepto":[function(require,module,exports){
 module.exports=require('naz2eD');
 },{}],"naz2eD":[function(require,module,exports){
@@ -19997,17 +19997,19 @@ $(document).on('click', '[anchor]', function (e) {
 var Env = require('env/env.js'),
     Mediator = require('mediator/mediator.js');
 
-exports.createTab = function () {
-    if (Env.firefox) {
-        this.createTab = function (url) {
-            Mediator.pub('browser:createTab', url);
-        };
-    } else {
-        this.createTab = function (url) {
-            chrome.tabs.create({url: url});
-        };
-    }
-    this.createTab.apply(this, arguments);
+module.exports = {
+    createTab: (function () {
+        if (Env.firefox) {
+            return function (url) {
+                Mediator.pub('browser:createTab', url);
+                console.log('createTab');
+            };
+        } else {
+            return function (url) {
+                chrome.tabs.create({url: url});
+            };
+        }
+    })()
 };
 
 
@@ -20255,7 +20257,9 @@ if (Env.firefox) {
 }
 exports.VK_PROTOCOL = 'https://';
 exports.VK_BASE = exports.VK_PROTOCOL + 'vk.com/';
-exports.AUTH_DOMAIN = exports.VK_PROTOCOL + 'oauth.vk.com/';
+// HTTPS only
+// @see http://vk.com/pages?oid=-1&p=%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2_%D0%BA_API
+exports.AUTH_DOMAIN = 'https://oauth.vk.com/';
 exports.AUTH_URI = [
     exports.AUTH_DOMAIN,
     'authorize?',
@@ -28626,6 +28630,17 @@ var process=require("__browserify_process");/**
 
 (function(global) {
 
+// Support ADDON SDK environment
+if (typeof setTimeout === 'undefined') {
+    var timer = require('timer'),
+    setImmediate = timer.setImmediate;
+    clearImmediate = timer.clearImmediate;
+    setTimeout = timer.setTimeout;
+    setInterval = timer.setInterval;
+    clearTimeout = timer.clearTimeout;
+    clearInterval = timer.clearInterval;
+}
+
 var Promise = function(val) {
     this._res = val;
 
@@ -28636,18 +28651,6 @@ var Promise = function(val) {
     this._rejectedCallbacks = [];
     this._progressCallbacks = [];
 };
-
-// Support ADDON SDK environment
-if (!global.setTimeout) {
-    var timer = require('timer'),
-
-    setImmediate = timer.setImmediate;
-    clearImmediate = timer.clearImmediate;
-    setTimeout = timer.setTimeout;
-    setInterval = timer.setInterval;
-    clearTimeout = timer.clearTimeout;
-    clearInterval = timer.clearInterval;
-}
 
 Promise.prototype = {
     valueOf : function() {
