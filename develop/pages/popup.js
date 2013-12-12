@@ -19979,9 +19979,9 @@ require('router/router.pu.js');
 window.onerror = function () {
     require('mediator/mediator.js').pub(arguments);
 };
-console.log = function () {
-    extension.sendMessage(arguments);
-};
+// console.log = function () {
+    // extension.sendMessage(arguments);
+// };
 
 },{"anchor/anchor.pu.js":16,"angular":"7Lkch9","angularKeypress":"OP3XyP","filters/filters.pu.js":22,"mediator/mediator.js":31,"router/router.pu.js":40,"tooltip/tooltip.pu.js":43}],16:[function(require,module,exports){
 var $ = require('zepto'),
@@ -20037,7 +20037,7 @@ require('angular').module('app')
             filtersModel.set(filters);
         }, true);
 
-        $($element).find('.dropdown-toggle').dropdown();
+        $($element[0]).find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {
             profile.isWatched = !profile.isWatched;
@@ -20064,7 +20064,7 @@ require('angular').module('app')
             Mediator.unsub('buddies:data');
         });
     })
-    .filter('buddiesFilter', function () {
+    .filter('buddiesFilter', function ($filter) {
         /**
          * Says if profile matched search clue.
          * Uses lowercasing of arguments
@@ -20075,7 +20075,7 @@ require('angular').module('app')
          * @returns [Boolean]
          */
         function matchProfile(profile, searchClue) {
-            return I18N.get('name')(profile)
+            return $filter('name')(profile)
                 .toLowerCase()
                 .indexOf(searchClue.toLowerCase()) !== -1;
         }
@@ -20277,12 +20277,8 @@ exports.AUTH_URI = [
 var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup');
 
 module.exports = {
-    // popup/background environment
     popup: isPopup,
     background: !isPopup,
-    // browser environment
-    // chrome: true
-    firefox:  true
 };
 
 },{}],22:[function(require,module,exports){
@@ -22313,6 +22309,7 @@ require('angular').module('app')
                         match = expression.match(/^\s*([\$\w]+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/),
                         collectionIdentifier, valueIdentifier,
                         trackByExp, trackByIdFn, trackByExpGetter,
+                        timeoutPromise,
                         hashFnLocals = {},
                         lastBlockMap = {},
                         // wrap with zepto, to make available some additional methods
@@ -22405,7 +22402,8 @@ require('angular').module('app')
                             }
                         }
                         if (index < collection.length) {
-                            $timeout(function () {
+                            $timeout.cancel(timeoutPromise);
+                            timeoutPromise = $timeout(function () {
                                 updateScrolledBlocks(
                                     collection,
                                     cursor,

@@ -3,7 +3,13 @@
     <head>
         <meta charset="utf-8">
         <title>VKfox</title>
+        <!-- @if TARGET='FIREFOX' -->
+        <base href="/vkfox/data/" />
+        <!-- @endif -->
+        <!-- @if TARGET!='FIREFOX' -->
         <base href="/" />
+        <!-- @endif -->
+
         <link rel="stylesheet" href="bower_components/emoji/lib/emoji.css" />
         <link rel="stylesheet" href="pages/popup.css" />
 

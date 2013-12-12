@@ -21,7 +21,7 @@ require('angular').module('app')
             filtersModel.set(filters);
         }, true);
 
-        $($element).find('.dropdown-toggle').dropdown();
+        $($element[0]).find('.dropdown-toggle').dropdown();
 
         $scope.toggleFriendWatching = function (profile) {
             profile.isWatched = !profile.isWatched;
@@ -48,7 +48,7 @@ require('angular').module('app')
             Mediator.unsub('buddies:data');
         });
     })
-    .filter('buddiesFilter', function () {
+    .filter('buddiesFilter', function ($filter) {
         /**
          * Says if profile matched search clue.
          * Uses lowercasing of arguments
@@ -59,7 +59,7 @@ require('angular').module('app')
          * @returns [Boolean]
          */
         function matchProfile(profile, searchClue) {
-            return I18N.get('name')(profile)
+            return $filter('name')(profile)
                 .toLowerCase()
                 .indexOf(searchClue.toLowerCase()) !== -1;
         }

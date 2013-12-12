@@ -127,22 +127,20 @@ module.exports = function (grunt) {
                 }
             }
         },
-        preprocess : BROWSERS.reduce(function (preprocess, browser) {
-            preprocess[browser] = {
-                expand: true,
-                cwd: browser + '/pages/',
-                dest: browser + '/pages/',
-                src: ['*.raw.html'],
-                ext: '.html'
-            };
-
-            return preprocess;
-        }, {
+        preprocess : {
+            popup: {
+                src : 'pages/popup.raw.html',
+                dest : 'pages/popup.html'
+            },
             manifest: {
                 src : 'manifest.raw.json',
                 dest : 'manifest.json'
+            },
+            env: {
+                src : 'modules/env/env.raw.js',
+                dest : 'modules/env/env.js'
             }
-        }),
+        },
         // optimize, preprocess only single file
         watch: BROWSERS.reduce(function (watch, browser) {
             // watch[browser] = {
@@ -325,6 +323,8 @@ module.exports = function (grunt) {
     grunt.registerTask('mozilla', [
         'env:firefox',
         'less',
+        'preprocess:env',
+        'preprocess:popup',
         'browserify:firefoxPopup',
         'mozilla-addon-sdk',
         'mozilla-cfx'
@@ -332,6 +332,8 @@ module.exports = function (grunt) {
     grunt.registerTask('chrome', [
         'env:chrome',
         'less',
+        'preprocess:env',
+        'preprocess:popup',
         'preprocess:manifest',
         'browserify:chromePopup',
         'browserify:chromeBackground',

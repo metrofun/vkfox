@@ -110,6 +110,7 @@ require('angular').module('app')
                         match = expression.match(/^\s*([\$\w]+)\s+in\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/),
                         collectionIdentifier, valueIdentifier,
                         trackByExp, trackByIdFn, trackByExpGetter,
+                        timeoutPromise,
                         hashFnLocals = {},
                         lastBlockMap = {},
                         // wrap with zepto, to make available some additional methods
@@ -202,7 +203,8 @@ require('angular').module('app')
                             }
                         }
                         if (index < collection.length) {
-                            $timeout(function () {
+                            $timeout.cancel(timeoutPromise);
+                            timeoutPromise = $timeout(function () {
                                 updateScrolledBlocks(
                                     collection,
                                     cursor,

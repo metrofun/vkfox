@@ -185,12 +185,12 @@ Auth.login();
 },{"backbone":32,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":18,"sdk/page-worker":33,"underscore":35,"vow":36}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
-        "19": "/assets/logo19.png",
-        "38": "/assets/logo38.png"
+        "19": "assets/logo19.png",
+        "38": "assets/logo38.png"
     },
     ICON_OFFLINE = {
-        "19": "/assets/logo19_offline.png",
-        "38": "/assets/logo38_offline.png"
+        "19": "assets/logo19_offline.png",
+        "38": "assets/logo38_offline.png"
     },
 
     Vow = require('vow'),
@@ -283,20 +283,19 @@ module.exports = Browser = {
 
         return promise;
     },
-    createTab: function () {
+    createTab: (function () {
         if (Env.firefox) {
             var tabs = require('sdk/tabs');
 
-            this.createTab = function (url) {
+            return function (url) {
                 tabs.open(url);
             };
         } else {
-            this.createTab = function (url) {
+            return function (url) {
                 chrome.tabs.create({url: url});
             };
         }
-        this.createTab.apply(this, arguments);
-    }
+    })()
 };
 
 },{"browserAction":33,"env/env.js":8,"mediator/mediator.js":18,"sdk/self":33,"sdk/tabs":33,"underscore":35,"vow":36}],5:[function(require,module,exports){
@@ -819,7 +818,9 @@ if (Env.firefox) {
 }
 exports.VK_PROTOCOL = 'https://';
 exports.VK_BASE = exports.VK_PROTOCOL + 'vk.com/';
-exports.AUTH_DOMAIN = exports.VK_PROTOCOL + 'oauth.vk.com/';
+// HTTPS only
+// @see http://vk.com/pages?oid=-1&p=%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2_%D0%BA_API
+exports.AUTH_DOMAIN = 'https://oauth.vk.com/';
 exports.AUTH_URI = [
     exports.AUTH_DOMAIN,
     'authorize?',
@@ -837,12 +838,8 @@ exports.AUTH_URI = [
 var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup');
 
 module.exports = {
-    // popup/background environment
     popup: isPopup,
     background: !isPopup,
-    // browser environment
-    // chrome: true
-    firefox:  true
 };
 
 },{}],9:[function(require,module,exports){
@@ -3218,10 +3215,11 @@ if (Env.firefox) {
     });
 
     Mediator.pub = function () {
-        Dispatcher.pub.apply(Mediator, arguments);
+        var args = arguments;
+        Dispatcher.pub.apply(Mediator, args);
 
         activePorts.forEach(function (port) {
-            port.postMessage([].slice.call(arguments));
+            port.postMessage([].slice.call(args));
         });
     };
 }
@@ -3862,6 +3860,8 @@ module.exports = Backbone.Collection.extend({
 },{"backbone":32,"mediator/mediator.js":18,"underscore":35,"users/users.bg.js":31}],25:[function(require,module,exports){
 var
 API_QUERIES_PER_REQUEST = 15,
+// HTTPS only
+// @see http://vk.com/pages?oid=-1&p=%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2_%D0%BA_API
 API_DOMAIN = 'https://api.vk.com/',
 API_REQUESTS_DEBOUNCE = 400,
 API_VERSION = 4.99,
@@ -7314,6 +7314,17 @@ var process=require("__browserify_process");/**
 
 (function(global) {
 
+// Support ADDON SDK environment
+if (typeof setTimeout === 'undefined') {
+    var timer = require('timer'),
+    setImmediate = timer.setImmediate;
+    clearImmediate = timer.clearImmediate;
+    setTimeout = timer.setTimeout;
+    setInterval = timer.setInterval;
+    clearTimeout = timer.clearTimeout;
+    clearInterval = timer.clearInterval;
+}
+
 var Promise = function(val) {
     this._res = val;
 
@@ -7324,18 +7335,6 @@ var Promise = function(val) {
     this._rejectedCallbacks = [];
     this._progressCallbacks = [];
 };
-
-// Support ADDON SDK environment
-if (!global.setTimeout) {
-    var timer = require('timer'),
-
-    setImmediate = timer.setImmediate;
-    clearImmediate = timer.clearImmediate;
-    setTimeout = timer.setTimeout;
-    setInterval = timer.setInterval;
-    clearTimeout = timer.clearTimeout;
-    clearInterval = timer.clearInterval;
-}
 
 Promise.prototype = {
     valueOf : function() {

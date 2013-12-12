@@ -31,10 +31,11 @@ if (Env.firefox) {
     });
 
     Mediator.pub = function () {
-        Dispatcher.pub.apply(Mediator, arguments);
+        var args = arguments;
+        Dispatcher.pub.apply(Mediator, args);
 
         activePorts.forEach(function (port) {
-            port.postMessage([].slice.call(arguments));
+            port.postMessage([].slice.call(args));
         });
     };
 }

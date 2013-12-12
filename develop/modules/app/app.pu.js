@@ -8,6 +8,6 @@ require('router/router.pu.js');
 window.onerror = function () {
     require('mediator/mediator.js').pub(arguments);
 };
-console.log = function () {
-    extension.sendMessage(arguments);
-};
+// console.log = function () {
+    // extension.sendMessage(arguments);
+// };

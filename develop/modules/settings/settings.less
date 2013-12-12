@@ -1,7 +1,7 @@
 .settings {
     padding: 10px;
     height: 441px;
-    box-sizing: border-box;
+    .box-sizing(border-box);
 }
 .settings__separator {
     border-top: 1px solid @clouds;
@@ -47,6 +47,7 @@
 }
 
 .settings__checkbox {
+    -moz-appearance: none;
     font-weight: bold;
     display: inline-block;
     padding: 0 !important;
@@ -67,7 +68,7 @@
     width: 40px;
     border: 5px solid @clouds;
     height: 100%;
-    box-sizing: border-box;
+    .box-sizing(border-box);
 }
 .settings__checkbox:hover::before,
 .settings__checkbox:checked:hover::after {

@@ -24,3 +24,9 @@ select[disabled] {
     color: darken(@clouds, 5%) !important;
     background: @clouds;
 }
+@-moz-document url-prefix() {
+    select {
+        margin-right: -30px;
+        padding-right: 30px;
+    }
+}
