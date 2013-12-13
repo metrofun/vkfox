@@ -838,8 +838,9 @@ exports.AUTH_URI = [
 var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup');
 
 module.exports = {
+    development: true,
     popup: isPopup,
-    background: !isPopup,
+    background: !isPopup
 };
 
 },{}],9:[function(require,module,exports){
@@ -3196,9 +3197,45 @@ if (Env.firefox) {
     }, writable: true, enumerable: true});
 
     browserAction.onMessage.addListener(function (messageData) {
-        console.log('recieve', messageData);
         Dispatcher.pub.apply(Mediator, messageData);
     });
+
+    // Code to make popup openable in a tab
+    if (Env.development) {
+        var data = require('sdk/self').data,
+            oldPub = Mediator.pub,
+            pageMod = require("sdk/page-mod"), activeWorkers = [];
+
+        pageMod.PageMod({
+            include: /.*vkfox\/data\/pages\/popup\.html/,
+            // include: "resource://jid1-ci3mbxpmmpdxuq-at-jetpack/vkfox/data/pages/popup.html",
+            contentScriptFile: data.url("modules/mediator/contentScript.js"),
+            // contentScriptFile: data.url("pages/popup.js"),
+            onAttach: function (worker) {
+                // TODO
+                activeWorkers = [worker];
+                // activeWorkers.push(worker);
+                worker.port.on('detach', function () {
+                    var index = activeWorkers.indexOf(worker);
+                    if (index !== -1) {
+                        activeWorkers.splice(index, 1);
+                    }
+                });
+                worker.port.on('message', function (messageData) {
+                    Dispatcher.pub.apply(Mediator, [].slice.call(messageData));
+                });
+            }
+        });
+
+        Object.defineProperty(Mediator, 'pub', { value: function () {
+            var args = [].slice.call(arguments);
+            oldPub.apply(Mediator, args);
+
+            activeWorkers.forEach(function (worker) {
+                worker.port.emit('message', args);
+            });
+        }, writable: true, enumerable: true});
+    }
 } else {
     var activePorts = [];
 
@@ -3226,7 +3263,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":16,"browser/browser.bg.js":4,"env/env.js":8}],18:[function(require,module,exports){
+},{"./dispatcher.js":16,"browser/browser.bg.js":4,"env/env.js":8,"sdk/page-mod":33,"sdk/self":33}],18:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -4101,9 +4138,9 @@ model = new PersistentModel(
     {name: 'router'}
 );
 
-Mediator.sub('router:lastPath:get', function () {
-    Mediator.pub('router:lastPath', model.get('lastPath'));
-});
+// Mediator.sub('router:lastPath:get', function () {
+    // Mediator.pub('router:lastPath', model.get('lastPath'));
+// });
 Mediator.sub('router:lastPath:put', function (lastPath) {
     model.set('lastPath', lastPath);
 });

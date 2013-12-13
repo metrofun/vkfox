@@ -1,6 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"angularKeypress":[function(require,module,exports){
-module.exports=require('OP3XyP');
-},{}],"OP3XyP":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"OP3XyP":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.angular = require("angular");
@@ -123,7 +121,9 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"angular":"7Lkch9"}],"angular":[function(require,module,exports){
+},{"angular":"7Lkch9"}],"angularKeypress":[function(require,module,exports){
+module.exports=require('OP3XyP');
+},{}],"angular":[function(require,module,exports){
 module.exports=require('7Lkch9');
 },{}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
@@ -17286,7 +17286,6 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
       if (!self.options.delay || !self.options.delay.show) return self.show()
 
-      console.log('clearTimeout', clearTimeout, window.clearTimeout);
       clearTimeout(this.timeout)
       self.hoverState = 'in'
       this.timeout = setTimeout(function() {
@@ -17561,6 +17560,8 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 },{"zepto":"naz2eD"}],"bootstrapTooltip":[function(require,module,exports){
 module.exports=require('7sF/R2');
+},{}],"jEmoji":[function(require,module,exports){
+module.exports=require('3GhwsM');
 },{}],"3GhwsM":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*global exports */
@@ -18460,10 +18461,6 @@ return jEmoji;
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"jEmoji":[function(require,module,exports){
-module.exports=require('3GhwsM');
-},{}],"javascript-linkify":[function(require,module,exports){
-module.exports=require('+vibbn');
 },{}],"+vibbn":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
@@ -18684,8 +18681,8 @@ window.linkify = (function(){
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('naz2eD');
+},{}],"javascript-linkify":[function(require,module,exports){
+module.exports=require('+vibbn');
 },{}],"naz2eD":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
@@ -19968,6 +19965,8 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('naz2eD');
 },{}],15:[function(require,module,exports){
 require('angularKeypress');
 require('angular').module('app', ['ui.keypress']);
@@ -20278,7 +20277,6 @@ var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup')
 
 module.exports = {
     development: true,
-    firefox:  true,
     popup: isPopup,
     background: !isPopup
 };
@@ -23178,10 +23176,18 @@ module.exports = {
 
 },{"mediator/mediator.js":31,"underscore":48,"vow":49}],40:[function(require,module,exports){
 var Vow = require('vow'),
-    Mediator = require('mediator/mediator.js');
+    Mediator = require('mediator/mediator.js'),
+    PersistentModel = require('persistent-model/persistent-model.js'),
+
+    model = new PersistentModel(
+        {lastPath: '/chat'},
+        {name: 'router'}
+    );
+
     // TODO
     // Tracker = require('tracker/tracker.js');
 
+location.hash = model.get('lastPath');
 require('buddies/buddies.pu.js');
 require('settings/settings.pu.js');
 require('news/news.pu.js');
@@ -23222,14 +23228,17 @@ require('angular').module('app')
         // default tab is chat
         var notificationsPromise = Vow.promise(),
             authPromise = Vow.promise(),
-            lastPathPromise = Vow.promise(),
             READY = 2; //ready status from auth module
 
         $rootScope.$on('$routeChangeSuccess', function (scope, current) {
+            var path;
             Mediator.pub('router:change', current.params);
             if (current.params.tab) {
+                // TODO
                 // Tracker.trackPage();
-                Mediator.pub('router:lastPath:put', $location.path());
+                path = $location.path();
+                model.set('lastPath', path);
+                Mediator.pub('router:lastPath:put', path);
             }
         });
         Mediator.sub('notifications:queue', function (queue) {
@@ -23237,9 +23246,6 @@ require('angular').module('app')
         });
         Mediator.sub('auth:state', function (state) {
             authPromise.fulfill(state);
-        });
-        Mediator.sub('router:lastPath', function (lastPath) {
-            lastPathPromise.fulfill(lastPath);
         });
         Vow.all([notificationsPromise, authPromise]).spread(function (queue, state) {
             $rootScope.$apply(function () {
@@ -23249,13 +23255,6 @@ require('angular').module('app')
                         // Property 'type' holds value
                         $location.path('/' + queue[queue.length - 1].type);
                         $location.replace();
-                    } else {
-                        lastPathPromise.then(function (lastPath) {
-                            $rootScope.$apply(function () {
-                                $location.path(lastPath);
-                                $location.replace();
-                            });
-                        });
                     }
                 }
             });
@@ -23268,10 +23267,9 @@ require('angular').module('app')
         });
         Mediator.pub('auth:state:get');
         Mediator.pub('notifications:queue:get');
-        Mediator.pub('router:lastPath:get');
     });
 
-},{"angular":"7Lkch9","buddies/buddies.pu.js":18,"chat/chat.pu.js":19,"mediator/mediator.js":31,"news/news.pu.js":34,"settings/settings.pu.js":41,"vow":49}],41:[function(require,module,exports){
+},{"angular":"7Lkch9","buddies/buddies.pu.js":18,"chat/chat.pu.js":19,"mediator/mediator.js":31,"news/news.pu.js":34,"persistent-model/persistent-model.js":36,"settings/settings.pu.js":41,"vow":49}],41:[function(require,module,exports){
 var _ = require('underscore')._,
     Env = require('env/env.js'),
     NotificationsSettings = require('notifications/settings.js'),

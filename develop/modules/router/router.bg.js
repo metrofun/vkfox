@@ -8,9 +8,9 @@ model = new PersistentModel(
     {name: 'router'}
 );
 
-Mediator.sub('router:lastPath:get', function () {
-    Mediator.pub('router:lastPath', model.get('lastPath'));
-});
+// Mediator.sub('router:lastPath:get', function () {
+    // Mediator.pub('router:lastPath', model.get('lastPath'));
+// });
 Mediator.sub('router:lastPath:put', function (lastPath) {
     model.set('lastPath', lastPath);
 });

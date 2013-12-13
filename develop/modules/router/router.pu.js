@@ -1,8 +1,16 @@
 var Vow = require('vow'),
-    Mediator = require('mediator/mediator.js');
+    Mediator = require('mediator/mediator.js'),
+    PersistentModel = require('persistent-model/persistent-model.js'),
+
+    model = new PersistentModel(
+        {lastPath: '/chat'},
+        {name: 'router'}
+    );
+
     // TODO
     // Tracker = require('tracker/tracker.js');
 
+location.hash = model.get('lastPath');
 require('buddies/buddies.pu.js');
 require('settings/settings.pu.js');
 require('news/news.pu.js');
@@ -43,14 +51,17 @@ require('angular').module('app')
         // default tab is chat
         var notificationsPromise = Vow.promise(),
             authPromise = Vow.promise(),
-            lastPathPromise = Vow.promise(),
             READY = 2; //ready status from auth module
 
         $rootScope.$on('$routeChangeSuccess', function (scope, current) {
+            var path;
             Mediator.pub('router:change', current.params);
             if (current.params.tab) {
+                // TODO
                 // Tracker.trackPage();
-                Mediator.pub('router:lastPath:put', $location.path());
+                path = $location.path();
+                model.set('lastPath', path);
+                Mediator.pub('router:lastPath:put', path);
             }
         });
         Mediator.sub('notifications:queue', function (queue) {
@@ -58,9 +69,6 @@ require('angular').module('app')
         });
         Mediator.sub('auth:state', function (state) {
             authPromise.fulfill(state);
-        });
-        Mediator.sub('router:lastPath', function (lastPath) {
-            lastPathPromise.fulfill(lastPath);
         });
         Vow.all([notificationsPromise, authPromise]).spread(function (queue, state) {
             $rootScope.$apply(function () {
@@ -70,13 +78,6 @@ require('angular').module('app')
                         // Property 'type' holds value
                         $location.path('/' + queue[queue.length - 1].type);
                         $location.replace();
-                    } else {
-                        lastPathPromise.then(function (lastPath) {
-                            $rootScope.$apply(function () {
-                                $location.path(lastPath);
-                                $location.replace();
-                            });
-                        });
                     }
                 }
             });
@@ -89,5 +90,4 @@ require('angular').module('app')
         });
         Mediator.pub('auth:state:get');
         Mediator.pub('notifications:queue:get');
-        Mediator.pub('router:lastPath:get');
     });

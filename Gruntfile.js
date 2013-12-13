@@ -103,6 +103,7 @@ module.exports = function (grunt) {
                         'sdk/request',
                         'sdk/self',
                         'sdk/page-worker',
+                        'sdk/page-mod',
                         'sdk/simple-storage'
                     ].filter(Boolean)
                 }
