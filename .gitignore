@@ -1,4 +1,5 @@
 .DS_Store
+develop/modules/env/env.js
 develop/manifest.json
 develop/*/pages/*.html
 !develop/*/pages/*.raw.html

@@ -12,9 +12,45 @@ if (Env.firefox) {
     }, writable: true, enumerable: true});
 
     browserAction.onMessage.addListener(function (messageData) {
-        console.log('recieve', messageData);
         Dispatcher.pub.apply(Mediator, messageData);
     });
+
+    // Code to make popup openable in a tab
+    if (Env.development) {
+        var data = require('sdk/self').data,
+            oldPub = Mediator.pub,
+            pageMod = require("sdk/page-mod"), activeWorkers = [];
+
+        pageMod.PageMod({
+            include: /.*vkfox\/data\/pages\/popup\.html/,
+            // include: "resource://jid1-ci3mbxpmmpdxuq-at-jetpack/vkfox/data/pages/popup.html",
+            contentScriptFile: data.url("modules/mediator/contentScript.js"),
+            // contentScriptFile: data.url("pages/popup.js"),
+            onAttach: function (worker) {
+                // TODO
+                activeWorkers = [worker];
+                // activeWorkers.push(worker);
+                worker.port.on('detach', function () {
+                    var index = activeWorkers.indexOf(worker);
+                    if (index !== -1) {
+                        activeWorkers.splice(index, 1);
+                    }
+                });
+                worker.port.on('message', function (messageData) {
+                    Dispatcher.pub.apply(Mediator, [].slice.call(messageData));
+                });
+            }
+        });
+
+        Object.defineProperty(Mediator, 'pub', { value: function () {
+            var args = [].slice.call(arguments);
+            oldPub.apply(Mediator, args);
+
+            activeWorkers.forEach(function (worker) {
+                worker.port.emit('message', args);
+            });
+        }, writable: true, enumerable: true});
+    }
 } else {
     var activePorts = [];
 

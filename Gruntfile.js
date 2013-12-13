@@ -2,8 +2,8 @@
 module.exports = function (grunt) {
     var BROWSERS = ['chrome', 'opera', 'firefox'],
         SRC_DIR = 'develop/',
-        PRODUCTION = 'production',
-        DEVELOP = 'develop',
+        PRODUCTION = 'PRODUCTION',
+        DEVELOPMENT = 'DEVELOPMENT',
         LOCALES = ['ru', 'en', 'uk'];
 
     grunt.loadNpmTasks('grunt-messageformat');
@@ -33,10 +33,10 @@ module.exports = function (grunt) {
                 TARGET: 'FIREFOX'
             },
             production: {
-                NODE_ENV : PRODUCTION
+                ENV : PRODUCTION
             },
-            develop: {
-                NODE_ENV : DEVELOP
+            development: {
+                ENV : DEVELOPMENT
             }
         },
         browserify: BROWSERS.reduce(function (memo, browser) {
@@ -193,7 +193,7 @@ module.exports = function (grunt) {
                 ext: '.css',
                 options: {
                     compile: true,
-                    compress: process.env.NODE_ENV === PRODUCTION
+                    compress: process.env.ENV === PRODUCTION
                 }
             }
         },
@@ -206,7 +206,7 @@ module.exports = function (grunt) {
                 // ext: '.css',
                 // options: {
                     // compile: true,
-                    // compress: process.env.NODE_ENV === PRODUCTION
+                    // compress: process.env.ENV === PRODUCTION
                 // }
             // };
             // return less;
@@ -322,6 +322,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('mozilla', [
         'env:firefox',
+        'env:development',
         'less',
         'preprocess:env',
         'preprocess:popup',
@@ -331,6 +332,7 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('chrome', [
         'env:chrome',
+        'env:development',
         'less',
         'preprocess:env',
         'preprocess:popup',
