@@ -3,6 +3,7 @@ var _ = require('underscore')._,
     NotificationsSettings = require('notifications/settings.js'),
     Mediator = require('mediator/mediator.js');
 
+require('checkbox/checkbox.pu.js');
 require('angular')
     .module('app')
     .controller('settingsSignalCtrl', function ($scope) {

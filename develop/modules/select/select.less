@@ -1,6 +1,5 @@
 select {
     -webkit-appearance: none;
-    -moz-appearance: none;
     background: @clouds;
     border: none;
     width: auto;
@@ -10,12 +9,14 @@ select {
     height: 25px !important;
     line-height: 25px !important;
     margin: 0;
-    padding: 0 5px;
+    padding: 0;
+    padding-left: 5px;
     text-align: center;
     width: 80px;
     outline: none !important;
     text-transform: uppercase;
     font-size: 12px;
+    position: relative;
 }
 select:not([disabled]):hover {
     background: darken(@clouds, 5%);
@@ -23,10 +24,4 @@ select:not([disabled]):hover {
 select[disabled] {
     color: darken(@clouds, 5%) !important;
     background: @clouds;
-}
-@-moz-document url-prefix() {
-    select {
-        margin-right: -30px;
-        padding-right: 30px;
-    }
 }

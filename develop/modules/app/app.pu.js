@@ -1,3 +1,4 @@
+console.log(location.href);
 require('angularKeypress');
 require('angular').module('app', ['ui.keypress']);
 require('filters/filters.pu.js');

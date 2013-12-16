@@ -34,7 +34,9 @@ input[type="range"][disabled] {
 input[type="range"]:not([disabled]):hover {
     background: darken(@clouds, 5%);
 }
-input[disabled]::-moz-range-thumb:after,
+input[disabled]::-moz-range-thumb {
+    background: darken(@clouds, 5%);
+}
 input[disabled]::-webkit-slider-thumb:after {
     background: darken(@clouds, 5%);
 }

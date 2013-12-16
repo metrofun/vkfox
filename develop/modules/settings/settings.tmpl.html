@@ -6,34 +6,25 @@
     <div class="settings__row">
         <i class="icon-eye-open settings__icon"></i>
         <label class="settings__label">{{'force online' | i18n}}</label>
-        <label class="settings__checkbox">
-            <input
-                class="settings__input"
-                ng-model="forceOnline.enabled"
-                type="checkbox" />
-        </label>
+        <checkbox class="settings__checkbox" ng-model="forceOnline.enabled"></checkbox>
     </div>
     <div class="settings__row settings__separator">
         <i class="icon-bullhorn settings__icon"></i>
         <label class="settings__label">{{'notifications' | i18n}}</label>
-        <input
-            class="settings__input settings__checkbox"
-            ng-model="notifications.enabled"
-            type="checkbox" />
+        <checkbox class="settings__checkbox" ng-model="notifications.enabled"></checkbox>
     </div>
     <div class="settings__row settings__row_sub">
         <i class="icon-volume-up settings__icon"></i>
         <label class="settings__label">{{'sound' | i18n}}</label>
-        <input
-            class="settings__input settings__checkbox"
+        <checkbox
+            class="settings__checkbox"
             ng-model="notifications.sound.enabled"
-            ng-disabled="!notifications.enabled"
-            type="checkbox" />
+            ng-disabled="!notifications.enabled"></checkbox>
     </div>
     <div class="settings__row settings__row_sub" ng-controller="settingsSignalCtrl">
         <label class="settings__label">{{'signal' | i18n}}</label>
         <select
-            class="settings__input"
+            class="settings__checkbox"
             ng-model="notifications.sound.signal"
             ng-options="signal for signal in signals"
             ng-disabled="!notifications.enabled || !notifications.sound.enabled">
@@ -53,26 +44,21 @@
     <div class="settings__row settings__row_sub">
         <i class="settings__icon icon-bell-alt"></i>
         <label class="settings__label">{{'popups' | i18n}}</label>
-        <input
-            class="settings__input settings__checkbox"
+        <checkbox
+            class="settings__checkbox"
             ng-model="notifications.popups.enabled"
-            ng-disabled="!notifications.enabled"
-            type="checkbox"/>
+            ng-disabled="!notifications.enabled"></checkbox>
     </div>
     <div class="settings__row settings__row_sub">
         <label class="settings__label">{{'show text' | i18n}}</label>
-        <input
-            class="settings__input settings__checkbox"
+        <checkbox
+            class="settings__checkbox"
             ng-model="notifications.popups.showText"
-            ng-disabled="!notifications.enabled || !notifications.popups.enabled"
-            type="checkbox"/>
+            ng-disabled="!notifications.enabled || !notifications.popups.enabled"></checkbox>
     </div>
     <div ng-if="yandex" class="settings__row settings__separator">
         <i class="settings__icon icon-search"></i>
         <label class="settings__label">{{'Yandex search' | i18n}}</label>
-        <input
-            class="settings__input settings__checkbox"
-            ng-model="yandex.enabled"
-            type="checkbox"/>
+        <checkbox class="settings__checkbox" ng-model="yandex.enabled"></checkbox>
     </div>
 </form>
