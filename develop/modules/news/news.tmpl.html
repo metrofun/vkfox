@@ -1,21 +1,11 @@
 <navigation></navigation>
 <div ng-controller="NewsController">
-    <div class="navbar navbar-static-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <ul class="nav news__navigation">
-                    <li
-                        ng-class="{active: tab.href === 'news/' + activeSubTab}"
-                        ng-repeat="tab in subtabs"
-                        ng-class="{active: tab.href === activeTab}">
-                        <a
-                            href="pages/popup.html#/{{tab.href}}">
-                            {{tab.text | i18n}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <div class="navbar navbar_style_sub">
+        <a
+            ng-repeat="tab in subtabs"
+            class="navbar__tab"
+            ng-class="{navbar__tab_active: tab.href === 'news/' + activeSubTab}"
+            href="pages/popup.html#/{{tab.href}}">{{tab.text | i18n}}</a>
     </div>
     <ng-include src="'modules/news/' + activeSubTab + '.tmpl.html'"></ng-include>
 </div>

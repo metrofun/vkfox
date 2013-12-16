@@ -9,7 +9,7 @@ require('item/item.pu.js');
 require('checkbox/checkbox.pu.js');
 require('bootstrapDropdown');
 require('angular').module('app')
-    .controller('buddiesCtrl', function ($scope, $element) {
+    .controller('buddiesCtrl', function ($scope, $element, $filter) {
         var filtersModel = new PersistentModel({
             male: true,
             female: true,
@@ -40,7 +40,7 @@ require('angular').module('app')
                     buddie.description = I18N.get(
                         buddie.online ? 'is_online_short':'went_offline_short',
                         gender
-                    ) + ' ' + I18N.get('timeago')(buddie.lastActivityTime);
+                    ) + ' ' + $filter('timeago')(buddie.lastActivityTime);
                 });
                 $scope.data = data;
             });

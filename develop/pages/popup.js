@@ -123,9 +123,7 @@ angular.module('ui.keypress').directive('uiKeyup', ['keypressHelper', function(k
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"angular":"7Lkch9"}],"angular":[function(require,module,exports){
-module.exports=require('7Lkch9');
-},{}],"7Lkch9":[function(require,module,exports){
+},{"angular":"7Lkch9"}],"7Lkch9":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /**
  * @license AngularJS v1.1.5
@@ -17008,8 +17006,8 @@ angular.element(document).find('head').append('<style type="text/css">@charset "
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"bootstrapDropdown":[function(require,module,exports){
-module.exports=require('uRsKAo');
+},{}],"angular":[function(require,module,exports){
+module.exports=require('7Lkch9');
 },{}],"uRsKAo":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
@@ -17188,7 +17186,9 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{"zepto":"naz2eD"}],"7sF/R2":[function(require,module,exports){
+},{"zepto":"naz2eD"}],"bootstrapDropdown":[function(require,module,exports){
+module.exports=require('uRsKAo');
+},{}],"7sF/R2":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.jQuery = require("zepto");
@@ -17560,8 +17560,6 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 },{"zepto":"naz2eD"}],"bootstrapTooltip":[function(require,module,exports){
 module.exports=require('7sF/R2');
-},{}],"jEmoji":[function(require,module,exports){
-module.exports=require('3GhwsM');
 },{}],"3GhwsM":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*global exports */
@@ -18461,6 +18459,8 @@ return jEmoji;
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
+},{}],"jEmoji":[function(require,module,exports){
+module.exports=require('3GhwsM');
 },{}],"+vibbn":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*!
@@ -18683,6 +18683,8 @@ window.linkify = (function(){
 
 },{}],"javascript-linkify":[function(require,module,exports){
 module.exports=require('+vibbn');
+},{}],"zepto":[function(require,module,exports){
+module.exports=require('naz2eD');
 },{}],"naz2eD":[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /* Zepto v1.0-195-g0459e1d - zepto event data selector - zeptojs.com/license */
@@ -19965,8 +19967,6 @@ window.$ === undefined && (window.$ = Zepto)
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
-},{}],"zepto":[function(require,module,exports){
-module.exports=require('naz2eD');
 },{}],15:[function(require,module,exports){
 console.log(location.href);
 require('angularKeypress');
@@ -20025,7 +20025,7 @@ require('item/item.pu.js');
 require('checkbox/checkbox.pu.js');
 require('bootstrapDropdown');
 require('angular').module('app')
-    .controller('buddiesCtrl', function ($scope, $element) {
+    .controller('buddiesCtrl', function ($scope, $element, $filter) {
         var filtersModel = new PersistentModel({
             male: true,
             female: true,
@@ -20056,7 +20056,7 @@ require('angular').module('app')
                     buddie.description = I18N.get(
                         buddie.online ? 'is_online_short':'went_offline_short',
                         gender
-                    ) + ' ' + I18N.get('timeago')(buddie.lastActivityTime);
+                    ) + ' ' + $filter('timeago')(buddie.lastActivityTime);
                 });
                 $scope.data = data;
             });
@@ -22835,31 +22835,30 @@ if (Env.firefox) {
 module.exports = Mediator;
 
 },{"./dispatcher.js":31,"env/env.js":22}],34:[function(require,module,exports){
-require('angular').module('app')
-    .directive('navigation', function ($routeParams) {
-        return {
-            controller: function ($scope) {
-                $scope.tabs = [
-                    {
-                        href: 'chat',
-                        name: 'chat'
-                    },
-                    {
-                        href: 'news',
-                        name: 'news'
-                    },
-                    {
-                        href: 'buddies',
-                        name: 'buddies'
-                    }
-                ];
-                $scope.activeTab = $routeParams.tab;
-            },
-            templateUrl: 'modules/navigation/navigation.tmpl.html',
-            replace: true,
-            restrict: 'E'
-        };
-    });
+require('angular').module('app').directive('navigation', function ($routeParams) {
+    return {
+        controller: function ($scope) {
+            $scope.tabs = [
+                {
+                    href: 'chat',
+                    name: 'chat'
+                },
+                {
+                    href: 'news',
+                    name: 'news'
+                },
+                {
+                    href: 'buddies',
+                    name: 'buddies'
+                }
+            ];
+            $scope.activeTab = $routeParams.tab;
+        },
+        templateUrl: 'modules/navigation/navigation.tmpl.html',
+        replace: true,
+        restrict: 'E'
+    };
+});
 
 },{"angular":"7Lkch9"}],35:[function(require,module,exports){
 var Config = require('config/config.js'),
