@@ -104,7 +104,8 @@ module.exports = function (grunt) {
                         'sdk/self',
                         'sdk/page-worker',
                         'sdk/page-mod',
-                        'sdk/simple-storage'
+                        'sdk/simple-storage',
+                        'sdk/notifications'
                     ].filter(Boolean)
                 }
             };

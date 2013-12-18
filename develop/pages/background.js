@@ -3565,6 +3565,7 @@ var
 _ = require('underscore')._,
 Backbone = require('backbone'),
 Browser = require('browser/browser.bg.js'),
+Env = require('env/env.js'),
 Mediator = require('mediator/mediator.js'),
 Settings = require('notifications/settings.js'),
 PersistentModel = require('persistent-model/persistent-model.js'),
@@ -3701,24 +3702,46 @@ module.exports = Notifications = {
     notify: function (data) {
         notificationQueue.push(data);
     },
-    createPopup: function (options) {
-        var popups = notificationsSettings.get('popups');
+    createPopup: (function () {
+        var createPopup;
 
-        if (notificationsSettings.get('enabled') && popups.enabled) {
-            getBase64FromImage(options.image, function (base64) {
-                try {
-                    chrome.notifications.create(_.uniqueId(), {
-                        type: 'basic',
-                        title: options.title,
-                        message: (popups.showText && options.message) || '',
-                        iconUrl: base64
-                    }, function () {});
-                } catch (e) {
-                    console.log(e);
-                }
-            });
+        if (Env.firefox) {
+            var notifications = require("sdk/notifications");
+
+            createPopup = function (options) {
+                notifications.notify({
+                    title: options.title,
+                    text: options.text,
+                    iconURL: options.image
+                });
+            };
+        } else {
+            createPopup = function (options) {
+                var popups = notificationsSettings.get('popups');
+
+                getBase64FromImage(options.image, function (base64) {
+                    try {
+                        chrome.notifications.create(_.uniqueId(), {
+                            type: 'basic',
+                            title: options.title,
+                            message: (popups.showText && options.message) || '',
+                            iconUrl: base64
+                        }, function () {});
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            };
         }
-    },
+
+        return function (options) {
+            var popups = NotificationsSettings.get('popups');
+
+            if (NotificationsSettings.get('enabled') && popups.enabled) {
+                createPopup(options);
+            }
+        };
+    })(),
     playSound: function () {
         var sound = notificationsSettings.get('sound'),
             audio = new Audio();
@@ -3742,7 +3765,7 @@ module.exports = Notifications = {
     }
 };
 
-},{"backbone":32,"browser/browser.bg.js":4,"mediator/mediator.js":18,"notifications/settings.js":21,"persistent-model/persistent-model.js":22,"underscore":35}],21:[function(require,module,exports){
+},{"backbone":32,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":18,"notifications/settings.js":21,"persistent-model/persistent-model.js":22,"sdk/notifications":33,"underscore":35}],21:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'
@@ -4165,9 +4188,7 @@ module.exports = {
 };
 
 },{"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":22}],28:[function(require,module,exports){
-var Env = require('env/env.js');
-
-if (Env.firefox) {
+if (typeof localStorage === 'undefined') {
     var storage = require("sdk/simple-storage");
 
     module.exports = {
@@ -4184,7 +4205,7 @@ if (Env.firefox) {
 
 
 
-},{"env/env.js":8,"sdk/simple-storage":33}],29:[function(require,module,exports){
+},{"sdk/simple-storage":33}],29:[function(require,module,exports){
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,

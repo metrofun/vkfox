@@ -2,6 +2,7 @@ var
 _ = require('underscore')._,
 Backbone = require('backbone'),
 Browser = require('browser/browser.bg.js'),
+Env = require('env/env.js'),
 Mediator = require('mediator/mediator.js'),
 Settings = require('notifications/settings.js'),
 PersistentModel = require('persistent-model/persistent-model.js'),
@@ -47,28 +48,29 @@ notificationsSettings = new NotificationsSettings({
 
 notificationQueue = new (Backbone.Collection.extend({
     initialize: function () {
+        var self = this;
         this
             .on('add remove reset', function () {
-                Notifications.setBadge(notificationQueue.filter(function (model) {
+                Notifications.setBadge(self.filter(function (model) {
                     return !model.get('noBadge');
                 }).length);
             })
             .on('add', function (model) {
-                if (!model.get('noSound')) {
-                    Notifications.playSound();
-                }
                 if (!model.get('noPopup')) {
                     Notifications.createPopup(model.toJSON());
+                }
+                if (!model.get('noSound')) {
+                    Notifications.playSound();
                 }
             });
 
         Mediator.sub('auth:success', function () {
-            notificationQueue.reset();
+            self.reset();
         });
         // Remove seen updates
         Mediator.sub('router:change', function (params) {
-            if (params.tab && notificationQueue.size()) {
-                notificationQueue.remove(notificationQueue.where({
+            if (params.tab && self.size()) {
+                self.remove(self.where({
                     type: params.tab
                 }));
             }
@@ -76,17 +78,17 @@ notificationQueue = new (Backbone.Collection.extend({
         // remove notifications about read messages
         Mediator.sub('chat:message:read', function (message) {
             if (!message.out) {
-                notificationQueue.remove(notificationQueue.findWhere({
+                self.remove(self.findWhere({
                     type: Notifications.CHAT
                 }));
             }
         });
         Mediator.sub('notifications:queue:get', function () {
-            Mediator.pub('notifications:queue', notificationQueue.toJSON());
+            Mediator.pub('notifications:queue', self.toJSON());
         });
         // Clear badge, when notifications turned off and vice versa
         notificationsSettings.on('change:enabled', function (event, enabled) {
-            Notifications.setBadge(enabled ? notificationQueue.size():'', true);
+            Notifications.setBadge(enabled ? self.size():'', true);
         });
 
     }
@@ -138,24 +140,44 @@ module.exports = Notifications = {
     notify: function (data) {
         notificationQueue.push(data);
     },
-    createPopup: function (options) {
-        var popups = notificationsSettings.get('popups');
+    createPopup: (function () {
+        var createPopup, notifications;
 
-        if (notificationsSettings.get('enabled') && popups.enabled) {
-            getBase64FromImage(options.image, function (base64) {
-                try {
-                    chrome.notifications.create(_.uniqueId(), {
-                        type: 'basic',
-                        title: options.title,
-                        message: (popups.showText && options.message) || '',
-                        iconUrl: base64
-                    }, function () {});
-                } catch (e) {
-                    console.log(e);
-                }
-            });
+        if (Env.firefox) {
+            notifications = require("sdk/notifications");
+
+            createPopup = function (options, text) {
+                notifications.notify({
+                    title: options.title,
+                    text: text,
+                    iconURL: options.image
+                });
+            };
+        } else {
+            createPopup = function (options, message) {
+                getBase64FromImage(options.image, function (base64) {
+                    try {
+                        chrome.notifications.create(_.uniqueId(), {
+                            type: 'basic',
+                            title: options.title,
+                            message: message,
+                            iconUrl: base64
+                        }, function () {});
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            };
         }
-    },
+
+        return function (options) {
+            var popups = notificationsSettings.get('popups');
+
+            if (notificationsSettings.get('enabled') && popups.enabled) {
+                createPopup(options, (popups.showText && options.message) || '');
+            }
+        };
+    })(),
     playSound: function () {
         var sound = notificationsSettings.get('sound'),
             audio = new Audio();

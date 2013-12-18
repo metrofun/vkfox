@@ -13,7 +13,11 @@ Auth = require('auth/auth.bg.js'),
 Env = require('env/env.js'),
 Mediator = require('mediator/mediator.js'),
 
-apiQueriesQueue = [];
+apiQueriesQueue = [],
+
+forceReauth = _.debounce(function () {
+    Auth.login(true);
+});
 
 if (Env.firefox) {
     var sdkRequest = require("sdk/request").Request;
@@ -207,11 +211,11 @@ var Request = module.exports = {
                     } else {
                         console.warn(data);
                         // force relogin on API error
-                        Auth.login(true);
+                        forceReauth();
                     }
                 }, function (e) {
                     // force relogin on API error
-                    Auth.login(true);
+                    forceReauth();
                     console.log(e);
                 }).done();
             }).done();

@@ -14,6 +14,7 @@ userId,
  */
 monitorAuthChanges = _.debounce(function () {
     Request.get(Config.VK_BASE + 'feed2.php', null, 'json').then(function (response) {
+        console.log(response);
         try {
             if (userId !== Number(response.user.id)) {
                 Auth.login(true);

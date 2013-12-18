@@ -1,6 +1,4 @@
-var Env = require('env/env.js');
-
-if (Env.firefox) {
+if (typeof localStorage === 'undefined') {
     var storage = require("sdk/simple-storage");
 
     module.exports = {

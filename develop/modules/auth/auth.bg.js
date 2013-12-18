@@ -14,54 +14,78 @@ var _ = require('underscore')._,
 
     model = new Backbone.Model(),
     Auth, page, iframe,
-    state = CREATED, authPromise = Vow.promise();
+    state = CREATED, authPromise = Vow.promise(),
 
-function closeAuthTabs() {
-    if (Env.firefox) {
-        // TODO
-        // throw "Not implemented";
-    } else {
-        chrome.tabs.query({url: Config.AUTH_DOMAIN + '*'}, function (tabs) {
-            tabs.forEach(function (tab) {
-                chrome.tabs.remove(tab.id);
-            });
-        });
-    }
-}
+    // After successful login we should close all auth tabs
+    closeAuthTabs = (function () {
+        return Env.firefox ? function () {
+            var tabs = require("sdk/tabs"), index, tab;
 
-// TODO run if one time
-function tryLogin() {
-    if (Env.firefox) {
-        page = require("sdk/page-worker").Page({
-            contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
-            contentURL: Config.AUTH_URI,
-            onMessage: function (url) {
-                Mediator.pub('auth:iframe', url);
+            for (index in tabs) {
+                tab = tabs[index];
+
+                if (~tab.url.indexOf(Config.AUTH_DOMAIN)) {
+                    tab.close();
+                }
             }
-        });
-    } else {
-        if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.name = 'vkfox-login-iframe';
-            document.body.appendChild(iframe);
-        }
-        iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
-    }
-}
-function freeLogin() {
-    if (Env.firefox) {
-        page.destroy();
-    } else {
-        document.body.removeChild(iframe);
-        iframe = null;
-    }
-    page = null;
-}
+        } : function () {
+            chrome.tabs.query({url: Config.AUTH_DOMAIN + '*'}, function (tabs) {
+                tabs.forEach(function (tab) {
+                    chrome.tabs.remove(tab.id);
+                });
+            });
+        };
+    })(),
+
+    tryLogin = (function () {
+        var tryLogin = Env.firefox ? function () {
+            page = require("sdk/page-worker").Page({
+                contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
+                contentURL: Config.AUTH_URI,
+                onMessage: function (url) {
+                    Mediator.pub('auth:iframe', url);
+                }
+            });
+        } : function () {
+            if (!iframe) {
+                iframe = document.createElement("iframe");
+                iframe.name = 'vkfox-login-iframe';
+                document.body.appendChild(iframe);
+            }
+            iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
+        };
+
+        return tryLogin;
+    })(),
+
+    freeLogin = (function () {
+        return Env.firefox ? function () {
+            page.destroy();
+            page = null;
+        } : function () {
+            document.body.removeChild(iframe);
+            iframe = null;
+        };
+    })();
 
 function onSuccess(data) {
     state = READY;
     Browser.setIconOnline();
     authPromise.fulfill(data);
+}
+
+// We need to authorize in own window, after user was logined in a tab
+// In google chrome we use content-script for this purpose (declared in manifest.js)
+if (Env.firefox) {
+    require("sdk/page-mod").PageMod({
+        include: [
+            "http://oauth.vk.com/blank.html*",
+            "https://oauth.vk.com/blank.html*"
+        ],
+        onAttach: function () {
+            Auth.login(true);
+        }
+    });
 }
 
 Mediator.sub('auth:iframe', function (url) {
@@ -72,7 +96,6 @@ Mediator.sub('auth:iframe', function (url) {
         closeAuthTabs();
         freeLogin();
     } catch (e) {
-        // TODO control console.log
         console.log(e);
     }
 }.bind(this));

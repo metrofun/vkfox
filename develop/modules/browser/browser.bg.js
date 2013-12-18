@@ -78,26 +78,32 @@ module.exports = Browser = {
      *
      * @returns {Vow.promise} Returns promise that resolves to Boolean
      */
-    isVKSiteActive: function () {
-        var promise = Vow.promise();
+    isVKSiteActive: (function () {
+        var getActiveTabUrl, tabs;
 
         if (Env.firefox) {
-            // TODO fix stub
-            promise.fulfill(false);
-        } else {
-            chrome.tabs.query({active: true}, function (tabs) {
-                if (tabs.every(function (tab) {
-                    return tab.url.indexOf('vk.com') === -1;
-                })) {
-                    promise.fulfill(false);
-                } else {
-                    promise.fulfill(true);
-                }
-            });
-        }
+            tabs = require('sdk/tabs');
 
-        return promise;
-    },
+            getActiveTabUrl = function () {
+                return Vow.fulfill(tabs.activeTab.url);
+            };
+        } else {
+            getActiveTabUrl = function () {
+                var promise = Vow.promise();
+                chrome.tabs.query({active: true}, function (tabs) {
+                    if (tabs.length) {
+                        promise.fulfill(tabs[0].url);
+                    }
+                });
+                return promise;
+            };
+        }
+        return function () {
+            return getActiveTabUrl.then(function (url) {
+                return ~url.indexOf('vk.com');
+            });
+        };
+    })(),
     createTab: (function () {
         if (Env.firefox) {
             var tabs = require('sdk/tabs');
