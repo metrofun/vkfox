@@ -9,6 +9,7 @@ develop/modules/i18n/*.js
 !develop/modules/i18n/i18n.js
 !develop/modules/i18n/i18n.pu.js
 develop/pages/popup.css
+develop/pages/popup.js
 develop/tmp
 node_modules
 bower_components
