@@ -125,7 +125,7 @@ module.exports = function (grunt) {
                     "mozilla-addon-sdk": "1_14",
                     extension_dir: ".",
                     command: "run",
-                    arguments: "-p tmp/ff"
+                    arguments: "-p ../ff"
                 }
             }
         },

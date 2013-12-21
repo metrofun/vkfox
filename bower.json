@@ -8,7 +8,7 @@
     "emoji": "~0.2.1",
     "font-awesome": "~3.2.1",
     "toolbarwidget-jplib": "https://github.com/Rob--W/toolbarwidget-jplib.git#~1.3.0",
-    "browser-action-jplib": "https://github.com/Rob--W/browser-action-jplib.git#~0.2.2",
+    "browser-action-jplib": "https://github.com/metrofun/browser-action-jplib.git#7734cf8d8af060bb1d91a6e15f923da9dc8ab508",
     "zepto-bootstrap": "git@github.com:metrofun/zepto-bootstrap.git"
   }
 }
