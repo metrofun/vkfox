@@ -179,22 +179,23 @@ module.exports = Notifications = {
         };
     })(),
     playSound: (function () {
-        var soundWorker, play;
+        var soundWorker, play, data;
 
         if (Env.firefox) {
+            data = require("sdk/self").data;
             play = function (source, volume) {
                 if (!audioInProgress) {
                     audioInProgress = true;
-                    soundWorker = require("page-worker").Page({
+                    soundWorker = require("sdk/page-worker").Page({
                         contentScript: [
-                            'var audio = new Audio("', source, '");',
+                            'var audio = new Audio("../', source, '");',
                             'audio.volume = ', volume, ';',
                             'audio.play();',
-                            'audio.addEventListener("ended", function () {})',
+                            'audio.addEventListener("ended", function () {',
                             'postMessage("destroy");',
                             '});'
                         ].join(''),
-                        contentURL: require('sdk/self').url("blank.html"),
+                        contentURL: data.url('modules/notifications/firefox.html'),
                         onMessage: function () {
                             soundWorker.destroy();
                             soundWorker = null;
