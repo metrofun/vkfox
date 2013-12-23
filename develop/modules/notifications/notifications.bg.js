@@ -178,22 +178,54 @@ module.exports = Notifications = {
             }
         };
     })(),
-    playSound: function () {
-        var sound = notificationsSettings.get('sound'),
-            audio = new Audio();
+    playSound: (function () {
+        var soundWorker, play;
 
-        if (notificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
-            audioInProgress = true;
+        if (Env.firefox) {
+            play = function (source, volume) {
+                if (!audioInProgress) {
+                    audioInProgress = true;
+                    soundWorker = require("page-worker").Page({
+                        contentScript: [
+                            'var audio = new Audio("', source, '");',
+                            'audio.volume = ', volume, ';',
+                            'audio.play();',
+                            'audio.addEventListener("ended", function () {})',
+                            'postMessage("destroy");',
+                            '});'
+                        ].join(''),
+                        contentURL: require('sdk/self').url("blank.html"),
+                        onMessage: function () {
+                            soundWorker.destroy();
+                            soundWorker = null;
+                            audioInProgress = false;
+                        }
+                    });
+                }
+            };
+        } else {
+            play = function (source, volume) {
+                var audio;
 
-            audio.volume = sound.volume;
-            audio.src = Settings[sound.signal];
-            audio.play();
-
-            audio.addEventListener('ended', function () {
-                audioInProgress = false;
-            });
+                if (!audioInProgress) {
+                    audioInProgress = true;
+                    audio = new Audio(source);
+                    audio.volume = volume;
+                    audio.play();
+                    audio.addEventListener('ended', function () {
+                        audioInProgress = false;
+                    });
+                }
+            };
         }
-    },
+        return function () {
+            var sound = notificationsSettings.get('sound');
+
+            if (notificationsSettings.get('enabled') && sound.enabled) {
+                play(Settings[sound.signal], sound.volume);
+            }
+        };
+    })(),
     setBadge: function (count, force) {
         if (notificationsSettings.get('enabled') || force) {
             Browser.setBadgeText(count || '');

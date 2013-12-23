@@ -55,7 +55,43 @@ function updateLatestMessageId() {
         );
     }
 }
+function fetchProfiles() {
+    var uids = dialogColl.reduce(function (uids, dialog) {
+        dialog.get('messages').map(function (message) {
+            var chatActive = message.chat_active;
+            if (chatActive) {
+                // unfortunately chatActive sometimes
+                // don't contain actual sender
+                uids = uids.concat(chatActive.map(function (uid) {
+                    return Number(uid);
+                })).concat(userId, message.uid);
+            } else {
+                uids = uids.concat([message.uid, dialog.get('uid')]);
+            }
+        });
+        return uids;
+    }, []);
 
+    uids.push(userId);
+    uids = _.chain(uids).uniq().difference(profilesColl.pluck('uid')).value();
+
+    if (uids.length) {
+        return Users.getProfilesById(uids).then(function (data) {
+            profilesColl.reset(data);
+            // mark self profile
+            profilesColl.get(userId).set('isSelf', true);
+        });
+    } else {
+        return Vow.fulfill();
+    }
+
+
+    // return Users.getProfilesById(uids).then(function (data) {
+        // profilesColl.reset(data);
+        // // mark self profile
+        // profilesColl.get(userId).set('isSelf', true);
+    // });
+}
 /**
  * Initialize all internal state
  */
@@ -76,8 +112,7 @@ function initialize() {
 
         persistentModel.on('change:latestMessageId', function () {
             var messages = dialogColl.first().get('messages'),
-            message = messages[messages.length - 1],
-            profile, gender;
+                message = messages[messages.length - 1];
 
             // don't notify on first run,
             // when there is no previous value
@@ -86,24 +121,25 @@ function initialize() {
             }
 
             if (!message.out) {
-                profile = profilesColl.get(message.uid).toJSON();
-                gender = profile.sex === 1 ? 'female':'male';
-
                 // Don't notify, when active tab is vk.com
                 Browser.isVKSiteActive().then(function (active) {
                     if (!active) {
-                        var chatActive = Browser.isPopupOpened() && Router.isChatTabActive();
+                        fetchProfiles().then(function () {
+                            var profile = profilesColl.get(message.uid).toJSON(),
+                                gender = profile.sex === 1 ? 'female':'male',
+                                chatActive = Browser.isPopupOpened() && Router.isChatTabActive();
 
-                        Notifications.notify({
-                            type: Notifications.CHAT,
-                            title: I18N.get('sent a message', {
-                                NAME: Users.getName(profile),
-                                GENDER: gender
-                            }),
-                            message: message.body,
-                            image: profile.photo,
-                            noBadge: chatActive,
-                            noPopup: chatActive
+                            Notifications.notify({
+                                type: Notifications.CHAT,
+                                title: I18N.get('sent a message', {
+                                    NAME: Users.getName(profile),
+                                    GENDER: gender
+                                }),
+                                message: message.body,
+                                image: profile.photo,
+                                noBadge: chatActive,
+                                noPopup: chatActive
+                            });
                         });
                     }
                 });
@@ -113,33 +149,7 @@ function initialize() {
         publishData();
     }).done();
 }
-function fetchProfiles() {
-    var uids = dialogColl.reduce(function (uids, dialog) {
-        dialog.get('messages').map(function (message) {
-            var chatActive = message.chat_active;
-            if (chatActive) {
-                // unfortunately chatActive sometimes
-                // don't contain actual sender
-                uids = uids.concat(chatActive.map(function (uid) {
-                    return Number(uid);
-                })).concat(userId, message.uid);
-            } else {
-                uids = uids.concat([message.uid, dialog.get('uid')]);
-            }
-        });
-        return uids;
-    }, []);
-
-    uids.push(userId);
-    uids = _.uniq(uids);
-
-    return Users.getProfilesById(uids).then(function (data) {
-        profilesColl.reset(data);
-        // mark self profile
-        profilesColl.get(userId).set('isSelf', true);
-    });
-}
-/*
+/**
  * Removes read messages from dialog,
  * leaves only first one or unread in sequence
  *
@@ -147,8 +157,8 @@ function fetchProfiles() {
  */
 function removeReadMessages(dialog) {
     var messages = dialog.get('messages'),
-    result = [messages.pop()],
-    originalOut = result[0].out;
+        result = [messages.pop()],
+        originalOut = result[0].out;
 
     messages.reverse().some(function (message) {
         if (message.out === originalOut && message.read_state === 0) {
@@ -166,10 +176,10 @@ function removeReadMessages(dialog) {
  */
 function addNewMessage(update) {
     var messageId = update[1],
-    flags = update[2],
-    attachment = update[7],
-    dialog, messageDeferred,
-    dialogCompanionUid = update[3];
+        flags = update[2],
+        attachment = update[7],
+        dialog, messageDeferred,
+        dialogCompanionUid = update[3];
 
     // For messages from chat attachment contains "from" property
     if (_(attachment).isEmpty()) {
@@ -217,7 +227,7 @@ function addNewMessage(update) {
         });
     }).done();
 }
-/*
+/**
  * If last message in dialog is unread,
  * fetch dialog history and get last unread messages in a row
  */

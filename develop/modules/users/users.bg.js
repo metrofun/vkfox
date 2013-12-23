@@ -1,5 +1,5 @@
 var
-DROP_PROFILES_INTERVAL = 500,
+DROP_PROFILES_INTERVAL = 60000,
 USERS_GET_DEBOUNCE = 400,
 
 Vow = require('vow'),
@@ -46,7 +46,7 @@ publishUids = function (queue) {
 processGetUsersQueue = _.debounce(function () {
     var processedQueue = usersGetQueue,
     newUids = _.chain(processedQueue).pluck('uids').flatten()
-    .unique().difference(usersColl.pluck('id')).value();
+        .unique().difference(usersColl.pluck('uid')).value();
 
     // start new queue
     usersGetQueue = [];

@@ -99,7 +99,7 @@ module.exports = Browser = {
             };
         }
         return function () {
-            return getActiveTabUrl.then(function (url) {
+            return getActiveTabUrl().then(function (url) {
                 return ~url.indexOf('vk.com');
             });
         };

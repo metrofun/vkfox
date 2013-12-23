@@ -5,6 +5,7 @@ API_QUERIES_PER_REQUEST = 15,
 API_DOMAIN = 'https://api.vk.com/',
 API_REQUESTS_DEBOUNCE = 400,
 API_VERSION = 4.99,
+REAUTH_DEBOUNCE = 2000,
 XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
@@ -17,7 +18,7 @@ apiQueriesQueue = [],
 
 forceReauth = _.debounce(function () {
     Auth.login(true);
-});
+}, REAUTH_DEBOUNCE);
 
 if (Env.firefox) {
     var sdkRequest = require("sdk/request").Request;
