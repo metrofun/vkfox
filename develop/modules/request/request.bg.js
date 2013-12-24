@@ -18,36 +18,17 @@ apiQueriesQueue = [],
 
 forceReauth = _.debounce(function () {
     Auth.login(true);
-}, REAUTH_DEBOUNCE);
-
-if (Env.firefox) {
-    var sdkRequest = require("sdk/request").Request;
-}
-
-// Custom errors
-function HttpError(message) {
-    this.name = 'HttpError';
-    this.message = message;
-}
-function AccessTokenError(message) {
-    this.name = 'AccessTokenError';
-    this.message = message;
-}
-[HttpError, AccessTokenError].forEach(function (constructor) {
-    constructor.prototype = new Error();
-    constructor.prototype.constructor = constructor;
-});
-
+}, REAUTH_DEBOUNCE),
 /**
- * Convert an object into a query params string
- *
- * @param {Object} params
- *
- * @returns {String}
- */
-function querystring(params) {
+* Convert an object into a query params string
+*
+* @param {Object} params
+*
+* @returns {String}
+*/
+querystring = function (params) {
     var query = [],
-        i, key;
+    i, key;
 
     for (key in params) {
         if (params[key] === undefined || params[key] === null)  {
@@ -65,31 +46,7 @@ function querystring(params) {
         }
     }
     return query.join('&');
-}
-
-/**
- * XMLHttpRequest onload handler.
- * Checks for an expired accessToken (e.g. a request that completed after relogin)
- *
- * @param {Vow.promise} ajaxPromise Will be resolved or rejected
- * @param {String} usedAccessToken
- * @param {String} responseText
- * @param {String} dataType Is ignored currently
- */
-function onLoad(ajaxPromise, usedAccessToken, responseText) {
-    Auth.getAccessToken().then(function (accessToken) {
-        if (accessToken === usedAccessToken) {
-            try {
-                ajaxPromise.fulfill(JSON.parse(responseText));
-            } catch (e) {
-                ajaxPromise.fulfill(responseText);
-            }
-        } else {
-            ajaxPromise.reject(new AccessTokenError());
-        }
-    });
-}
-
+},
 /**
  * Make HTTP Request
  *
@@ -98,47 +55,94 @@ function onLoad(ajaxPromise, usedAccessToken, responseText) {
  * @param {Object|String} data to send
  * @param {String} dataType If "json" than reponseText will be parsed and returned as object
  */
-function xhr(type, url, data, dataType) {
-    return Auth.getAccessToken().then(function (accessToken) {
-        var ajaxPromise = Vow.promise(), xhr,
-            encodedData = typeof data === 'string' ? data:querystring(data);
-
-        if (Env.firefox) {
-            // TODO implement timeout
-            sdkRequest({
-                url: url,
-                content: data === 'string' ? encodeURIComponent(data):data,
-                onComplete: function (response) {
-                    if (response.statusText === 'OK') {
-                        onLoad(ajaxPromise, accessToken, response.text, dataType);
-                    } else {
-                        ajaxPromise.reject(new HttpError(response.status));
-                    }
-                }
-            })[type]();
-        } else {
-            xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                onLoad(ajaxPromise, accessToken, xhr.responseText);
-            };
-            xhr.timeout = XHR_TIMEOUT;
-            xhr.onerror = xhr.ontimeout = function (e) {
-                ajaxPromise.reject(new HttpError(e));
-            };
-            type = type.toUpperCase();
-            if (type === 'POST') {
-                xhr.open(type, url, true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-                xhr.send(encodedData);
-            } else {
-                xhr.open(type, url + '?' + encodedData, true);
-                xhr.send();
-            }
-        }
-
-        return ajaxPromise;
+xhr = (function () {
+    var sdkRequest;
+    // Custom errors
+    function HttpError(message) {
+        this.name = 'HttpError';
+        this.message = message;
+    }
+    function AccessTokenError(message) {
+        this.name = 'AccessTokenError';
+        this.message = message;
+    }
+    [HttpError, AccessTokenError].forEach(function (constructor) {
+        constructor.prototype = new Error();
+        constructor.prototype.constructor = constructor;
     });
-}
+    /**
+     * XMLHttpRequest onload handler.
+     * Checks for an expired accessToken (e.g. a request that completed after relogin)
+     *
+     * @param {Vow.promise} ajaxPromise Will be resolved or rejected
+     * @param {String} usedAccessToken
+     * @param {String} responseText
+     * @param {String} dataType Is ignored currently
+     */
+    function onLoad(ajaxPromise, usedAccessToken, responseText) {
+        Auth.getAccessToken().then(function (accessToken) {
+            if (accessToken === usedAccessToken) {
+                try {
+                    ajaxPromise.fulfill(JSON.parse(responseText));
+                } catch (e) {
+                    ajaxPromise.fulfill(responseText);
+                }
+            } else {
+                ajaxPromise.reject(new AccessTokenError());
+            }
+        });
+    }
+
+    if (Env.firefox) {
+        sdkRequest  = require("sdk/request").Request;
+        return function (type, url, data) {
+            return Auth.getAccessToken().then(function (accessToken) {
+                var ajaxPromise = Vow.promise();
+
+                // TODO implement timeout
+                sdkRequest({
+                    url: url,
+                    content: data === 'string' ? encodeURIComponent(data):data,
+                    onComplete: function (response) {
+                        if (response.statusText === 'OK') {
+                            onLoad(ajaxPromise, accessToken, response.text);
+                        } else {
+                            ajaxPromise.reject(new HttpError(response.status));
+                        }
+                    }
+                })[type]();
+                return ajaxPromise;
+            });
+        };
+    } else {
+        return function (type, url, data) {
+            return Auth.getAccessToken().then(function (accessToken) {
+                var ajaxPromise = Vow.promise(), xhr,
+                    encodedData = typeof data === 'string' ? data:querystring(data);
+
+                xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                    onLoad(ajaxPromise, accessToken, xhr.responseText);
+                };
+                xhr.timeout = XHR_TIMEOUT;
+                xhr.onerror = xhr.ontimeout = function (e) {
+                    ajaxPromise.reject(new HttpError(e));
+                };
+                type = type.toUpperCase();
+                if (type === 'POST') {
+                    xhr.open(type, url, true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                    xhr.send(encodedData);
+                } else {
+                    xhr.open(type, url + '?' + encodedData, true);
+                    xhr.send();
+                }
+                return ajaxPromise;
+            });
+        };
+    }
+})(),
+Request;
 
 Mediator.sub('request', function (params) {
     Request[params.method].apply(Request, params['arguments']).then(function () {
@@ -153,8 +157,7 @@ Mediator.sub('request', function (params) {
         });
     });
 });
-
-var Request = module.exports = {
+Request = module.exports = {
     get: function (url, data, dataType) {
         return xhr('get', url, data, dataType);
     },

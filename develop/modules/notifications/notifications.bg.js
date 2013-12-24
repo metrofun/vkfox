@@ -192,7 +192,7 @@ module.exports = Notifications = {
                             'audio.volume = ', volume, ';',
                             'audio.play();',
                             'audio.addEventListener("ended", function () {',
-                            'postMessage("destroy");',
+                            'self.postMessage("destroy");',
                             '});'
                         ].join(''),
                         contentURL: data.url('modules/notifications/firefox.html'),
