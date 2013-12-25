@@ -64,54 +64,78 @@ var _ = require('underscore')._,
 
     model = new Backbone.Model(),
     Auth, page, iframe,
-    state = CREATED, authPromise = Vow.promise();
+    state = CREATED, authPromise = Vow.promise(),
 
-function closeAuthTabs() {
-    if (Env.firefox) {
-        // TODO
-        // throw "Not implemented";
-    } else {
-        chrome.tabs.query({url: Config.AUTH_DOMAIN + '*'}, function (tabs) {
-            tabs.forEach(function (tab) {
-                chrome.tabs.remove(tab.id);
-            });
-        });
-    }
-}
+    // After successful login we should close all auth tabs
+    closeAuthTabs = (function () {
+        return Env.firefox ? function () {
+            var tabs = require("sdk/tabs"), index, tab;
 
-// TODO run if one time
-function tryLogin() {
-    if (Env.firefox) {
-        page = require("sdk/page-worker").Page({
-            contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
-            contentURL: Config.AUTH_URI,
-            onMessage: function (url) {
-                Mediator.pub('auth:iframe', url);
+            for (index in tabs) {
+                tab = tabs[index];
+
+                if (~tab.url.indexOf(Config.AUTH_DOMAIN)) {
+                    tab.close();
+                }
             }
-        });
-    } else {
-        if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.name = 'vkfox-login-iframe';
-            document.body.appendChild(iframe);
-        }
-        iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
-    }
-}
-function freeLogin() {
-    if (Env.firefox) {
-        page.destroy();
-    } else {
-        document.body.removeChild(iframe);
-        iframe = null;
-    }
-    page = null;
-}
+        } : function () {
+            chrome.tabs.query({url: Config.AUTH_DOMAIN + '*'}, function (tabs) {
+                tabs.forEach(function (tab) {
+                    chrome.tabs.remove(tab.id);
+                });
+            });
+        };
+    })(),
+
+    tryLogin = (function () {
+        var tryLogin = Env.firefox ? function () {
+            page = require("sdk/page-worker").Page({
+                contentScript: 'self.postMessage(decodeURIComponent(window.location.href));',
+                contentURL: Config.AUTH_URI,
+                onMessage: function (url) {
+                    Mediator.pub('auth:iframe', url);
+                }
+            });
+        } : function () {
+            if (!iframe) {
+                iframe = document.createElement("iframe");
+                iframe.name = 'vkfox-login-iframe';
+                document.body.appendChild(iframe);
+            }
+            iframe.setAttribute('src', Config.AUTH_URI + '&time=' + Date.now());
+        };
+
+        return tryLogin;
+    })(),
+
+    freeLogin = (function () {
+        return Env.firefox ? function () {
+            page.destroy();
+            page = null;
+        } : function () {
+            document.body.removeChild(iframe);
+            iframe = null;
+        };
+    })();
 
 function onSuccess(data) {
     state = READY;
     Browser.setIconOnline();
     authPromise.fulfill(data);
+}
+
+// We need to authorize in own window, after user was logined in a tab
+// In google chrome we use content-script for this purpose (declared in manifest.js)
+if (Env.firefox) {
+    require("sdk/page-mod").PageMod({
+        include: [
+            "http://oauth.vk.com/blank.html*",
+            "https://oauth.vk.com/blank.html*"
+        ],
+        onAttach: function () {
+            Auth.login(true);
+        }
+    });
 }
 
 Mediator.sub('auth:iframe', function (url) {
@@ -122,7 +146,6 @@ Mediator.sub('auth:iframe', function (url) {
         closeAuthTabs();
         freeLogin();
     } catch (e) {
-        // TODO control console.log
         console.log(e);
     }
 }.bind(this));
@@ -182,7 +205,7 @@ module.exports = Auth = {
 
 Auth.login();
 
-},{"backbone":32,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":18,"sdk/page-worker":33,"underscore":35,"vow":36}],4:[function(require,module,exports){
+},{"backbone":32,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":18,"sdk/page-mod":33,"sdk/page-worker":33,"sdk/tabs":33,"underscore":35,"vow":36}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
         "19": "assets/logo19.png",
@@ -263,26 +286,32 @@ module.exports = Browser = {
      *
      * @returns {Vow.promise} Returns promise that resolves to Boolean
      */
-    isVKSiteActive: function () {
-        var promise = Vow.promise();
+    isVKSiteActive: (function () {
+        var getActiveTabUrl, tabs;
 
         if (Env.firefox) {
-            // TODO fix stub
-            promise.fulfill(false);
-        } else {
-            chrome.tabs.query({active: true}, function (tabs) {
-                if (tabs.every(function (tab) {
-                    return tab.url.indexOf('vk.com') === -1;
-                })) {
-                    promise.fulfill(false);
-                } else {
-                    promise.fulfill(true);
-                }
-            });
-        }
+            tabs = require('sdk/tabs');
 
-        return promise;
-    },
+            getActiveTabUrl = function () {
+                return Vow.fulfill(tabs.activeTab.url);
+            };
+        } else {
+            getActiveTabUrl = function () {
+                var promise = Vow.promise();
+                chrome.tabs.query({active: true}, function (tabs) {
+                    if (tabs.length) {
+                        promise.fulfill(tabs[0].url);
+                    }
+                });
+                return promise;
+            };
+        }
+        return function () {
+            return getActiveTabUrl().then(function (url) {
+                return ~url.indexOf('vk.com');
+            });
+        };
+    })(),
     createTab: (function () {
         if (Env.firefox) {
             var tabs = require('sdk/tabs');
@@ -540,7 +569,36 @@ function updateLatestMessageId() {
         );
     }
 }
+function fetchProfiles() {
+    var requiredUids = dialogColl.reduce(function (uids, dialog) {
+        dialog.get('messages').map(function (message) {
+            var chatActive = message.chat_active;
+            if (chatActive) {
+                // unfortunately chatActive sometimes
+                // don't contain actual sender
+                uids = uids.concat(chatActive.map(function (uid) {
+                    return Number(uid);
+                })).concat(userId, message.uid);
+            } else {
+                uids = uids.concat([message.uid, dialog.get('uid')]);
+            }
+        });
+        return uids;
+    }, [userId]),
+    cachesUids = profilesColl.pluck('uid'),
+    missingUids = _.chain(requiredUids).uniq().difference(cachesUids).value();
 
+    profilesColl.remove(_(cachesUids).difference(requiredUids));
+
+    if (missingUids.length) {
+        return Users.getProfilesById(missingUids).then(function (data) {
+            profilesColl.add(data);
+            profilesColl.get(userId).set('isSelf', true);
+        });
+    } else {
+        return Vow.fulfill();
+    }
+}
 /**
  * Initialize all internal state
  */
@@ -561,8 +619,7 @@ function initialize() {
 
         persistentModel.on('change:latestMessageId', function () {
             var messages = dialogColl.first().get('messages'),
-            message = messages[messages.length - 1],
-            profile, gender;
+                message = messages[messages.length - 1];
 
             // don't notify on first run,
             // when there is no previous value
@@ -571,24 +628,25 @@ function initialize() {
             }
 
             if (!message.out) {
-                profile = profilesColl.get(message.uid).toJSON();
-                gender = profile.sex === 1 ? 'female':'male';
-
                 // Don't notify, when active tab is vk.com
                 Browser.isVKSiteActive().then(function (active) {
                     if (!active) {
-                        var chatActive = Browser.isPopupOpened() && Router.isChatTabActive();
+                        fetchProfiles().then(function () {
+                            var profile = profilesColl.get(message.uid).toJSON(),
+                                gender = profile.sex === 1 ? 'female':'male',
+                                chatActive = Browser.isPopupOpened() && Router.isChatTabActive();
 
-                        Notifications.notify({
-                            type: Notifications.CHAT,
-                            title: I18N.get('sent a message', {
-                                NAME: Users.getName(profile),
-                                GENDER: gender
-                            }),
-                            message: message.body,
-                            image: profile.photo,
-                            noBadge: chatActive,
-                            noPopup: chatActive
+                            Notifications.notify({
+                                type: Notifications.CHAT,
+                                title: I18N.get('sent a message', {
+                                    NAME: Users.getName(profile),
+                                    GENDER: gender
+                                }),
+                                message: message.body,
+                                image: profile.photo,
+                                noBadge: chatActive,
+                                noPopup: chatActive
+                            });
                         });
                     }
                 });
@@ -598,33 +656,7 @@ function initialize() {
         publishData();
     }).done();
 }
-function fetchProfiles() {
-    var uids = dialogColl.reduce(function (uids, dialog) {
-        dialog.get('messages').map(function (message) {
-            var chatActive = message.chat_active;
-            if (chatActive) {
-                // unfortunately chatActive sometimes
-                // don't contain actual sender
-                uids = uids.concat(chatActive.map(function (uid) {
-                    return Number(uid);
-                })).concat(userId, message.uid);
-            } else {
-                uids = uids.concat([message.uid, dialog.get('uid')]);
-            }
-        });
-        return uids;
-    }, []);
-
-    uids.push(userId);
-    uids = _.uniq(uids);
-
-    return Users.getProfilesById(uids).then(function (data) {
-        profilesColl.reset(data);
-        // mark self profile
-        profilesColl.get(userId).set('isSelf', true);
-    });
-}
-/*
+/**
  * Removes read messages from dialog,
  * leaves only first one or unread in sequence
  *
@@ -632,8 +664,8 @@ function fetchProfiles() {
  */
 function removeReadMessages(dialog) {
     var messages = dialog.get('messages'),
-    result = [messages.pop()],
-    originalOut = result[0].out;
+        result = [messages.pop()],
+        originalOut = result[0].out;
 
     messages.reverse().some(function (message) {
         if (message.out === originalOut && message.read_state === 0) {
@@ -651,14 +683,13 @@ function removeReadMessages(dialog) {
  */
 function addNewMessage(update) {
     var messageId = update[1],
-    flags = update[2],
-    attachment = update[7],
-    dialog, messageDeferred,
-    dialogCompanionUid = update[3];
+        flags = update[2],
+        attachment = update[7],
+        dialog, messageDeferred,
+        dialogCompanionUid = update[3];
 
     // For messages from chat attachment contains "from" property
     if (_(attachment).isEmpty()) {
-
         // mimic response from server
         messageDeferred = Vow.promise([1, {
             body: update[6],
@@ -677,7 +708,7 @@ function addNewMessage(update) {
 
     messageDeferred.then(function (response) {
         var message = response[1],
-        dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
+            dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
         dialog = dialogColl.get(dialogId);
         if (dialog) {
@@ -687,7 +718,7 @@ function addNewMessage(update) {
             // TODO add parse function and move this code into dialogColl
             dialogColl.add({
                 id: dialogId,
-                uid: dialogCompanionUid,
+                uid: message.uid,
                 chat_id: message.chat_id,
                 chat_active: message.chat_active,
                 messages: [message]
@@ -702,7 +733,7 @@ function addNewMessage(update) {
         });
     }).done();
 }
-/*
+/**
  * If last message in dialog is unread,
  * fetch dialog history and get last unread messages in a row
  */
@@ -3611,28 +3642,29 @@ notificationsSettings = new NotificationsSettings({
 
 notificationQueue = new (Backbone.Collection.extend({
     initialize: function () {
+        var self = this;
         this
             .on('add remove reset', function () {
-                Notifications.setBadge(notificationQueue.filter(function (model) {
+                Notifications.setBadge(self.filter(function (model) {
                     return !model.get('noBadge');
                 }).length);
             })
             .on('add', function (model) {
-                if (!model.get('noSound')) {
-                    Notifications.playSound();
-                }
                 if (!model.get('noPopup')) {
                     Notifications.createPopup(model.toJSON());
+                }
+                if (!model.get('noSound')) {
+                    Notifications.playSound();
                 }
             });
 
         Mediator.sub('auth:success', function () {
-            notificationQueue.reset();
+            self.reset();
         });
         // Remove seen updates
         Mediator.sub('router:change', function (params) {
-            if (params.tab && notificationQueue.size()) {
-                notificationQueue.remove(notificationQueue.where({
+            if (params.tab && self.size()) {
+                self.remove(self.where({
                     type: params.tab
                 }));
             }
@@ -3640,17 +3672,17 @@ notificationQueue = new (Backbone.Collection.extend({
         // remove notifications about read messages
         Mediator.sub('chat:message:read', function (message) {
             if (!message.out) {
-                notificationQueue.remove(notificationQueue.findWhere({
+                self.remove(self.findWhere({
                     type: Notifications.CHAT
                 }));
             }
         });
         Mediator.sub('notifications:queue:get', function () {
-            Mediator.pub('notifications:queue', notificationQueue.toJSON());
+            Mediator.pub('notifications:queue', self.toJSON());
         });
         // Clear badge, when notifications turned off and vice versa
         notificationsSettings.on('change:enabled', function (event, enabled) {
-            Notifications.setBadge(enabled ? notificationQueue.size():'', true);
+            Notifications.setBadge(enabled ? self.size():'', true);
         });
 
     }
@@ -3703,28 +3735,26 @@ module.exports = Notifications = {
         notificationQueue.push(data);
     },
     createPopup: (function () {
-        var createPopup;
+        var createPopup, notifications;
 
         if (Env.firefox) {
-            var notifications = require("sdk/notifications");
+            notifications = require("sdk/notifications");
 
-            createPopup = function (options) {
+            createPopup = function (options, text) {
                 notifications.notify({
                     title: options.title,
-                    text: options.text,
+                    text: text,
                     iconURL: options.image
                 });
             };
         } else {
-            createPopup = function (options) {
-                var popups = notificationsSettings.get('popups');
-
+            createPopup = function (options, message) {
                 getBase64FromImage(options.image, function (base64) {
                     try {
                         chrome.notifications.create(_.uniqueId(), {
                             type: 'basic',
                             title: options.title,
-                            message: (popups.showText && options.message) || '',
+                            message: message,
                             iconUrl: base64
                         }, function () {});
                     } catch (e) {
@@ -3735,29 +3765,62 @@ module.exports = Notifications = {
         }
 
         return function (options) {
-            var popups = NotificationsSettings.get('popups');
+            var popups = notificationsSettings.get('popups');
 
-            if (NotificationsSettings.get('enabled') && popups.enabled) {
-                createPopup(options);
+            if (notificationsSettings.get('enabled') && popups.enabled) {
+                createPopup(options, (popups.showText && options.message) || '');
             }
         };
     })(),
-    playSound: function () {
-        var sound = notificationsSettings.get('sound'),
-            audio = new Audio();
+    playSound: (function () {
+        var soundWorker, play, data;
 
-        if (notificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
-            audioInProgress = true;
+        if (Env.firefox) {
+            data = require("sdk/self").data;
+            play = function (source, volume) {
+                if (!audioInProgress) {
+                    audioInProgress = true;
+                    soundWorker = require("sdk/page-worker").Page({
+                        contentScript: [
+                            'var audio = new Audio("../', source, '");',
+                            'audio.volume = ', volume, ';',
+                            'audio.play();',
+                            'audio.addEventListener("ended", function () {',
+                            'self.postMessage("destroy");',
+                            '});'
+                        ].join(''),
+                        contentURL: data.url('modules/notifications/firefox.html'),
+                        onMessage: function () {
+                            soundWorker.destroy();
+                            soundWorker = null;
+                            audioInProgress = false;
+                        }
+                    });
+                }
+            };
+        } else {
+            play = function (source, volume) {
+                var audio;
 
-            audio.volume = sound.volume;
-            audio.src = Settings[sound.signal];
-            audio.play();
-
-            audio.addEventListener('ended', function () {
-                audioInProgress = false;
-            });
+                if (!audioInProgress) {
+                    audioInProgress = true;
+                    audio = new Audio(source);
+                    audio.volume = volume;
+                    audio.play();
+                    audio.addEventListener('ended', function () {
+                        audioInProgress = false;
+                    });
+                }
+            };
         }
-    },
+        return function () {
+            var sound = notificationsSettings.get('sound');
+
+            if (notificationsSettings.get('enabled') && sound.enabled) {
+                play(Settings[sound.signal], sound.volume);
+            }
+        };
+    })(),
     setBadge: function (count, force) {
         if (notificationsSettings.get('enabled') || force) {
             Browser.setBadgeText(count || '');
@@ -3765,7 +3828,7 @@ module.exports = Notifications = {
     }
 };
 
-},{"backbone":32,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":18,"notifications/settings.js":21,"persistent-model/persistent-model.js":22,"sdk/notifications":33,"underscore":35}],21:[function(require,module,exports){
+},{"backbone":32,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":18,"notifications/settings.js":21,"persistent-model/persistent-model.js":22,"sdk/notifications":33,"sdk/page-worker":33,"sdk/self":33,"underscore":35}],21:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'
@@ -3925,6 +3988,7 @@ API_QUERIES_PER_REQUEST = 15,
 API_DOMAIN = 'https://api.vk.com/',
 API_REQUESTS_DEBOUNCE = 400,
 API_VERSION = 4.99,
+REAUTH_DEBOUNCE = 2000,
 XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
@@ -3933,36 +3997,21 @@ Auth = require('auth/auth.bg.js'),
 Env = require('env/env.js'),
 Mediator = require('mediator/mediator.js'),
 
-apiQueriesQueue = [];
+apiQueriesQueue = [],
 
-if (Env.firefox) {
-    var sdkRequest = require("sdk/request").Request;
-}
-
-// Custom errors
-function HttpError(message) {
-    this.name = 'HttpError';
-    this.message = message;
-}
-function AccessTokenError(message) {
-    this.name = 'AccessTokenError';
-    this.message = message;
-}
-[HttpError, AccessTokenError].forEach(function (constructor) {
-    constructor.prototype = new Error();
-    constructor.prototype.constructor = constructor;
-});
-
+forceReauth = _.debounce(function () {
+    Auth.login(true);
+}, REAUTH_DEBOUNCE),
 /**
- * Convert an object into a query params string
- *
- * @param {Object} params
- *
- * @returns {String}
- */
-function querystring(params) {
+* Convert an object into a query params string
+*
+* @param {Object} params
+*
+* @returns {String}
+*/
+querystring = function (params) {
     var query = [],
-        i, key;
+    i, key;
 
     for (key in params) {
         if (params[key] === undefined || params[key] === null)  {
@@ -3980,31 +4029,7 @@ function querystring(params) {
         }
     }
     return query.join('&');
-}
-
-/**
- * XMLHttpRequest onload handler.
- * Checks for an expired accessToken (e.g. a request that completed after relogin)
- *
- * @param {Vow.promise} ajaxPromise Will be resolved or rejected
- * @param {String} usedAccessToken
- * @param {String} responseText
- * @param {String} dataType Is ignored currently
- */
-function onLoad(ajaxPromise, usedAccessToken, responseText) {
-    Auth.getAccessToken().then(function (accessToken) {
-        if (accessToken === usedAccessToken) {
-            try {
-                ajaxPromise.fulfill(JSON.parse(responseText));
-            } catch (e) {
-                ajaxPromise.fulfill(responseText);
-            }
-        } else {
-            ajaxPromise.reject(new AccessTokenError());
-        }
-    });
-}
-
+},
 /**
  * Make HTTP Request
  *
@@ -4013,47 +4038,94 @@ function onLoad(ajaxPromise, usedAccessToken, responseText) {
  * @param {Object|String} data to send
  * @param {String} dataType If "json" than reponseText will be parsed and returned as object
  */
-function xhr(type, url, data, dataType) {
-    return Auth.getAccessToken().then(function (accessToken) {
-        var ajaxPromise = Vow.promise(), xhr,
-            encodedData = typeof data === 'string' ? data:querystring(data);
-
-        if (Env.firefox) {
-            // TODO implement timeout
-            sdkRequest({
-                url: url,
-                content: data === 'string' ? encodeURIComponent(data):data,
-                onComplete: function (response) {
-                    if (response.statusText === 'OK') {
-                        onLoad(ajaxPromise, accessToken, response.text, dataType);
-                    } else {
-                        ajaxPromise.reject(new HttpError(response.status));
-                    }
-                }
-            })[type]();
-        } else {
-            xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                onLoad(ajaxPromise, accessToken, xhr.responseText);
-            };
-            xhr.timeout = XHR_TIMEOUT;
-            xhr.onerror = xhr.ontimeout = function (e) {
-                ajaxPromise.reject(new HttpError(e));
-            };
-            type = type.toUpperCase();
-            if (type === 'POST') {
-                xhr.open(type, url, true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-                xhr.send(encodedData);
-            } else {
-                xhr.open(type, url + '?' + encodedData, true);
-                xhr.send();
-            }
-        }
-
-        return ajaxPromise;
+xhr = (function () {
+    var sdkRequest;
+    // Custom errors
+    function HttpError(message) {
+        this.name = 'HttpError';
+        this.message = message;
+    }
+    function AccessTokenError(message) {
+        this.name = 'AccessTokenError';
+        this.message = message;
+    }
+    [HttpError, AccessTokenError].forEach(function (constructor) {
+        constructor.prototype = new Error();
+        constructor.prototype.constructor = constructor;
     });
-}
+    /**
+     * XMLHttpRequest onload handler.
+     * Checks for an expired accessToken (e.g. a request that completed after relogin)
+     *
+     * @param {Vow.promise} ajaxPromise Will be resolved or rejected
+     * @param {String} usedAccessToken
+     * @param {String} responseText
+     * @param {String} dataType Is ignored currently
+     */
+    function onLoad(ajaxPromise, usedAccessToken, responseText) {
+        Auth.getAccessToken().then(function (accessToken) {
+            if (accessToken === usedAccessToken) {
+                try {
+                    ajaxPromise.fulfill(JSON.parse(responseText));
+                } catch (e) {
+                    ajaxPromise.fulfill(responseText);
+                }
+            } else {
+                ajaxPromise.reject(new AccessTokenError());
+            }
+        });
+    }
+
+    if (Env.firefox) {
+        sdkRequest  = require("sdk/request").Request;
+        return function (type, url, data) {
+            return Auth.getAccessToken().then(function (accessToken) {
+                var ajaxPromise = Vow.promise();
+
+                // TODO implement timeout
+                sdkRequest({
+                    url: url,
+                    content: data === 'string' ? encodeURIComponent(data):data,
+                    onComplete: function (response) {
+                        if (response.statusText === 'OK') {
+                            onLoad(ajaxPromise, accessToken, response.text);
+                        } else {
+                            ajaxPromise.reject(new HttpError(response.status));
+                        }
+                    }
+                })[type]();
+                return ajaxPromise;
+            });
+        };
+    } else {
+        return function (type, url, data) {
+            return Auth.getAccessToken().then(function (accessToken) {
+                var ajaxPromise = Vow.promise(), xhr,
+                    encodedData = typeof data === 'string' ? data:querystring(data);
+
+                xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                    onLoad(ajaxPromise, accessToken, xhr.responseText);
+                };
+                xhr.timeout = XHR_TIMEOUT;
+                xhr.onerror = xhr.ontimeout = function (e) {
+                    ajaxPromise.reject(new HttpError(e));
+                };
+                type = type.toUpperCase();
+                if (type === 'POST') {
+                    xhr.open(type, url, true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                    xhr.send(encodedData);
+                } else {
+                    xhr.open(type, url + '?' + encodedData, true);
+                    xhr.send();
+                }
+                return ajaxPromise;
+            });
+        };
+    }
+})(),
+Request;
 
 Mediator.sub('request', function (params) {
     Request[params.method].apply(Request, params['arguments']).then(function () {
@@ -4068,8 +4140,7 @@ Mediator.sub('request', function (params) {
         });
     });
 });
-
-var Request = module.exports = {
+Request = module.exports = {
     get: function (url, data, dataType) {
         return xhr('get', url, data, dataType);
     },
@@ -4127,11 +4198,11 @@ var Request = module.exports = {
                     } else {
                         console.warn(data);
                         // force relogin on API error
-                        Auth.login(true);
+                        forceReauth();
                     }
                 }, function (e) {
                     // force relogin on API error
-                    Auth.login(true);
+                    forceReauth();
                     console.log(e);
                 }).done();
             }).done();
@@ -4161,27 +4232,24 @@ model = new PersistentModel(
     {name: 'router'}
 );
 
-// Mediator.sub('router:lastPath:get', function () {
-    // Mediator.pub('router:lastPath', model.get('lastPath'));
-// });
 Mediator.sub('router:lastPath:put', function (lastPath) {
     model.set('lastPath', lastPath);
 });
 
 module.exports = {
     /**
-    * Returns true if an active tab in a popup is a feedbacks tab
-    *
-    * @returns {Boolean}
-    */
+     * Returns true if an active tab in a popup is a feedbacks tab
+     *
+     * @returns {Boolean}
+     */
     isFeedbackTabActive: function () {
         return model.get('lastPath').indexOf('my') !== -1;
     },
     /**
-    * Returns true if an active tab in a popup is a chat tab
-    *
-    * @returns {Boolean}
-    */
+     * Returns true if an active tab in a popup is a chat tab
+     *
+     * @returns {Boolean}
+     */
     isChatTabActive: function () {
         return model.get('lastPath').indexOf('chat') !== -1;
     }
@@ -4294,7 +4362,7 @@ exports.getName = function (input) {
 
 },{}],31:[function(require,module,exports){
 var
-DROP_PROFILES_INTERVAL = 500,
+DROP_PROFILES_INTERVAL = 60000,
 USERS_GET_DEBOUNCE = 400,
 
 Vow = require('vow'),
@@ -4340,8 +4408,8 @@ publishUids = function (queue) {
 },
 processGetUsersQueue = _.debounce(function () {
     var processedQueue = usersGetQueue,
-    newUids = _.chain(processedQueue).pluck('uids').flatten()
-    .unique().difference(usersColl.pluck('id')).value();
+        newUids = _.chain(processedQueue).pluck('uids').flatten()
+            .unique().difference(usersColl.pluck('uid')).value();
 
     // start new queue
     usersGetQueue = [];

@@ -45,8 +45,8 @@ publishUids = function (queue) {
 },
 processGetUsersQueue = _.debounce(function () {
     var processedQueue = usersGetQueue,
-    newUids = _.chain(processedQueue).pluck('uids').flatten()
-        .unique().difference(usersColl.pluck('uid')).value();
+        newUids = _.chain(processedQueue).pluck('uids').flatten()
+            .unique().difference(usersColl.pluck('uid')).value();
 
     // start new queue
     usersGetQueue = [];

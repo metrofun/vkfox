@@ -56,7 +56,7 @@ function updateLatestMessageId() {
     }
 }
 function fetchProfiles() {
-    var uids = dialogColl.reduce(function (uids, dialog) {
+    var requiredUids = dialogColl.reduce(function (uids, dialog) {
         dialog.get('messages').map(function (message) {
             var chatActive = message.chat_active;
             if (chatActive) {
@@ -70,27 +70,20 @@ function fetchProfiles() {
             }
         });
         return uids;
-    }, []);
+    }, [userId]),
+    cachesUids = profilesColl.pluck('uid'),
+    missingUids = _.chain(requiredUids).uniq().difference(cachesUids).value();
 
-    uids.push(userId);
-    uids = _.chain(uids).uniq().difference(profilesColl.pluck('uid')).value();
+    profilesColl.remove(_(cachesUids).difference(requiredUids));
 
-    if (uids.length) {
-        return Users.getProfilesById(uids).then(function (data) {
-            profilesColl.reset(data);
-            // mark self profile
+    if (missingUids.length) {
+        return Users.getProfilesById(missingUids).then(function (data) {
+            profilesColl.add(data);
             profilesColl.get(userId).set('isSelf', true);
         });
     } else {
         return Vow.fulfill();
     }
-
-
-    // return Users.getProfilesById(uids).then(function (data) {
-        // profilesColl.reset(data);
-        // // mark self profile
-        // profilesColl.get(userId).set('isSelf', true);
-    // });
 }
 /**
  * Initialize all internal state
@@ -183,7 +176,6 @@ function addNewMessage(update) {
 
     // For messages from chat attachment contains "from" property
     if (_(attachment).isEmpty()) {
-
         // mimic response from server
         messageDeferred = Vow.promise([1, {
             body: update[6],
@@ -202,7 +194,7 @@ function addNewMessage(update) {
 
     messageDeferred.then(function (response) {
         var message = response[1],
-        dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
+            dialogId = message.chat_id ? 'chat_id_' + message.chat_id:'uid_' + dialogCompanionUid;
 
         dialog = dialogColl.get(dialogId);
         if (dialog) {
@@ -212,7 +204,7 @@ function addNewMessage(update) {
             // TODO add parse function and move this code into dialogColl
             dialogColl.add({
                 id: dialogId,
-                uid: dialogCompanionUid,
+                uid: message.uid,
                 chat_id: message.chat_id,
                 chat_active: message.chat_active,
                 messages: [message]
