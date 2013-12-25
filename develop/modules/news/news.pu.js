@@ -28,13 +28,16 @@ require('angular').module('app')
                     // case 'mention':
                         return Config.VK_BASE + 'wall'
                             + (parent.to_id || parent.source_id) + '_'
-                            + (parent.post_id || parent.id);
+                            + (parent.post_id || parent.id) + '?offset=last&scroll=1';
                     case 'comment':
+                        console.log(item);
                         // generate link to parent item
                         return ['post', 'topic', 'photo', 'video']
                             .filter(Object.hasOwnProperty, parent)
                             .map(function (type) {
-                                return this.getSourceLink({type: type, parent: parent[type]});
+                                var parentLink = this.getSourceLink({type: type, parent: parent[type]});
+                                // replace query params
+                                return parentLink.replace(/\?[^?]+$/, '?reply=' + item.parent.id);
                             }, this)[0];
                     case 'topic':
                         return Config.VK_BASE + 'topic' + parent.owner_id
