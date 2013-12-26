@@ -6,6 +6,7 @@ require('chat/chat.bg.js');
 require('newsfeed/newsfeed.bg.js');
 require('feedbacks/feedbacks.bg.js');
 require('router/router.bg.js');
+require('likes/likes.bg.js');
 // TODO
 // require('yandex/yandex.bg.js');
 // require('tracker/tracker.bg.js');

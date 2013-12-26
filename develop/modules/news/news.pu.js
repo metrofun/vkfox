@@ -30,7 +30,6 @@ require('angular').module('app')
                             + (parent.to_id || parent.source_id) + '_'
                             + (parent.post_id || parent.id) + '?offset=last&scroll=1';
                     case 'comment':
-                        console.log(item);
                         // generate link to parent item
                         return ['post', 'topic', 'photo', 'video']
                             .filter(Object.hasOwnProperty, parent)

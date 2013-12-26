@@ -39,7 +39,7 @@ require('angular').module('app')
 
                     buddie.description = I18N.get(
                         buddie.online ? 'is_online_short':'went_offline_short',
-                        gender
+                        {GENDER: gender}
                     ) + ' ' + $filter('timeago')(buddie.lastActivityTime);
                 });
                 $scope.data = data;

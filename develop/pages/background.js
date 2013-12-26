@@ -7,13 +7,14 @@ require('chat/chat.bg.js');
 require('newsfeed/newsfeed.bg.js');
 require('feedbacks/feedbacks.bg.js');
 require('router/router.bg.js');
+require('likes/likes.bg.js');
 // TODO
 // require('yandex/yandex.bg.js');
 // require('tracker/tracker.bg.js');
 require('force-online/force-online.bg.js');
 require('longpoll/longpoll.bg.js');
 
-},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"longpoll/longpoll.bg.js":15,"newsfeed/newsfeed.bg.js":19,"router/router.bg.js":27}],2:[function(require,module,exports){
+},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"likes/likes.bg.js":15,"longpoll/longpoll.bg.js":16,"newsfeed/newsfeed.bg.js":20,"router/router.bg.js":28}],2:[function(require,module,exports){
 var
 CHECK_AUTH_PERIOD = 3000, //ms
 
@@ -47,7 +48,7 @@ Mediator.sub('auth:success', function (data) {
     monitorAuthChanges();
 });
 
-},{"auth/auth.bg.js":3,"config/config.js":7,"mediator/mediator.js":18,"request/request.bg.js":25,"underscore":35}],3:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"config/config.js":7,"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36}],3:[function(require,module,exports){
 var RETRY_INTERVAL = 10000, //ms
     CREATED = 1,
     IN_PROGRESS = 1,
@@ -205,7 +206,7 @@ module.exports = Auth = {
 
 Auth.login();
 
-},{"backbone":32,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":18,"sdk/page-mod":33,"sdk/page-worker":33,"sdk/tabs":33,"underscore":35,"vow":36}],4:[function(require,module,exports){
+},{"backbone":33,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":19,"sdk/page-mod":34,"sdk/page-worker":34,"sdk/tabs":34,"underscore":36,"vow":37}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
         "19": "assets/logo19.png",
@@ -327,7 +328,7 @@ module.exports = Browser = {
     })()
 };
 
-},{"browserAction":33,"env/env.js":8,"mediator/mediator.js":18,"sdk/self":33,"sdk/tabs":33,"underscore":35,"vow":36}],5:[function(require,module,exports){
+},{"browserAction":34,"env/env.js":8,"mediator/mediator.js":19,"sdk/self":34,"sdk/tabs":34,"underscore":36,"vow":37}],5:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Vow = require('vow'),
@@ -511,7 +512,7 @@ Mediator.sub('buddies:watch:toggle', function (uid) {
     }
 });
 
-},{"backbone":32,"i18n/i18n.js":12,"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-set/persistent-set.bg.js":23,"profiles-collection/profiles-collection.bg.js":24,"request/request.bg.js":25,"underscore":35,"users/users.bg.js":31,"vow":36}],6:[function(require,module,exports){
+},{"backbone":33,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-set/persistent-set.bg.js":24,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":26,"underscore":36,"users/users.bg.js":32,"vow":37}],6:[function(require,module,exports){
 /*jshint bitwise:false */
 var
 MAX_HISTORY_COUNT = 10,
@@ -836,7 +837,7 @@ Mediator.sub('chat:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":32,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":22,"profiles-collection/profiles-collection.bg.js":24,"request/request.bg.js":25,"router/router.bg.js":27,"underscore":35,"users/users.bg.js":31,"vow":36}],7:[function(require,module,exports){
+},{"backbone":33,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":26,"router/router.bg.js":28,"underscore":36,"users/users.bg.js":32,"vow":37}],7:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -1328,7 +1329,7 @@ Mediator.sub('feedbacks:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":32,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":22,"profiles-collection/profiles-collection.bg.js":24,"request/request.bg.js":25,"router/router.bg.js":27,"underscore":35,"users/users.bg.js":31,"vow":36}],10:[function(require,module,exports){
+},{"backbone":33,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":26,"router/router.bg.js":28,"underscore":36,"users/users.bg.js":32,"vow":37}],10:[function(require,module,exports){
 var MARK_PERIOD = 5 * 60 * 1000, //5 min
 
     Mediator = require('mediator/mediator.js'),
@@ -1364,7 +1365,7 @@ settings.on('change:enabled', function (event, enabled) {
     }
 });
 
-},{"mediator/mediator.js":18,"persistent-model/persistent-model.js":22,"request/request.bg.js":25}],11:[function(require,module,exports){
+},{"mediator/mediator.js":19,"persistent-model/persistent-model.js":23,"request/request.bg.js":26}],11:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -1747,7 +1748,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":11,"./ru.js":13,"./uk.js":14,"underscore":35}],13:[function(require,module,exports){
+},{"./en.js":11,"./ru.js":13,"./uk.js":14,"underscore":36}],13:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -3156,6 +3157,41 @@ return r;
 })();
 
 },{}],15:[function(require,module,exports){
+var Mediator = require('mediator/mediator.js'),
+    _ = require('underscore')._,
+    Request = require('request/request.bg.js');
+
+console.log('likes.bg.js included');
+
+/**
+ * @param [Object] params
+ * @param [String] params.action 'delete' or 'add'
+ * @param [String] params.type 'post', 'comment' etc
+ * @param [Number] params.owner_id
+ * @param [Number] params.item_id
+ */
+Mediator.sub('likes:change', function (params) {
+    var action = params.action;
+
+    delete params.action;
+
+    console.log('sub likes:change');
+    Request.api({
+        code: 'return API.likes.' + action + '(' + JSON.stringify(params) + ');'
+    }).then(function (response) {
+        console.log(response);
+        Mediator.pub('likes:changed', _.extend(params, {
+            likes: {
+                count: response.likes,
+                user_likes: action === 'delete' ? 0:1,
+                can_like: action === 'delete' ? 1:0
+            }
+        }));
+    });
+
+});
+
+},{"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36}],16:[function(require,module,exports){
 var LONG_POLL_WAIT = 20,
     FETCH_DEBOUNCE = 1000,
     fetchUpdates,
@@ -3193,7 +3229,7 @@ Mediator.sub('auth:success', function () {
     enableLongPollUpdates();
 });
 
-},{"mediator/mediator.js":18,"request/request.bg.js":25,"underscore":35}],16:[function(require,module,exports){
+},{"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36}],17:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -3213,7 +3249,7 @@ module.exports = {
     }
 };
 
-},{"backbone":32,"underscore":35}],17:[function(require,module,exports){
+},{"backbone":33,"underscore":36}],18:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Browser = require('browser/browser.bg.js'),
@@ -3294,7 +3330,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":16,"browser/browser.bg.js":4,"env/env.js":8,"sdk/page-mod":33,"sdk/self":33}],18:[function(require,module,exports){
+},{"./dispatcher.js":17,"browser/browser.bg.js":4,"env/env.js":8,"sdk/page-mod":34,"sdk/self":34}],19:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -3305,7 +3341,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":17,"./mediator.pu.js":33,"env/env.js":8}],19:[function(require,module,exports){
+},{"./mediator.bg.js":18,"./mediator.pu.js":34,"env/env.js":8}],20:[function(require,module,exports){
 var
 MAX_ITEMS_COUNT = 50,
 UPDATE_PERIOD = 10000, //ms
@@ -3591,7 +3627,7 @@ readyPromise.then(function () {
     }), 0);
 }).done();
 
-},{"backbone":32,"mediator/mediator.js":18,"request/request.bg.js":25,"tracker/tracker.js":29,"underscore":35,"vow":36}],20:[function(require,module,exports){
+},{"backbone":33,"mediator/mediator.js":19,"request/request.bg.js":26,"tracker/tracker.js":30,"underscore":36,"vow":37}],21:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Backbone = require('backbone'),
@@ -3828,13 +3864,13 @@ module.exports = Notifications = {
     }
 };
 
-},{"backbone":32,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":18,"notifications/settings.js":21,"persistent-model/persistent-model.js":22,"sdk/notifications":33,"sdk/page-worker":33,"sdk/self":33,"underscore":35}],21:[function(require,module,exports){
+},{"backbone":33,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":19,"notifications/settings.js":22,"persistent-model/persistent-model.js":23,"sdk/notifications":34,"sdk/page-worker":34,"sdk/self":34,"underscore":36}],22:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -3867,7 +3903,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":32,"storage/storage.js":28}],23:[function(require,module,exports){
+},{"backbone":33,"storage/storage.js":29}],24:[function(require,module,exports){
 var
 storage = require('storage/storage.js'),
 constructor = function (name) {
@@ -3913,7 +3949,7 @@ constructor.prototype = {
 
 module.exports = constructor;
 
-},{"storage/storage.js":28}],24:[function(require,module,exports){
+},{"storage/storage.js":29}],25:[function(require,module,exports){
 var UPDATE_NON_FRIENDS_PERIOD = 10000,
 
     Users = require('users/users.bg.js'),
@@ -3980,7 +4016,7 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"backbone":32,"mediator/mediator.js":18,"underscore":35,"users/users.bg.js":31}],25:[function(require,module,exports){
+},{"backbone":33,"mediator/mediator.js":19,"underscore":36,"users/users.bg.js":32}],26:[function(require,module,exports){
 var
 API_QUERIES_PER_REQUEST = 15,
 // HTTPS only
@@ -4210,7 +4246,7 @@ Request = module.exports = {
     }, API_REQUESTS_DEBOUNCE)
 };
 
-},{"auth/auth.bg.js":3,"env/env.js":8,"mediator/mediator.js":18,"sdk/request":33,"underscore":35,"vow":36}],26:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"env/env.js":8,"mediator/mediator.js":19,"sdk/request":34,"underscore":36,"vow":37}],27:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -4221,7 +4257,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./request.bg.js');
 }
 
-},{"./request.bg.js":25,"./request.pu.js":33,"env/env.js":8}],27:[function(require,module,exports){
+},{"./request.bg.js":26,"./request.pu.js":34,"env/env.js":8}],28:[function(require,module,exports){
 require('notifications/notifications.bg.js');
 var
 Mediator = require('mediator/mediator.js'),
@@ -4255,7 +4291,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":18,"notifications/notifications.bg.js":20,"persistent-model/persistent-model.js":22}],28:[function(require,module,exports){
+},{"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23}],29:[function(require,module,exports){
 if (typeof localStorage === 'undefined') {
     var storage = require("sdk/simple-storage");
 
@@ -4273,7 +4309,7 @@ if (typeof localStorage === 'undefined') {
 
 
 
-},{"sdk/simple-storage":33}],29:[function(require,module,exports){
+},{"sdk/simple-storage":34}],30:[function(require,module,exports){
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,
@@ -4340,7 +4376,7 @@ module.exports = {
     }
 };
 
-},{"config/config.js":7,"i18n/i18n.js":12,"persistent-model/persistent-model.js":22,"request/request.js":26,"underscore":35}],30:[function(require,module,exports){
+},{"config/config.js":7,"i18n/i18n.js":12,"persistent-model/persistent-model.js":23,"request/request.js":27,"underscore":36}],31:[function(require,module,exports){
 /**
  * Returns user's name
  *
@@ -4360,7 +4396,7 @@ exports.getName = function (input) {
     }).join(', ');
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var
 DROP_PROFILES_INTERVAL = 60000,
 USERS_GET_DEBOUNCE = 400,
@@ -4485,7 +4521,7 @@ module.exports = _.extend({
     }
 }, require('users/name.js'));
 
-},{"backbone":32,"mediator/mediator.js":18,"request/request.bg.js":25,"underscore":35,"users/name.js":30,"vow":36}],32:[function(require,module,exports){
+},{"backbone":33,"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36,"users/name.js":31,"vow":37}],33:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -6058,9 +6094,9 @@ module.exports = _.extend({
 
 }).call(this);
 
-},{"underscore":35}],33:[function(require,module,exports){
+},{"underscore":36}],34:[function(require,module,exports){
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6114,7 +6150,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -7426,7 +7462,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":33}],36:[function(require,module,exports){
+},{"timer":34}],37:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -8019,5 +8055,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":34,"timer":33}]},{},[1])
+},{"__browserify_process":35,"timer":34}]},{},[1])
 ;

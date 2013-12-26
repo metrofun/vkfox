@@ -184,6 +184,7 @@ require('angular').module('app')
 
                 return function (scope, element) {
                     element.bind('click', function () {
+                        console.log('pubbed', 'likes:change');
                         Mediator.pub('likes:change', {
                             action: scope.likes.user_likes ? 'delete':'add',
                             type: scope.type || 'post',
