@@ -9,7 +9,7 @@ var LONG_POLL_WAIT = 20,
 function enableLongPollUpdates() {
     Request.api({
         code: 'return API.messages.getLongPollServer();'
-    }).then(fetchUpdates);
+    }).then(fetchUpdates, enableLongPollUpdates);
 }
 fetchUpdates = _.debounce(function (params) {
     Request.get('http://' + params.server, {
