@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html ng-app="app" ng-csp>
+<html
+    ng-app="app"
+    ng-controller="AppCtrl"
+    style="width:{{width}}px;height:{{height}}px;">
     <head>
         <meta charset="utf-8">
         <title>VKfox</title>
@@ -17,6 +20,6 @@
     </head>
     <body class="app">
         <ng-view></ng-view>
-        <div class="resize"></div>
+        <resize></resize>
     </body>
 </html>

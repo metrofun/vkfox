@@ -1,17 +1,17 @@
 var LONG_POLL_WAIT = 20,
-    FETCH_DEBOUNCE = 1000,
+    DEBOUNCE_RATE = 1000,
     fetchUpdates,
 
     _ = require('underscore')._,
     Request = require('request/request.bg.js'),
-    Mediator = require('mediator/mediator.js');
+    Mediator = require('mediator/mediator.js'),
 
-function enableLongPollUpdates() {
+enableLongPollUpdates = _.DEBOUNCE_RATE(function () {
     Request.api({
         code: 'return API.messages.getLongPollServer();'
-    }).then(fetchUpdates, enableLongPollUpdates);
-}
-fetchUpdates = _.debounce(function (params) {
+    }).then(fetchUpdates, enableLongPollUpdates).done();
+}, DEBOUNCE_RATE),
+fetchUpdates = _.DEBOUNCE_RATE(function (params) {
     Request.get('http://' + params.server, {
         act: 'a_check',
         key:  params.key,
@@ -29,7 +29,7 @@ fetchUpdates = _.debounce(function (params) {
         params.ts = response.ts;
         fetchUpdates(params);
     }, enableLongPollUpdates).done();
-}, FETCH_DEBOUNCE);
+}, DEBOUNCE_RATE);
 
 Mediator.sub('auth:success', function () {
     enableLongPollUpdates();

@@ -1,0 +1,70 @@
+html {
+    position: relative;
+}
+.resize {
+    @size: 41px;
+    @handleRadius: 20px;
+
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-bottom: @size solid fade(@peterRiver, 25%);
+    border-right: @size solid transparent;
+    left: 0;
+    bottom: 0;
+
+    &__active {
+        .user-select(none);
+        cursor: move;
+    }
+
+    &__handle {
+        cursor: move;
+        opacity: 0;
+        background-color: @peterRiver;
+        width: @handleRadius;
+        height: @handleRadius;
+        position: absolute;
+        .border-radius(@handleRadius);
+        left: (@size - @handleRadius) / 2;
+        top: (@size - @handleRadius) / 2;
+
+        .resize__active &,
+        .resize:hover &,
+        &:hover {
+            -webkit-animation-duration: 0.15s;
+            -moz-animation-duration: 0.15s;
+            -webkit-animation-name: shake;
+            -moz-animation-name: shake;
+            -webkit-animation-fill-mode: both;
+            -moz-animation-fill-mode: both;
+            opacity: 1;
+        }
+    }
+    .resize__active &,
+    &:hover {
+        border-color: transparent;
+    }
+}
+@-webkit-keyframes shake {
+    0%, 100% {
+        .translate(0, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        .translate(-2px, 0);
+    }
+    20%, 40%, 60%, 80% {
+        .translate(2px, 0);
+    }
+}
+@-moz-keyframes shake {
+    0%, 100% {
+        .translate(0, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        .translate(-2px, 0);
+    }
+    20%, 40%, 60%, 80% {
+        .translate(2px, 0);
+    }
+}

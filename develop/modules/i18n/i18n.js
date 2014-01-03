@@ -1,7 +1,8 @@
-var DEFAULT_LANGUAGE = 'ru',
+var DEFAULT_LANGUAGE = 'en',
 
     _ = require('underscore')._,
 
+    // TODO add belarussian
     i18n = _.extend(
         {},
         require('./ru.js'),
@@ -10,6 +11,7 @@ var DEFAULT_LANGUAGE = 'ru',
     ), language, messages;
 
 try {
+    // TODO
     // language = navigator.language.split('-')[0].toLowerCase();
 } catch (e) {}
 
