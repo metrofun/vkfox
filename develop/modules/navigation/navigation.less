@@ -2,25 +2,24 @@
     position: relative;
 }
 .navigation__actions {
-    height: 40px;
-    margin-right: 12px;
     position: absolute;
     top: 0;
-    right: 0;
+    bottom: 0;
+    right: @itemPadding;
+    height: 1em;
+    margin: auto;
 }
 .navigation__action {
     display: inline-block;
-    line-height: 40px;
-    vertical-align: middle;
     cursor: pointer;
     .color-with-hover (white);
-    font-size: 16px;
+    font-size: calc(~'1em + 2px');
 
     &:hover {
         text-decoration: none;
     }
 
     & + .navigation__action {
-        margin-left: 9px;
+        margin-left: 0.75rem;
     }
 }
