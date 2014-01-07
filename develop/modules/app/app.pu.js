@@ -1,4 +1,6 @@
 require('angular').module('app', ['ui.keypress']);
+//include resize as soon as possible,
+//because it sets width/height
 require('resize/resize.pu.js');
 require('angularKeypress');
 require('filters/filters.pu.js');
@@ -14,3 +16,4 @@ if (require('env/env.js').firefox) {
         // extension.sendMessage(arguments);
     // };
 }
+console.log(location.href);
