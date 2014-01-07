@@ -4311,8 +4311,6 @@ if (typeof localStorage === 'undefined') {
     module.exports = localStorage;
 }
 
-
-
 },{"sdk/simple-storage":34}],30:[function(require,module,exports){
 /*jshint bitwise: false */
 var

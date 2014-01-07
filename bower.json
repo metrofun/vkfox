@@ -7,8 +7,8 @@
     "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git",
     "emoji": "~0.2.1",
     "font-awesome": "~3.2.1",
-    "toolbarwidget-jplib": "https://github.com/Rob--W/toolbarwidget-jplib.git#~1.3.0",
-    "browser-action-jplib": "https://github.com/metrofun/browser-action-jplib.git#7734cf8d8af060bb1d91a6e15f923da9dc8ab508",
+    "toolbarwidget-jplib": "https://github.com/Rob--W/toolbarwidget-jplib.git#dee2ba36c44ad889b796a5181723de98928e9e1b",
+    "browser-action-jplib": "https://github.com/metrofun/browser-action-jplib.git#1e5a3604c171960aff841a3b6344217f1e0d3b50",
     "zepto-bootstrap": "git@github.com:metrofun/zepto-bootstrap.git"
   }
 }

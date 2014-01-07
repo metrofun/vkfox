@@ -12,5 +12,3 @@ if (typeof localStorage === 'undefined') {
 } else {
     module.exports = localStorage;
 }
-
-
