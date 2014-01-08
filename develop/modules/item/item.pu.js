@@ -1,11 +1,12 @@
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
+    $ = require('zepto'),
     I18N = require('i18n/i18n.pu.js');
 
 require('angular').module('app')
     .directive('item', function () {
         return {
-            controller: function ($scope) {
+            controller: function ($scope, $element, $timeout) {
                 $scope.reply = {
                     visible: false
                 };
@@ -27,6 +28,10 @@ require('angular').module('app')
                     $scope.reply.onSend = onSend;
                     $scope.reply.placeholder = placeholder;
                     $scope.reply.visible = !$scope.reply.visible;
+
+                    $timeout(function () {
+                        $element[0].getElementsByTagName('textarea')[0].focus();
+                    });
                 };
 
                 $scope.onReply = function (message) {

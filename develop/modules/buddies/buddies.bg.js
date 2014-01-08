@@ -151,8 +151,6 @@ readyPromise.then(function () {
             }, {silent: true});
             gender = profile.sex === 1 ? 'female':'male';
 
-            // TODO
-            // Notify about watched buddies
             Notifications.notify({
                 type: Notifications.BUDDIES,
                 title: [

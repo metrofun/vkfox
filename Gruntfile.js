@@ -84,6 +84,7 @@ module.exports = function (grunt) {
                         './request.bg.js',
                         './mediator.bg.js',
                         'timer',
+                        'chrome',
                         'sdk/tabs',
                         'sdk/simple-storage'
                     ].filter(Boolean)
@@ -99,6 +100,7 @@ module.exports = function (grunt) {
                         './mediator.pu.js',
                         'timer',
                         'browserAction',
+                        'chrome',
                         'sdk/tabs',
                         'sdk/request',
                         'sdk/self',

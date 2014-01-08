@@ -2,17 +2,27 @@ var DEFAULT_LANGUAGE = 'en',
 
     _ = require('underscore')._,
 
-    // TODO add belarussian
     i18n = _.extend(
         {},
         require('./ru.js'),
         require('./uk.js'),
         require('./en.js')
-    ), language, messages;
+    ), language, locale, messages, chr, Ci, Cc;
 
+// Show russian locale for belorus
+i18n.be = i18n.ru;
+
+if (typeof navigator !== 'undefined') {
+    locale = navigator.language;
+} else {
+    chr = require("chrome");
+    Cc = chr.Cc;
+    Ci = chr.Ci;
+    locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
+        .getService(Ci.nsIXULChromeRegistry).getSelectedLocale("global");
+}
 try {
-    // TODO
-    // language = navigator.language.split('-')[0].toLowerCase();
+    language = locale.split('-')[0].toLowerCase();
 } catch (e) {}
 
 if (!i18n[language]) {
