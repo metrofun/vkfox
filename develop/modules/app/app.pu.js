@@ -7,13 +7,4 @@ require('filters/filters.pu.js');
 require('anchor/anchor.pu.js');
 require('tooltip/tooltip.pu.js');
 require('router/router.pu.js');
-
-window.onerror = function () {
-    require('mediator/mediator.js').pub(arguments);
-};
-if (require('env/env.js').firefox) {
-    // console.log = function () {
-        // extension.sendMessage(arguments);
-    // };
-}
 console.log(location.href);

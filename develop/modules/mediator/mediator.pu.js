@@ -3,13 +3,6 @@ var Dispatcher = require('./dispatcher.js'),
     Env = require('env/env.js');
 
 if (Env.firefox) {
-    Mediator.pub = function () {
-        Dispatcher.pub.apply(Dispatcher, arguments);
-
-        // extension.sendMessage([].slice.call(arguments));
-        window.postMessage({from: 'page', data: JSON.stringify([].slice.call(arguments))}, '*');
-    };
-    // TODO refactor
     // is opened from panel
     if (typeof extension !== 'undefined') {
         extension.onMessage.addListener(function (messageData) {

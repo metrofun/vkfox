@@ -8,13 +8,13 @@ require('newsfeed/newsfeed.bg.js');
 require('feedbacks/feedbacks.bg.js');
 require('router/router.bg.js');
 require('likes/likes.bg.js');
+require('tracker/tracker.js');
 // TODO
 // require('yandex/yandex.bg.js');
-// require('tracker/tracker.bg.js');
 require('force-online/force-online.bg.js');
 require('longpoll/longpoll.bg.js');
 
-},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"likes/likes.bg.js":15,"longpoll/longpoll.bg.js":16,"newsfeed/newsfeed.bg.js":20,"router/router.bg.js":28}],2:[function(require,module,exports){
+},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"likes/likes.bg.js":15,"longpoll/longpoll.bg.js":16,"newsfeed/newsfeed.bg.js":20,"router/router.bg.js":28,"tracker/tracker.js":30}],2:[function(require,module,exports){
 var
 CHECK_AUTH_PERIOD = 3000, //ms
 
@@ -482,8 +482,6 @@ readyPromise.then(function () {
             }, {silent: true});
             gender = profile.sex === 1 ? 'female':'male';
 
-            // TODO
-            // Notify about watched buddies
             Notifications.notify({
                 type: Notifications.BUDDIES,
                 title: [
@@ -1706,17 +1704,27 @@ var DEFAULT_LANGUAGE = 'en',
 
     _ = require('underscore')._,
 
-    // TODO add belarussian
     i18n = _.extend(
         {},
         require('./ru.js'),
         require('./uk.js'),
         require('./en.js')
-    ), language, messages;
+    ), language, locale, messages, chr, Ci, Cc;
 
+// Show russian locale for belorus
+i18n.be = i18n.ru;
+
+if (typeof navigator !== 'undefined') {
+    locale = navigator.language;
+} else {
+    chr = require("chrome");
+    Cc = chr.Cc;
+    Ci = chr.Ci;
+    locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
+        .getService(Ci.nsIXULChromeRegistry).getSelectedLocale("global");
+}
 try {
-    // TODO
-    // language = navigator.language.split('-')[0].toLowerCase();
+    language = locale.split('-')[0].toLowerCase();
 } catch (e) {}
 
 if (!i18n[language]) {
@@ -1750,7 +1758,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":11,"./ru.js":13,"./uk.js":14,"underscore":36}],13:[function(require,module,exports){
+},{"./en.js":11,"./ru.js":13,"./uk.js":14,"chrome":34,"underscore":36}],13:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -4317,6 +4325,7 @@ var
 _ = require('underscore')._,
 PersistentModel = require('persistent-model/persistent-model.js'),
 I18n = require('i18n/i18n.js'),
+Env = require('env/env.js'),
 Request = require('request/request.js'),
 Config = require('config/config.js'),
 
@@ -4325,10 +4334,10 @@ persistentModel = new PersistentModel({}, {name: 'tracker'}),
 requiredParams;
 
 /**
-* Creates unique identifier if VKfox instance
-*
-* @see http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-*/
+ * Creates unique identifier if VKfox instance
+ *
+ * @see http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+ */
 function guid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0,
@@ -4336,26 +4345,34 @@ function guid() {
         return v.toString(16);
     });
 }
+function getPage() {
+    if (Env.background) {
+        return '/pages/background.html';
+    } else {
+        if (location.hash) {
+            return location.hash.replace('#', '');
+        } else {
+            return location.pathname;
+        }
+    }
+}
 
 if (!persistentModel.has('guid')) {
     persistentModel.set('guid', guid());
 }
 
 requiredParams = {
-    v: 1,               // Version.
-    tid: Config.TRACKER_ID,    // Tracking ID / Web property / Property ID.
+    v: 1, // Version.
+    tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
     cid: persistentModel.get('guid'), // Anonymous Client ID.
     ul: I18n.getLang(), //user language
-    // TODO
-    // ap: chrome.app.getDetails().version //app version
 };
 
 module.exports = {
     trackPage: function () {
         Request.post(url, _.extend({}, requiredParams, {
             t: 'pageview',          // Pageview hit type.
-            dh: location.hostname,  // Document hostname.
-            dp: location.pathname  // Page
+            dp: getPage() // Page
         }));
     },
     /**
@@ -4372,13 +4389,12 @@ module.exports = {
             ea: action, // Event Action. Required.
             el: label, // Event label.
             ev: value, // Event value.
-            dh: location.hostname,  // Document hostname.
-            dp: location.pathname  // Page
+            dp: getPage() // Page
         }));
     }
 };
 
-},{"config/config.js":7,"i18n/i18n.js":12,"persistent-model/persistent-model.js":23,"request/request.js":27,"underscore":36}],31:[function(require,module,exports){
+},{"config/config.js":7,"env/env.js":8,"i18n/i18n.js":12,"persistent-model/persistent-model.js":23,"request/request.js":27,"underscore":36}],31:[function(require,module,exports){
 /**
  * Returns user's name
  *

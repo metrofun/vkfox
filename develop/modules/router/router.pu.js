@@ -1,14 +1,12 @@
 var Vow = require('vow'),
     Mediator = require('mediator/mediator.js'),
+    Tracker = require('tracker/tracker.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
 
     model = new PersistentModel(
         {lastPath: '/chat'},
         {name: 'router'}
     );
-
-    // TODO
-    // Tracker = require('tracker/tracker.js');
 
 location.hash = model.get('lastPath');
 require('buddies/buddies.pu.js');
@@ -57,8 +55,7 @@ require('angular').module('app')
             var path;
             Mediator.pub('router:change', current.params);
             if (current.params.tab) {
-                // TODO
-                // Tracker.trackPage();
+                Tracker.trackPage();
                 path = $location.path();
                 model.set('lastPath', path);
                 Mediator.pub('router:lastPath:put', path);

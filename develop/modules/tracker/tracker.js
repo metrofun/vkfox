@@ -3,6 +3,7 @@ var
 _ = require('underscore')._,
 PersistentModel = require('persistent-model/persistent-model.js'),
 I18n = require('i18n/i18n.js'),
+Env = require('env/env.js'),
 Request = require('request/request.js'),
 Config = require('config/config.js'),
 
@@ -11,10 +12,10 @@ persistentModel = new PersistentModel({}, {name: 'tracker'}),
 requiredParams;
 
 /**
-* Creates unique identifier if VKfox instance
-*
-* @see http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-*/
+ * Creates unique identifier if VKfox instance
+ *
+ * @see http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+ */
 function guid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0,
@@ -22,26 +23,34 @@ function guid() {
         return v.toString(16);
     });
 }
+function getPage() {
+    if (Env.background) {
+        return '/pages/background.html';
+    } else {
+        if (location.hash) {
+            return location.hash.replace('#', '');
+        } else {
+            return location.pathname;
+        }
+    }
+}
 
 if (!persistentModel.has('guid')) {
     persistentModel.set('guid', guid());
 }
 
 requiredParams = {
-    v: 1,               // Version.
-    tid: Config.TRACKER_ID,    // Tracking ID / Web property / Property ID.
+    v: 1, // Version.
+    tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
     cid: persistentModel.get('guid'), // Anonymous Client ID.
     ul: I18n.getLang(), //user language
-    // TODO
-    // ap: chrome.app.getDetails().version //app version
 };
 
 module.exports = {
     trackPage: function () {
         Request.post(url, _.extend({}, requiredParams, {
             t: 'pageview',          // Pageview hit type.
-            dh: location.hostname,  // Document hostname.
-            dp: location.pathname  // Page
+            dp: getPage() // Page
         }));
     },
     /**
@@ -58,8 +67,7 @@ module.exports = {
             ea: action, // Event Action. Required.
             el: label, // Event label.
             ev: value, // Event value.
-            dh: location.hostname,  // Document hostname.
-            dp: location.pathname  // Page
+            dp: getPage() // Page
         }));
     }
 };
