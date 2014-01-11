@@ -20,13 +20,14 @@ module.exports = {
         Mediator.sub('proxy-methods:' + namespace, function (params) {
             var result = Module[params.method].apply(Module, params['arguments']);
 
+            console.log(result);
             if (Vow.isPromise(result)) {
                 result.always(function (promise) {
                     Mediator.pub('proxy-methods:' + params.id, {
                         method: promise.isFulfilled() ? 'fulfill':'reject',
-                        'arguments': [].slice.call(promise.valueOf())
+                        'arguments': [promise.valueOf()]
                     });
-                });
+                }).done();
             }
         });
     },
@@ -47,7 +48,6 @@ module.exports = {
                     id = _.uniqueId();
 
                 Mediator.pub('proxy-methods:' + namespace, {
-                    namespace: namespace,
                     method: methodName,
                     id: id,
                     'arguments': [].slice.apply(arguments)

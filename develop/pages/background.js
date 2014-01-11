@@ -15,7 +15,7 @@ require('proxy-methods/proxy-methods.js');
 require('force-online/force-online.bg.js');
 require('longpoll/longpoll.bg.js');
 
-},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"likes/likes.bg.js":15,"longpoll/longpoll.bg.js":16,"newsfeed/newsfeed.bg.js":20,"proxy-methods/proxy-methods.js":26,"router/router.bg.js":29,"tracker/tracker.js":32}],2:[function(require,module,exports){
+},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":6,"chat/chat.bg.js":7,"feedbacks/feedbacks.bg.js":10,"force-online/force-online.bg.js":11,"likes/likes.bg.js":16,"longpoll/longpoll.bg.js":17,"newsfeed/newsfeed.bg.js":21,"proxy-methods/proxy-methods.js":27,"router/router.bg.js":30,"tracker/tracker.js":32}],2:[function(require,module,exports){
 var
 CHECK_AUTH_PERIOD = 3000, //ms
 
@@ -49,7 +49,7 @@ Mediator.sub('auth:success', function (data) {
     monitorAuthChanges();
 });
 
-},{"auth/auth.bg.js":3,"config/config.js":7,"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38}],3:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"config/config.js":8,"mediator/mediator.js":20,"request/request.bg.js":28,"underscore":38}],3:[function(require,module,exports){
 var RETRY_INTERVAL = 10000, //ms
     CREATED = 1,
     IN_PROGRESS = 1,
@@ -207,7 +207,7 @@ module.exports = Auth = {
 
 Auth.login();
 
-},{"backbone":35,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":19,"sdk/page-mod":36,"sdk/page-worker":36,"sdk/tabs":36,"underscore":38,"vow":39}],4:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"config/config.js":8,"env/env.js":9,"mediator/mediator.js":20,"sdk/page-mod":36,"sdk/page-worker":36,"sdk/tabs":36,"underscore":38,"vow":39}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
         "19": "assets/logo19.png",
@@ -253,7 +253,7 @@ ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
             ? require('sdk/self').version
             : chrome.app.getDetails().version;
         return function () {
-            return version;
+            return Vow.fulfill(version);
         };
     })(),
     /**
@@ -342,7 +342,20 @@ ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
     })()
 });
 
-},{"browserAction":36,"env/env.js":8,"mediator/mediator.js":19,"proxy-methods/proxy-methods.js":26,"sdk/self":36,"sdk/tabs":36,"underscore":38,"vow":39}],5:[function(require,module,exports){
+},{"browserAction":36,"env/env.js":9,"mediator/mediator.js":20,"proxy-methods/proxy-methods.js":27,"sdk/self":36,"sdk/tabs":36,"underscore":38,"vow":39}],5:[function(require,module,exports){
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+if (require('env/env.js').background) {
+    module.exports = require('browser/browser.bg.js');
+} else {
+    var ProxyMethods = require(('proxy-methods/proxy-methods.js'));
+
+    module.exports = ProxyMethods.forward('browser/browser.bg.js', ['createTab', 'getVkfoxVersion']);
+}
+
+},{"browser/browser.bg.js":4,"env/env.js":9,"proxy-methods/proxy-methods.js":27}],6:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Vow = require('vow'),
@@ -524,7 +537,7 @@ Mediator.sub('buddies:watch:toggle', function (uid) {
     }
 });
 
-},{"backbone":35,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-set/persistent-set.bg.js":24,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":27,"underscore":38,"users/users.bg.js":34,"vow":39}],6:[function(require,module,exports){
+},{"backbone":35,"i18n/i18n.js":13,"mediator/mediator.js":20,"notifications/notifications.bg.js":22,"persistent-set/persistent-set.bg.js":25,"profiles-collection/profiles-collection.bg.js":26,"request/request.bg.js":28,"underscore":38,"users/users.bg.js":34,"vow":39}],7:[function(require,module,exports){
 /*jshint bitwise:false */
 var
 MAX_HISTORY_COUNT = 10,
@@ -848,7 +861,7 @@ Mediator.sub('chat:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":35,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":27,"router/router.bg.js":29,"underscore":38,"users/users.bg.js":34,"vow":39}],7:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"i18n/i18n.js":13,"mediator/mediator.js":20,"notifications/notifications.bg.js":22,"persistent-model/persistent-model.js":24,"profiles-collection/profiles-collection.bg.js":26,"request/request.bg.js":28,"router/router.bg.js":30,"underscore":38,"users/users.bg.js":34,"vow":39}],8:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -876,7 +889,7 @@ exports.AUTH_URI = [
     ].join('&')
 ].join('');
 
-},{"env/env.js":8}],8:[function(require,module,exports){
+},{"env/env.js":9}],9:[function(require,module,exports){
 /*jshint bitwise: false*/
 var isPopup = typeof location !== 'undefined' && ~location.href.indexOf('popup');
 
@@ -886,7 +899,7 @@ module.exports = {
     background: !isPopup
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var
 MAX_ITEMS_COUNT = 50,
 MAX_COMMENTS_COUNT = 3,
@@ -1340,7 +1353,7 @@ Mediator.sub('feedbacks:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":35,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":27,"router/router.bg.js":29,"underscore":38,"users/users.bg.js":34,"vow":39}],10:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"i18n/i18n.js":13,"mediator/mediator.js":20,"notifications/notifications.bg.js":22,"persistent-model/persistent-model.js":24,"profiles-collection/profiles-collection.bg.js":26,"request/request.bg.js":28,"router/router.bg.js":30,"underscore":38,"users/users.bg.js":34,"vow":39}],11:[function(require,module,exports){
 var MARK_PERIOD = 5 * 60 * 1000, //5 min
 
     Mediator = require('mediator/mediator.js'),
@@ -1376,7 +1389,7 @@ settings.on('change:enabled', function (event, enabled) {
     }
 });
 
-},{"mediator/mediator.js":19,"persistent-model/persistent-model.js":23,"request/request.bg.js":27}],11:[function(require,module,exports){
+},{"mediator/mediator.js":20,"persistent-model/persistent-model.js":24,"request/request.bg.js":28}],12:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -1712,7 +1725,7 @@ return r;
 }
 })();
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var DEFAULT_LANGUAGE = 'en',
 
     _ = require('underscore')._,
@@ -1771,7 +1784,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":11,"./ru.js":13,"./uk.js":14,"chrome":36,"underscore":38}],13:[function(require,module,exports){
+},{"./en.js":12,"./ru.js":14,"./uk.js":15,"chrome":36,"underscore":38}],14:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -2475,7 +2488,7 @@ return r;
 }
 })();
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.uk = function (n) {
@@ -3179,7 +3192,7 @@ return r;
 }
 })();
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var Mediator = require('mediator/mediator.js'),
     _ = require('underscore')._,
     Request = require('request/request.bg.js');
@@ -3214,7 +3227,7 @@ Mediator.sub('likes:change', function (params) {
 
 });
 
-},{"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38}],16:[function(require,module,exports){
+},{"mediator/mediator.js":20,"request/request.bg.js":28,"underscore":38}],17:[function(require,module,exports){
 var LONG_POLL_WAIT = 20,
     DEBOUNCE_RATE = 1000,
     fetchUpdates,
@@ -3254,7 +3267,7 @@ Mediator.sub('auth:success', function () {
     enableLongPollUpdates();
 });
 
-},{"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38}],17:[function(require,module,exports){
+},{"mediator/mediator.js":20,"request/request.bg.js":28,"underscore":38}],18:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -3274,7 +3287,7 @@ module.exports = {
     }
 };
 
-},{"backbone":35,"underscore":38}],18:[function(require,module,exports){
+},{"backbone":35,"underscore":38}],19:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Browser = require('browser/browser.bg.js'),
@@ -3355,7 +3368,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":17,"browser/browser.bg.js":4,"env/env.js":8,"sdk/page-mod":36,"sdk/self":36}],19:[function(require,module,exports){
+},{"./dispatcher.js":18,"browser/browser.bg.js":4,"env/env.js":9,"sdk/page-mod":36,"sdk/self":36}],20:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -3366,7 +3379,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":18,"./mediator.pu.js":36,"env/env.js":8}],20:[function(require,module,exports){
+},{"./mediator.bg.js":19,"./mediator.pu.js":36,"env/env.js":9}],21:[function(require,module,exports){
 var
 MAX_ITEMS_COUNT = 50,
 UPDATE_PERIOD = 10000, //ms
@@ -3650,7 +3663,7 @@ readyPromise.then(function () {
     }), 0);
 }).done();
 
-},{"backbone":35,"browser/browser.bg.js":4,"mediator/mediator.js":19,"request/request.bg.js":27,"tracker/tracker.js":32,"underscore":38,"vow":39}],21:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"mediator/mediator.js":20,"request/request.bg.js":28,"tracker/tracker.js":32,"underscore":38,"vow":39}],22:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Backbone = require('backbone'),
@@ -3887,13 +3900,13 @@ module.exports = Notifications = {
     }
 };
 
-},{"backbone":35,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":19,"notifications/settings.js":22,"persistent-model/persistent-model.js":23,"sdk/notifications":36,"sdk/page-worker":36,"sdk/self":36,"underscore":38}],22:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"env/env.js":9,"mediator/mediator.js":20,"notifications/settings.js":23,"persistent-model/persistent-model.js":24,"sdk/notifications":36,"sdk/page-worker":36,"sdk/self":36,"underscore":38}],23:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var Backbone = require('backbone'),
     storage = require('storage/storage.js');
 
@@ -3926,7 +3939,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":35,"storage/storage.js":30}],24:[function(require,module,exports){
+},{"backbone":35,"storage/storage.js":31}],25:[function(require,module,exports){
 var
 storage = require('storage/storage.js'),
 constructor = function (name) {
@@ -3972,7 +3985,7 @@ constructor.prototype = {
 
 module.exports = constructor;
 
-},{"storage/storage.js":30}],25:[function(require,module,exports){
+},{"storage/storage.js":31}],26:[function(require,module,exports){
 var UPDATE_NON_FRIENDS_PERIOD = 10000,
 
     Users = require('users/users.bg.js'),
@@ -4039,7 +4052,7 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"backbone":35,"mediator/mediator.js":19,"underscore":38,"users/users.bg.js":34}],26:[function(require,module,exports){
+},{"backbone":35,"mediator/mediator.js":20,"underscore":38,"users/users.bg.js":34}],27:[function(require,module,exports){
 /**
  * This module is used to proxy methods call from one module to another.
  * Is used to proxy calls from popup to background.
@@ -4062,13 +4075,14 @@ module.exports = {
         Mediator.sub('proxy-methods:' + namespace, function (params) {
             var result = Module[params.method].apply(Module, params['arguments']);
 
+            console.log(result);
             if (Vow.isPromise(result)) {
                 result.always(function (promise) {
                     Mediator.pub('proxy-methods:' + params.id, {
                         method: promise.isFulfilled() ? 'fulfill':'reject',
-                        'arguments': [].slice.call(promise.valueOf())
+                        'arguments': [promise.valueOf()]
                     });
-                });
+                }).done();
             }
         });
     },
@@ -4089,7 +4103,6 @@ module.exports = {
                     id = _.uniqueId();
 
                 Mediator.pub('proxy-methods:' + namespace, {
-                    namespace: namespace,
                     method: methodName,
                     id: id,
                     'arguments': [].slice.apply(arguments)
@@ -4105,7 +4118,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":19,"underscore":38,"vow":39}],27:[function(require,module,exports){
+},{"mediator/mediator.js":20,"underscore":38,"vow":39}],28:[function(require,module,exports){
 var
 API_QUERIES_PER_REQUEST = 15,
 // HTTPS only
@@ -4322,7 +4335,7 @@ ProxyMethods.connect('request/request.bg.js', Request = module.exports = {
     }, API_REQUESTS_DEBOUNCE)
 });
 
-},{"auth/auth.bg.js":3,"env/env.js":8,"proxy-methods/proxy-methods.js":26,"sdk/request":36,"underscore":38,"vow":39}],28:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"env/env.js":9,"proxy-methods/proxy-methods.js":27,"sdk/request":36,"underscore":38,"vow":39}],29:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -4335,7 +4348,7 @@ if (require('env/env.js').background) {
     module.exports = ProxyMethods.forward('request/request.bg.js', ['api', 'post', 'get']);
 }
 
-},{"./request.bg.js":27,"env/env.js":8,"proxy-methods/proxy-methods.js":26}],29:[function(require,module,exports){
+},{"./request.bg.js":28,"env/env.js":9,"proxy-methods/proxy-methods.js":27}],30:[function(require,module,exports){
 require('notifications/notifications.bg.js');
 var
 Mediator = require('mediator/mediator.js'),
@@ -4369,7 +4382,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23}],30:[function(require,module,exports){
+},{"mediator/mediator.js":20,"notifications/notifications.bg.js":22,"persistent-model/persistent-model.js":24}],31:[function(require,module,exports){
 if (typeof localStorage === 'undefined') {
     var storage = require("sdk/simple-storage");
 
@@ -4385,7 +4398,7 @@ if (typeof localStorage === 'undefined') {
     module.exports = localStorage;
 }
 
-},{"sdk/simple-storage":36}],31:[function(require,module,exports){
+},{"sdk/simple-storage":36}],32:[function(require,module,exports){
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,
@@ -4393,8 +4406,7 @@ PersistentModel = require('persistent-model/persistent-model.js'),
 I18n = require('i18n/i18n.js'),
 Env = require('env/env.js'),
 Env = require('env/env.js'),
-Browser = require('browser/browser.bg.js'),
-ProxyMethods = require(('proxy-methods/proxy-methods.js')),
+Browser = require('browser/browser.js'),
 Request = require('request/request.js'),
 Config = require('config/config.js'),
 
@@ -4430,15 +4442,17 @@ if (!persistentModel.has('guid')) {
     persistentModel.set('guid', guid());
 }
 
-requiredParams = {
-    v: 1, // Version.
-    tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
-    cid: persistentModel.get('guid'), // Anonymous Client ID.
-    ul: I18n.getLang(), //user language
-    ap: Browser.getVkfoxVersion() //app version
-};
+Browser.getVkfoxVersion().then(function (version) {
+    requiredParams = {
+        v: 1, // Version.
+        tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
+        cid: persistentModel.get('guid'), // Anonymous Client ID.
+        ul: I18n.getLang(), //user language
+        ap: version //app version
+    };
+});
 
-ProxyMethods.connect('tracker/tracker.bg.js', module.exports = {
+module.exports = {
     trackPage: function () {
         Request.post(url, _.extend({}, requiredParams, {
             t: 'pageview',          // Pageview hit type.
@@ -4471,10 +4485,12 @@ ProxyMethods.connect('tracker/tracker.bg.js', module.exports = {
     debug: function () {
         var args = Array.prototype.slice.call(arguments);
 
-        this.trackEvent(
-            'debug;v' + Browser.getVkfoxVersion(),
-            JSON.stringify(args)
-        );
+        Browser.getVkfoxVersion().then(function (version) {
+            this.trackEvent(
+                'debug;v' + version,
+                JSON.stringify(args)
+            );
+        }).done();
     },
     /**
      * Remotely track an error
@@ -4482,31 +4498,17 @@ ProxyMethods.connect('tracker/tracker.bg.js', module.exports = {
      * @param {Error} error
      */
     error: function (stack) {
-        this.trackEvent(
-            'error;v' + Browser.getVkfoxVersion(),
-            stack,
-            navigator.userAgent
-        );
+        Browser.getVkfoxVersion().then(function (version) {
+            this.trackEvent(
+                'error;v' + version,
+                stack,
+                navigator.userAgent
+            );
+        }).done();
     }
-});
+};
 
-},{"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"i18n/i18n.js":12,"persistent-model/persistent-model.js":23,"proxy-methods/proxy-methods.js":26,"request/request.js":28,"underscore":38}],32:[function(require,module,exports){
-/**
- * Returns a correct implementation
- * for background or popup page
- */
-if (require('env/env.js').background) {
-    module.exports = require('tracker/tracker.bg.js');
-} else {
-    var ProxyMethods = require(('proxy-methods/proxy-methods.js'));
-
-    module.exports = ProxyMethods.forward(
-        'tracker/tracker.bg.js',
-        ['trackPage', 'trackEvent', 'error', 'debug']
-    );
-}
-
-},{"env/env.js":8,"proxy-methods/proxy-methods.js":26,"tracker/tracker.bg.js":31}],33:[function(require,module,exports){
+},{"browser/browser.js":5,"config/config.js":8,"env/env.js":9,"i18n/i18n.js":13,"persistent-model/persistent-model.js":24,"request/request.js":29,"underscore":38}],33:[function(require,module,exports){
 /**
  * Returns user's name
  *
@@ -4651,7 +4653,7 @@ module.exports = _.extend({
     }
 }, require('users/name.js'));
 
-},{"backbone":35,"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38,"users/name.js":33,"vow":39}],35:[function(require,module,exports){
+},{"backbone":35,"mediator/mediator.js":20,"request/request.bg.js":28,"underscore":38,"users/name.js":33,"vow":39}],35:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.

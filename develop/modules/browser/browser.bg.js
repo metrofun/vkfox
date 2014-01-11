@@ -43,7 +43,7 @@ ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
             ? require('sdk/self').version
             : chrome.app.getDetails().version;
         return function () {
-            return version;
+            return Vow.fulfill(version);
         };
     })(),
     /**
