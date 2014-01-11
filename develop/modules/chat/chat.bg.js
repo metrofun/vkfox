@@ -201,7 +201,6 @@ function addNewMessage(update) {
             dialog.get('messages').push(message);
             removeReadMessages(dialog);
         } else {
-            // TODO add parse function and move this code into dialogColl
             dialogColl.add({
                 id: dialogId,
                 uid: message.uid,

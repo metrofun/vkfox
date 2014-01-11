@@ -1,5 +1,5 @@
 var $ = require('zepto'),
-    Browser = require('browser/browser.pu.js');
+    Browser = require('browser/browser.js');
 
 $(document).on('click', '[anchor]', function (e) {
     var jTarget = $(e.currentTarget);

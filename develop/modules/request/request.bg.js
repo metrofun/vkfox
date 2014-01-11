@@ -10,9 +10,9 @@ XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
 _ = require('underscore')._,
+ProxyMethods = require(('proxy-methods/proxy-methods.js')),
 Auth = require('auth/auth.bg.js'),
 Env = require('env/env.js'),
-Mediator = require('mediator/mediator.js'),
 
 apiQueriesQueue = [],
 
@@ -144,20 +144,7 @@ xhr = (function () {
 })(),
 Request;
 
-Mediator.sub('request', function (params) {
-    Request[params.method].apply(Request, params['arguments']).then(function () {
-        Mediator.pub('request:' + params.id, {
-            method: 'fulfill',
-            'arguments': [].slice.call(arguments)
-        });
-    }, function () {
-        Mediator.pub('request:' + params.id, {
-            method: 'reject',
-            'arguments': [].slice.call(arguments)
-        });
-    });
-});
-Request = module.exports = {
+ProxyMethods.connect('request/request.bg.js', Request = module.exports = {
     get: function (url, data, dataType) {
         return xhr('get', url, data, dataType);
     },
@@ -170,10 +157,10 @@ Request = module.exports = {
             params: params,
             promise: promise
         });
-        Request.processApiQueries();
+        Request._processApiQueries();
         return promise;
     },
-    processApiQueries: _.debounce(function () {
+    _processApiQueries: _.debounce(function () {
         if (apiQueriesQueue.length) {
             var queriesToProcess = apiQueriesQueue.splice(0, API_QUERIES_PER_REQUEST),
                 executeCodeTokens = [], executeCode,  i, method, params;
@@ -211,7 +198,7 @@ Request = module.exports = {
                         for (i = 0; i < response.length; i++) {
                             queriesToProcess[i].promise.fulfill(response[i]);
                         }
-                        Request.processApiQueries();
+                        Request._processApiQueries();
                     } else {
                         console.warn(data);
                         // force relogin on API error
@@ -225,4 +212,4 @@ Request = module.exports = {
             }).done();
         }
     }, API_REQUESTS_DEBOUNCE)
-};
+});

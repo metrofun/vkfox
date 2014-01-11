@@ -120,7 +120,6 @@ require('angular').module('app')
                 });
             });
         };
-        // TODO
         $scope.unreadHandler = function (event) {
             if ($scope.out) {
                 //show tooltip

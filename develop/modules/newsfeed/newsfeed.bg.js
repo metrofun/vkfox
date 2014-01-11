@@ -7,6 +7,7 @@ Vow = require('vow'),
 Backbone = require('backbone'),
 Tracker = require('tracker/tracker.js'),
 Request = require('request/request.bg.js'),
+Browser = require('browser/browser.bg.js'),
 Mediator = require('mediator/mediator.js'),
 
 profilesColl = new (Backbone.Collection.extend({
@@ -86,10 +87,7 @@ function processRawItem(item) {
 
                 item[propertyName] = [collection.size()].concat(collection.toJSON());
             } catch (event) {
-                Tracker.trackEvent(
-                    'debug;v' + chrome.app.getDetails().version,
-                    JSON.stringify([collisionItem, item, event.stack])
-                );
+                Tracker.debug(collisionItem, item, event.stack);
             }
         }
     }

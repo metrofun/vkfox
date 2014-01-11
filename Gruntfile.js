@@ -81,11 +81,15 @@ module.exports = function (grunt) {
                         }
                     },
                     ignore: [
+                        'browser/browser.bg.js',
+                        'tracker/tracker.bg.js',
                         './request.bg.js',
+                        './tracker.bg.js',
                         './mediator.bg.js',
                         'timer',
                         'chrome',
                         'sdk/tabs',
+                        'sdk/self',
                         'sdk/simple-storage'
                     ].filter(Boolean)
                 }
@@ -96,7 +100,6 @@ module.exports = function (grunt) {
                 },
                 options: {
                     ignore: [
-                        './request.pu.js',
                         './mediator.pu.js',
                         'timer',
                         'browserAction',

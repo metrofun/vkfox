@@ -8,6 +8,7 @@ require('feedbacks/feedbacks.bg.js');
 require('router/router.bg.js');
 require('likes/likes.bg.js');
 require('tracker/tracker.js');
+require('proxy-methods/proxy-methods.js');
 // TODO
 // require('yandex/yandex.bg.js');
 require('force-online/force-online.bg.js');

@@ -9,12 +9,13 @@ require('feedbacks/feedbacks.bg.js');
 require('router/router.bg.js');
 require('likes/likes.bg.js');
 require('tracker/tracker.js');
+require('proxy-methods/proxy-methods.js');
 // TODO
 // require('yandex/yandex.bg.js');
 require('force-online/force-online.bg.js');
 require('longpoll/longpoll.bg.js');
 
-},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"likes/likes.bg.js":15,"longpoll/longpoll.bg.js":16,"newsfeed/newsfeed.bg.js":20,"router/router.bg.js":28,"tracker/tracker.js":30}],2:[function(require,module,exports){
+},{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":5,"chat/chat.bg.js":6,"feedbacks/feedbacks.bg.js":9,"force-online/force-online.bg.js":10,"likes/likes.bg.js":15,"longpoll/longpoll.bg.js":16,"newsfeed/newsfeed.bg.js":20,"proxy-methods/proxy-methods.js":26,"router/router.bg.js":29,"tracker/tracker.js":32}],2:[function(require,module,exports){
 var
 CHECK_AUTH_PERIOD = 3000, //ms
 
@@ -48,7 +49,7 @@ Mediator.sub('auth:success', function (data) {
     monitorAuthChanges();
 });
 
-},{"auth/auth.bg.js":3,"config/config.js":7,"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36}],3:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"config/config.js":7,"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38}],3:[function(require,module,exports){
 var RETRY_INTERVAL = 10000, //ms
     CREATED = 1,
     IN_PROGRESS = 1,
@@ -206,7 +207,7 @@ module.exports = Auth = {
 
 Auth.login();
 
-},{"backbone":33,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":19,"sdk/page-mod":34,"sdk/page-worker":34,"sdk/tabs":34,"underscore":36,"vow":37}],4:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"mediator/mediator.js":19,"sdk/page-mod":36,"sdk/page-worker":36,"sdk/tabs":36,"underscore":38,"vow":39}],4:[function(require,module,exports){
 var BADGE_COLOR = [231, 76, 60, 255],
     ICON_ONLINE = {
         "19": "assets/logo19.png",
@@ -219,6 +220,7 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
+    ProxyMethods = require(('proxy-methods/proxy-methods.js')),
     _ = require('underscore'),
 
     Browser, browserAction;
@@ -233,7 +235,7 @@ if (Env.firefox) {
         default_popup: data.url('pages/popup.html')
     });
 
-    // circular dependencies
+    // overcome circular dependencies
     _.defer(function () {
         require('mediator/mediator.js').sub('browser:createTab', function (url) {
             Browser.createTab(url);
@@ -245,7 +247,19 @@ if (Env.firefox) {
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = Browser = {
+ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
+    getVkfoxVersion: (function () {
+        var version = (Env.firefox)
+            ? require('sdk/self').version
+            : chrome.app.getDetails().version;
+        return function () {
+            return version;
+        };
+    })(),
+    /**
+     * Accessor for browserAction.
+     * @returns {Object}
+     */
     getBrowserAction: function () {
         return browserAction;
     },
@@ -326,9 +340,9 @@ module.exports = Browser = {
             };
         }
     })()
-};
+});
 
-},{"browserAction":34,"env/env.js":8,"mediator/mediator.js":19,"sdk/self":34,"sdk/tabs":34,"underscore":36,"vow":37}],5:[function(require,module,exports){
+},{"browserAction":36,"env/env.js":8,"mediator/mediator.js":19,"proxy-methods/proxy-methods.js":26,"sdk/self":36,"sdk/tabs":36,"underscore":38,"vow":39}],5:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Vow = require('vow'),
@@ -510,7 +524,7 @@ Mediator.sub('buddies:watch:toggle', function (uid) {
     }
 });
 
-},{"backbone":33,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-set/persistent-set.bg.js":24,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":26,"underscore":36,"users/users.bg.js":32,"vow":37}],6:[function(require,module,exports){
+},{"backbone":35,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-set/persistent-set.bg.js":24,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":27,"underscore":38,"users/users.bg.js":34,"vow":39}],6:[function(require,module,exports){
 /*jshint bitwise:false */
 var
 MAX_HISTORY_COUNT = 10,
@@ -714,7 +728,6 @@ function addNewMessage(update) {
             dialog.get('messages').push(message);
             removeReadMessages(dialog);
         } else {
-            // TODO add parse function and move this code into dialogColl
             dialogColl.add({
                 id: dialogId,
                 uid: message.uid,
@@ -835,7 +848,7 @@ Mediator.sub('chat:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":33,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":26,"router/router.bg.js":28,"underscore":36,"users/users.bg.js":32,"vow":37}],7:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":27,"router/router.bg.js":29,"underscore":38,"users/users.bg.js":34,"vow":39}],7:[function(require,module,exports){
 var Env = require('env/env.js');
 
 exports.APP_ID = 3807372;
@@ -1327,7 +1340,7 @@ Mediator.sub('feedbacks:data:get', function () {
     readyPromise.then(publishData).done();
 });
 
-},{"backbone":33,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":26,"router/router.bg.js":28,"underscore":36,"users/users.bg.js":32,"vow":37}],10:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"i18n/i18n.js":12,"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23,"profiles-collection/profiles-collection.bg.js":25,"request/request.bg.js":27,"router/router.bg.js":29,"underscore":38,"users/users.bg.js":34,"vow":39}],10:[function(require,module,exports){
 var MARK_PERIOD = 5 * 60 * 1000, //5 min
 
     Mediator = require('mediator/mediator.js'),
@@ -1363,7 +1376,7 @@ settings.on('change:enabled', function (event, enabled) {
     }
 });
 
-},{"mediator/mediator.js":19,"persistent-model/persistent-model.js":23,"request/request.bg.js":26}],11:[function(require,module,exports){
+},{"mediator/mediator.js":19,"persistent-model/persistent-model.js":23,"request/request.bg.js":27}],11:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.en = function ( n ) {
@@ -1758,7 +1771,7 @@ module.exports = {
     }
 };
 
-},{"./en.js":11,"./ru.js":13,"./uk.js":14,"chrome":34,"underscore":36}],13:[function(require,module,exports){
+},{"./en.js":11,"./ru.js":13,"./uk.js":14,"chrome":36,"underscore":38}],13:[function(require,module,exports){
 (function(){ module.exports || (module.exports = {}) 
 var MessageFormat = { locale: {} };
 MessageFormat.locale.ru = function (n) {
@@ -3201,7 +3214,7 @@ Mediator.sub('likes:change', function (params) {
 
 });
 
-},{"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36}],16:[function(require,module,exports){
+},{"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38}],16:[function(require,module,exports){
 var LONG_POLL_WAIT = 20,
     DEBOUNCE_RATE = 1000,
     fetchUpdates,
@@ -3241,7 +3254,7 @@ Mediator.sub('auth:success', function () {
     enableLongPollUpdates();
 });
 
-},{"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36}],17:[function(require,module,exports){
+},{"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38}],17:[function(require,module,exports){
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
@@ -3261,7 +3274,7 @@ module.exports = {
     }
 };
 
-},{"backbone":33,"underscore":36}],18:[function(require,module,exports){
+},{"backbone":35,"underscore":38}],18:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js'),
     Mediator = Object.create(Dispatcher),
     Browser = require('browser/browser.bg.js'),
@@ -3342,7 +3355,7 @@ if (Env.firefox) {
 
 module.exports = Mediator;
 
-},{"./dispatcher.js":17,"browser/browser.bg.js":4,"env/env.js":8,"sdk/page-mod":34,"sdk/self":34}],19:[function(require,module,exports){
+},{"./dispatcher.js":17,"browser/browser.bg.js":4,"env/env.js":8,"sdk/page-mod":36,"sdk/self":36}],19:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
@@ -3353,7 +3366,7 @@ if (require('env/env.js').popup) {
     module.exports = require('./mediator.bg.js');
 }
 
-},{"./mediator.bg.js":18,"./mediator.pu.js":34,"env/env.js":8}],20:[function(require,module,exports){
+},{"./mediator.bg.js":18,"./mediator.pu.js":36,"env/env.js":8}],20:[function(require,module,exports){
 var
 MAX_ITEMS_COUNT = 50,
 UPDATE_PERIOD = 10000, //ms
@@ -3363,6 +3376,7 @@ Vow = require('vow'),
 Backbone = require('backbone'),
 Tracker = require('tracker/tracker.js'),
 Request = require('request/request.bg.js'),
+Browser = require('browser/browser.bg.js'),
 Mediator = require('mediator/mediator.js'),
 
 profilesColl = new (Backbone.Collection.extend({
@@ -3442,10 +3456,7 @@ function processRawItem(item) {
 
                 item[propertyName] = [collection.size()].concat(collection.toJSON());
             } catch (event) {
-                Tracker.trackEvent(
-                    'debug;v' + chrome.app.getDetails().version,
-                    JSON.stringify([collisionItem, item, event.stack])
-                );
+                Tracker.debug(collisionItem, item, event.stack);
             }
         }
     }
@@ -3639,7 +3650,7 @@ readyPromise.then(function () {
     }), 0);
 }).done();
 
-},{"backbone":33,"mediator/mediator.js":19,"request/request.bg.js":26,"tracker/tracker.js":30,"underscore":36,"vow":37}],21:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"mediator/mediator.js":19,"request/request.bg.js":27,"tracker/tracker.js":32,"underscore":38,"vow":39}],21:[function(require,module,exports){
 var
 _ = require('underscore')._,
 Backbone = require('backbone'),
@@ -3876,7 +3887,7 @@ module.exports = Notifications = {
     }
 };
 
-},{"backbone":33,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":19,"notifications/settings.js":22,"persistent-model/persistent-model.js":23,"sdk/notifications":34,"sdk/page-worker":34,"sdk/self":34,"underscore":36}],22:[function(require,module,exports){
+},{"backbone":35,"browser/browser.bg.js":4,"env/env.js":8,"mediator/mediator.js":19,"notifications/settings.js":22,"persistent-model/persistent-model.js":23,"sdk/notifications":36,"sdk/page-worker":36,"sdk/self":36,"underscore":38}],22:[function(require,module,exports){
 module.exports = {
     standart: 'notifications/standart.ogg',
     original: 'notifications/original.ogg'
@@ -3915,7 +3926,7 @@ module.exports = Backbone.Model.extend({
 });
 
 
-},{"backbone":33,"storage/storage.js":29}],24:[function(require,module,exports){
+},{"backbone":35,"storage/storage.js":30}],24:[function(require,module,exports){
 var
 storage = require('storage/storage.js'),
 constructor = function (name) {
@@ -3961,7 +3972,7 @@ constructor.prototype = {
 
 module.exports = constructor;
 
-},{"storage/storage.js":29}],25:[function(require,module,exports){
+},{"storage/storage.js":30}],25:[function(require,module,exports){
 var UPDATE_NON_FRIENDS_PERIOD = 10000,
 
     Users = require('users/users.bg.js'),
@@ -4028,7 +4039,73 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"backbone":33,"mediator/mediator.js":19,"underscore":36,"users/users.bg.js":32}],26:[function(require,module,exports){
+},{"backbone":35,"mediator/mediator.js":19,"underscore":38,"users/users.bg.js":34}],26:[function(require,module,exports){
+/**
+ * This module is used to proxy methods call from one module to another.
+ * Is used to proxy calls from popup to background.
+ * ProxyMethods can proxy only methods that return promises or no value,
+ * because use the asynchronous Mediator underneath.
+ */
+var Vow = require('vow'),
+    _ = require('underscore')._,
+    Mediator = require('mediator/mediator.js');
+
+module.exports = {
+    /**
+     * Backup forwarded calls. Second arguments is required due to browserify issue
+     * that you can't require some module, if it was not explicitely required in a file
+     *
+     * @param {String} namespace Name of module that accepts forwarded calls
+     * @param {Object} Module Module implementation that backups forwarded calls.
+     */
+    connect: function (namespace, Module) {
+        Mediator.sub('proxy-methods:' + namespace, function (params) {
+            var result = Module[params.method].apply(Module, params['arguments']);
+
+            if (Vow.isPromise(result)) {
+                result.always(function (promise) {
+                    Mediator.pub('proxy-methods:' + params.id, {
+                        method: promise.isFulfilled() ? 'fulfill':'reject',
+                        'arguments': [].slice.call(promise.valueOf())
+                    });
+                });
+            }
+        });
+    },
+    /**
+     * Forward calls of passed methods to nother side.
+     * Another side must call 'connect' method to make it work.
+     * Can forward only methods that return promise or undefined.
+     *
+     * @param {String} namespace Name of module, whose methods will be proxied
+     * @param {Array} methodNames Contains names of methods, that will be proxied
+     *
+     * @returns {Object}
+     */
+    forward: function (namespace, methodNames) {
+        return methodNames.reduce(function (exports, methodName) {
+            exports[methodName] = function () {
+                var ajaxPromise = new Vow.promise(),
+                    id = _.uniqueId();
+
+                Mediator.pub('proxy-methods:' + namespace, {
+                    namespace: namespace,
+                    method: methodName,
+                    id: id,
+                    'arguments': [].slice.apply(arguments)
+                });
+                Mediator.once('proxy-methods:' + id, function (data) {
+                    ajaxPromise[data.method].apply(ajaxPromise, data['arguments']);
+                });
+
+                return ajaxPromise;
+            };
+            return exports;
+        }, {});
+    }
+};
+
+},{"mediator/mediator.js":19,"underscore":38,"vow":39}],27:[function(require,module,exports){
 var
 API_QUERIES_PER_REQUEST = 15,
 // HTTPS only
@@ -4041,9 +4118,9 @@ XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
 _ = require('underscore')._,
+ProxyMethods = require(('proxy-methods/proxy-methods.js')),
 Auth = require('auth/auth.bg.js'),
 Env = require('env/env.js'),
-Mediator = require('mediator/mediator.js'),
 
 apiQueriesQueue = [],
 
@@ -4175,20 +4252,7 @@ xhr = (function () {
 })(),
 Request;
 
-Mediator.sub('request', function (params) {
-    Request[params.method].apply(Request, params['arguments']).then(function () {
-        Mediator.pub('request:' + params.id, {
-            method: 'fulfill',
-            'arguments': [].slice.call(arguments)
-        });
-    }, function () {
-        Mediator.pub('request:' + params.id, {
-            method: 'reject',
-            'arguments': [].slice.call(arguments)
-        });
-    });
-});
-Request = module.exports = {
+ProxyMethods.connect('request/request.bg.js', Request = module.exports = {
     get: function (url, data, dataType) {
         return xhr('get', url, data, dataType);
     },
@@ -4201,10 +4265,10 @@ Request = module.exports = {
             params: params,
             promise: promise
         });
-        Request.processApiQueries();
+        Request._processApiQueries();
         return promise;
     },
-    processApiQueries: _.debounce(function () {
+    _processApiQueries: _.debounce(function () {
         if (apiQueriesQueue.length) {
             var queriesToProcess = apiQueriesQueue.splice(0, API_QUERIES_PER_REQUEST),
                 executeCodeTokens = [], executeCode,  i, method, params;
@@ -4242,7 +4306,7 @@ Request = module.exports = {
                         for (i = 0; i < response.length; i++) {
                             queriesToProcess[i].promise.fulfill(response[i]);
                         }
-                        Request.processApiQueries();
+                        Request._processApiQueries();
                     } else {
                         console.warn(data);
                         // force relogin on API error
@@ -4256,20 +4320,22 @@ Request = module.exports = {
             }).done();
         }
     }, API_REQUESTS_DEBOUNCE)
-};
+});
 
-},{"auth/auth.bg.js":3,"env/env.js":8,"mediator/mediator.js":19,"sdk/request":34,"underscore":36,"vow":37}],27:[function(require,module,exports){
+},{"auth/auth.bg.js":3,"env/env.js":8,"proxy-methods/proxy-methods.js":26,"sdk/request":36,"underscore":38,"vow":39}],28:[function(require,module,exports){
 /**
  * Returns a correct implementation
  * for background or popup page
  */
-if (require('env/env.js').popup) {
-    module.exports = require('./request.pu.js');
-} else {
+if (require('env/env.js').background) {
     module.exports = require('./request.bg.js');
+} else {
+    var ProxyMethods = require(('proxy-methods/proxy-methods.js'));
+
+    module.exports = ProxyMethods.forward('request/request.bg.js', ['api', 'post', 'get']);
 }
 
-},{"./request.bg.js":26,"./request.pu.js":34,"env/env.js":8}],28:[function(require,module,exports){
+},{"./request.bg.js":27,"env/env.js":8,"proxy-methods/proxy-methods.js":26}],29:[function(require,module,exports){
 require('notifications/notifications.bg.js');
 var
 Mediator = require('mediator/mediator.js'),
@@ -4303,7 +4369,7 @@ module.exports = {
     }
 };
 
-},{"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23}],29:[function(require,module,exports){
+},{"mediator/mediator.js":19,"notifications/notifications.bg.js":21,"persistent-model/persistent-model.js":23}],30:[function(require,module,exports){
 if (typeof localStorage === 'undefined') {
     var storage = require("sdk/simple-storage");
 
@@ -4319,13 +4385,16 @@ if (typeof localStorage === 'undefined') {
     module.exports = localStorage;
 }
 
-},{"sdk/simple-storage":34}],30:[function(require,module,exports){
+},{"sdk/simple-storage":36}],31:[function(require,module,exports){
 /*jshint bitwise: false */
 var
 _ = require('underscore')._,
 PersistentModel = require('persistent-model/persistent-model.js'),
 I18n = require('i18n/i18n.js'),
 Env = require('env/env.js'),
+Env = require('env/env.js'),
+Browser = require('browser/browser.bg.js'),
+ProxyMethods = require(('proxy-methods/proxy-methods.js')),
 Request = require('request/request.js'),
 Config = require('config/config.js'),
 
@@ -4366,9 +4435,10 @@ requiredParams = {
     tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
     cid: persistentModel.get('guid'), // Anonymous Client ID.
     ul: I18n.getLang(), //user language
+    ap: Browser.getVkfoxVersion() //app version
 };
 
-module.exports = {
+ProxyMethods.connect('tracker/tracker.bg.js', module.exports = {
     trackPage: function () {
         Request.post(url, _.extend({}, requiredParams, {
             t: 'pageview',          // Pageview hit type.
@@ -4391,10 +4461,52 @@ module.exports = {
             ev: value, // Event value.
             dp: getPage() // Page
         }));
-    }
-};
+    },
+    /**
+     * Remote debug. All arguments would be send to Analytics.
+     *
+     * @param {...Mixed} var_args Any number of arguments,
+     * that will be sent to Analytics
+     */
+    debug: function () {
+        var args = Array.prototype.slice.call(arguments);
 
-},{"config/config.js":7,"env/env.js":8,"i18n/i18n.js":12,"persistent-model/persistent-model.js":23,"request/request.js":27,"underscore":36}],31:[function(require,module,exports){
+        this.trackEvent(
+            'debug;v' + Browser.getVkfoxVersion(),
+            JSON.stringify(args)
+        );
+    },
+    /**
+     * Remotely track an error
+     *
+     * @param {Error} error
+     */
+    error: function (stack) {
+        this.trackEvent(
+            'error;v' + Browser.getVkfoxVersion(),
+            stack,
+            navigator.userAgent
+        );
+    }
+});
+
+},{"browser/browser.bg.js":4,"config/config.js":7,"env/env.js":8,"i18n/i18n.js":12,"persistent-model/persistent-model.js":23,"proxy-methods/proxy-methods.js":26,"request/request.js":28,"underscore":38}],32:[function(require,module,exports){
+/**
+ * Returns a correct implementation
+ * for background or popup page
+ */
+if (require('env/env.js').background) {
+    module.exports = require('tracker/tracker.bg.js');
+} else {
+    var ProxyMethods = require(('proxy-methods/proxy-methods.js'));
+
+    module.exports = ProxyMethods.forward(
+        'tracker/tracker.bg.js',
+        ['trackPage', 'trackEvent', 'error', 'debug']
+    );
+}
+
+},{"env/env.js":8,"proxy-methods/proxy-methods.js":26,"tracker/tracker.bg.js":31}],33:[function(require,module,exports){
 /**
  * Returns user's name
  *
@@ -4414,7 +4526,7 @@ exports.getName = function (input) {
     }).join(', ');
 };
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var
 DROP_PROFILES_INTERVAL = 60000,
 USERS_GET_DEBOUNCE = 400,
@@ -4539,7 +4651,7 @@ module.exports = _.extend({
     }
 }, require('users/name.js'));
 
-},{"backbone":33,"mediator/mediator.js":19,"request/request.bg.js":26,"underscore":36,"users/name.js":31,"vow":37}],33:[function(require,module,exports){
+},{"backbone":35,"mediator/mediator.js":19,"request/request.bg.js":27,"underscore":38,"users/name.js":33,"vow":39}],35:[function(require,module,exports){
 //     Backbone.js 1.0.0
 
 //     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -6112,9 +6224,9 @@ module.exports = _.extend({
 
 }).call(this);
 
-},{"underscore":36}],34:[function(require,module,exports){
+},{"underscore":38}],36:[function(require,module,exports){
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6168,7 +6280,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -7480,7 +7592,7 @@ process.chdir = function (dir) {
   }
 }).call(this);
 
-},{"timer":34}],37:[function(require,module,exports){
+},{"timer":36}],39:[function(require,module,exports){
 var process=require("__browserify_process");/**
  * Vow
  *
@@ -8073,5 +8185,5 @@ defineAsGlobal && (global.Vow = Vow);
 
 })(this);
 
-},{"__browserify_process":35,"timer":34}]},{},[1])
+},{"__browserify_process":37,"timer":36}]},{},[1])
 ;

@@ -10,6 +10,7 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
+    ProxyMethods = require(('proxy-methods/proxy-methods.js')),
     _ = require('underscore'),
 
     Browser, browserAction;
@@ -24,7 +25,7 @@ if (Env.firefox) {
         default_popup: data.url('pages/popup.html')
     });
 
-    // circular dependencies
+    // overcome circular dependencies
     _.defer(function () {
         require('mediator/mediator.js').sub('browser:createTab', function (url) {
             Browser.createTab(url);
@@ -36,7 +37,19 @@ if (Env.firefox) {
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = Browser = {
+ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
+    getVkfoxVersion: (function () {
+        var version = (Env.firefox)
+            ? require('sdk/self').version
+            : chrome.app.getDetails().version;
+        return function () {
+            return version;
+        };
+    })(),
+    /**
+     * Accessor for browserAction.
+     * @returns {Object}
+     */
     getBrowserAction: function () {
         return browserAction;
     },
@@ -117,4 +130,4 @@ module.exports = Browser = {
             };
         }
     })()
-};
+});
