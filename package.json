@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.5.3",
-    "grunt": "~0.4.1"
+    "grunt": "~0.4.1",
+    "grunt-inline-angular-templates": "~0.1.4"
   }
 }

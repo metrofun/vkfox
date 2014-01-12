@@ -1,20 +1,25 @@
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-require('tracker/tracker.js').trackPage();
-require('browser/browser.bg.js');
-require('auth/auth.bg.js');
-require('auth-monitor/auth-monitor.bg.js');
-require('buddies/buddies.bg.js');
-require('chat/chat.bg.js');
-require('newsfeed/newsfeed.bg.js');
-require('feedbacks/feedbacks.bg.js');
-require('router/router.bg.js');
-require('likes/likes.bg.js');
-require('tracker/tracker.js');
-require('proxy-methods/proxy-methods.js');
-// TODO
-// require('yandex/yandex.bg.js');
-require('force-online/force-online.bg.js');
-require('longpoll/longpoll.bg.js');
+try {
+    require('tracker/tracker.js').trackPage();
+    require('browser/browser.bg.js');
+    require('auth/auth.bg.js');
+    require('auth-monitor/auth-monitor.bg.js');
+    require('buddies/buddies.bg.js');
+    require('chat/chat.bg.js');
+    require('newsfeed/newsfeed.bg.js');
+    require('feedbacks/feedbacks.bg.js');
+    require('router/router.bg.js');
+    require('likes/likes.bg.js');
+    require('tracker/tracker.js');
+    require('proxy-methods/proxy-methods.js');
+    // TODO
+    // require('yandex/yandex.bg.js');
+    require('force-online/force-online.bg.js');
+    require('longpoll/longpoll.bg.js');
+} catch (e)  {
+    require('tracker/tracker.js').error(e.stack);
+    throw e;
+}
 
 },{"auth-monitor/auth-monitor.bg.js":2,"auth/auth.bg.js":3,"browser/browser.bg.js":4,"buddies/buddies.bg.js":6,"chat/chat.bg.js":7,"feedbacks/feedbacks.bg.js":10,"force-online/force-online.bg.js":11,"likes/likes.bg.js":16,"longpoll/longpoll.bg.js":17,"newsfeed/newsfeed.bg.js":21,"proxy-methods/proxy-methods.js":27,"router/router.bg.js":30,"tracker/tracker.js":32}],2:[function(require,module,exports){
 var
@@ -221,7 +226,6 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
-    ProxyMethods = require('proxy-methods/proxy-methods.js'),
     _ = require('underscore'),
 
     Browser, browserAction;
@@ -235,7 +239,6 @@ if (Env.firefox) {
         default_title: 'VKfox',
         default_popup: data.url('pages/popup.html')
     });
-    console.log(browserAction);
 
     // overcome circular dependencies
     _.defer(function () {
@@ -249,7 +252,11 @@ if (Env.firefox) {
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-module.exports = Browser = ProxyMethods.connect('browser/browser.bg.js',  {
+// overcome circular dependency through Mediator
+_.defer(function () {
+    require('proxy-methods/proxy-methods.js').connect('browser/browser.bg.js', Browser);
+});
+module.exports = Browser = {
     getVkfoxVersion: (function () {
         var version = (Env.firefox)
             ? require('sdk/self').version
@@ -342,7 +349,7 @@ module.exports = Browser = ProxyMethods.connect('browser/browser.bg.js',  {
             };
         }
     })()
-});
+};
 
 },{"browserAction":36,"env/env.js":9,"mediator/mediator.js":20,"proxy-methods/proxy-methods.js":27,"sdk/self":36,"sdk/tabs":36,"underscore":38,"vow":39}],5:[function(require,module,exports){
 /**
@@ -3296,7 +3303,6 @@ var Dispatcher = require('./dispatcher.js'),
     Env = require('env/env.js');
 
 if (Env.firefox) {
-    console.log(Browser);
     var browserAction = Browser.getBrowserAction();
 
     Object.defineProperty(Mediator, 'pub', { value: function () {
@@ -4137,7 +4143,7 @@ XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
 _ = require('underscore')._,
-ProxyMethods = require(('proxy-methods/proxy-methods.js')),
+ProxyMethods = require('proxy-methods/proxy-methods.js'),
 Auth = require('auth/auth.bg.js'),
 Env = require('env/env.js'),
 

@@ -6,6 +6,7 @@ module.exports = function (grunt) {
         DEVELOPMENT = 'DEVELOPMENT',
         LOCALES = ['ru', 'en', 'uk'];
 
+    grunt.loadNpmTasks('grunt-inline-angular-templates');
     grunt.loadNpmTasks('grunt-messageformat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -39,9 +40,14 @@ module.exports = function (grunt) {
                 ENV : DEVELOPMENT
             }
         },
+        inline_angular_templates: {
+            popup: {
+                files: {
+                    'pages/popup.html': ['modules/*/*.tmpl.html']
+                }
+            }
+        },
         browserify: BROWSERS.reduce(function (memo, browser) {
-            var isFirefox = browser === 'firefox';
-
             memo[browser + 'Popup'] = {
                 files: {
                     'pages/popup.js': ['modules/app/app.pu.js'],
@@ -333,6 +339,7 @@ module.exports = function (grunt) {
         'less',
         'preprocess:env',
         'preprocess:popup',
+        'inline_angular_templates',
         'browserify:firefoxPopup',
         'mozilla-addon-sdk',
         'mozilla-cfx'
@@ -344,6 +351,7 @@ module.exports = function (grunt) {
         'preprocess:env',
         'preprocess:popup',
         'preprocess:manifest',
+        'inline_angular_templates',
         'browserify:chromePopup',
         'browserify:chromeBackground',
         'watch'
