@@ -10,7 +10,7 @@ XHR_TIMEOUT = 30000,
 
 Vow = require('vow'),
 _ = require('underscore')._,
-ProxyMethods = require(('proxy-methods/proxy-methods.js')),
+ProxyMethods = require('proxy-methods/proxy-methods.js'),
 Auth = require('auth/auth.bg.js'),
 Env = require('env/env.js'),
 
@@ -144,7 +144,7 @@ xhr = (function () {
 })(),
 Request;
 
-ProxyMethods.connect('request/request.bg.js', Request = module.exports = {
+module.exports = Request = ProxyMethods.connect('request/request.bg.js', {
     get: function (url, data, dataType) {
         return xhr('get', url, data, dataType);
     },

@@ -1,4 +1,5 @@
 try {
+    require('tracker/tracker.js').trackPage();
     require('angular').module('app', ['ui.keypress']);
     //include resize as soon as possible,
     //because it sets width/height

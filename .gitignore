@@ -11,6 +11,7 @@ develop/modules/i18n/*.js
 develop/pages/popup.css
 develop/pages/popup.js
 develop/tmp
+ff
 node_modules
 bower_components
 build

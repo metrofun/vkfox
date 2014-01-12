@@ -10,7 +10,6 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
-    ProxyMethods = require(('proxy-methods/proxy-methods.js')),
     _ = require('underscore'),
 
     Browser, browserAction;
@@ -37,7 +36,11 @@ if (Env.firefox) {
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
+// overcome circular dependency through Mediator
+_.defer(function () {
+    require('proxy-methods/proxy-methods.js').connect('browser/browser.bg.js', Browser);
+});
+module.exports = Browser = {
     getVkfoxVersion: (function () {
         var version = (Env.firefox)
             ? require('sdk/self').version
@@ -130,4 +133,4 @@ ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
             };
         }
     })()
-});
+};

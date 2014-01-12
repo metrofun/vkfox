@@ -1,3 +1,4 @@
+require('tracker/tracker.js').trackPage();
 require('browser/browser.bg.js');
 require('auth/auth.bg.js');
 require('auth-monitor/auth-monitor.bg.js');

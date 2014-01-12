@@ -1,4 +1,5 @@
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require('tracker/tracker.js').trackPage();
 require('browser/browser.bg.js');
 require('auth/auth.bg.js');
 require('auth-monitor/auth-monitor.bg.js');
@@ -220,7 +221,7 @@ var BADGE_COLOR = [231, 76, 60, 255],
 
     Vow = require('vow'),
     Env = require('env/env.js'),
-    ProxyMethods = require(('proxy-methods/proxy-methods.js')),
+    ProxyMethods = require('proxy-methods/proxy-methods.js'),
     _ = require('underscore'),
 
     Browser, browserAction;
@@ -234,6 +235,7 @@ if (Env.firefox) {
         default_title: 'VKfox',
         default_popup: data.url('pages/popup.html')
     });
+    console.log(browserAction);
 
     // overcome circular dependencies
     _.defer(function () {
@@ -247,7 +249,7 @@ if (Env.firefox) {
 
 browserAction.setBadgeBackgroundColor({color: BADGE_COLOR});
 
-ProxyMethods.connect('browser/browser.bg.js', module.exports = Browser = {
+module.exports = Browser = ProxyMethods.connect('browser/browser.bg.js',  {
     getVkfoxVersion: (function () {
         var version = (Env.firefox)
             ? require('sdk/self').version
@@ -3294,6 +3296,7 @@ var Dispatcher = require('./dispatcher.js'),
     Env = require('env/env.js');
 
 if (Env.firefox) {
+    console.log(Browser);
     var browserAction = Browser.getBrowserAction();
 
     Object.defineProperty(Mediator, 'pub', { value: function () {
@@ -4070,12 +4073,13 @@ module.exports = {
      *
      * @param {String} namespace Name of module that accepts forwarded calls
      * @param {Object} Module Module implementation that backups forwarded calls.
+     *
+     * @returns {Object} returns second argument, used for chaining
      */
     connect: function (namespace, Module) {
         Mediator.sub('proxy-methods:' + namespace, function (params) {
             var result = Module[params.method].apply(Module, params['arguments']);
 
-            console.log(result);
             if (Vow.isPromise(result)) {
                 result.always(function (promise) {
                     Mediator.pub('proxy-methods:' + params.id, {
@@ -4085,6 +4089,8 @@ module.exports = {
                 }).done();
             }
         });
+
+        return Module;
     },
     /**
      * Forward calls of passed methods to nother side.
@@ -4265,7 +4271,7 @@ xhr = (function () {
 })(),
 Request;
 
-ProxyMethods.connect('request/request.bg.js', Request = module.exports = {
+module.exports = Request = ProxyMethods.connect('request/request.bg.js', {
     get: function (url, data, dataType) {
         return xhr('get', url, data, dataType);
     },

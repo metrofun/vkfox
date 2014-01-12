@@ -15,12 +15,13 @@ module.exports = {
      *
      * @param {String} namespace Name of module that accepts forwarded calls
      * @param {Object} Module Module implementation that backups forwarded calls.
+     *
+     * @returns {Object} returns second argument, used for chaining
      */
     connect: function (namespace, Module) {
         Mediator.sub('proxy-methods:' + namespace, function (params) {
             var result = Module[params.method].apply(Module, params['arguments']);
 
-            console.log(result);
             if (Vow.isPromise(result)) {
                 result.always(function (promise) {
                     Mediator.pub('proxy-methods:' + params.id, {
@@ -30,6 +31,8 @@ module.exports = {
                 }).done();
             }
         });
+
+        return Module;
     },
     /**
      * Forward calls of passed methods to nother side.

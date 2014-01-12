@@ -101,8 +101,8 @@ module.exports = function (grunt) {
                 options: {
                     ignore: [
                         './mediator.pu.js',
-                        'timer',
                         'browserAction',
+                        'timer',
                         'chrome',
                         'sdk/tabs',
                         'sdk/request',
