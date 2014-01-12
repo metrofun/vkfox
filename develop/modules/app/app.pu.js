@@ -9,8 +9,8 @@ try {
     require('anchor/anchor.pu.js');
     require('tooltip/tooltip.pu.js');
     require('router/router.pu.js');
+    zzz();
 } catch (e) {
-    console.log(require('tracker/tracker.js'));
     // we don't use window.onerror
     // because Firefox doesn't provide an error object,
     // only line number and column

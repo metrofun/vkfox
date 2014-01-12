@@ -94,6 +94,7 @@ module.exports = function (grunt) {
                         './mediator.bg.js',
                         'timer',
                         'chrome',
+                        'sdk/system',
                         'sdk/tabs',
                         'sdk/self',
                         'sdk/simple-storage'
@@ -105,11 +106,18 @@ module.exports = function (grunt) {
                     'pages/background.js': ['modules/app/app.bg.js'],
                 },
                 options: {
+                    shim: {
+                        'zepto': {
+                            path: 'bower_components/zepto-bootstrap/zepto.js',
+                            exports: '$'
+                        }
+                    },
                     ignore: [
                         './mediator.pu.js',
                         'browserAction',
                         'timer',
                         'chrome',
+                        'sdk/system',
                         'sdk/tabs',
                         'sdk/request',
                         'sdk/self',

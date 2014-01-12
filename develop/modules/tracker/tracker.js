@@ -25,6 +25,13 @@ function guid() {
         return v.toString(16);
     });
 }
+function getBrowserVersion() {
+    if (Env.background && Env.firefox) {
+        return require("sdk/system").version;
+    } else {
+        return require('zepto').browser.version;
+    }
+}
 function getPage() {
     if (Env.background) {
         return '/pages/background.html';
@@ -89,7 +96,7 @@ module.exports = {
                 'debug;v' + version,
                 JSON.stringify(args)
             );
-        }).done();
+        }.bind(this)).done();
     },
     /**
      * Remotely track an error
@@ -101,8 +108,8 @@ module.exports = {
             this.trackEvent(
                 'error;v' + version,
                 stack,
-                navigator.userAgent
+                getBrowserVersion()
             );
-        }).done();
+        }.bind(this)).done();
     }
 };
