@@ -11,8 +11,7 @@ try {
     require('likes/likes.bg.js');
     require('tracker/tracker.js');
     require('proxy-methods/proxy-methods.js');
-    // TODO
-    // require('yandex/yandex.bg.js');
+    require('yandex/yandex.bg.js');
     require('force-online/force-online.bg.js');
     require('longpoll/longpoll.bg.js');
 } catch (e)  {

@@ -1,6 +1,5 @@
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
-    $ = require('zepto'),
     I18N = require('i18n/i18n.pu.js');
 
 require('angular').module('app')

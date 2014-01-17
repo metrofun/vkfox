@@ -17,6 +17,7 @@ require('angular')
              */
             ['forceOnline', !Env.opera && 'yandex', 'notifications']
                 .filter(Boolean).forEach(function (moduleName) {
+                    console.log(moduleName);
                     Mediator.sub(moduleName + ':settings', function (settings) {
                         $scope.$apply(function () {
                             $scope[moduleName] = settings;

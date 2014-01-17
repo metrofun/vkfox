@@ -29,7 +29,9 @@ function getBrowserVersion() {
     if (Env.background && Env.firefox) {
         return require("sdk/system").version;
     } else {
-        return require('zepto').browser.version;
+        //hack for Firefox's SDK syntax analyzer
+        // extpression instead of a regular string
+        return require('zep' + 'to').browser.version;
     }
 }
 function getPage() {

@@ -101,6 +101,45 @@ module.exports = function (grunt) {
                     ].filter(Boolean)
                 }
             };
+            memo[browser + 'Install'] = {
+                files: {
+                    'pages/install.js': ['modules/app/app.install.js'],
+                },
+                options: {
+                    shim: {
+                        'angular': {
+                            path: 'bower_components/angular-unstable/angular.js',
+                            exports: 'angular'
+                        },
+                        'jEmoji': {
+                            path: 'bower_components/emoji/lib/emoji.js',
+                            exports: 'jEmoji'
+                        },
+                        'javascript-linkify': {
+                            path: 'bower_components/javascript-linkify/ba-linkify.js',
+                            exports: 'linkify',
+                        },
+                        'zepto': {
+                            path: 'bower_components/zepto-bootstrap/zepto.js',
+                            exports: '$'
+                        }
+                    },
+                    ignore: [
+                        'browser/browser.bg.js',
+                        'tracker/tracker.bg.js',
+                        './request.bg.js',
+                        './tracker.bg.js',
+                        './mediator.bg.js',
+                        'timer',
+                        'chrome',
+                        'sdk/system',
+                        'sdk/tabs',
+                        'sdk/self',
+                        'sdk/simple-storage'
+                    ].filter(Boolean)
+                }
+            };
+
             memo[browser + 'Background'] = {
                 files: {
                     'pages/background.js': ['modules/app/app.bg.js'],
@@ -152,6 +191,10 @@ module.exports = function (grunt) {
             popup: {
                 src : 'pages/popup.raw.html',
                 dest : 'pages/popup.html'
+            },
+            install: {
+                src : 'pages/install.raw.html',
+                dest : 'pages/install.html'
             },
             manifest: {
                 src : 'manifest.raw.json',
@@ -346,21 +389,25 @@ module.exports = function (grunt) {
         'env:development',
         'less',
         'preprocess:env',
+        'preprocess:install',
         'preprocess:popup',
         'inline_angular_templates',
         'browserify:firefoxPopup',
+        'browserify:firefoxInstall',
         'mozilla-addon-sdk',
         'mozilla-cfx'
     ]);
     grunt.registerTask('chrome', [
-        'env:chrome',
         'env:development',
+        'env:chrome',
         'less',
         'preprocess:env',
         'preprocess:popup',
+        'preprocess:install',
         'preprocess:manifest',
         'inline_angular_templates',
         'browserify:chromePopup',
+        'browserify:chromeInstall',
         'browserify:chromeBackground',
         'watch'
     ]);
