@@ -132,5 +132,30 @@ module.exports = Browser = {
                 chrome.tabs.create({url: url});
             };
         }
+    })(),
+    /**
+     * Closes all tabs that contain urlFragment in its url
+     *
+     * @see http://developer.chrome.com/extensions/match_patterns.html
+     */
+    closeTabs: (function () {
+        return Env.firefox ? function (urlFragment) {
+            var tabs = require("sdk/tabs"), index, tab;
+
+            for (index in tabs) {
+                tab = tabs[index];
+
+                console.log(tab.url, urlFragment);
+                if (~tab.url.indexOf(urlFragment)) {
+                    tab.close();
+                }
+            }
+        } : function (urlFragment) {
+            chrome.tabs.query({url: urlFragment + '*'}, function (tabs) {
+                tabs.forEach(function (tab) {
+                    chrome.tabs.remove(tab.id);
+                });
+            });
+        };
     })()
 };

@@ -156,6 +156,7 @@ module.exports = function (grunt) {
                         'browserAction',
                         'timer',
                         'chrome',
+                        'sdk/system/unload',
                         'sdk/system',
                         'sdk/tabs',
                         'sdk/request',

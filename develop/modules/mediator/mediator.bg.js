@@ -18,8 +18,6 @@ if (Env.firefox) {
         // include: "resource://jid1-ci3mbxpmmpdxuq-at-jetpack/vkfox/data/pages/popup.html",
         contentScriptFile: data.url("modules/mediator/contentScript.js"),
         onAttach: function (worker) {
-            // TODO
-            // activeWorkers = [worker];
             activeWorkers.push(worker);
             worker.port.on('detach', function () {
                 var index = activeWorkers.indexOf(worker);
@@ -40,8 +38,12 @@ if (Env.firefox) {
 
         browserAction.sendMessage(args);
 
-        activeWorkers.forEach(function (worker) {
-            worker.port.emit('message', args);
+        activeWorkers.forEach(function (worker, index) {
+            try {
+                worker.port.emit('message', args);
+            } catch (e) {
+                activeWorkers.splice(index, 1);
+            }
         });
     }, writable: true, enumerable: true});
 } else {

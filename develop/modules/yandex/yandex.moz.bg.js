@@ -19,7 +19,6 @@ var Mediator = require('mediator/mediator.js'),
     YANDEX_CYRILLIC = 'Яндекс',
     MAX_ATTEMPTS = 100;
 
-
 Mediator.sub('yandex:settings:get', function () {
     Mediator.pub('yandex:settings', storageModel.toJSON());
 });
@@ -72,6 +71,12 @@ function updateSearch(enabled) {
 
 storageModel.on('change:enabled', function (event, enabled) {
     updateSearch(enabled);
+});
+
+require('sdk/system/unload').when(function (reason) {
+    if (reason === 'uninstall') {
+        updateSearch(false);
+    }
 });
 
 // Show install dialog only once, don't bother

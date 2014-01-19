@@ -80,14 +80,16 @@ a:hover {
 .app__brand {
   font-size: 3em;
 }
+.app__steps-wrap {
+  position: relative;
+}
 .app__steps {
   margin-top: 80px;
   display: flex;
   justify-content: space-around;
-  position: relative;
 }
 .app__progress,
-.app__steps:before {
+.app__steps-wrap:before {
   content: '';
   position: absolute;
   height: 8px;
@@ -97,7 +99,7 @@ a:hover {
   bottom: 0;
   margin: auto;
 }
-.app__steps:before {
+.app__steps-wrap:before {
   background: #ecf0f1;
   width: 100%;
 }

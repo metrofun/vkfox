@@ -16,27 +16,6 @@ var _ = require('underscore')._,
     Auth, page, iframe,
     state = CREATED, authPromise = Vow.promise(),
 
-    // After successful login we should close all auth tabs
-    closeAuthTabs = (function () {
-        return Env.firefox ? function () {
-            var tabs = require("sdk/tabs"), index, tab;
-
-            for (index in tabs) {
-                tab = tabs[index];
-
-                if (~tab.url.indexOf(Config.AUTH_DOMAIN)) {
-                    tab.close();
-                }
-            }
-        } : function () {
-            chrome.tabs.query({url: Config.AUTH_DOMAIN + '*'}, function (tabs) {
-                tabs.forEach(function (tab) {
-                    chrome.tabs.remove(tab.id);
-                });
-            });
-        };
-    })(),
-
     tryLogin = (function () {
         var tryLogin = Env.firefox ? function () {
             page = require("sdk/page-worker").Page({
@@ -93,7 +72,8 @@ Mediator.sub('auth:iframe', function (url) {
         model.set('userId',  parseInt(url.match(/user_id=(\w+)(?:&|$)/i)[1], 10));
         model.set('accessToken',  url.match(/access_token=(\w+)(?:&|$)/i)[1]);
 
-        closeAuthTabs();
+        // After successful login we should close all auth tabs
+        Browser.closeTabs(Config.AUTH_DOMAIN);
         freeLogin();
     } catch (e) {
         console.log(e);

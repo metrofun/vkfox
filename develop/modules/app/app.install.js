@@ -66,10 +66,7 @@ angular.module('app').controller('AppCtrl', function ($scope) {
                 },
                 onButtonClick: function () {
                     Tracker.trackEvent('install', 'close');
-                    //hack for Windows Google Chrome,
-                    //which can't simply close tab
-                    window.open('', '_self', '');
-                    window.close();
+                    Mediator.pub('yandex:dialog:close');
                 }
             }
         };

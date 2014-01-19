@@ -36,14 +36,16 @@ a:hover {
 .app__brand {
     font-size: 3em;
 }
+.app__steps-wrap {
+    position: relative;
+}
 .app__steps {
     margin-top: 80px;
     display: flex;
     justify-content: space-around;
-    position: relative;
 }
 .app__progress,
-.app__steps:before {
+.app__steps-wrap:before {
     content: '';
     position: absolute;
     height: 2 * @baseDistance;
@@ -53,7 +55,7 @@ a:hover {
     bottom: 0;
     margin: auto;
 }
-.app__steps:before {
+.app__steps-wrap:before {
     background: @clouds;
     width: 100%;
 }
