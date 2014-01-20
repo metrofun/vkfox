@@ -80,7 +80,7 @@ require('sdk/system/unload').when(function (reason) {
 });
 
 // Show install dialog only once, don't bother
-// if (storageModel.get('dialog')) {
+if (storageModel.get('dialog')) {
     storageModel.set('dialog', false);
     Browser.createTab(data.url('pages/install.html'));
-// }
+}

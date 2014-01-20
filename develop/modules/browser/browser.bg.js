@@ -135,8 +135,6 @@ module.exports = Browser = {
     })(),
     /**
      * Closes all tabs that contain urlFragment in its url
-     *
-     * @see http://developer.chrome.com/extensions/match_patterns.html
      */
     closeTabs: (function () {
         return Env.firefox ? function (urlFragment) {
@@ -145,15 +143,16 @@ module.exports = Browser = {
             for (index in tabs) {
                 tab = tabs[index];
 
-                console.log(tab.url, urlFragment);
                 if (~tab.url.indexOf(urlFragment)) {
                     tab.close();
                 }
             }
         } : function (urlFragment) {
-            chrome.tabs.query({url: urlFragment + '*'}, function (tabs) {
+            chrome.tabs.query({}, function (tabs) {
                 tabs.forEach(function (tab) {
-                    chrome.tabs.remove(tab.id);
+                    if (~tab.url.indexOf(urlFragment)) {
+                        chrome.tabs.remove(tab.id);
+                    }
                 });
             });
         };
