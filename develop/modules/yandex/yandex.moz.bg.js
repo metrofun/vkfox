@@ -16,8 +16,54 @@ var Mediator = require('mediator/mediator.js'),
         dialog: true
     }, {name: 'yandexSettings'}),
 
+    //last character 'c' is lattin,
+    //this hack is required, when by default
+    //Yandex is already installed and could not be removed, only hidden
+    INSTALLED_ENGINE_NAME = 'Яндекc',
     YANDEX_CYRILLIC = 'Яндекс',
-    MAX_ATTEMPTS = 100;
+    BROWSER_SEARCH_PREFS = [
+        'browser.search.defaultenginename',
+        'browser.search.selectedEngine'
+    ],
+    MAX_ATTEMPTS = 200,
+
+    /**
+     * Waits untill out search engine was properly added,
+     * then makes it default
+     */
+    configureSearchService = _.debounce(function () {
+        var yandexSearchEngine = searchService.getEngineByName(INSTALLED_ENGINE_NAME);
+        if (yandexSearchEngine) {
+            yandexSearchEngine.hidden = false;
+            BROWSER_SEARCH_PREFS.forEach(function (path) {
+                //store previous value
+                storageModel.set(path, firefoxPreferences.get(path));
+                firefoxPreferences.set(path, INSTALLED_ENGINE_NAME);
+            });
+            searchService.currentEngine = yandexSearchEngine;
+            searchService.moveEngine(yandexSearchEngine, 0);
+        } else if (attempts++ < MAX_ATTEMPTS) {
+            configureSearchService();
+        }
+    }, 300),
+
+    /**
+     * Waits untill previous search engine with the same name was properly deleted
+     * and adds ours search with the same day
+     */
+    addSearchService = _.debounce(function () {
+        if (!searchService.getEngineByName(INSTALLED_ENGINE_NAME)) {
+            searchService.addEngine(
+                data.url('modules/yandex/search.moz.xml'),
+                Ci.nsISearchEngine.DATA_XML,
+                null, false
+            );
+            configureSearchService();
+        } else if (attempts++ < MAX_ATTEMPTS) {
+            addSearchService();
+        }
+    }, 300);
+
 
 Mediator.sub('yandex:settings:get', function () {
     Mediator.pub('yandex:settings', storageModel.toJSON());
@@ -26,45 +72,38 @@ Mediator.sub('yandex:settings:put', function (settings) {
     storageModel.set(settings);
 });
 
-function configureSearchService() {
-    var yandexSearchEngine = searchService.getEngineByName(YANDEX_CYRILLIC);
-    if (yandexSearchEngine) {
-        yandexSearchEngine.hidden = false;
-        ['browser.search.defaultenginename', 'browser.search.selectedEngine'].forEach(function (path) {
-            //store previous value
-            storageModel.set(path, firefoxPreferences.get(path));
-            firefoxPreferences.set(path, YANDEX_CYRILLIC);
-        });
-        searchService.currentEngine = yandexSearchEngine;
-        searchService.moveEngine(yandexSearchEngine, 0);
-    } else if (attempts++ < MAX_ATTEMPTS) {
-        _.defer(configureSearchService, 300);
-    }
-}
-
 function updateSearch(enabled) {
     if (enabled) {
-        if (!searchService.getEngineByName(YANDEX_CYRILLIC)) {
-            searchService.addEngine(
-                data.url('modules/yandex/search.moz.xml'),
-                Ci.nsISearchEngine.DATA_XML,
-                null, false
-            );
-            configureSearchService();
-            //mark that we have installed a new search engine
-            storageModel.set('addEngine', true);
+        if (BROWSER_SEARCH_PREFS.some(function (path) {
+            return firefoxPreferences.get(path).indexOf(YANDEX_CYRILLIC) === -1;
+        })) {
+            // removeEngine removes installed engines,
+            // but only hides default ones.
+            // So try to remove/hide previously installed,
+            // but not active 'Яндекс' engine.
+            // And try to remove previously installed our own engine
+            [YANDEX_CYRILLIC, INSTALLED_ENGINE_NAME]
+                .map(searchService.getEngineByName, searchService)
+                .filter(Boolean)
+                .map(searchService.removeEngine, searchService);
+            addSearchService();
         }
     } else {
         //restore preinstall settings
-        ['browser.search.defaultenginename', 'browser.search.selectedEngine'].forEach(function (path) {
+        BROWSER_SEARCH_PREFS.forEach(function (path) {
             if (storageModel.get(path)) {
                 firefoxPreferences.set(path, storageModel.get(path));
                 storageModel.unset(path);
             }
         });
-        if (storageModel.get('addEngine')) {
-            searchService.removeEngine(searchService.getEngineByName(YANDEX_CYRILLIC));
-            storageModel.unset('addEngine');
+        // if after restoration default search engine is not installed by us -
+        // then remove it
+        if (BROWSER_SEARCH_PREFS.every(function (path) {
+            return firefoxPreferences.get(path).indexOf(INSTALLED_ENGINE_NAME) === -1;
+        })) {
+            searchService.removeEngine(
+                searchService.getEngineByName(INSTALLED_ENGINE_NAME)
+            );
         }
     }
 }
@@ -74,7 +113,8 @@ storageModel.on('change:enabled', function (event, enabled) {
 });
 
 require('sdk/system/unload').when(function (reason) {
-    if (reason === 'uninstall') {
+    console.log('unload reason', reason);
+    if (reason === 'disable') {
         updateSearch(false);
     }
 });
