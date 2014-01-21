@@ -3,7 +3,7 @@ var isPopup = typeof location !== 'undefined' && !~location.href.indexOf('backgr
 
 module.exports = {
     development: true,
-    firefox:  true,
+    chrome:  true,
     popup: isPopup,
     background: !isPopup
 };

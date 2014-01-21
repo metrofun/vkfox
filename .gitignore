@@ -12,6 +12,8 @@ develop/pages/popup.html
 develop/pages/popup.css
 develop/pages/background.js
 develop/pages/popup.js
+develop/pages/install.js
+develop/pages/install.html
 develop/tmp
 ff
 node_modules

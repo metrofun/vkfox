@@ -28,9 +28,11 @@ require('angular').module('app')
                     $scope.reply.placeholder = placeholder;
                     $scope.reply.visible = !$scope.reply.visible;
 
-                    $timeout(function () {
-                        $element[0].getElementsByTagName('textarea')[0].focus();
-                    });
+                    if ($scope.reply.visible) {
+                        $timeout(function () {
+                            $element[0].getElementsByTagName('textarea')[0].focus();
+                        });
+                    }
                 };
 
                 $scope.onReply = function (message) {
