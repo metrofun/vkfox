@@ -73,10 +73,8 @@ module.exports = function (grunt) {
                     path: 'bower_components/emoji/lib/emoji.js',
                     exports: 'jEmoji'
                 }
-            }, options = {
-                external: Object.keys(vendorShim).concat([
-                    'backbone', 'underscore', 'vow'
-                ]),
+            }, commonExternals = ['backbone', 'underscore', 'vow', 'moment'], options = {
+                external: Object.keys(vendorShim).concat(commonExternals),
                 ignore: [
                     'browser/browser.bg.js',
                     'tracker/tracker.bg.js',
@@ -110,7 +108,7 @@ module.exports = function (grunt) {
                         'pages/background.js': ['modules/app/app.bg.js'],
                     },
                     options: {
-                        external: ['backbone', 'underscore', 'vow'],
+                        external: commonExternals,
                         ignore: [
                             './mediator.pu.js',
                             'browserAction',
@@ -133,10 +131,11 @@ module.exports = function (grunt) {
                 return browserify;
             }, {
                 vendorCommon: {
-                    src: ['backbone', 'vow', 'underscore'],
+                    src: commonExternals,
                     dest: 'pages/vendor.js',
                     options: {
                         alias: [
+                            '../node_modules/moment/moment.js:moment',
                             '../node_modules/backbone/backbone.js:backbone',
                             '../node_modules/underscore/underscore.js:underscore',
                             '../node_modules/vow/lib/vow.js:vow'
