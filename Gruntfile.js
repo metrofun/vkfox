@@ -1,9 +1,12 @@
 "use strict";
 module.exports = function (grunt) {
-    var BROWSERS = ['chrome', 'opera', 'firefox'],
-        SRC_DIR = 'develop/',
+    var FIREFOX = 'FIREFOX',
+        CHROME = 'CHROME',
+        OPERA = 'OPERA',
         PRODUCTION = 'PRODUCTION',
         DEVELOPMENT = 'DEVELOPMENT',
+        BROWSERS = [FIREFOX, CHROME, OPERA],
+        SRC_DIR = 'develop/',
         LOCALES = ['ru', 'en', 'uk'];
 
     grunt.loadNpmTasks('grunt-inline-angular-templates');
@@ -18,27 +21,16 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-preprocess');
     grunt.loadNpmTasks('grunt-usemin');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
     grunt.loadNpmTasks('grunt-browserify');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         env : {
-            opera: {
-                TARGET: 'OPERA'
-            },
-            chrome: {
-                TARGET: 'CHROME'
-            },
-            firefox: {
-                TARGET: 'FIREFOX'
-            },
-            production: {
-                ENV : PRODUCTION
-            },
-            development: {
-                ENV : DEVELOPMENT
-            }
+            opera: {TARGET: OPERA},
+            chrome: {TARGET: CHROME},
+            firefox: {TARGET: FIREFOX},
+            production: {ENV : PRODUCTION},
+            development: {ENV : DEVELOPMENT}
         },
         inline_angular_templates: {
             popup: {
@@ -47,130 +39,118 @@ module.exports = function (grunt) {
                 }
             }
         },
-        browserify: BROWSERS.reduce(function (memo, browser) {
-            memo[browser + 'Popup'] = {
-                files: {
-                    'pages/popup.js': ['modules/app/app.pu.js'],
+        browserify: (function () {
+            var vendorShim = {
+                'angularKeypress': {
+                    path: 'bower_components/angular-ui-utils/modules/keypress/keypress.js',
+                    exports: 'angular',
+                    depends: {angular: 'angular'}
                 },
-                options: {
-                    shim: {
-                        'angularKeypress': {
-                            path: 'bower_components/angular-ui-utils/modules/keypress/keypress.js',
-                            exports: 'angular',
-                            depends: {angular: 'angular'}
-                        },
-                        'bootstrapDropdown': {
-                            path: 'bower_components/bootstrap/js/bootstrap-dropdown.js',
-                            exports: 'jQuery',
-                            depends: {zepto: 'jQuery'}
-                        },
-                        'bootstrapTooltip': {
-                            path: 'bower_components/bootstrap/js/bootstrap-tooltip.js',
-                            exports: 'jQuery',
-                            depends: {zepto: 'jQuery'}
-                        },
-                        'angular': {
-                            path: 'bower_components/angular-unstable/angular.js',
-                            exports: 'angular'
-                        },
-                        'javascript-linkify': {
-                            path: 'bower_components/javascript-linkify/ba-linkify.js',
-                            exports: 'linkify',
-                        },
-                        'zepto': {
-                            path: 'bower_components/zepto-bootstrap/zepto.js',
-                            exports: '$'
-                        },
-                        'jEmoji': {
-                            path: 'bower_components/emoji/lib/emoji.js',
-                            exports: 'jEmoji'
-                        }
-                    },
-                    ignore: [
-                        'browser/browser.bg.js',
-                        'tracker/tracker.bg.js',
-                        './request.bg.js',
-                        './tracker.bg.js',
-                        './mediator.bg.js',
-                        'timer',
-                        'chrome',
-                        'sdk/system',
-                        'sdk/tabs',
-                        'sdk/self',
-                        'sdk/simple-storage'
-                    ].filter(Boolean)
-                }
-            };
-            memo[browser + 'Install'] = {
-                files: {
-                    'pages/install.js': ['modules/app/app.install.js'],
+                'bootstrapDropdown': {
+                    path: 'bower_components/bootstrap/js/bootstrap-dropdown.js',
+                    exports: 'jQuery',
+                    depends: {zepto: 'jQuery'}
                 },
-                options: {
-                    shim: {
-                        'angular': {
-                            path: 'bower_components/angular-unstable/angular.js',
-                            exports: 'angular'
-                        },
-                        'jEmoji': {
-                            path: 'bower_components/emoji/lib/emoji.js',
-                            exports: 'jEmoji'
-                        },
-                        'javascript-linkify': {
-                            path: 'bower_components/javascript-linkify/ba-linkify.js',
-                            exports: 'linkify',
-                        },
-                        'zepto': {
-                            path: 'bower_components/zepto-bootstrap/zepto.js',
-                            exports: '$'
-                        }
-                    },
-                    ignore: [
-                        'browser/browser.bg.js',
-                        'tracker/tracker.bg.js',
-                        './request.bg.js',
-                        './tracker.bg.js',
-                        './mediator.bg.js',
-                        'timer',
-                        'chrome',
-                        'sdk/system',
-                        'sdk/tabs',
-                        'sdk/self',
-                        'sdk/simple-storage'
-                    ].filter(Boolean)
+                'bootstrapTooltip': {
+                    path: 'bower_components/bootstrap/js/bootstrap-tooltip.js',
+                    exports: 'jQuery',
+                    depends: {zepto: 'jQuery'}
+                },
+                'angular': {
+                    path: 'bower_components/angular-unstable/angular.js',
+                    exports: 'angular'
+                },
+                'javascript-linkify': {
+                    path: 'bower_components/javascript-linkify/ba-linkify.js',
+                    exports: 'linkify',
+                },
+                'zepto': {
+                    path: 'bower_components/zepto-bootstrap/zepto.js',
+                    exports: '$'
+                },
+                'jEmoji': {
+                    path: 'bower_components/emoji/lib/emoji.js',
+                    exports: 'jEmoji'
                 }
+            }, options = {
+                external: Object.keys(vendorShim).concat([
+                    'backbone', 'underscore', 'vow'
+                ]),
+                ignore: [
+                    'browser/browser.bg.js',
+                    'tracker/tracker.bg.js',
+                    './request.bg.js',
+                    './tracker.bg.js',
+                    './mediator.bg.js',
+                    'timer',
+                    'chrome',
+                    'sdk/system',
+                    'sdk/tabs',
+                    'sdk/self',
+                    'sdk/simple-storage'
+                ]
             };
 
-            memo[browser + 'Background'] = {
-                files: {
-                    'pages/background.js': ['modules/app/app.bg.js'],
-                },
-                options: {
-                    shim: {
-                        'zepto': {
-                            path: 'bower_components/zepto-bootstrap/zepto.js',
-                            exports: '$'
-                        }
+            return BROWSERS.reduce(function (browserify, browser) {
+                browserify[browser.toLowerCase() + 'Popup'] = {
+                    files: {
+                        'pages/popup.js': ['modules/app/app.pu.js'],
                     },
-                    ignore: [
-                        './mediator.pu.js',
-                        'browserAction',
-                        'timer',
-                        'chrome',
-                        'sdk/system/unload',
-                        'sdk/system',
-                        'sdk/tabs',
-                        'sdk/request',
-                        'sdk/self',
-                        'sdk/page-worker',
-                        'sdk/page-mod',
-                        'sdk/simple-storage',
-                        'sdk/notifications'
-                    ].filter(Boolean)
-                }
-            };
+                    options: options
+                };
+                browserify[browser.toLowerCase() + 'Install'] = {
+                    files: {
+                        'pages/install.js': ['modules/app/app.install.js'],
+                    },
+                    options: options
+                };
+                browserify[browser.toLowerCase() + 'Background'] = {
+                    files: {
+                        'pages/background.js': ['modules/app/app.bg.js'],
+                    },
+                    options: {
+                        external: ['backbone', 'underscore', 'vow'],
+                        ignore: [
+                            './mediator.pu.js',
+                            'browserAction',
+                            'timer',
+                            'chrome',
+                            'sdk/system/unload',
+                            'sdk/system',
+                            'sdk/tabs',
+                            'sdk/request',
+                            'sdk/self',
+                            'sdk/page-worker',
+                            'sdk/page-mod',
+                            'sdk/simple-storage',
+                            'sdk/notifications',
+                            browser === FIREFOX ? './yandex.webkit.bg.js':'./yandex.moz.bg.js'
+                        ]
+                    }
+                };
 
-            return memo;
-        }, {}),
+                return browserify;
+            }, {
+                vendorCommon: {
+                    src: ['backbone', 'vow', 'underscore'],
+                    dest: 'pages/vendor.js',
+                    options: {
+                        alias: [
+                            '../node_modules/backbone/backbone.js:backbone',
+                            '../node_modules/underscore/underscore.js:underscore',
+                            '../node_modules/vow/lib/vow.js:vow'
+                        ],
+                        ignore: ['timer']
+                    }
+                },
+                vendorPopup: {
+                    files: {
+                        'pages/vendor.pu.js': [Object.keys(vendorShim)]
+                    },
+                    options: {shim: vendorShim}
+                }
+            });
+        })(),
         "mozilla-addon-sdk": {
             '1_14': {
                 options: {
@@ -358,33 +338,6 @@ module.exports = function (grunt) {
 
     grunt.file.setBase(SRC_DIR);
 
-
-    // BROWSERS.forEach(function (browser) {
-        // grunt.registerTask(browser, [
-            // 'env:' + browser,
-            // 'preprocess:manifest',
-            // 'preprocess:' + browser,
-            // 'messageformat',
-            // 'less:' + browser,
-            // 'watch'
-        // ]);
-
-        // grunt.registerTask('build:' + browser, [
-            // 'clean',
-            // 'env:production',
-            // 'env:' + browser,
-            // 'preprocess:manifest',
-            // 'preprocess:' + browser,
-            // 'messageformat',
-            // 'less:' + browser,
-            // 'useminPrepare',
-            // 'concat',
-            // 'usemin',
-            // 'copy:' + browser,
-            // 'compress:' + browser
-        // ]);
-    // });
-
     grunt.registerTask('mozilla', [
         'env:firefox',
         'env:development',
@@ -393,6 +346,8 @@ module.exports = function (grunt) {
         'preprocess:install',
         'preprocess:popup',
         'inline_angular_templates',
+        'browserify:vendorCommon',
+        'browserify:vendorPopup',
         'browserify:firefoxPopup',
         'browserify:firefoxInstall',
         'mozilla-addon-sdk',
@@ -407,6 +362,8 @@ module.exports = function (grunt) {
         'preprocess:install',
         'preprocess:manifest',
         'inline_angular_templates',
+        'browserify:vendorCommon',
+        'browserify:vendorPopup',
         'browserify:chromePopup',
         'browserify:chromeInstall',
         'browserify:chromeBackground',
