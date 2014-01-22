@@ -1,4 +1,4 @@
 module.exports = {
-    standart: 'notifications/standart.ogg',
-    original: 'notifications/original.ogg'
+    standart: 'modules/notifications/standart.ogg',
+    original: 'modules/notifications/original.ogg'
 };

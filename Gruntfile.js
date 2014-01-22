@@ -21,6 +21,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-preprocess');
     grunt.loadNpmTasks('grunt-usemin');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
     grunt.loadNpmTasks('grunt-browserify');
 
     grunt.initConfig({
@@ -151,20 +152,20 @@ module.exports = function (grunt) {
                 }
             });
         })(),
-        "mozilla-addon-sdk": {
-            '1_14': {
+        'mozilla-cfx': {
+            run: {
                 options: {
-                    revision: "1.14"
+                    'mozilla-addon-sdk': '1_14',
+                    extension_dir: '.',
+                    command: 'run',
+                    arguments: '-p ../ff'
                 }
             }
         },
-        "mozilla-cfx": {
-            run: {
+        'mozilla-addon-sdk': {
+            '1_14': {
                 options: {
-                    "mozilla-addon-sdk": "1_14",
-                    extension_dir: ".",
-                    command: "run",
-                    arguments: "-p ../ff"
+                    revision: '1.14'
                 }
             }
         },
@@ -186,12 +187,15 @@ module.exports = function (grunt) {
                 dest : 'modules/env/env.js'
             }
         },
-        // optimize, preprocess only single file
         watch: BROWSERS.reduce(function (watch, browser) {
-            // watch[browser] = {
-                // files: browser + '/pages/*.raw.html',
-                // tasks: ['preprocess:' + browser]
-            // };
+            watch[browser.toLowerCase()] = {
+                files: 'modules/**/*.js',
+                tasks: [
+                    'browserify:' + browser.toLowerCase() + 'Popup',
+                    'browserify:' + browser.toLowerCase() + 'Background',
+                    'browserify:' + browser.toLowerCase() + 'Install'
+                ]
+            };
 
             return watch;
         }, {
@@ -212,10 +216,6 @@ module.exports = function (grunt) {
             less: {
                 files: 'modules/**/*.less',
                 tasks: ['less']
-            },
-            js: {
-                files: 'modules/**/*.js',
-                tasks: ['browserify']
             }
         }),
         //localization
@@ -242,20 +242,6 @@ module.exports = function (grunt) {
                 }
             }
         },
-        // less: BROWSERS.reduce(function (less, browser) {
-            // less[browser] = {
-                // expand: true,
-                // cwd: browser + '/pages/',
-                // dest: browser + '/pages/',
-                // src: ['*.less'],
-                // ext: '.css',
-                // options: {
-                    // compile: true,
-                    // compress: process.env.ENV === PRODUCTION
-                // }
-            // };
-            // return less;
-        // }, {}),
         clean: {
             // Warning: Cannot delete files outside the current working directory.
             options: {force: true},
@@ -367,8 +353,6 @@ module.exports = function (grunt) {
         'browserify:chromePopup',
         'browserify:chromeInstall',
         'browserify:chromeBackground',
-        'watch'
+        'watch:chrome'
     ]);
-
-
 };
