@@ -7,13 +7,11 @@ var LONG_POLL_WAIT = 20,
     Mediator = require('mediator/mediator.js'),
 
 enableLongPollUpdates = _.debounce(function () {
-    console.log('enableLongPollUpdates');
     Request.api({
         code: 'return API.messages.getLongPollServer();'
     }).then(fetchUpdates, enableLongPollUpdates).done();
 }, DEBOUNCE_RATE),
 fetchUpdates = _.debounce(function (params) {
-    console.log('fetchUpdates');
     Request.get('http://' + params.server, {
         act: 'a_check',
         key:  params.key,

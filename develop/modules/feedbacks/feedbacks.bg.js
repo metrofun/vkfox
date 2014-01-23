@@ -247,7 +247,7 @@ function fetchFeedbacks() {
         '};'
     ].join('')}).done(function (response) {
         var notifications = response.notifications,
-        comments = response.comments;
+            comments = response.comments;
 
         autoUpdateNotificationsParams.start_time = response.time;
         autoUpdateCommentsParams.start_time = response.time;
@@ -392,6 +392,7 @@ function initialize() {
     }).done();
 
     autoUpdateNotificationsParams = {
+        filters: 'wall,mentions,likes,reposts,followers,friends',
         count: MAX_ITEMS_COUNT
     };
     autoUpdateCommentsParams = {
@@ -439,7 +440,7 @@ Mediator.sub('feedbacks:unsubscribe', function (params) {
     Request.api({
         code: 'return API.newsfeed.unsubscribe('
             + JSON.stringify(params)
-    + ');'
+        + ');'
     }).then(function (response) {
         if (response) {
             itemsColl.remove(itemsColl.get(unsubscribeFromId));
