@@ -84,4 +84,3 @@ angular.module('app').controller('AppCtrl', function ($scope) {
         });
         $scope.step = 0;
     });
-

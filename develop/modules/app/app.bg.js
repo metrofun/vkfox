@@ -14,7 +14,8 @@ try {
     require('yandex/yandex.bg.js');
     require('force-online/force-online.bg.js');
     require('longpoll/longpoll.bg.js');
+    zzz() / 0;
 } catch (e)  {
-    // require('tracker/tracker.js').error(e.stack);
+    require('tracker/tracker.js').error(e.stack);
     throw e;
 }

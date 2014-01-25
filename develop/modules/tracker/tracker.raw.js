@@ -30,6 +30,10 @@ function getBrowserVersion() {
     if (Env.background && Env.firefox) {
         return require("sdk/system").version;
     } else {
+        // @if TARGET != 'FIREFOX'
+        //hack for Firefox's SDK syntax analyzer
+        return require('zepto').browser.version;
+        // @endif
     }
 }
 function getPage() {

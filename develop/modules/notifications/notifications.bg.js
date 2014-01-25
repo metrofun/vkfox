@@ -188,7 +188,7 @@ module.exports = Notifications = {
                     audioInProgress = true;
                     soundWorker = require("sdk/page-worker").Page({
                         contentScript: [
-                            'var audio = new Audio("../', source, '");',
+                            'var audio = new Audio("../../', source, '");',
                             'audio.volume = ', volume, ';',
                             'audio.play();',
                             'audio.addEventListener("ended", function () {',

@@ -2,8 +2,6 @@ var Mediator = require('mediator/mediator.js'),
     _ = require('underscore')._,
     Request = require('request/request.bg.js');
 
-console.log('likes.bg.js included');
-
 /**
  * @param [Object] params
  * @param [String] params.action 'delete' or 'add'
@@ -16,11 +14,9 @@ Mediator.sub('likes:change', function (params) {
 
     delete params.action;
 
-    console.log('sub likes:change');
     Request.api({
         code: 'return API.likes.' + action + '(' + JSON.stringify(params) + ');'
     }).then(function (response) {
-        console.log(response);
         Mediator.pub('likes:changed', _.extend(params, {
             likes: {
                 count: response.likes,

@@ -15,7 +15,6 @@ var Mediator = require('mediator/mediator.js'),
         '*://*.google.com.ua/*sourceid=chrome*'
     ];
 
-
 Mediator.sub('yandex:settings:get', function () {
     Mediator.pub('yandex:settings', yandexSettings.toJSON());
 });

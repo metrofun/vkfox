@@ -1,11 +1,12 @@
 {
   "name": "vkfox",
-  "fullName": "vkfox",
+  "fullName": "VKfox – плагин для ВКонтакте™",
+  "description": "С VKfox вы всегда в курсе новостей ВКонтакте, даже оставаясь оффлайн! Вести беседы или следить за онлайном друзей стало еще проще!",
+  "homepage": "vkfox.org.ua",
+  "icon": "data/assets/logo48.png",
   "id": "gmetrofun@gmail.com",
-  "description": "a basic add-on",
-  "author": "",
-  "license": "MPL 2.0",
-  "version": "0.1",
+  "license": "Creative Commons Attribution-NoDerivs 3.0 Unported(http://vkfox.org.ua/license)",
+  "version": "5.1",
   "lib": "data/modules",
   "dependencies": ["browser-action"],
   "main": "app/app.bg.js"

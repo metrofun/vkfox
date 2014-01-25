@@ -109,6 +109,12 @@ module.exports = function (grunt) {
                     },
                     options: {
                         external: commonExternals,
+                        shim: {
+                            'zepto': {
+                                path: 'bower_components/zepto-bootstrap/zepto.js',
+                                exports: '$'
+                            }
+                        },
                         ignore: [
                             './mediator.pu.js',
                             'browserAction',
@@ -198,6 +204,10 @@ module.exports = function (grunt) {
                 src : 'manifest.raw.json',
                 dest : 'manifest.json'
             },
+            tracker: {
+                src : 'modules/tracker/tracker.raw.js',
+                dest : 'modules/tracker/tracker.js'
+            },
             env: {
                 src : 'modules/env/env.raw.js',
                 dest : 'modules/env/env.js'
@@ -279,6 +289,7 @@ module.exports = function (grunt) {
 
                     'modules/auth/oauth.vk.com.js',
                     'modules/resize/dimensions.pu.js',
+                    'modules/notifications/*.ogg',
 
                     'pages/*.html',
                     '!pages/*.raw.html',
@@ -304,8 +315,8 @@ module.exports = function (grunt) {
                     'data/bower_components/emoji/lib/emoji.png',
 
                     'data/modules/yandex/search.moz.xml',
-                    'modules/resize/dimensions.pu.js',
-                    'data/modules/*/*.bg.js',
+                    'data/modules/notifications/*.ogg',
+                    'data/modules/notifications/firefox.html',
                     'data/modules/*/*.js',
 
                     'data/pages/*.html',
@@ -365,6 +376,7 @@ module.exports = function (grunt) {
                 'env:development',
                 'less',
                 'preprocess:env',
+                'preprocess:tracker',
                 'preprocess:install',
                 'preprocess:popup',
                 'inline_angular_templates',
@@ -392,6 +404,7 @@ module.exports = function (grunt) {
                 'env:' + browserLowercased,
                 'less',
                 'preprocess:env',
+                'preprocess:tracker',
                 'preprocess:popup',
                 'preprocess:install',
                 'preprocess:manifest',
