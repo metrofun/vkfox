@@ -159,6 +159,23 @@ module.exports = function (grunt) {
                     command: 'run',
                     arguments: '-p ../ff'
                 }
+            },
+            'run-build': {
+                options: {
+                    'mozilla-addon-sdk': '1_14',
+                    extension_dir: '../build/firefox',
+                    command: 'run',
+                    arguments: '-p ../ff'
+                }
+            },
+
+            xpi: {
+                options: {
+                    'mozilla-addon-sdk': '1_14',
+                    extension_dir: '../build/firefox/',
+                    command: 'xpi',
+                    arguments: '-p ../ff'
+                }
             }
         },
         'mozilla-addon-sdk': {
@@ -241,47 +258,65 @@ module.exports = function (grunt) {
                 }
             }
         },
-        clean: {
-            // Warning: Cannot delete files outside the current working directory.
-            options: {force: true},
-            build: ['../build'],
-            manifest: ['manifest.json'],
-            pages: [
-                'pages/*.html',
-                '!pages/*.raw.html',
-                'pages/*.js',
-                'pages/*.css'
-            ]
-        },
-        copy: BROWSERS.reduce(function (copy, browser) {
-            copy[browser] = {
+        // Prevent Warning: Cannot delete files outside the current working directory.
+        clean: BROWSERS.reduce(function (clean, browser) {
+            var browserLowercased = browser.toLowerCase();
+            clean[browserLowercased] = ['../build/' + browserLowercased];
+            return clean;
+        }, {options: {force: true}}),
+        copy: [CHROME, OPERA].reduce(function (copy, browser) {
+            copy[browser.toLowerCase()] = {
                 expand: true,
                 src: [
-                    '_locales/**',
-                    'assets/**',
                     'manifest.json',
 
-                    'components/font-awesome/font/fontawesome-webfont.ttf',
-                    'components/emoji/lib/emoji.png',
-                    'components/emoji/lib/emoji.css',
-                    'components/jquery/jquery.js',
-                    'components/angular-unstable/angular.js',
-                    'components/underscore/underscore.js',
-                    'components/backbone/backbone.js',
+                    '_locales/**',
+                    'assets/**',
+
+                    'bower_components/font-awesome/font/fontawesome-webfont.ttf',
+                    'bower_components/emoji/lib/emoji.css',
+                    'bower_components/emoji/lib/emoji.png',
 
                     'modules/auth/oauth.vk.com.js',
-                    'modules/**/*.html',
-                    'modules/**/*.ogg',
-                    browser + '/pages/*.html',
-                    '!' + browser + '/pages/*.raw.html',
-                    browser + '/pages/*.js',
-                    browser + '/pages/*.css',
+                    'modules/resize/dimensions.pu.js',
+
+                    'pages/*.html',
+                    '!pages/*.raw.html',
+                    'pages/*.css',
+                    'pages/*.js'
                 ],
-                dest: '../build/' + browser
+                dest: '../build/' + browser.toLowerCase()
             };
 
             return copy;
-        }, {}),
+        }, {
+            firefox: {
+                expand: true,
+                src: [
+                    'package.json',
+                    'packages/**',
+
+                    'data/assets/**',
+
+                    //best font for window and osx in firefox and chrome
+                    'data/bower_components/font-awesome/font/fontawesome-webfont.ttf',
+                    'data/bower_components/emoji/lib/emoji.css',
+                    'data/bower_components/emoji/lib/emoji.png',
+
+                    'data/modules/yandex/search.moz.xml',
+                    'modules/resize/dimensions.pu.js',
+                    'data/modules/*/*.bg.js',
+                    'data/modules/*/*.js',
+
+                    'data/pages/*.html',
+                    '!data/pages/*.raw.html',
+                    'data/pages/*.css',
+                    'data/pages/*.js',
+                    '!data/pages/background.js',
+                ],
+                dest: '../build/firefox'
+            }
+        }),
         //Next two targets concatenates js/css
         useminPrepare: {
             html: BROWSERS.reduce(function (html, browser) {
@@ -323,35 +358,57 @@ module.exports = function (grunt) {
 
     grunt.file.setBase(SRC_DIR);
 
-    grunt.registerTask('mozilla', [
-        'env:firefox',
-        'env:development',
-        'less',
-        'preprocess:env',
-        'preprocess:install',
-        'preprocess:popup',
-        'inline_angular_templates',
-        'browserify:vendorCommon',
-        'browserify:vendorPopup',
-        'browserify:firefoxPopup',
-        'browserify:firefoxInstall',
-        'mozilla-addon-sdk',
-        'mozilla-cfx'
-    ]);
-    grunt.registerTask('chrome', [
-        'env:development',
-        'env:chrome',
-        'less',
-        'preprocess:env',
-        'preprocess:popup',
-        'preprocess:install',
-        'preprocess:manifest',
-        'inline_angular_templates',
-        'browserify:vendorCommon',
-        'browserify:vendorPopup',
-        'browserify:chromePopup',
-        'browserify:chromeInstall',
-        'browserify:chromeBackground',
-        'watch:chrome'
-    ]);
+    [FIREFOX].forEach(function (browser) {
+        var browserLowercased = browser.toLowerCase(),
+            commonTasks = [
+                'env:firefox',
+                'env:development',
+                'less',
+                'preprocess:env',
+                'preprocess:install',
+                'preprocess:popup',
+                'inline_angular_templates',
+                'browserify:vendorCommon',
+                'browserify:vendorPopup',
+                'browserify:firefoxPopup',
+                'browserify:firefoxInstall',
+                'mozilla-addon-sdk'
+            ];
+
+        grunt.registerTask(browserLowercased, commonTasks.concat([
+            'mozilla-cfx:run'
+        ]));
+        grunt.registerTask('build:' + browserLowercased, commonTasks.concat([
+            'clean:' + browserLowercased,
+            'copy:' + browserLowercased,
+            'mozilla-cfx:xpi',
+            'mozilla-cfx:run-build'
+        ]));
+    });
+
+    [CHROME, OPERA].forEach(function (browser) {
+        var browserLowercased = browser.toLowerCase(),
+            commonTasks = [
+                'env:' + browserLowercased,
+                'less',
+                'preprocess:env',
+                'preprocess:popup',
+                'preprocess:install',
+                'preprocess:manifest',
+                'inline_angular_templates',
+                'browserify:vendorCommon',
+                'browserify:vendorPopup',
+                'browserify:' + browserLowercased + 'Popup',
+                'browserify:' + browserLowercased + 'Install',
+                'browserify:' + browserLowercased + 'Background'
+            ];
+
+        grunt.registerTask(browserLowercased, commonTasks.concat([
+            'watch:' + browserLowercased
+        ]));
+        grunt.registerTask('build:' + browserLowercased, commonTasks.concat([
+            'clean:' + browserLowercased,
+            'copy:' + browserLowercased
+        ]));
+    });
 };
