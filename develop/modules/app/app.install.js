@@ -1,5 +1,12 @@
-angular.module('app', ['i18n', 'anchor', 'mediator', 'tracker'])
-    .controller('AppCtrl', function ($scope, Mediator, Tracker) {
+var angular = require('angular'),
+    Tracker, Mediator;
+
+angular.module('app', []);
+Tracker = require('tracker/tracker.js');
+Mediator = require('mediator/mediator.js');
+require('anchor/anchor.pu.js');
+require('filters/filters.pu.js');
+angular.module('app').controller('AppCtrl', function ($scope) {
         var data = {
             // authorization  step
             '0': {
@@ -59,10 +66,7 @@ angular.module('app', ['i18n', 'anchor', 'mediator', 'tracker'])
                 },
                 onButtonClick: function () {
                     Tracker.trackEvent('install', 'close');
-                    //hack for Windows Google Chrome,
-                    //which can't simply close tab
-                    window.open('', '_self', '');
-                    window.close();
+                    Mediator.pub('yandex:dialog:close');
                 }
             }
         };
@@ -80,4 +84,3 @@ angular.module('app', ['i18n', 'anchor', 'mediator', 'tracker'])
         });
         $scope.step = 0;
     });
-

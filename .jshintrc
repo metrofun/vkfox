@@ -13,17 +13,13 @@
     "couch"         : false,
     "wsh"           : false,   // Windows Scripting Host.
 
-    "jquery"        : true,
     "prototypejs"   : false,
     "mootools"      : false,
     "dojo"          : false,
 
     "predef"        : [  // Extra globals.
-        "moment",
-        "_",
+        "extension",
         "LocalStorage",
-        "Backbone",
-        "angular",
         "module",
         "require",
         "define",
@@ -47,7 +43,7 @@
     "unused"        : true,
     "asi"           : false,  // Tolerate Automatic Semicolon Insertion (no semicolons).
     "laxbreak"      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
-    "bitwise"       : true,   // Prohibit bitwise operators (&, |, ^, etc.).
+    "bitwise"       : false,   // Prohibit bitwise operators (&, |, ^, etc.).
     "boss"          : false,  // Tolerate assignments inside if, for & while. Usually conditions & loops are for comparison, not assignments.
     "curly"         : true,   // Require {} for every new block or scope.
     "eqeqeq"        : true,   // Require triple equals i.e. `===`.
@@ -71,7 +67,7 @@
     // Persone styling prefrences.
 "onecase"       : true,
     "newcap"        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
-    "noempty"       : true,   // Prohibit use of empty blocks.
+    "noempty"       : false,   // Prohibit use of empty blocks.
     "nonew"         : true,   // Prohibit use of constructors for side-effects.
     "nomen"         : false,   // Prohibit use of initial or trailing underbars in names.
     "onevar"        : true,  // Allow only one `var` statement per function.

@@ -1,6 +1,5 @@
 .item__attachment {
     width: 100%;
-    overflow: hidden;
     display: inline-block;
     margin-top: @baseLineHeight / 2;
 
@@ -46,7 +45,7 @@
     &:after {
         content: '';
         display: block;
-        margin-top: 100%;
+        margin-top: 110%;
     }
     &:hover {
         opacity: 1;
@@ -64,20 +63,21 @@
     position: absolute;
     opacity: 0.75;
     background-color: #000;
-    font-size: @fontSizeMini;
+    font-size: calc(~'1rem - 1px');
     font-weight: bold;
     width: 100%;
-    padding: 4px;
-    box-sizing: border-box;
+    padding: 1rem / 3;
+    .box-sizing(border-box);
+    overflow: hidden;
 }
 .item__video-title {
     max-width: 75%;
-    display: inline-block;
+    float: left;
     .text-overflow();
 }
 .item__video-duration {
-    display: inline-block;
+    float: left;
     position: absolute;
-    right: 4px;
+    right: 1rem / 3;
 }
 

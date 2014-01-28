@@ -1,23 +1,18 @@
 .btn {
-    margin-top: 5px;
+    margin-top: @baseLineHeight / 2;
+    display: inline-block;
     background: @clouds;
     border-radius: 3px;
-    border: none;
-    text-shadow: none;
-    box-shadow: none;
     border-bottom: 2px solid darken(@clouds, 15%);
-    padding: 4px 8px;
-    font-size: 14px;
+    padding: 0.5rem 0.75rem;
     .user-select(none);
+    font-size: calc(~'1rem + 2px');
+    line-height: @baseLineHeight;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
 
-    &:hover,
     &:active {
-        text-shadow: none;
-        box-shadow: none;
-        background: @clouds;
-        color: inherit;
+        color: lighten(black, 60%);
     }
-}
-.btn:active {
-    color: lighten(black, 60%);
 }

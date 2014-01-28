@@ -1,5 +1,5 @@
-.chat .item-list__content {
-    height: 441px;
+.chat {
+    height: calc(~"100% - 2rem - @{baseLineHeight} - 1px");
 }
 .chat__author  {
     color: @asbestos;
@@ -11,7 +11,7 @@
     cursor: pointer;
 
     p {
-        font-size: @baseFontSize;
+        font-size: calc(~'1rem + 2px');
         line-height: @baseLineHeight;
         font-weight: normal;
     }

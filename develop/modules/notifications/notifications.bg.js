@@ -1,36 +1,76 @@
-angular.module('notifications', ['mediator', 'persistent-model', 'config', 'browser'])
-    .constant('NOTIFICATIONS_CHAT', 'chat')
-    .constant('NOTIFICATIONS_BUDDIES', 'buddies')
-    .constant('NOTIFICATIONS_NEWS', 'news')
-    .factory('NotificationsQueue', function (
-        NotificationsSettings,
-        Notifications,
-        Mediator,
-        NOTIFICATIONS_CHAT
-    ) {
-        var notificationQueue = new Backbone.Collection();
+var
+_ = require('underscore')._,
+Backbone = require('backbone'),
+Browser = require('browser/browser.bg.js'),
+Env = require('env/env.js'),
+Mediator = require('mediator/mediator.js'),
+Settings = require('notifications/settings.js'),
+PersistentModel = require('persistent-model/persistent-model.js'),
 
-        notificationQueue.on('add remove reset', function () {
-            Notifications.setBadge(notificationQueue.filter(function (model) {
-                return !model.get('noBadge');
-            }).length);
+audioInProgress = false, Notifications,
+
+NotificationsSettings = PersistentModel.extend({
+    initialize: function () {
+        var sound, self = this;
+
+        PersistentModel.prototype.initialize.apply(this, arguments);
+
+        Mediator.sub('notifications:settings:get', function () {
+            Mediator.pub('notifications:settings', self.toJSON());
+        });
+        Mediator.sub('notifications:settings:put', function (settings) {
+            self.set(settings);
         });
 
-        notificationQueue.on('add', function (model) {
-            if (!model.get('noSound')) {
-                Notifications.playSound();
-            }
-            if (!model.get('noPopup')) {
-                Notifications.createPopup(model.toJSON());
+        // TODO remove in v5.0.7
+        // support legacy signal values (i.g. standart.mp3)
+        sound = self.get('sound');
+        ['standart', 'original'].some(function (type) {
+            if (sound.signal.indexOf(type) > 0) {
+                sound.signal = type;
+                return true;
             }
         });
+    }
+}),
+notificationsSettings = new NotificationsSettings({
+    enabled: true,
+    sound: {
+        enabled: true,
+        volume: 0.5,
+        signal: Settings.standart
+    },
+    popups: {
+        enabled: true,
+        showText: true
+    }
+}, {name: 'notificationsSettings'}),
+
+notificationQueue = new (Backbone.Collection.extend({
+    initialize: function () {
+        var self = this;
+        this
+            .on('add remove reset', function () {
+                Notifications.setBadge(self.filter(function (model) {
+                    return !model.get('noBadge');
+                }).length);
+            })
+            .on('add', function (model) {
+                if (!model.get('noPopup')) {
+                    Notifications.createPopup(model.toJSON());
+                }
+                if (!model.get('noSound')) {
+                    Notifications.playSound();
+                }
+            });
+
         Mediator.sub('auth:success', function () {
-            notificationQueue.reset();
+            self.reset();
         });
         // Remove seen updates
         Mediator.sub('router:change', function (params) {
-            if (params.tab && notificationQueue.size()) {
-                notificationQueue.remove(notificationQueue.where({
+            if (params.tab && self.size()) {
+                self.remove(self.where({
                     type: params.tab
                 }));
             }
@@ -38,131 +78,158 @@ angular.module('notifications', ['mediator', 'persistent-model', 'config', 'brow
         // remove notifications about read messages
         Mediator.sub('chat:message:read', function (message) {
             if (!message.out) {
-                notificationQueue.remove(notificationQueue.findWhere({
-                    type: NOTIFICATIONS_CHAT
+                self.remove(self.findWhere({
+                    type: Notifications.CHAT
                 }));
             }
         });
         Mediator.sub('notifications:queue:get', function () {
-            Mediator.pub('notifications:queue', notificationQueue.toJSON());
+            Mediator.pub('notifications:queue', self.toJSON());
         });
-
         // Clear badge, when notifications turned off and vice versa
-        NotificationsSettings.on('change:enabled', function (event, enabled) {
-            Notifications.setBadge(enabled ? notificationQueue.size():'', true);
+        notificationsSettings.on('change:enabled', function (event, enabled) {
+            Notifications.setBadge(enabled ? self.size():'', true);
         });
 
-        return notificationQueue;
-    })
-    .factory('NotificationsSettings', function (Mediator, PersistentModel, NOTIFICATIONS_SOUNDS) {
-        var notificationsSettings = new PersistentModel(
-            {
-                enabled: true,
-                sound: {
-                    enabled: true,
-                    volume: 0.5,
-                    signal: NOTIFICATIONS_SOUNDS.standart
-                },
-                popups: {
-                    enabled: true,
-                    showText: true
-                }
-            },
-            {name: 'notificationsSettings'}
-        ), sound;
+    }
+}))();
 
-        Mediator.sub('notifications:settings:get', function () {
-            Mediator.pub('notifications:settings', notificationsSettings.toJSON());
-        });
-        Mediator.sub('notifications:settings:put', function (settings) {
-            notificationsSettings.set(settings);
-        });
+function getBase64FromImage(url, onSuccess, onError) {
+    var xhr = new XMLHttpRequest();
 
-        // TODO remove in v5.0.7
-        // support legacy signal values (i.g. standart.mp3)
-        sound = notificationsSettings.get('sound');
-        ['standart', 'original'].some(function (type) {
-            if (sound.signal.indexOf(type) > 0) {
-                sound.signal = type;
-                return true;
-            }
-        });
+    xhr.responseType = "arraybuffer";
+    xhr.open("GET", url);
 
-        return notificationsSettings;
-    })
-    .factory('Notifications', function (NotificationsSettings, Browser, NOTIFICATIONS_SOUNDS) {
-        var audioInProgress = false,
-            audio = new Audio(),
-            Notifications;
+    xhr.onload = function () {
+        var base64, binary, bytes, mediaType;
 
-        function getBase64FromImage(url, onSuccess, onError) {
-            var xhr = new XMLHttpRequest();
+        bytes = new Uint8Array(xhr.response);
+        //NOTE String.fromCharCode.apply(String, ...
+        //may cause "Maximum call stack size exceeded"
+        binary = [].map.call(bytes, function (byte) {
+            return String.fromCharCode(byte);
+        }).join('');
+        mediaType = xhr.getResponseHeader('content-type');
+        base64 = [
+            'data:',
+            mediaType ? mediaType + ';':'',
+            'base64,',
+            btoa(binary)
+        ].join('');
+        onSuccess(base64);
+    };
+    xhr.onerror = onError;
+    xhr.send();
+}
 
-            xhr.responseType = "arraybuffer";
-            xhr.open("GET", url);
+module.exports = Notifications = {
+    CHAT: 'chat',
+    BUDDIES: 'buddies',
+    NEWS: 'news',
+    /**
+     * Create notifications. Usually you will need only this method
+     *
+     * @param {Object} data
+     * @param {String} data.type
+     * @param {String} data.title
+     * @param {String} data.message
+     * @param {String} data.image
+     * @param {Boolean} [data.noBadge]
+     * @param {Boolean} [data.noPopup]
+     */
+    notify: function (data) {
+        notificationQueue.push(data);
+    },
+    createPopup: (function () {
+        var createPopup, notifications;
 
-            xhr.onload = function () {
-                var base64, binary, bytes, mediaType;
+        if (Env.firefox) {
+            notifications = require("sdk/notifications");
 
-                bytes = new Uint8Array(xhr.response);
-                //NOTE String.fromCharCode.apply(String, ...
-                //may cause "Maximum call stack size exceeded"
-                binary = [].map.call(bytes, function (byte) {
-                    return String.fromCharCode(byte);
-                }).join('');
-                mediaType = xhr.getResponseHeader('content-type');
-                base64 = [
-                    'data:',
-                    mediaType ? mediaType + ';':'',
-                    'base64,',
-                    btoa(binary)
-                ].join('');
-                onSuccess(base64);
+            createPopup = function (options, text) {
+                notifications.notify({
+                    title: options.title,
+                    text: text,
+                    iconURL: options.image
+                });
             };
-            xhr.onerror = onError;
-            xhr.send();
+        } else {
+            createPopup = function (options, message) {
+                getBase64FromImage(options.image, function (base64) {
+                    try {
+                        chrome.notifications.create(_.uniqueId(), {
+                            type: 'basic',
+                            title: options.title,
+                            message: message,
+                            iconUrl: base64
+                        }, function () {});
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            };
         }
 
-        Notifications = {
-            createPopup: function (options) {
-                var popups = NotificationsSettings.get('popups');
+        return function (options) {
+            var popups = notificationsSettings.get('popups');
 
-                if (NotificationsSettings.get('enabled') && popups.enabled) {
-                    getBase64FromImage(options.image, function (base64) {
-                        try {
-                            chrome.notifications.create(_.uniqueId(), {
-                                type: 'basic',
-                                title: options.title,
-                                message: (popups.showText && options.message) || '',
-                                iconUrl: base64
-                            }, function () {});
-                        } catch (e) {
-                            console.log(e);
+            if (notificationsSettings.get('enabled') && popups.enabled) {
+                createPopup(options, (popups.showText && options.message) || '');
+            }
+        };
+    })(),
+    playSound: (function () {
+        var soundWorker, play, data;
+
+        if (Env.firefox) {
+            data = require("sdk/self").data;
+            play = function (source, volume) {
+                if (!audioInProgress) {
+                    audioInProgress = true;
+                    soundWorker = require("sdk/page-worker").Page({
+                        contentScript: [
+                            'var audio = new Audio("../../', source, '");',
+                            'audio.volume = ', volume, ';',
+                            'audio.play();',
+                            'audio.addEventListener("ended", function () {',
+                            'self.postMessage("destroy");',
+                            '});'
+                        ].join(''),
+                        contentURL: data.url('modules/notifications/firefox.html'),
+                        onMessage: function () {
+                            soundWorker.destroy();
+                            soundWorker = null;
+                            audioInProgress = false;
                         }
                     });
                 }
-            },
-            playSound: function () {
-                var sound = NotificationsSettings.get('sound');
+            };
+        } else {
+            play = function (source, volume) {
+                var audio;
 
-                if (NotificationsSettings.get('enabled') && sound.enabled && !audioInProgress) {
+                if (!audioInProgress) {
                     audioInProgress = true;
-
-                    audio.volume = sound.volume;
-                    audio.src = NOTIFICATIONS_SOUNDS[sound.signal];
+                    audio = new Audio(source);
+                    audio.volume = volume;
                     audio.play();
-
                     audio.addEventListener('ended', function () {
                         audioInProgress = false;
                     });
                 }
-            },
-            setBadge: function (count, force) {
-                if (NotificationsSettings.get('enabled') || force) {
-                    Browser.setBadgeText(count || '');
-                }
+            };
+        }
+        return function () {
+            var sound = notificationsSettings.get('sound');
+
+            if (notificationsSettings.get('enabled') && sound.enabled) {
+                play(Settings[sound.signal], sound.volume);
             }
         };
-
-        return Notifications;
-    });
+    })(),
+    setBadge: function (count, force) {
+        if (notificationsSettings.get('enabled') || force) {
+            Browser.setBadgeText(count || '');
+        }
+    }
+};

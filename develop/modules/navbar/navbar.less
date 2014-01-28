@@ -1,41 +1,37 @@
-.navbar .navbar-inner {
-    background: @clouds;
-    border-color: darken(@clouds, 15%);
-    box-shadow: none;
-    padding: 0 10px;
+.navbar (@bgColor, @textColor) {
+        position: relative;
+        background: @bgColor;
+        padding: 0 0.75rem;
+        border-bottom: 1px solid darken(@bgColor, 15%);
 
-    & .nav > li > a {
-        text-shadow: none;
-        outline: none;
-        color: @asbestos;
+    .navbar__tab {
+        display: inline-block;
+        padding: 1rem 1.25rem 1rem;
+        color: @textColor;
+        text-transform: capitalize;
+        cursor: pointer;
+
+        &:hover {
+            background: darken(@bgColor, 5%);
+            text-decoration: none;
+            color: @textColor;
+        }
+        &:focus {
+            outline: none;
+            text-decoration: none;
+        }
     }
-    & .nav > li > a:hover {
-        background: darken(@clouds, 5%);
-    }
-
-
-    & .nav .active > a:hover,
-    & .nav .active > a {
-        box-shadow: none;
-        color: darken(@asbestos, 15%);
-        background: darken(@clouds, 10%);
+    .navbar__tab_active {
+        background: darken(@bgColor, 10%) !important;
+        cursor: default;
     }
 }
-.navbar-inverse .navbar-inner {
-    background: @peterRiver;
-    border-color: darken(@peterRiver, 15%);
-
-    & .nav > li > a {
-        outline: none;
-        color: white;
-    }
-    & .nav > li > a:hover {
-        background: darken(@peterRiver, 5%);
-    }
-
-    & .nav .active > a:hover,
-    & .nav .active > a {
-        background: darken(@peterRiver, 10%);
-        color: white;
+.navbar_style_main {
+    .navbar(@peterRiver, white);
+}
+.navbar_style_sub {
+    .navbar(@clouds, @asbestos);
+    .navbar__tab_active {
+        color: darken(@asbestos, 15%) !important;
     }
 }

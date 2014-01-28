@@ -1,19 +1,14 @@
 {
   "name": "vkfox",
   "dependencies": {
-    "jquery": "~1.9.1",
-    "underscore": "~1.4.4",
-    "backbone": "https://github.com/jashkenas/backbone.git#~1.0.0",
     "bootstrap": "https://github.com/metrofun/bootstrap.git#~2.3.3",
     "angular-unstable": "~1.1.5",
     "angular-ui-utils": "~0.0.2",
-    "moment": "~2.3.0",
     "javascript-linkify": "https://github.com/cowboy/javascript-linkify.git",
     "emoji": "~0.2.1",
     "font-awesome": "~3.2.1",
-    "less": "~1.5.0-b3"
-  },
-  "resolutions": {
-    "jquery": "~1.9.1"
+    "toolbarwidget-jplib": "https://github.com/Rob--W/toolbarwidget-jplib.git#dee2ba36c44ad889b796a5181723de98928e9e1b",
+    "browser-action-jplib": "https://github.com/metrofun/browser-action-jplib.git#1e5a3604c171960aff841a3b6344217f1e0d3b50",
+    "zepto-bootstrap": "git@github.com:metrofun/zepto-bootstrap.git"
   }
 }

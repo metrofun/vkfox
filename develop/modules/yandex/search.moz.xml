@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+<ShortName>Яндекc</ShortName>
+<Description>Воспользуйтесь Яндексом для поиска в Интернете.</Description>
+<Image width="16" height="16">data:image/vnd.microsoft.icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAACgoKB+oKCg56CgoP+goKD/oKCg/6CgoP+goKD/oKCg/6CgoP+goKD/oKCg/6CgoJbExMQAxMTEAMTExADExMQAoqKi58HBwf/ExMT/xMTE/8TExP/ExMT/xMTE/8TExP/ExMT/xMTE/8TExP+tra3/oqKie8TExADExMQAxMTEAKSkpP/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/w8PD/6Wlpf+kpKQPx8fHAMfHxwCnp6f/zMzM/8zMzP+Wls7/DAzT/5SUzv/MzMz/jY3O/wwM0//MzMz/zMzM/8zMzP+4uLj/p6eniszMzADMzMwAq6ur/9LS0v/S0tL/0tLS/1BQ1/8oKNn/zc3S/4yM1f8MDNr/0tLS/9LS0v/S0tL/0NDQ/6+vr/+rq6s80tLSAK+vr//X19f/19fX/9fX1//Cwtj/Ghrk/2lp3/+Pj9z/DAzl/9fX1//X19f/19fX/9fX1//Jycn/r6+vpdfX1wCysrL/3d3d/93d3f/d3d3/3d3d/4SE5f8MDPD/JSXu/wwM8P/d3d3/3d3d/93d3f/d3d3/3d3d/7y8vP+ysrJmtra2/+Hh4f/h4eH/4eHh/8PD5f8vL/b/XFzx/0ND9P8MDPr/4eHh/+Hh4f/h4eH/4eHh/+Hh4f/Z2dn/tra2z7u7u//y8vL/8vLy//Ly8v9BQvz/e3z5//Ly8v+jo/f/ERP///Ly8v/y8vL/8vLy//Ly8v/y8vL/6Ojo/7u7u8+/v7//9PT0//T09P/09PT/Hyr//62x+P/09PT/qKz4/xwo///09PT/9PT0//T09P/09PT/9PT0/8vLy/+/v79mwsLC//f39//39/f/9/f3/zhO/v+nsPr/9/f3/6+3+v8qQf//9/f3//f39//39/f/9/f3/+Tk5P/CwsKl9/f3AMbGxv/5+fn/+fn5//n5+f+TpPz/X3n+/87V+v+crPz/OFn///n5+f/5+fn/+fn5//f39//Ly8v/xsbGPPn5+QDKysr//Pz8//z8/P/8/Pz/9ff8/5Cn/v9ZfP//QWn//0xy///8/Pz//Pz8//z8/P/i4uL/ysrKivz8/AD8/PwAzc3N//7+/v/+/v7//v7+//7+/v/+/v7//v7+//7+/v/+/v7//v7+//7+/v/4+Pj/zs7O/83NzQ/+/v4A/v7+AM/Pz+T6+vr/////////////////////////////////////////////////39/f/8/Pz3j///8A////AP///wDR0dF70dHR5NHR0f/R0dH/0dHR/9HR0f/R0dH/0dHR/9HR0f/R0dH/0dHR/9HR0Zb///8A////AP///wD///8AAA8AAAAHAAAAAwAAAAMAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAMAAAADAAAABwAAAA8AAA==</Image>
+<Url type="application/x-suggestions+json" method="GET" template="http://suggest.yandex.net/suggest-ff.cgi">
+  <Param name="part" value="{searchTerms}"/>
+</Url>
+<SearchForm>http://yandex.ru/?clid=149185/</SearchForm>
+<Url type="text/html" method="GET" template="http://yandex.ru/yandsearch?clid=149185&amp;text={searchTerms}"/>
+<InputEncoding>UTF-8</InputEncoding>
+<SearchForm>http://yandex.ru/?clid=149185/</SearchForm>
+</OpenSearchDescription>

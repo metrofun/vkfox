@@ -1,51 +1,37 @@
 <navigation></navigation>
 <div ng-controller="buddiesCtrl" class="buddies">
-    <div class="navbar navbar-static-top">
-        <div class="navbar-inner">
-            <label class="buddies__search">
-                <i class="icon-search"></i>
-                <input
-                    id="prependedInput"
-                    type="text"
-                    ng-model="searchClue"
-                    class="span2"
-                    placeholder="{{'Search' | i18n}}">
-                </input>
-            </label>
-            <div
-                role="menu"
-                class="dropdown buddies__filter pull-right">
-                <i class="icon-reorder dropdown-toggle"></i>
-                <ul class="dropdown-menu">
-                    <li><label class="checkbox">
-                        <input
-                            class="buddies__checkbox"
-                            ng-model="filters.male"
-                            type="checkbox">{{'Male' | i18n}}
-                    </label></li>
-                    <li><label class="checkbox">
-                        <input
-                            class="buddies__checkbox"
-                            ng-model="filters.female"
-                            type="checkbox">{{'Female' | i18n}}
-                    </label></li>
-                    <li class="divider"></li>
-                    <li><label class="checkbox">
-                        <input
-                            class="buddies__checkbox"
-                            ng-model="filters.offline"
-                            type="checkbox">{{'Offline' | i18n}}
-                    </label></li>
-                    <li class="divider"></li>
-                    <li><label class="checkbox">
-                        <input
-                            class="buddies__checkbox"
-                            ng-model="filters.faves"
-                            type="checkbox">{{'Bookmarked' | i18n}}
-                    </label></li>
+    <div class="navbar navbar_style_sub">
+        <label class="buddies__search">
+            <i class="icon-search"></i>
+            <input
+            id="prependedInput"
+            type="text"
+            ng-model="searchClue"
+            class="span2"
+            placeholder="{{'Search' | i18n}}">
+            </input>
+        </label>
+        <div
+            role="menu"
+            class="dropdown buddies__filter pull-right">
+            <i class="icon-reorder dropdown-toggle"></i>
+            <ul class="dropdown-menu">
+                <li><checkbox class="buddies__checkbox" ng-model="filters.male">
+                {{'Male' | i18n}}
+                </checkbox></li>
+                <li><checkbox class="buddies__checkbox" ng-model="filters.female">
+                {{'Female' | i18n}}
+                </checkbox></li>
+                <li class="divider"></li>
+                <li><checkbox class="buddies__checkbox" ng-model="filters.offline">
+                {{'Offline' | i18n}}
+                </checkbox></li>
+                <li class="divider"></li>
+                <li><checkbox class="buddies__checkbox" ng-model="filters.faves">
+                {{'Bookmarked' | i18n}}
+                </checkbox></li>
             </div>
         </div>
-    </div>
     <item-list>
         <item
             item-list-repeat="buddie in data | buddiesFilter:filters:searchClue track by buddie.uid"

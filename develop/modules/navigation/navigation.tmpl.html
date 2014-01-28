@@ -1,21 +1,15 @@
-<div class="navigation navbar navbar-inverse navbar-static-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <ul class="nav">
-                <li
-                    ng-repeat="tab in tabs"
-                    ng-class="{active: tab.href === activeTab}">
-                    <a href="/{{tab.href}}">{{tab.name | i18n}}</a>
-                </li>
-            </ul>
-            <div class="navigation__actions">
-                <i
-                    anchor="{{'/plugin_vkfox' | addVKBase}}"
-                    class="navigation__action navigation__help icon-bug"></i>
-                <a class="navigation__action navigation__settings" href="/settings">
-                    <i class="icon-cog"></i>
-                </a>
-            </div>
-        </div>
+<div class="navigation navbar navbar_style_main">
+    <a
+        ng-repeat="tab in tabs"
+        class="navbar__tab"
+        ng-class="{navbar__tab_active: tab.href === activeTab}"
+        href="pages/popup.html#/{{tab.href}}">{{tab.name | i18n}}</a>
+    <div class="navigation__actions">
+        <a class="navigation__action navigation__help" anchor="{{'/plugin_vkfox' | addVKBase}}">
+            <i class="icon-bug"></i>
+        </a>
+        <a class="navigation__action navigation__settings" href="pages/popup.html#/settings">
+            <i class="icon-cog"></i>
+        </a>
     </div>
 </div>

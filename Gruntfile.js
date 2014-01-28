@@ -1,11 +1,15 @@
 "use strict";
 module.exports = function (grunt) {
-    var BROWSERS = ['chrome', 'opera'],
+    var FIREFOX = 'FIREFOX',
+        CHROME = 'CHROME',
+        OPERA = 'OPERA',
+        PRODUCTION = 'PRODUCTION',
+        DEVELOPMENT = 'DEVELOPMENT',
+        BROWSERS = [FIREFOX, CHROME, OPERA],
         SRC_DIR = 'develop/',
-        PRODUCTION = 'production',
-        DEVELOP = 'develop',
         LOCALES = ['ru', 'en', 'uk'];
 
+    grunt.loadNpmTasks('grunt-inline-angular-templates');
     grunt.loadNpmTasks('grunt-messageformat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -17,44 +21,202 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-preprocess');
     grunt.loadNpmTasks('grunt-usemin');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
+    grunt.loadNpmTasks('grunt-browserify');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         env : {
-            opera: {
-                TARGET: 'OPERA'
-            },
-            chrome: {
-                TARGET: 'CHROME'
-            },
-            production: {
-                NODE_ENV : PRODUCTION
-            },
-            develop: {
-                NODE_ENV : DEVELOP
+            opera: {TARGET: OPERA},
+            chrome: {TARGET: CHROME},
+            firefox: {TARGET: FIREFOX},
+            production: {ENV : PRODUCTION},
+            development: {ENV : DEVELOPMENT}
+        },
+        inline_angular_templates: {
+            popup: {
+                files: {
+                    'pages/popup.html': ['modules/*/*.tmpl.html']
+                }
             }
         },
-        preprocess : BROWSERS.reduce(function (preprocess, browser) {
-            preprocess[browser] = {
-                expand: true,
-                cwd: browser + '/pages/',
-                dest: browser + '/pages/',
-                src: ['*.raw.html'],
-                ext: '.html'
+        browserify: (function () {
+            var vendorShim = {
+                'angularKeypress': {
+                    path: 'bower_components/angular-ui-utils/modules/keypress/keypress.js',
+                    exports: 'angular',
+                    depends: {angular: 'angular'}
+                },
+                'bootstrapDropdown': {
+                    path: 'bower_components/bootstrap/js/bootstrap-dropdown.js',
+                    exports: 'jQuery',
+                    depends: {zepto: 'jQuery'}
+                },
+                'bootstrapTooltip': {
+                    path: 'bower_components/bootstrap/js/bootstrap-tooltip.js',
+                    exports: 'jQuery',
+                    depends: {zepto: 'jQuery'}
+                },
+                'angular': {
+                    path: 'bower_components/angular-unstable/angular.js',
+                    exports: 'angular'
+                },
+                'javascript-linkify': {
+                    path: 'bower_components/javascript-linkify/ba-linkify.js',
+                    exports: 'linkify',
+                },
+                'zepto': {
+                    path: 'bower_components/zepto-bootstrap/zepto.js',
+                    exports: '$'
+                },
+                'jEmoji': {
+                    path: 'bower_components/emoji/lib/emoji.js',
+                    exports: 'jEmoji'
+                }
+            }, commonExternals = ['backbone', 'underscore', 'vow', 'moment'], options = {
+                external: Object.keys(vendorShim).concat(commonExternals),
+                ignore: [
+                    'browser/browser.bg.js',
+                    'tracker/tracker.bg.js',
+                    './request.bg.js',
+                    './tracker.bg.js',
+                    './mediator.bg.js',
+                    'timer',
+                    'chrome',
+                    'sdk/system',
+                    'sdk/tabs',
+                    'sdk/self',
+                    'sdk/simple-storage'
+                ]
             };
 
-            return preprocess;
-        }, {
+            return BROWSERS.reduce(function (browserify, browser) {
+                browserify[browser.toLowerCase() + 'Popup'] = {
+                    files: {
+                        'pages/popup.js': ['modules/app/app.pu.js'],
+                    },
+                    options: options
+                };
+                browserify[browser.toLowerCase() + 'Install'] = {
+                    files: {
+                        'pages/install.js': ['modules/app/app.install.js'],
+                    },
+                    options: options
+                };
+                browserify[browser.toLowerCase() + 'Background'] = {
+                    files: {
+                        'pages/background.js': [
+                            //zepto is hardcoded (simply concatenated)
+                            //to make it globally available,
+                            //because require('zepto') would broke cfx xpi.
+                            'bower_components/zepto-bootstrap/zepto.js',
+                            'modules/app/app.bg.js'
+                        ],
+                    },
+                    options: {
+                        external: commonExternals,
+                        ignore: [
+                            './mediator.pu.js',
+                            'browserAction',
+                            'timer',
+                            'chrome',
+                            'sdk/system/unload',
+                            'sdk/system',
+                            'sdk/tabs',
+                            'sdk/request',
+                            'sdk/self',
+                            'sdk/page-worker',
+                            'sdk/page-mod',
+                            'sdk/simple-storage',
+                            'sdk/notifications',
+                            browser === FIREFOX ? './yandex.webkit.bg.js':'./yandex.moz.bg.js'
+                        ]
+                    }
+                };
+
+                return browserify;
+            }, {
+                vendorCommon: {
+                    src: commonExternals,
+                    dest: 'pages/vendor.js',
+                    options: {
+                        alias: [
+                            '../node_modules/moment/moment.js:moment',
+                            '../node_modules/backbone/backbone.js:backbone',
+                            '../node_modules/underscore/underscore.js:underscore',
+                            '../node_modules/vow/lib/vow.js:vow'
+                        ],
+                        ignore: ['timer']
+                    }
+                },
+                vendorPopup: {
+                    files: {
+                        'pages/vendor.pu.js': [Object.keys(vendorShim)]
+                    },
+                    options: {shim: vendorShim}
+                }
+            });
+        })(),
+        'mozilla-cfx': {
+            run: {
+                options: {
+                    'mozilla-addon-sdk': '1_14',
+                    extension_dir: '.',
+                    command: 'run',
+                    arguments: '-p ../ff'
+                }
+            },
+            'run-build': {
+                options: {
+                    'mozilla-addon-sdk': '1_14',
+                    extension_dir: '../build/firefox',
+                    command: 'run',
+                    arguments: '-p ../ff'
+                }
+            },
+
+            xpi: {
+                options: {
+                    'mozilla-addon-sdk': '1_14',
+                    extension_dir: '../build/firefox/',
+                    command: 'xpi',
+                    arguments: '-p ../ff'
+                }
+            }
+        },
+        'mozilla-addon-sdk': {
+            '1_14': {
+                options: {
+                    revision: '1.14'
+                }
+            }
+        },
+        preprocess : {
+            popup: {
+                src : 'pages/popup.raw.html',
+                dest : 'pages/popup.html'
+            },
+            install: {
+                src : 'pages/install.raw.html',
+                dest : 'pages/install.html'
+            },
             manifest: {
                 src : 'manifest.raw.json',
                 dest : 'manifest.json'
+            },
+            env: {
+                src : 'modules/env/env.raw.js',
+                dest : 'modules/env/env.js'
             }
-        }),
-        // optimize, preprocess only single file
+        },
         watch: BROWSERS.reduce(function (watch, browser) {
-            watch[browser] = {
-                files: browser + '/pages/*.raw.html',
-                tasks: ['preprocess:' + browser]
+            watch[browser.toLowerCase()] = {
+                files: 'modules/**/*.js',
+                tasks: [
+                    'browserify:' + browser.toLowerCase() + 'Popup',
+                    'browserify:' + browser.toLowerCase() + 'Background',
+                    'browserify:' + browser.toLowerCase() + 'Install'
+                ]
             };
 
             return watch;
@@ -81,6 +243,7 @@ module.exports = function (grunt) {
         //localization
         messageformat: LOCALES.reduce(function (memo, locale) {
             memo[locale] = {
+                namespace: 'module.exports',
                 locale: locale,
                 inputdir: 'modules/i18n/' + locale,
                 output: 'modules/i18n/' + locale + '.js'
@@ -88,61 +251,79 @@ module.exports = function (grunt) {
 
             return memo;
         }, {}),
-        less: BROWSERS.reduce(function (less, browser) {
-            less[browser] = {
+        less: {
+            all: {
                 expand: true,
-                cwd: browser + '/pages/',
-                dest: browser + '/pages/',
+                cwd: 'pages/',
+                dest: 'pages/',
                 src: ['*.less'],
                 ext: '.css',
                 options: {
                     compile: true,
-                    compress: process.env.NODE_ENV === PRODUCTION
+                    compress: process.env.ENV === PRODUCTION
                 }
-            };
-            return less;
-        }, {}),
-        clean: {
-            // Warning: Cannot delete files outside the current working directory.
-            options: {force: true},
-            build: ['../build'],
-            manifest: ['manifest.json'],
-            pages: [
-                'pages/*.html',
-                '!pages/*.raw.html',
-                'pages/*.js',
-                'pages/*.css'
-            ]
+            }
         },
-        copy: BROWSERS.reduce(function (copy, browser) {
-            copy[browser] = {
+        // Prevent Warning: Cannot delete files outside the current working directory.
+        clean: BROWSERS.reduce(function (clean, browser) {
+            var browserLowercased = browser.toLowerCase();
+            clean[browserLowercased] = ['../build/' + browserLowercased];
+            return clean;
+        }, {options: {force: true}}),
+        copy: [CHROME, OPERA].reduce(function (copy, browser) {
+            copy[browser.toLowerCase()] = {
                 expand: true,
                 src: [
-                    '_locales/**',
-                    'assets/**',
                     'manifest.json',
 
-                    'components/font-awesome/font/fontawesome-webfont.ttf',
-                    'components/emoji/lib/emoji.png',
-                    'components/emoji/lib/emoji.css',
-                    'components/jquery/jquery.js',
-                    'components/angular-unstable/angular.js',
-                    'components/underscore/underscore.js',
-                    'components/backbone/backbone.js',
+                    '_locales/**',
+                    'assets/**',
+
+                    'bower_components/font-awesome/font/fontawesome-webfont.ttf',
+                    'bower_components/emoji/lib/emoji.css',
+                    'bower_components/emoji/lib/emoji.png',
 
                     'modules/auth/oauth.vk.com.js',
-                    'modules/**/*.html',
-                    'modules/**/*.ogg',
-                    browser + '/pages/*.html',
-                    '!' + browser + '/pages/*.raw.html',
-                    browser + '/pages/*.js',
-                    browser + '/pages/*.css',
+                    'modules/resize/dimensions.pu.js',
+                    'modules/notifications/*.ogg',
+
+                    'pages/*.html',
+                    '!pages/*.raw.html',
+                    'pages/*.css',
+                    'pages/*.js'
                 ],
-                dest: '../build/' + browser
+                dest: '../build/' + browser.toLowerCase()
             };
 
             return copy;
-        }, {}),
+        }, {
+            firefox: {
+                expand: true,
+                src: [
+                    'package.json',
+                    'packages/**',
+
+                    'data/assets/**',
+
+                    //best font for window and osx in firefox and chrome
+                    'data/bower_components/font-awesome/font/fontawesome-webfont.ttf',
+                    'data/bower_components/emoji/lib/emoji.css',
+                    'data/bower_components/emoji/lib/emoji.png',
+
+                    'data/modules/yandex/search.moz.xml',
+                    'data/modules/notifications/*.ogg',
+                    'data/modules/notifications/firefox.html',
+                    'data/modules/*/*.js',
+
+                    'data/pages/*.html',
+                    '!data/pages/*.raw.html',
+                    'data/pages/*.css',
+                    'data/pages/*.js',
+                    '!data/pages/background.js',
+                ],
+                dest: '../build/firefox'
+            }
+        }),
         //Next two targets concatenates js/css
         useminPrepare: {
             html: BROWSERS.reduce(function (html, browser) {
@@ -184,30 +365,57 @@ module.exports = function (grunt) {
 
     grunt.file.setBase(SRC_DIR);
 
+    [FIREFOX].forEach(function (browser) {
+        var browserLowercased = browser.toLowerCase(),
+            commonTasks = [
+                'env:firefox',
+                'env:development',
+                'less',
+                'preprocess:env',
+                'preprocess:install',
+                'preprocess:popup',
+                'inline_angular_templates',
+                'browserify:vendorCommon',
+                'browserify:vendorPopup',
+                'browserify:firefoxPopup',
+                'browserify:firefoxInstall',
+                'mozilla-addon-sdk'
+            ];
 
-    BROWSERS.forEach(function (browser) {
-        grunt.registerTask(browser, [
-            'env:' + browser,
-            'preprocess:manifest',
-            'preprocess:' + browser,
-            'messageformat',
-            'less:' + browser,
-            'watch'
-        ]);
+        grunt.registerTask(browserLowercased, commonTasks.concat([
+            'mozilla-cfx:run'
+        ]));
+        grunt.registerTask('build:' + browserLowercased, commonTasks.concat([
+            'clean:' + browserLowercased,
+            'copy:' + browserLowercased,
+            'mozilla-cfx:xpi',
+            'mozilla-cfx:run-build'
+        ]));
+    });
 
-        grunt.registerTask('build:' + browser, [
-            'clean',
-            'env:production',
-            'env:' + browser,
-            'preprocess:manifest',
-            'preprocess:' + browser,
-            'messageformat',
-            'less:' + browser,
-            'useminPrepare',
-            'concat',
-            'usemin',
-            'copy:' + browser,
-            'compress:' + browser
-        ]);
+    [CHROME, OPERA].forEach(function (browser) {
+        var browserLowercased = browser.toLowerCase(),
+            commonTasks = [
+                'env:' + browserLowercased,
+                'less',
+                'preprocess:env',
+                'preprocess:popup',
+                'preprocess:install',
+                'preprocess:manifest',
+                'inline_angular_templates',
+                'browserify:vendorCommon',
+                'browserify:vendorPopup',
+                'browserify:' + browserLowercased + 'Popup',
+                'browserify:' + browserLowercased + 'Install',
+                'browserify:' + browserLowercased + 'Background'
+            ];
+
+        grunt.registerTask(browserLowercased, commonTasks.concat([
+            'watch:' + browserLowercased
+        ]));
+        grunt.registerTask('build:' + browserLowercased, commonTasks.concat([
+            'clean:' + browserLowercased,
+            'copy:' + browserLowercased
+        ]));
     });
 };

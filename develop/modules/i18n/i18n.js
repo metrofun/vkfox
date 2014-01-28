@@ -1,34 +1,57 @@
-/*global i18n */
-angular.module('i18n', [])
-    .config(function ($filterProvider, $provide) {
-        $provide.factory('I18N', function () {
-            var DEFAULT_LANGUAGE = 'ru',
-                language;
+var DEFAULT_LANGUAGE = 'en',
 
-            try {
-                language = navigator.language.split('-')[0].toLowerCase();
-            } catch (e) {
-            }
+    _ = require('underscore')._,
 
-            if (!i18n[language]) {
-                language = DEFAULT_LANGUAGE;
-            }
-            return {
-                getLang: function () {
-                    return language;
-                }
-            };
-        });
-        $filterProvider.register('i18n', function (I18N) {
-            var messages = i18n[I18N.getLang()];
+    i18n = _.extend(
+        {},
+        require('./ru.js'),
+        require('./uk.js'),
+        require('./en.js')
+    ), language, locale, messages, chr, Ci, Cc;
 
-            return function (input) {
-                if (input) {
-                    return messages[input].apply(
-                        messages,
-                        [].slice.call(arguments, 1)
-                    );
-                }
-            };
-        });
-    });
+// Show russian locale for belorus
+i18n.be = i18n.ru;
+
+if (typeof navigator !== 'undefined') {
+    locale = navigator.language;
+} else {
+    chr = require("chrome");
+    Cc = chr.Cc;
+    Ci = chr.Ci;
+    locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
+        .getService(Ci.nsIXULChromeRegistry).getSelectedLocale("global");
+}
+try {
+    language = locale.split('-')[0].toLowerCase();
+} catch (e) {}
+
+if (!i18n[language]) {
+    language = DEFAULT_LANGUAGE;
+}
+
+messages = i18n[language];
+
+module.exports = {
+    /**
+     * Returns current browser language
+     *
+     * @returns {String}
+     */
+    getLang: function () {
+        return language;
+    },
+    /**
+     * Returns localized text
+     *
+     * @param [String] key
+     * @param [...Mixed] any number of params
+     *
+     * @returns {String}
+     */
+    get: function (key) {
+        return messages[key].apply(
+            messages,
+            [].slice.call(arguments, 1)
+        );
+    }
+};

@@ -1,17 +1,12 @@
 {
         "name": "__MSG_name__",
         "short_name": "VKfox",
-        "version": "5.0.10",
+        "version": "5.1.0",
         "manifest_version": 2,
         "default_locale": "ru",
         "description": "__MSG_description__",
         "background": {
-            <!-- @if TARGET='CHROME' -->
-            "page": "chrome/pages/background.html"
-            <!-- @endif -->
-            <!-- @if TARGET='OPERA' -->
-            "page": "opera/pages/background.html"
-            <!-- @endif -->
+            "page": "pages/background.html"
         },
         "icons": {
             "16": "assets/logo16.png",
@@ -40,12 +35,7 @@
                 "38": "assets/logo38_offline.png"
             },
             "default_title": "VKfox",
-            <!-- @if TARGET='CHROME' -->
-            "default_popup": "chrome/pages/popup.html"
-            <!-- @endif -->
-            <!-- @if TARGET='OPERA' -->
-            "default_popup": "opera/pages/popup.html"
-            <!-- @endif -->
+            "default_popup": "pages/popup.html"
 
         },
         "content_scripts": [{
@@ -54,5 +44,5 @@
             "run_at" : "document_start",
             "all_frames" : true
         }],
-        "minimum_chrome_version" : "28"
+        "minimum_chrome_version" : "29"
 }

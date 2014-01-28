@@ -1,0 +1,184 @@
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: 11.33333333333rem;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* Google Chrome has rendering issues
+with woff fonts on Windows */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: normal;
+  src: url(../assets/Roboto/Roboto-Regular.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: bold;
+  src: url(../assets/Roboto/Roboto-Bold.ttf) format('truetype');
+}
+/* see http://flatuicolors.com/ */
+[anchor] {
+  cursor: pointer;
+}
+html {
+  height: 100%;
+}
+a {
+  color: #fbedb8;
+}
+a:focus,
+a:hover {
+  text-decoration: underline;
+}
+.app {
+  background-color: #3498db;
+  color: #ecf0f1;
+  font-family: 'Roboto';
+  font-size: 21px;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+
+  height: 100%;
+}
+.app__content {
+  width: 640px;
+  position: relative;
+  top: 80px;
+}
+.app__title {
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+  text-align: right;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+.app__brand {
+  font-size: 3em;
+}
+.app__steps-wrap {
+  position: relative;
+}
+.app__steps {
+  margin-top: 80px;
+  display: flex;
+  justify-content: space-around;
+}
+.app__progress,
+.app__steps-wrap:before {
+  content: '';
+  position: absolute;
+  height: 8px;
+  border-radius: 4px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+.app__steps-wrap:before {
+  background: #ecf0f1;
+  width: 100%;
+}
+.app__progress {
+  background: #f1c40f;
+  border-bottom: 2px solid #aa8a0a;
+  -webkit-transition: width 0.1s;
+  -moz-transition: width 0.1s;
+  -o-transition: width 0.1s;
+  transition: width 0.1s;
+}
+.app__bullet {
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background: #ecf0f1;
+}
+.app__bullet_active {
+  background: #f1c40f;
+  border-bottom: 2px solid #aa8a0a;
+  -webkit-transition: background 0.3s;
+  -moz-transition: background 0.3s;
+  -o-transition: background 0.3s;
+  transition: background 0.3s;
+}
+.app__main {
+  line-height: 1.3em;
+  margin: 80px 0;
+  color: #cce5f6;
+  font-weight: 300;
+  min-height: 81px;
+}
+.app__controls {
+  display: flex;
+  align-items: flex-end;
+  min-height: 43px;
+}
+.app__button {
+  min-width: 100px;
+  text-align: center;
+  border: none;
+  background: #ecf0f1;
+  color: #7f8c8d;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  border-bottom: 2px solid #c0cdd1;
+  cursor: pointer;
+  z-index: 1;
+}
+.app__button:focus,
+.app__button:hover {
+  background: #fbfcfc;
+}
+.app__button:active {
+  border-bottom: 0;
+}
+.app__button:first-letter {
+  text-transform: uppercase;
+}
+.app__button_next {
+  margin-left: auto;
+  color: #614f06;
+  background: #f1c40f;
+  border-bottom: 2px solid #aa8a0a;
+}
+.app__button_next:focus,
+.app__button_next:hover {
+  background: #f2ca27;
+}
+.app__logo {
+  background-image: url(/modules/app/logo.install.png);
+  width: 96px;
+  height: 106px;
+  margin: auto;
+}
