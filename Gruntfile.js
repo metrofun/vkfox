@@ -105,16 +105,16 @@ module.exports = function (grunt) {
                 };
                 browserify[browser.toLowerCase() + 'Background'] = {
                     files: {
-                        'pages/background.js': ['modules/app/app.bg.js'],
+                        'pages/background.js': [
+                            //zepto is hardcoded (simply concatenated)
+                            //to make it globally available,
+                            //because require('zepto') would broke cfx xpi.
+                            'bower_components/zepto-bootstrap/zepto.js',
+                            'modules/app/app.bg.js'
+                        ],
                     },
                     options: {
                         external: commonExternals,
-                        shim: {
-                            'zepto': {
-                                path: 'bower_components/zepto-bootstrap/zepto.js',
-                                exports: '$'
-                            }
-                        },
                         ignore: [
                             './mediator.pu.js',
                             'browserAction',
@@ -203,10 +203,6 @@ module.exports = function (grunt) {
             manifest: {
                 src : 'manifest.raw.json',
                 dest : 'manifest.json'
-            },
-            tracker: {
-                src : 'modules/tracker/tracker.raw.js',
-                dest : 'modules/tracker/tracker.js'
             },
             env: {
                 src : 'modules/env/env.raw.js',
@@ -376,7 +372,6 @@ module.exports = function (grunt) {
                 'env:development',
                 'less',
                 'preprocess:env',
-                'preprocess:tracker',
                 'preprocess:install',
                 'preprocess:popup',
                 'inline_angular_templates',
@@ -404,7 +399,6 @@ module.exports = function (grunt) {
                 'env:' + browserLowercased,
                 'less',
                 'preprocess:env',
-                'preprocess:tracker',
                 'preprocess:popup',
                 'preprocess:install',
                 'preprocess:manifest',

@@ -28,8 +28,12 @@ function guid() {
 }
 function getBrowserVersion() {
     if (Env.background && Env.firefox) {
-        return require("sdk/system").version;
+        return require('sdk/system').platformVersion;
     } else {
+        // we don't user require('zepto')
+        // to hack for Firefox's SDK syntax analyzer
+        // But we do need, to somewhere include zepto
+        return $.browser.version;
     }
 }
 function getPage() {

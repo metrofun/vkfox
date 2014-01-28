@@ -102,7 +102,7 @@ xhr = (function () {
                 // TODO implement timeout
                 sdkRequest({
                     url: url,
-                    content: data === 'string' ? encodeURIComponent(data):data,
+                    content: data === 'string' ? data:querystring(data),
                     onComplete: function (response) {
                         if (response.statusText === 'OK') {
                             onLoad(ajaxPromise, accessToken, response.text);
