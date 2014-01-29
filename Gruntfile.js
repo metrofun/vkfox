@@ -345,15 +345,15 @@ module.exports = function (grunt) {
             }, [])
         },
         compress: BROWSERS.reduce(function (compress, browser) {
-            compress[browser] = {
+            compress[browser.toLowerCase()] = {
                 options: {
                     level: '9', //best compression
-                    archive: '../build/' + browser + '.zip'
+                    archive: '../build/' + browser.toLowerCase() + '.zip'
                 },
                 files: [
                     {
                         expand: true,
-                        cwd: '../build/' + browser + '/',
+                        cwd: '../build/' + browser.toLowerCase() + '/',
                         src: ['**']
                     }
                 ]
@@ -415,7 +415,8 @@ module.exports = function (grunt) {
         ]));
         grunt.registerTask('build:' + browserLowercased, commonTasks.concat([
             'clean:' + browserLowercased,
-            'copy:' + browserLowercased
+            'copy:' + browserLowercased,
+            'compress:' + browserLowercased
         ]));
     });
 };
