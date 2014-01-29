@@ -160,7 +160,7 @@ module.exports = function (grunt) {
         'mozilla-cfx': {
             run: {
                 options: {
-                    'mozilla-addon-sdk': '1_14',
+                    'mozilla-addon-sdk': '1_15',
                     extension_dir: '.',
                     command: 'run',
                     arguments: '-p ../ff'
@@ -168,7 +168,7 @@ module.exports = function (grunt) {
             },
             'run-build': {
                 options: {
-                    'mozilla-addon-sdk': '1_14',
+                    'mozilla-addon-sdk': '1_15',
                     extension_dir: '../build/firefox',
                     command: 'run',
                     arguments: '-p ../ff'
@@ -177,7 +177,7 @@ module.exports = function (grunt) {
 
             xpi: {
                 options: {
-                    'mozilla-addon-sdk': '1_14',
+                    'mozilla-addon-sdk': '1_15',
                     extension_dir: '../build/firefox/',
                     command: 'xpi',
                     arguments: '-p ../ff'
@@ -185,9 +185,9 @@ module.exports = function (grunt) {
             }
         },
         'mozilla-addon-sdk': {
-            '1_14': {
+            '1_15': {
                 options: {
-                    revision: '1.14'
+                    revision: '1.15'
                 }
             }
         },
