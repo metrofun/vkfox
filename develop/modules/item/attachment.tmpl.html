@@ -21,21 +21,21 @@
 
     <div
         ng-switch-when="graffiti"
-        anchor="{{data.src_big}}"
+        anchor="{{data | highResSrc}}"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>
 
     <div
         ng-switch-when="photo"
-        anchor="{{data.src_big}}"
+        anchor="{{data | highResSrc}}"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>
 
     <div
         ng-switch-when="posted_photo"
-        anchor="{{data.src_big}}"
+        anchor="{{data | highResSrc}}"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>

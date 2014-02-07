@@ -57,18 +57,12 @@ function updateLatestMessageId() {
 }
 function fetchProfiles() {
     var requiredUids = dialogColl.reduce(function (uids, dialog) {
-        dialog.get('messages').map(function (message) {
-            var chatActive = message.chat_active;
-            if (chatActive) {
-                // unfortunately chatActive sometimes
-                // don't contain actual sender
-                uids = uids.concat(chatActive.map(function (uid) {
-                    return Number(uid);
-                })).concat(userId, message.uid);
-            } else {
-                uids = uids.concat([message.uid, dialog.get('uid')]);
-            }
-        });
+        uids = uids.concat(dialog.get('messages').map(function (message) {
+            return message.uid;
+        }), dialog.get('uid'));
+        if (dialog.get('chat_active')) {
+            uids = uids.concat(dialog.get('chat_active'));
+        }
         return uids;
     }, [userId]),
     cachesUids = profilesColl.pluck('uid'),

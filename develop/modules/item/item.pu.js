@@ -66,6 +66,25 @@ require('angular').module('app')
             }
         };
     })
+    .filter('highResSrc', function () {
+        return function (photo) {
+            var sizes = [
+                'src_xxxbig',
+                'src_xxbig',
+                'src_xbig',
+                'src_big',
+                'src_small',
+                'src'
+            ], i;
+            if (photo) {
+                for (i in sizes) {
+                    if (sizes[i] in photo) {
+                        return photo[sizes[i]];
+                    }
+                }
+            }
+        };
+    })
     .directive('itemActions', function () {
         return {
             template: '<div class="item__actions" ng-transclude></div>',

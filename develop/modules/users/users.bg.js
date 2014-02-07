@@ -6,6 +6,7 @@ Vow = require('vow'),
 Backbone = require('backbone'),
 Mediator = require('mediator/mediator.js'),
 Request = require('request/request.bg.js'),
+ProxyMethods = require('proxy-methods/proxy-methods.js'),
 _ = require('underscore')._,
 
 inProgress, usersGetQueue, friendsProfilesDefer,
@@ -84,7 +85,7 @@ Mediator.sub('auth:success', function () {
 
 dropOldNonFriendsProfiles();
 
-module.exports = _.extend({
+module.exports = ProxyMethods.connect('users/users.bg.js', _.extend({
     getFriendsProfiles: function () {
         if (!friendsProfilesDefer) {
             friendsProfilesDefer = Request.api({
@@ -120,4 +121,4 @@ module.exports = _.extend({
             return promise;
         });
     }
-}, require('users/name.js'));
+}, require('users/name.js')));

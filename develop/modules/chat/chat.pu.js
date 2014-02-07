@@ -1,6 +1,7 @@
 var _ = require('underscore')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
+    Vow = require('vow'),
     Request = require('request/request.js'),
     Mediator = require('mediator/mediator.js');
 
@@ -48,26 +49,46 @@ require('angular').module('app')
                 Request.api({code: 'return API.messages.markAsRead({mids: ['
                     + _.pluck(messages, 'mid') + ']});'});
             },
-            getHistory: function (uid, offset) {
-                return Request.api({code: 'return  API.messages.getHistory(' + JSON.stringify({
-                    uid: uid,
+            getHistory: function (dialog, offset) {
+                var params = {
                     offset: offset,
                     count: 5
-                }) + ');'});
+                };
+                if (dialog.chat_active) {
+                    params.chat_id = dialog.chat_id;
+                } else {
+                    params.user_id = dialog.uid;
+                }
+                return Request.api({
+                    code: 'return  API.messages.getHistory(' + JSON.stringify(params) + ');'
+                }).then(function (messages) {
+                    if (dialog.chat_active) {
+                        //after fetching of news profiles,
+                        //we must make sure that we have
+                        //required profile objects
+                        return require('users/users.pu.js')
+                            .getProfilesById(messages.slice(1).map(function (message) {
+                                return message.uid;
+                            })).then(function (profiles) {
+                                return {messages: messages, profiles: profiles};
+                            });
+                    } else {
+                        return Vow.fulfill({messages: messages, profiles: []});
+                    }
+                });
             }
-
         };
     })
     .controller('ChatCtrl', function ($scope) {
         Mediator.pub('chat:data:get');
         Mediator.sub('chat:data', function (data) {
             $scope.$apply(function () {
+                $scope.dialogs = data.dialogs;
                 $scope.profilesColl = new Backbone.Collection(data.profiles, {
                     model: Backbone.Model.extend({
                         idAttribute: 'uid'
                     })
                 });
-                $scope.dialogs = data.dialogs;
             });
         });
         $scope.$on('$destroy', function () {
@@ -76,8 +97,8 @@ require('angular').module('app')
     })
     .controller('ChatItemCtrl', function ($scope, Chat) {
         var dialog = $scope.dialog,
-        profilesColl = $scope.profilesColl,
-        online;
+            profilesColl = $scope.profilesColl,
+            online;
 
         if (dialog.chat_id) {
             $scope.owners = dialog.chat_active.map(function (uid) {
@@ -112,13 +133,19 @@ require('angular').module('app')
     })
     .controller('ChatActionsCtrl', function ($scope, Chat) {
         $scope.showHistory = function (dialog) {
-            Chat.getHistory(dialog.uid, dialog.messages.length).then(function (messages) {
+            Chat.getHistory(dialog, dialog.messages.length).then(function (data) {
+                console.log(data);
+                var messages = data.messages;
+                $scope.profilesColl.add(data.profiles);
                 $scope.$apply(function () {
-                    //remove first item, which contains count
-                    messages.shift();
-                    [].unshift.apply(dialog.messages, messages.reverse());
+                    // TODO else hide button - show history
+                    if (messages.length > 1) {
+                        //remove first item, which contains count
+                        data.messages.shift();
+                        [].unshift.apply(dialog.messages, messages.reverse());
+                    }
                 });
-            });
+            }).done();
         };
         $scope.unreadHandler = function (event) {
             if ($scope.out) {
