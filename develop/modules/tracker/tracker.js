@@ -12,7 +12,15 @@ Config = require('config/config.js'),
 
 url = 'http://www.google-analytics.com/collect',
 persistentModel = new PersistentModel({}, {name: 'tracker'}),
-requiredParams;
+commonParamsPromise = Browser.getVkfoxVersion().then(function (version) {
+    return {
+        v: 1, // Version.
+        tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
+        cid: persistentModel.get('guid'), // Anonymous Client ID.
+        ul: I18n.getLang(), //user language
+        ap: version //app version
+    };
+});
 
 /**
  * Creates unique identifier if VKfox instance
@@ -52,22 +60,14 @@ if (!persistentModel.has('guid')) {
     persistentModel.set('guid', guid());
 }
 
-Browser.getVkfoxVersion().then(function (version) {
-    requiredParams = {
-        v: 1, // Version.
-        tid: Config.TRACKER_ID, // Tracking ID / Web property / Property ID.
-        cid: persistentModel.get('guid'), // Anonymous Client ID.
-        ul: I18n.getLang(), //user language
-        ap: version //app version
-    };
-});
-
 module.exports = {
     trackPage: function () {
-        Request.post(url, _.extend({}, requiredParams, {
-            t: 'pageview',          // Pageview hit type.
-            dp: getPage() // Page
-        }));
+        commonParamsPromise.then(function (params) {
+            Request.post(url, _.extend({}, params, {
+                t: 'pageview',          // Pageview hit type.
+                dp: getPage() // Page
+            }));
+        });
     },
     /**
     * Tracks a custom event
@@ -77,14 +77,16 @@ module.exports = {
     * @param {Number} [value]
     */
     trackEvent: function (category, action, label, value) {
-        Request.post(url, _.extend({}, requiredParams, {
-            t: 'event', // Event hit type
-            ec: category, // Event Category. Required.
-            ea: action, // Event Action. Required.
-            el: label, // Event label.
-            ev: value, // Event value.
-            dp: getPage() // Page
-        }));
+        commonParamsPromise.then(function (params) {
+            Request.post(url, _.extend({}, params, {
+                t: 'event', // Event hit type
+                ec: category, // Event Category. Required.
+                ea: action, // Event Action. Required.
+                el: label, // Event label.
+                ev: value, // Event value.
+                dp: getPage() // Page
+            }));
+        });
     },
     /**
      * Remote debug. All arguments would be send to Analytics.
