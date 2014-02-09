@@ -47,6 +47,11 @@ module.exports = function (grunt) {
                     exports: 'angular',
                     depends: {angular: 'angular'}
                 },
+                'angularSanitize': {
+                    path: 'bower_components/angular-sanitize/angular-sanitize.js',
+                    exports: 'angular',
+                    depends: {angular: 'angular'}
+                },
                 'bootstrapDropdown': {
                     path: 'bower_components/bootstrap/js/bootstrap-dropdown.js',
                     exports: 'jQuery',

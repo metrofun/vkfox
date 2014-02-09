@@ -9,6 +9,7 @@
     "font-awesome": "~3.2.1",
     "toolbarwidget-jplib": "https://github.com/Rob--W/toolbarwidget-jplib.git#4ff24e9b3a49a6e284fe8dec82ce5f9911f32150",
     "browser-action-jplib": "https://github.com/metrofun/browser-action-jplib.git#1e5a3604c171960aff841a3b6344217f1e0d3b50",
-    "zepto-bootstrap": "git@github.com:metrofun/zepto-bootstrap.git"
+    "zepto-bootstrap": "git@github.com:metrofun/zepto-bootstrap.git",
+    "angular-sanitize": "~1.0.8"
   }
 }
