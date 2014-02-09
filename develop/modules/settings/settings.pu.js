@@ -15,7 +15,7 @@ require('angular')
             /**
              * Similar interface for simple modules
              */
-            ['forceOnline', !Env.opera && 'yandex', 'notifications']
+            ['forceOnline', Env.chrome && 'yandex', 'notifications']
                 .filter(Boolean).forEach(function (moduleName) {
                     console.log(moduleName);
                     Mediator.sub(moduleName + ':settings', function (settings) {
