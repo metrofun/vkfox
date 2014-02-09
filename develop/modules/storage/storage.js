@@ -1,12 +1,12 @@
 if (typeof localStorage === 'undefined') {
-    var storage = require("sdk/simple-storage");
+    var ss = require('sdk/simple-storage');
 
     module.exports = {
         getItem: function (key) {
-            return storage[key];
+            return ss.storage[key];
         },
         setItem: function (key, value) {
-            storage[key] = value;
+            ss.storage[key] = value;
         }
     };
 } else {

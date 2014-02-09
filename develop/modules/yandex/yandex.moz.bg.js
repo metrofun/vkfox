@@ -113,8 +113,8 @@ storageModel.on('change:enabled', function (event, enabled) {
 });
 
 require('sdk/system/unload').when(function (reason) {
-    console.log('unload reason', reason);
     if (reason === 'disable') {
+        console.log('unload reason', reason);
         updateSearch(false);
     }
 });

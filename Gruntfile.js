@@ -171,7 +171,7 @@ module.exports = function (grunt) {
                     'mozilla-addon-sdk': '1_15',
                     extension_dir: '../build/firefox',
                     command: 'run',
-                    arguments: '-p ../ff'
+                    arguments: '-p ../../ff'
                 }
             },
 
@@ -180,7 +180,7 @@ module.exports = function (grunt) {
                     'mozilla-addon-sdk': '1_15',
                     extension_dir: '../build/firefox/',
                     command: 'xpi',
-                    arguments: '-p ../ff'
+                    arguments: '-p ../../ff'
                 }
             }
         },
