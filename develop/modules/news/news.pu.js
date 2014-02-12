@@ -59,7 +59,7 @@ require('angular').module('app')
                     case 'mention':
                         if (parent.comments.can_post) {
                             return {
-                                ownerId: parent.owner_id,
+                                ownerId: parent.source_id || parent.owner_id,
                                 id: parent.id || parent.post_id,
                                 type: 'post'
                             };
