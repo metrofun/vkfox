@@ -1,4 +1,4 @@
-var Vow = require('vow'),
+var Vow = require('shim/vow.js'),
     Mediator = require('mediator/mediator.js'),
     Tracker = require('tracker/tracker.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),

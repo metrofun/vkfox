@@ -8,9 +8,9 @@ var BADGE_COLOR = [231, 76, 60, 255],
         "38": "assets/logo38_offline.png"
     },
 
-    Vow = require('vow'),
+    Vow = require('shim/vow.js'),
     Env = require('env/env.js'),
-    _ = require('underscore'),
+    _ = require('shim/underscore.js')._,
 
     Browser, browserAction;
 

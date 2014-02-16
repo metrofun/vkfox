@@ -17,7 +17,7 @@ require('angular').module('app').directive('resize', function () {
     }, {name: 'resize'}),
 
     $ = require('zepto'),
-    _ = require('underscore')._,
+    _ = require('shim/underscore.js')._,
     root = $('html'),
     screenX, screenY,
     dragMove = _.debounce(function (e) {

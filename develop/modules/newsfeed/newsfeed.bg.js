@@ -2,8 +2,8 @@ var
 MAX_ITEMS_COUNT = 50,
 UPDATE_PERIOD = 10000, //ms
 
-_ = require('underscore')._,
-Vow = require('vow'),
+_ = require('shim/underscore.js')._,
+Vow = require('shim/vow.js'),
 Backbone = require('backbone'),
 Tracker = require('tracker/tracker.js'),
 Request = require('request/request.bg.js'),

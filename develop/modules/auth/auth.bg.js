@@ -8,9 +8,9 @@ var RETRY_INTERVAL = 10000, //ms
     Env = require('env/env.js'),
     Browser = require('browser/browser.bg.js');
 
-var _ = require('underscore')._,
+var _ = require('shim/underscore.js')._,
     Backbone = require('backbone'),
-    Vow = require('vow'),
+    Vow = require('shim/vow.js'),
 
     model = new Backbone.Model(),
     Auth, page, iframe,

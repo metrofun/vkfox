@@ -1,7 +1,7 @@
 var Mediator = require('mediator/mediator.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
     Browser = require('browser/browser.bg.js'),
-    _ = require('underscore')._,
+    _ = require('shim/underscore.js')._,
     data = require('sdk/self').data,
 
     attempts = 0,

@@ -2,12 +2,12 @@ var
 DROP_PROFILES_INTERVAL = 60000,
 USERS_GET_DEBOUNCE = 400,
 
-Vow = require('vow'),
+Vow = require('shim/vow.js'),
 Backbone = require('backbone'),
 Mediator = require('mediator/mediator.js'),
 Request = require('request/request.bg.js'),
 ProxyMethods = require('proxy-methods/proxy-methods.js'),
-_ = require('underscore')._,
+_ = require('shim/underscore.js')._,
 
 inProgress, usersGetQueue, friendsProfilesDefer,
 usersColl = new (Backbone.Collection.extend({

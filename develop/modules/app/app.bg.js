@@ -15,6 +15,6 @@ try {
     require('force-online/force-online.bg.js');
     require('longpoll/longpoll.bg.js');
 } catch (e)  {
-    require('tracker/tracker.js').error(e.stack);
+    // require('tracker/tracker.js').error(e.stack);
     throw e;
 }

@@ -1,5 +1,5 @@
 var
-_ = require('underscore')._,
+_ = require('shim/underscore.js')._,
 Backbone = require('backbone'),
 Browser = require('browser/browser.bg.js'),
 Env = require('env/env.js'),

@@ -1,4 +1,4 @@
-var _ = require('underscore')._,
+var _ = require('shim/underscore.js')._,
     Config = require('config/config.js'),
     moment = require('moment'),
     I18N = require('i18n/i18n.pu.js');

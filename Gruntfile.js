@@ -88,7 +88,11 @@ module.exports = function (grunt) {
                     './mediator.bg.js',
                     'timer',
                     'chrome',
+                    'toolkit/loader',
+                    '@loader/options',
+                    'sdk/timers',
                     'sdk/system',
+                    'sdk/system/globals',
                     'sdk/tabs',
                     'sdk/self',
                     'sdk/simple-storage'
@@ -150,8 +154,7 @@ module.exports = function (grunt) {
                             '../node_modules/backbone/backbone.js:backbone',
                             '../node_modules/underscore/underscore.js:underscore',
                             '../node_modules/vow/lib/vow.js:vow'
-                        ],
-                        ignore: ['timer']
+                        ]
                     }
                 },
                 vendorPopup: {

@@ -1,6 +1,6 @@
 var
-_ = require('underscore')._,
-Vow = require('vow'),
+_ = require('shim/underscore.js')._,
+Vow = require('shim/vow.js'),
 Backbone = require('backbone'),
 Request = require('request/request.bg.js'),
 Mediator = require('mediator/mediator.js'),

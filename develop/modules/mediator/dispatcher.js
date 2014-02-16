@@ -1,4 +1,4 @@
-var _ = require('underscore')._,
+var _ = require('shim/underscore.js')._,
     Backbone = require('backbone'),
     dispatcher = _.clone(Backbone.Events);
 

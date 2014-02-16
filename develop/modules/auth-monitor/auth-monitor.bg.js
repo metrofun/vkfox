@@ -1,7 +1,7 @@
 var
 CHECK_AUTH_PERIOD = 3000, //ms
 
-_ = require('underscore')._,
+_ = require('shim/underscore.js')._,
 Config = require('config/config.js'),
 Request = require('request/request.bg.js'),
 Auth = require('auth/auth.bg.js'),

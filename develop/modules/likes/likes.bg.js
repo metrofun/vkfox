@@ -1,5 +1,5 @@
 var Mediator = require('mediator/mediator.js'),
-    _ = require('underscore')._,
+    _ = require('shim/underscore.js')._,
     Request = require('request/request.bg.js');
 
 /**

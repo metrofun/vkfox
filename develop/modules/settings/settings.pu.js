@@ -1,4 +1,4 @@
-var _ = require('underscore')._,
+var _ = require('shim/underscore.js')._,
     Env = require('env/env.js'),
     NotificationsSettings = require('notifications/settings.js'),
     Mediator = require('mediator/mediator.js');

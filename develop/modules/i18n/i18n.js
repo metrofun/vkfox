@@ -1,6 +1,6 @@
 var DEFAULT_LANGUAGE = 'en',
 
-    _ = require('underscore')._,
+    _ = require('shim/underscore.js')._,
 
     i18n = _.extend(
         {},

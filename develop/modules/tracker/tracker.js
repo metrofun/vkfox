@@ -1,7 +1,7 @@
 /*jshint bitwise: false */
 /*global $ */
 var
-_ = require('underscore')._,
+_ = require('shim/underscore.js')._,
 PersistentModel = require('persistent-model/persistent-model.js'),
 I18n = require('i18n/i18n.js'),
 Env = require('env/env.js'),

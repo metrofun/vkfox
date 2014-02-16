@@ -3,8 +3,8 @@ MAX_ITEMS_COUNT = 50,
 MAX_COMMENTS_COUNT = 3,
 UPDATE_PERIOD = 2000, //ms
 
-_ = require('underscore')._,
-Vow = require('vow'),
+_ = require('shim/underscore.js')._,
+Vow = require('shim/vow.js'),
 Backbone = require('backbone'),
 Request = require('request/request.bg.js'),
 User = require('users/users.bg.js'),

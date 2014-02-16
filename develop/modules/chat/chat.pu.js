@@ -1,7 +1,7 @@
-var _ = require('underscore')._,
+var _ = require('shim/underscore.js')._,
     Backbone = require('backbone'),
     $ = require('zepto'),
-    Vow = require('vow'),
+    Vow = require('shim/vow.js'),
     Request = require('request/request.js'),
     Mediator = require('mediator/mediator.js');
 
