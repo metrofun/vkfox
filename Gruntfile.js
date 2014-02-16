@@ -47,6 +47,21 @@ module.exports = function (grunt) {
                     exports: 'angular',
                     depends: {angular: 'angular'}
                 },
+                //we create a chain of moment.js => lang/ru.js => lang/uk.js
+                'moment': {
+                    path: 'bower_components/moment/lang/ru.js',
+                    exports: 'moment',
+                    depends: {moment1: 'moment'}
+                },
+                'moment1': {
+                    path: 'bower_components/moment/lang/uk.js',
+                    exports: 'moment',
+                    depends: {moment2: 'moment'}
+                },
+                'moment2': {
+                    path: 'bower_components/moment/moment.js',
+                    exports: 'moment'
+                },
                 'angularSanitize': {
                     path: 'bower_components/angular-sanitize/angular-sanitize.js',
                     exports: 'angular',
@@ -78,7 +93,7 @@ module.exports = function (grunt) {
                     path: 'bower_components/emoji/lib/emoji.js',
                     exports: 'jEmoji'
                 }
-            }, commonExternals = ['backbone', 'underscore', 'vow', 'moment'], options = {
+            }, commonExternals = ['backbone', 'underscore', 'vow'], options = {
                 external: Object.keys(vendorShim).concat(commonExternals),
                 ignore: [
                     'browser/browser.bg.js',
@@ -154,7 +169,6 @@ module.exports = function (grunt) {
                     dest: 'pages/vendor.js',
                     options: {
                         alias: [
-                            '../node_modules/moment/moment.js:moment',
                             '../node_modules/backbone/backbone.js:backbone',
                             '../node_modules/underscore/underscore.js:underscore',
                             '../node_modules/vow/lib/vow.js:vow'
