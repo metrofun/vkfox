@@ -86,7 +86,6 @@ module.exports = function (grunt) {
                     './request.bg.js',
                     './tracker.bg.js',
                     './mediator.bg.js',
-                    'timer',
                     'chrome',
                     'toolkit/loader',
                     '@loader/options',
@@ -117,7 +116,7 @@ module.exports = function (grunt) {
                         'pages/background.js': [
                             //zepto is hardcoded (simply concatenated)
                             //to make it globally available,
-                            //because require('zepto') would broke cfx xpi.
+                            //because require('zepto') would break cfx xpi.
                             'bower_components/zepto-bootstrap/zepto.js',
                             'modules/app/app.bg.js'
                         ],
@@ -127,7 +126,10 @@ module.exports = function (grunt) {
                         ignore: [
                             './mediator.pu.js',
                             'browserAction',
-                            'timer',
+                            'sdk/timers',
+                            '@loader/options',
+                            'sdk/system',
+                            'sdk/system/globals',
                             'chrome',
                             'sdk/system/unload',
                             'sdk/system',
@@ -136,10 +138,12 @@ module.exports = function (grunt) {
                             'sdk/self',
                             'sdk/page-worker',
                             'sdk/page-mod',
+                            'toolkit/loader',
                             'sdk/simple-storage',
                             'sdk/notifications',
-                            browser === FIREFOX ? './yandex.webkit.bg.js':'./yandex.moz.bg.js'
-                        ]
+                            (browser !== FIREFOX) && './yandex.moz.bg.js',
+                            (browser !== CHROME) && './yandex.webkit.bg.js'
+                        ].filter(Boolean)
                     }
                 };
 

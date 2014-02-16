@@ -11,9 +11,11 @@ try {
     require('likes/likes.bg.js');
     require('tracker/tracker.js');
     require('proxy-methods/proxy-methods.js');
-    require('yandex/yandex.bg.js');
     require('force-online/force-online.bg.js');
     require('longpoll/longpoll.bg.js');
+    if (!require('env/env.js').opera) {
+        require('yandex/yandex.bg.js');
+    }
 } catch (e)  {
     require('tracker/tracker.js').error(e.stack);
     throw e;
