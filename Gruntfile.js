@@ -12,7 +12,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-inline-angular-templates');
     grunt.loadNpmTasks('grunt-messageformat');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -94,6 +93,7 @@ module.exports = function (grunt) {
                     exports: 'jEmoji'
                 }
             }, commonExternals = ['backbone', 'underscore', 'vow'], options = {
+                prelude: grunt.file.read('node_modules/browserify/node_modules/browser-pack/prelude.js'),
                 external: Object.keys(vendorShim).concat(commonExternals),
                 ignore: [
                     'browser/browser.bg.js',
@@ -137,6 +137,7 @@ module.exports = function (grunt) {
                         ],
                     },
                     options: {
+                        prelude: grunt.file.read('node_modules/browserify/node_modules/browser-pack/prelude.js'),
                         external: commonExternals,
                         ignore: [
                             './mediator.pu.js',
@@ -168,6 +169,7 @@ module.exports = function (grunt) {
                     src: commonExternals,
                     dest: 'pages/vendor.js',
                     options: {
+                        prelude: grunt.file.read('node_modules/browserify/node_modules/browser-pack/prelude.js'),
                         alias: [
                             '../node_modules/backbone/backbone.js:backbone',
                             '../node_modules/underscore/underscore.js:underscore',
@@ -179,7 +181,10 @@ module.exports = function (grunt) {
                     files: {
                         'pages/vendor.pu.js': [Object.keys(vendorShim)]
                     },
-                    options: {shim: vendorShim}
+                    options: {
+                        prelude: grunt.file.read('node_modules/browserify/node_modules/browser-pack/prelude.js'),
+                        shim: vendorShim
+                    }
                 }
             });
         })(),
