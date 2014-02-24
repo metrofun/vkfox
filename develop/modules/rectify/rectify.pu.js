@@ -3,12 +3,12 @@ var I18N = require('i18n/i18n.pu.js'),
     jEmoji = require('jEmoji'),
     $ = require('zepto');
 
-angular.module('app')
+require('angular').module('app')
     .filter('rectify', function ($sanitize) {
         var MAX_TEXT_LENGTH = 300,
             TRUNCATE_LENGTH = 200,
 
-            label = I18N.get('more...');
+        showMoreButtonLabel = I18N.get('more...');
 
         $('body').on('click', '.show-more', function (e) {
             var jTarget = $(e.currentTarget);
@@ -35,11 +35,14 @@ angular.module('app')
             var sanitized = $sanitize(hasEmoji ? jEmoji.unifiedToHTML(text):text),
                 linkifiedText = linkify(sanitized, {
                     callback: function (text, href) {
+                        //"text" and "href" are safe tokens of the already sanitized string,
+                        //which is passed to the "linkify" function above
                         return href ? '<a anchor="' + href + '">' + text + '</a>' : text;
                     }
                 });
 
-            //replace wiki layout
+            //replace wiki layout,
+            //linkifiedText is a sanitized and linkified text
             return linkifiedText.replace(
                 /\[((?:id|club)\d+)(?::bp-\d+_\d+)?\|([^\]]+)\]/g,
                 '<a anchor="http://vk.com/$1">$2</a>'
@@ -80,7 +83,7 @@ angular.module('app')
                             ' <span class="show-more btn rectify__button" data-text="',
                             escapeQuotes(text.slice(spaceIndex)), '" ',
                             hasEmoji ? 'data-emoji="yes" ':'',
-                            'type="button">', label, '</span>'
+                            'type="button">', showMoreButtonLabel, '</span>'
                         ].join('');
                     } else {
                         return linkifySanitizeEmoji(text, hasEmoji);

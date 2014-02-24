@@ -6,7 +6,7 @@
   "icon": "data/assets/logo48.png",
   "id": "gmetrofun@gmail.com",
   "license": "Creative Commons Attribution-NoDerivs 3.0 Unported(http://vkfox.org.ua/license)",
-  "version": "5.1.7",
+  "version": "5.1.8",
   "lib": "data/modules",
   "dependencies": ["browser-action"],
   "main": "app/app.bg.js"
