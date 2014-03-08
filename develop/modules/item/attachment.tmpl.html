@@ -8,9 +8,9 @@
     <a ng-switch-when="note" anchor="/note{{data.owner_id}}_{{data.nid}}">
         <i class="icon-file"></i> {{data.title}}
     </a>
-    <div  ng-switch-when="doc"  class="item__link">
+    <a ng-switch-when="doc"  class="item__link" anchor="{{data | docViewPath}}">
         <i class="icon-file"></i> {{data.title}}
-    </div>
+    </a>
     <div ng-switch-when="poll">
         <i class="icon-list-alt"></i> {{data.question}}
     </div>
@@ -21,21 +21,21 @@
 
     <div
         ng-switch-when="graffiti"
-        anchor="{{data | highResSrc}}"
+        anchor="{{data | imageViewPath}}"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>
 
     <div
         ng-switch-when="photo"
-        anchor="{{data | highResSrc}}"
+        anchor="{{data | imageViewPath}}"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>
 
     <div
         ng-switch-when="posted_photo"
-        anchor="{{data | highResSrc}}"
+        anchor="{{data | imageViewPath}}"
         class="item__picture"
         style="background-image: url({{data.src_big}})">
     </div>
@@ -43,6 +43,8 @@
     <div
         ng-switch-when="video"
         class="item__video"
+        data-id="{{data.owner_id}}_{{data.vid}}"
+        data-access-key="{{data.access_key}}"
         style="background-image: url({{data.image}})">
         <div class="item__video-desc">
             <div class="item__video-title">{{data.title}}</div>

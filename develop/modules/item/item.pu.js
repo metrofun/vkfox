@@ -1,5 +1,7 @@
 var Mediator = require('mediator/mediator.js'),
     Request = require('request/request.js'),
+    Browser = require('browser/browser.js'),
+    $ = require('zepto'),
     I18N = require('i18n/i18n.pu.js');
 
 require('angular').module('app')
@@ -55,6 +57,22 @@ require('angular').module('app')
         };
     })
     .directive('itemAttachment', function () {
+        var VIDEO_VIEW_URL = 'http://vkfox.io/video/';
+
+        $(document).on('click', '.item__video', function (e) {
+            var jTarget = $(e.currentTarget),
+                video = [jTarget.data('id'), jTarget.data('access-key')].filter(Boolean).join('_'),
+                params = {videos: video};
+
+            Request.api({
+                code: 'return API.video.get(' + JSON.stringify(params) + ');'
+            }).then(function (data) {
+                if (data && data[1]) {
+                    Browser.createTab(VIDEO_VIEW_URL + '#' + btoa(data[1].player));
+                }
+            });
+        });
+
         return {
             templateUrl: 'modules/item/attachment.tmpl.html',
             replace: true,
@@ -66,7 +84,29 @@ require('angular').module('app')
             }
         };
     })
-    .filter('highResSrc', function () {
+    .filter('docViewPath', function () {
+        var DOC_VIEW_URL = 'http://vkfox.io/doc/',
+            IMAGE_VIEW_URL = 'http://vkfox.io/photo/';
+
+        function isImage(filename) {
+            var IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'tiff'],
+                match = filename.match(/\.([^.]+)$/);
+
+            if (match) {
+                console.log(match);
+                return ~IMAGE_EXTS.indexOf(match[1].toLowerCase());
+            }
+        }
+
+        return function (data) {
+            if (data) {
+                return (isImage(data.title) ? IMAGE_VIEW_URL:DOC_VIEW_URL) + '#' + btoa(data.url);
+            }
+        };
+    })
+    .filter('imageViewPath', function () {
+        var IMAGE_VIEW_URL = 'http://vkfox.io/photo/';
+
         return function (photo) {
             var sizes = [
                 'src_xxxbig',
@@ -79,7 +119,7 @@ require('angular').module('app')
             if (photo) {
                 for (i in sizes) {
                     if (sizes[i] in photo) {
-                        return photo[sizes[i]];
+                        return IMAGE_VIEW_URL + '#' + btoa(photo[sizes[i]]);
                     }
                 }
             }
