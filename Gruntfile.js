@@ -429,6 +429,7 @@ module.exports = function (grunt) {
             commonTasks = [
                 'env:' + browserLowercased,
                 'less',
+                'messageformat',
                 'preprocess:env',
                 'preprocess:popup',
                 'preprocess:install',

@@ -686,7 +686,7 @@ return r;
 }
 module.exports["uk"]["Accept license agreement"] = function(d){
 var r = "";
-r += "Встановлюючи даний додаток ви погоджуєтесь з усіма правилами, умовами та інформацією нашої <a anchor='http: //vkfox.org.ua/license'>ліцензійної угоди.</a>";
+r += "Встановлюючи даний додаток ви погоджуєтесь з усіма правилами, умовами та інформацією нашої <a anchor='http://vkfox.io/license'>ліцензійної угоди.</a>";
 return r;
 }
 module.exports["uk"]["Install Yandex search"] = function(d){
