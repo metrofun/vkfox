@@ -85,11 +85,31 @@ module.exports = function (grunt) {
                     exports: 'linkify',
                 },
                 'zepto': {
-                    path: 'bower_components/zepto-bootstrap/zepto.js',
-                    exports: '$'
+                    path: 'bower_components/zeptojs/src/event.js',
+                    exports: '$',
+                    depends: {zepto1: 'Zepto'}
+                },
+                'zepto1': {
+                    path: 'bower_components/emoji/lib/emoji.js',
+                    exports: 'Zepto',
+                    depends: {zepto2: 'Zepto'}
+                },
+                'zepto2': {
+                    path: 'bower_components/zeptojs/src/data.js',
+                    exports: 'Zepto',
+                    depends: {zepto3: 'Zepto'}
+                },
+                'zepto3': {
+                    path: 'bower_components/zeptojs/src/selector.js',
+                    exports: 'Zepto',
+                    depends: {zepto4: 'Zepto'}
+                },
+                'zepto4': {
+                    path: 'bower_components/zeptojs/src/detect.js',
+                    exports: 'Zepto',
                 },
                 'jEmoji': {
-                    path: 'bower_components/emoji/lib/emoji.js',
+                    path: 'bower_components/zeptojs/src/zepto.js',
                     exports: 'jEmoji'
                 }
             }, commonExternals = ['backbone', 'underscore', 'vow'], options = {
