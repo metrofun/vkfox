@@ -90,7 +90,7 @@ module.exports = function (grunt) {
                     depends: {zepto1: 'Zepto'}
                 },
                 'zepto1': {
-                    path: 'bower_components/emoji/lib/emoji.js',
+                    path: 'bower_components/zeptojs/src/detect.js',
                     exports: 'Zepto',
                     depends: {zepto2: 'Zepto'}
                 },
@@ -105,11 +105,11 @@ module.exports = function (grunt) {
                     depends: {zepto4: 'Zepto'}
                 },
                 'zepto4': {
-                    path: 'bower_components/zeptojs/src/detect.js',
+                    path: 'bower_components/zeptojs/src/zepto.js',
                     exports: 'Zepto',
                 },
                 'jEmoji': {
-                    path: 'bower_components/zeptojs/src/zepto.js',
+                    path: 'bower_components/emoji/lib/emoji.js',
                     exports: 'jEmoji'
                 }
             }, commonExternals = ['backbone', 'underscore', 'vow'], options = {
