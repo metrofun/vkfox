@@ -3,15 +3,12 @@ var Dispatcher = require('./dispatcher.js'),
     Browser = require('browser/browser.bg.js'),
     Env = require('env/env.js');
 
+
 if (Env.firefox) {
-    var browserAction = Browser.getBrowserAction(),
+    var firefoxPanel = Browser.getFirefoxPanel(),
         data = require('sdk/self').data,
-        pageMod = require("sdk/page-mod"), activeWorkers = [];
+        pageMod = require("sdk/page-mod"), activeWorkers = [firefoxPanel];
 
-
-    browserAction.onMessage.addListener(function (messageData) {
-        Dispatcher.pub.apply(Mediator, messageData);
-    });
 
     pageMod.PageMod({
         include: /.*vkfox\/data\/pages\/.*\.html/,
@@ -31,12 +28,15 @@ if (Env.firefox) {
         }
     });
 
+
+    firefoxPanel.port.on('message', function (messageData) {
+        Dispatcher.pub.apply(Mediator, [].slice.call(messageData));
+    });
+
     Object.defineProperty(Mediator, 'pub', { value: function () {
         var args = [].slice.call(arguments);
 
         Dispatcher.pub.apply(Mediator, arguments);
-
-        browserAction.sendMessage(args);
 
         activeWorkers.forEach(function (worker, index) {
             try {

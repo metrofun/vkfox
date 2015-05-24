@@ -1,5 +1,6 @@
 var Vow = require('shim/vow.js'),
     Mediator = require('mediator/mediator.js'),
+    Browser = require('browser/browser.js'),
     Tracker = require('tracker/tracker.js'),
     PersistentModel = require('persistent-model/persistent-model.js'),
 
@@ -82,7 +83,7 @@ require('angular').module('app')
         authPromise.then(function (state) {
             if (state !== READY) {
                 Mediator.pub('auth:oauth');
-                window.close();
+                Browser.closePopup();
             }
         });
         Mediator.pub('auth:state:get');

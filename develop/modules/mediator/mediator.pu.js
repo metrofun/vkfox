@@ -4,21 +4,24 @@ var Dispatcher = require('./dispatcher.js'),
 
 if (Env.firefox) {
     // is opened from panel
-    if (typeof extension !== 'undefined') {
-        extension.onMessage.addListener(function (messageData) {
-            Dispatcher.pub.apply(Mediator, messageData);
+    if (typeof addon !== 'undefined') {
+        addon.port.on('message', function (messageData) {
+            Dispatcher.pub.apply(Mediator, [].slice.call(messageData));
         });
+
         Mediator.pub = function () {
             Dispatcher.pub.apply(Dispatcher, arguments);
 
-            extension.sendMessage([].slice.call(arguments));
+            addon.port.emit('message', [].slice.call(arguments));
         };
     } else {
         Mediator.pub = function () {
+            var data = JSON.stringify([].slice.call(arguments));
             Dispatcher.pub.apply(Dispatcher, arguments);
 
-            window.postMessage({from: 'page', data: JSON.stringify([].slice.call(arguments))}, '*');
+            window.postMessage({from: 'page', data: data}, '*');
         };
+
         window.addEventListener('message', function (e) {
             if (e.data.from === 'content-script') {
                 Dispatcher.pub.apply(Mediator, JSON.parse(e.data.data));

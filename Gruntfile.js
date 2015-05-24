@@ -124,6 +124,7 @@ module.exports = function (grunt) {
                     'chrome',
                     'toolkit/loader',
                     '@loader/options',
+                    'sdk/ui/button/toggle',
                     'sdk/timers',
                     'sdk/system',
                     'sdk/system/globals',
@@ -211,7 +212,7 @@ module.exports = function (grunt) {
         'mozilla-cfx': {
             run: {
                 options: {
-                    'mozilla-addon-sdk': '1_15',
+                    'mozilla-addon-sdk': '1_17',
                     extension_dir: '.',
                     command: 'run',
                     arguments: '-p ../ff'
@@ -219,7 +220,7 @@ module.exports = function (grunt) {
             },
             'run-build': {
                 options: {
-                    'mozilla-addon-sdk': '1_15',
+                    'mozilla-addon-sdk': '1_17',
                     extension_dir: '../build/firefox',
                     command: 'run',
                     arguments: '-p ../../ff'
@@ -228,7 +229,7 @@ module.exports = function (grunt) {
 
             xpi: {
                 options: {
-                    'mozilla-addon-sdk': '1_15',
+                    'mozilla-addon-sdk': '1_17',
                     extension_dir: '../build/firefox/',
                     command: 'xpi',
                     arguments: '-p ../../ff'
@@ -236,9 +237,9 @@ module.exports = function (grunt) {
             }
         },
         'mozilla-addon-sdk': {
-            '1_15': {
+            '1_17': {
                 options: {
-                    revision: '1.15'
+                    revision: '1.17'
                 }
             }
         },

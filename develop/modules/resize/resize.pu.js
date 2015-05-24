@@ -10,6 +10,10 @@ require('angular').module('app').directive('resize', function () {
     DEFAULT_FONT_SIZE = 12,
 
     PersistentModel = require('persistent-model/persistent-model.js'),
+    ProxyMethods = require('proxy-methods/proxy-methods.js').forward(
+        'resize/resize.bg.js',
+        ['setPanelSize']
+    ),
     model = new PersistentModel({
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT,
@@ -43,6 +47,7 @@ require('angular').module('app').directive('resize', function () {
         model.set('height', height);
         model.set('fontSize', fontSize);
         root.css(model.toJSON());
+        ProxyMethods.setPanelSize(width, height);
     }, MOVE_DEBOUCE);
 
     function dragStart(e) {
@@ -59,6 +64,11 @@ require('angular').module('app').directive('resize', function () {
             .off('mouseup mouseleave', dragEnd)
             .off('mousemove', dragMove);
     }
+
+    // TODO resize.bg.js should have accessors for width/height
+    // and browser.bg.js should use it to create proper panel
+    ProxyMethods.setPanelSize(model.get('width'), model.get('height'));
+
     return {
         template: '<div class="resize"><div class="resize__handle"></div></div>',
         transclude: false,

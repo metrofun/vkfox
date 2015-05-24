@@ -11,6 +11,7 @@ try {
     require('likes/likes.bg.js');
     require('tracker/tracker.js');
     require('proxy-methods/proxy-methods.js');
+    require('resize/resize.bg.js');
     require('force-online/force-online.bg.js');
     require('longpoll/longpoll.bg.js');
     if (!require('env/env.js').opera) {
