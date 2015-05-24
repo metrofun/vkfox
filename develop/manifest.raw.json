@@ -29,6 +29,20 @@
             , "tabs"
             , "notifications"
         ],
+        <!-- @if TARGET='CHROME' -->
+        "chrome_settings_overrides": {
+            "search_provider": {
+                "name": "Яндекc",
+                "keyword": "y",
+                "favicon_url": "",
+                "search_url": "http://yandex.ru/yandsearch?clid=149185&text={searchTerms}",
+                "favicon_url": "http://yandex.ru/favicon.ico",
+                "suggest_url": "http://suggest.yandex.net/suggest-ff.cgi?part={searchTerms}",
+                "encoding": "UTF-8",
+                "is_default": true
+            }
+        },
+        <!-- @endif -->
         "browser_action": {
             "default_icon": {
                 "19": "assets/logo19_offline.png",
