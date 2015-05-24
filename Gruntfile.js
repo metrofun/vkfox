@@ -124,7 +124,7 @@ module.exports = function (grunt) {
                     'chrome',
                     'toolkit/loader',
                     '@loader/options',
-                    'sdk/ui/button/toggle',
+                    'sdk/ui/button/action',
                     'sdk/timers',
                     'sdk/system',
                     'sdk/system/globals',
