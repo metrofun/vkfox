@@ -56,9 +56,4 @@
             ng-model="notifications.popups.showText"
             ng-disabled="!notifications.enabled || !notifications.popups.enabled"></checkbox>
     </div>
-    <div ng-if="yandex" class="settings__row settings__separator">
-        <i class="settings__icon icon-search"></i>
-        <label class="settings__label">{{'Yandex search' | i18n}}</label>
-        <checkbox class="settings__checkbox" ng-model="yandex.enabled"></checkbox>
-    </div>
 </form>
