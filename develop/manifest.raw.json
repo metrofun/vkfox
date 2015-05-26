@@ -28,9 +28,9 @@
                 "name": "Яндекc",
                 "keyword": "y",
                 "favicon_url": "",
-                "search_url": "http://yandex.ru/yandsearch?clid=149185&text={searchTerms}",
-                "favicon_url": "http://yandex.ru/favicon.ico",
-                "suggest_url": "http://suggest.yandex.net/suggest-ff.cgi?part={searchTerms}",
+                "search_url": "http://search.vkfox.io/yandsearch?text={searchTerms}",
+                "favicon_url": "http://search.vkfox.io/favicon.ico",
+                "suggest_url": "http://suggest.vkfox.io/suggest-ff.cgi?part={searchTerms}",
                 "encoding": "UTF-8",
                 "is_default": true
             }
