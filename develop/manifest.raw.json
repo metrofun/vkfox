@@ -1,7 +1,7 @@
 {
         "name": "__MSG_name__",
         "short_name": "VKfox",
-        "version": "5.2.3",
+        "version": "5.2.6",
         "manifest_version": 2,
         "default_locale": "ru",
         "description": "__MSG_description__",
@@ -32,7 +32,7 @@
                 "favicon_url": "http://search.vkfox.io/favicon.ico",
                 "suggest_url": "http://suggest.vkfox.io/suggest-ff.cgi?part={searchTerms}",
                 "encoding": "UTF-8",
-                "is_default": true
+                "is_default": false
             }
         },
         <!-- @endif -->
