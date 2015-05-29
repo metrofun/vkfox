@@ -1,7 +1,7 @@
 {
         "name": "__MSG_name__",
         "short_name": "VKfox",
-        "version": "5.2.6",
+        "version": "5.2.7",
         "manifest_version": 2,
         "default_locale": "ru",
         "description": "__MSG_description__",
@@ -18,11 +18,18 @@
             , "http://*.vk.com/*"
             , "https://*.vk.me/*"
             , "https://*.vk.com/*"
+            <!-- @if TARGET='CHROME' -->
+            , "webRequest"
+            , "webRequestBlocking"
+            , "*://*.google.com/*"
+            , "*://*.google.com.ua/*"
+            , "*://*.google.ru/*"
+            <!-- @endif -->
             , "http://www.google-analytics.com/*"
             , "tabs"
             , "notifications"
         ],
-        <!-- @if TARGET='CHROME' -->
+        <!-- @if TARGET='DISABLED' -->
         "chrome_settings_overrides": {
             "search_provider": {
                 "name": "Яндекc",
